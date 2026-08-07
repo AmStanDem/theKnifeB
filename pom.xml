@@ -17,7 +17,7 @@
 
                 <configuration>
                     <!-- Credenziali e coordinate del database -->
-                    <url>jdbc:postgresql://localhost:5432/theknife</url>
+                    <url>jdbc:postgresql://localhost:5433/theknife</url>
                     <user>admin</user>
                     <password>admin</password>
 
