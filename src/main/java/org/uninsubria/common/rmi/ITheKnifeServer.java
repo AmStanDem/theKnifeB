@@ -16,15 +16,42 @@ import java.util.List;
  */
 public interface ITheKnifeServer extends Remote {
 
-    public UtenteDTO login(String email, String password) throws RemoteException, CredenzialiErrateException;
-    UtenteDTO registrazione(UtenteDTO utente, String passwordInChiaro) throws RemoteException;
+    // ==========================================
+    // AREA AUTENTICAZIONE
+    // ==========================================
 
-    List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws RemoteException;
+    UtenteDTO eseguiLogin(String email, String password)
+            throws RemoteException, CredenzialiErrateException;
 
+    UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
+            throws RemoteException, EmailGiaEsistenteException;
+
+    // ==========================================
+    // AREA RISTORANTI (Consultazione)
+    // ==========================================
+
+    List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
+            throws RemoteException;
+
+    RistoranteDTO getDettaglioRistorante(Integer idRistorante)
+            throws RemoteException, RistoranteNonTrovatoException;
+
+    // ==========================================
+    // AREA RECENSIONI E INTERAZIONI
+    // ==========================================
+
+    List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
+            throws RemoteException;
+
+    void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
+            throws RemoteException, OperazioneNonConsentitaException;
 
     void aggiungiPreferito(Integer idUtente, Integer idRistorante)
             throws RemoteException;
 
+    // ==========================================
+    // AREA GESTIONE (Solo per i Gestori)
+    // ==========================================
 
     void registraNuovoRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException;
@@ -32,3 +59,4 @@ public interface ITheKnifeServer extends Remote {
     void rispondiARecensione(Integer idRecensione, String testoRisposta, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException;
 }
+
