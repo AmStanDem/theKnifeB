@@ -55,13 +55,13 @@ public final class SessioneUtente {
      * @return {@code true} se l'utente loggato ha ruolo gestore
      */
     public static boolean isGestore() {
-        return isLoggato() && utenteCorrente.getRuolo() == RuoloUtente.GESTORE;
+        return isLoggato() && utenteCorrente.ruolo() == RuoloUtente.GESTORE;
     }
 
     /**
      * @return {@code true} se l'utente loggato ha ruolo cliente
      */
     public static boolean isCliente() {
-        return isLoggato() && utenteCorrente.getRuolo() == RuoloUtente.CLIENTE;
+        return isLoggato() && utenteCorrente.ruolo() == RuoloUtente.CLIENTE;
     }
 }
