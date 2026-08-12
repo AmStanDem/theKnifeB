@@ -4,10 +4,7 @@ import org.uninsubria.common.dto.FiltriRicercaDTO;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
-import org.uninsubria.common.exceptions.CredenzialiErrateException;
-import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
-import org.uninsubria.common.exceptions.RistoranteNonTrovatoException;
-import org.uninsubria.common.exceptions.UtenteGiaEsistenteException;
+import org.uninsubria.common.exceptions.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
