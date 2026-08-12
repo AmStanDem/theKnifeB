@@ -17,9 +17,9 @@
 
                 <configuration>
                     <!-- Credenziali e coordinate del database -->
-                    <url>${env.DB_URL}</url>
-                    <user>${env.DB_USER}</user>
-                    <password>${env.DB_PASSWORD}</password>
+                    <url>jdbc:postgresql://localhost:5433/theknife</url>
+                    <user>admin</user>
+                    <password>admin</password>
 
                     <!-- Crea il database se non esiste (se supportato dal driver) o gestisce schemi vuoti -->
                     <baselineOnMigrate>true</baselineOnMigrate>
@@ -83,11 +83,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
             <version>12.11.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
