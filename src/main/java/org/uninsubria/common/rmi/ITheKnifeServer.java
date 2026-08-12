@@ -3,6 +3,7 @@ package org.uninsubria.common.rmi;
 import org.uninsubria.common.dto.FiltriRicercaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.CredenzialiErrateException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public interface ITheKnifeServer extends Remote {
 
-    public UtenteDTO login(String email, String password) throws RemoteException;
+    public UtenteDTO login(String email, String password) throws RemoteException, CredenzialiErrateException;
     UtenteDTO registrazione(UtenteDTO utente, String passwordInChiaro) throws RemoteException;
 
     List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws RemoteException;
