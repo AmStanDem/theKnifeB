@@ -3,6 +3,8 @@ package org.uninsubria.common.rmi;
 import org.uninsubria.common.dto.FiltriRicercaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.dto.RecensioneDTO;
+import org.uninsubria.common.exceptions.TheKnifeException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -18,4 +20,14 @@ public interface ITheKnifeServer extends Remote {
     UtenteDTO registrazione(UtenteDTO utente, String passwordInChiaro) throws RemoteException;
 
     List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws RemoteException;
+
+    RistoranteDTO getDettaglioRistorante(Integer idRistorante)
+            throws RemoteException, RistoranteNonTrovatoException;
+
+
+    List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
+            throws RemoteException;
+    void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
+            throws RemoteException, OperazioneNonConsentitaException;
+
 }
