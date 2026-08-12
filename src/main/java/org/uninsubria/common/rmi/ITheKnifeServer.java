@@ -1,10 +1,13 @@
 package org.uninsubria.common.rmi;
 
 import org.uninsubria.common.dto.FiltriRicercaDTO;
+import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
+import org.uninsubria.common.exceptions.RistoranteNonTrovatoException;
+import org.uninsubria.common.exceptions.UtenteGiaEsistenteException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -24,7 +27,7 @@ public interface ITheKnifeServer extends Remote {
             throws RemoteException, CredenzialiErrateException;
 
     UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
-            throws RemoteException, EmailGiaEsistenteException;
+            throws RemoteException, UtenteGiaEsistenteException;
 
     // ==========================================
     // AREA RISTORANTI (Consultazione)
