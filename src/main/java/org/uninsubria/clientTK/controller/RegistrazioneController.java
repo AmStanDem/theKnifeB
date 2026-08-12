@@ -1,7 +1,7 @@
-package org.uninsubria.menuprova.controller;
+package org.uninsubria.clientTK.controller;
 
 import javafx.fxml.FXML;
-import org.uninsubria.menuprova.util.SceneManager;
+import org.uninsubria.clientTK.util.SceneManager;
 
 import java.io.IOException;
 

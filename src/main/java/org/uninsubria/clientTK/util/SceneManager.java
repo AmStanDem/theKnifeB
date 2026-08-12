@@ -1,4 +1,4 @@
-package org.uninsubria.menuprova.util;
+package org.uninsubria.clientTK.util;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

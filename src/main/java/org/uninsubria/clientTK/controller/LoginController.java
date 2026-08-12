@@ -1,12 +1,12 @@
-package org.uninsubria.menuprova.controller;
+package org.uninsubria.clientTK.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import org.uninsubria.menuprova.util.SceneManager;
-import org.uninsubria.menuprova.util.ServerConnection;
-import org.uninsubria.menuprova.util.SessioneUtente;
+import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.exceptions.CredenzialiErrateException;
 

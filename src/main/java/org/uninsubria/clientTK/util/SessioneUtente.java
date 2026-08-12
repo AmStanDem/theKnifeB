@@ -1,4 +1,4 @@
-package org.uninsubria.menuprova.util;
+package org.uninsubria.clientTK.util;
 
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.enums.RuoloUtente;

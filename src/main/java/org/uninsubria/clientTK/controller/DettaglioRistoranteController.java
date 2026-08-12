@@ -1,8 +1,8 @@
-package org.uninsubria.menuprova.controller;
+package org.uninsubria.clientTK.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import org.uninsubria.menuprova.util.SceneManager;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
 import java.io.IOException;

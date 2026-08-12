@@ -1,18 +1,16 @@
-package org.uninsubria.menuprova.controller;
+package org.uninsubria.clientTK.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import org.uninsubria.menuprova.util.SceneManager;
-import org.uninsubria.menuprova.util.ServerConnection;
-import org.uninsubria.menuprova.util.SessioneUtente;
+import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
 
 import java.io.IOException;
@@ -20,30 +18,29 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 /**
- * Controller della schermata "Le mie recensioni", riservata ai clienti
- * registrati: elenca le recensioni scritte dall'utente (con il ristorante
- * di riferimento e l'eventuale risposta del gestore) e permette di
- * modificarle o eliminarle.
+ * Controller della schermata "Recensioni ricevute", riservata ai gestori
+ * registrati: elenca le recensioni relative ai ristoranti dell'utente e
+ * permette di rispondere a ciascuna (al massimo una risposta per recensione).
  *
  * @author TheKnife Team
  */
-public class MieRecensioniController {
+public class RecensioniGestoreController {
 
     @FXML
     private TableView<RecensioneDTO> tabellaRecensioni;
     @FXML
     private TableColumn<RecensioneDTO, String> colRistorante;
     @FXML
+    private TableColumn<RecensioneDTO, String> colCliente;
+    @FXML
     private TableColumn<RecensioneDTO, String> colStelle;
     @FXML
-    private TableColumn<RecensioneDTO, String> colData;
+    private TableColumn<RecensioneDTO, String> colTesto;
     @FXML
     private TableColumn<RecensioneDTO, String> colRisposta;
 
     @FXML
-    private TextArea areaTesto;
-    @FXML
-    private Spinner<Integer> spinnerStelle;
+    private TextArea areaRisposta;
     @FXML
     private Label labelMessaggio;
 
@@ -51,21 +48,20 @@ public class MieRecensioniController {
     private void initialize() {
         colRistorante.setCellValueFactory(dato ->
                 new SimpleStringProperty(dato.getValue().getNomeRistorante()));
+        colCliente.setCellValueFactory(dato ->
+                new SimpleStringProperty(dato.getValue().getAutoreNome()));
         colStelle.setCellValueFactory(dato ->
                 new SimpleStringProperty(String.valueOf(dato.getValue().getStelle())));
-        colData.setCellValueFactory(dato ->
-                new SimpleStringProperty(String.valueOf(dato.getValue().getData())));
+        colTesto.setCellValueFactory(dato ->
+                new SimpleStringProperty(dato.getValue().getTesto()));
         colRisposta.setCellValueFactory(dato -> {
             String risposta = dato.getValue().getRisposta();
             return new SimpleStringProperty(risposta == null || risposta.isBlank() ? "-" : risposta);
         });
 
-        spinnerStelle.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 5));
-
         tabellaRecensioni.getSelectionModel().selectedItemProperty().addListener((oss, vecchia, nuova) -> {
             if (nuova != null) {
-                areaTesto.setText(nuova.getTesto());
-                spinnerStelle.getValueFactory().setValue(nuova.getStelle());
+                areaRisposta.setText(nuova.getRisposta() == null ? "" : nuova.getRisposta());
             }
         });
 
@@ -75,7 +71,7 @@ public class MieRecensioniController {
     private void caricaRecensioni() {
         try {
             ObservableList<RecensioneDTO> recensioni = FXCollections.observableArrayList(
-                    ServerConnection.getServer().recensioniUtente(SessioneUtente.getUtenteCorrente()));
+                    ServerConnection.getServer().recensioniRicevute(SessioneUtente.getUtenteCorrente()));
             tabellaRecensioni.setItems(recensioni);
         } catch (RemoteException | NotBoundException e) {
             labelMessaggio.setText("Impossibile contattare il server: " + e.getMessage());
@@ -83,39 +79,24 @@ public class MieRecensioniController {
     }
 
     @FXML
-    private void onModifica() {
+    private void onInviaRisposta() {
         RecensioneDTO selezionata = tabellaRecensioni.getSelectionModel().getSelectedItem();
         if (selezionata == null) {
             labelMessaggio.setText("Seleziona prima una recensione dall'elenco.");
             return;
         }
-        String nuovoTesto = areaTesto.getText();
-        int nuoveStelle = spinnerStelle.getValue();
-
-        try {
-            ServerConnection.getServer().modificaRecensione(
-                    SessioneUtente.getUtenteCorrente(), selezionata.getId(), nuoveStelle, nuovoTesto);
-            labelMessaggio.setText("Recensione aggiornata.");
-            caricaRecensioni();
-        } catch (RemoteException | NotBoundException e) {
-            labelMessaggio.setText("Impossibile salvare le modifiche: " + e.getMessage());
-        }
-    }
-
-    @FXML
-    private void onElimina() {
-        RecensioneDTO selezionata = tabellaRecensioni.getSelectionModel().getSelectedItem();
-        if (selezionata == null) {
-            labelMessaggio.setText("Seleziona prima una recensione dall'elenco.");
+        String testoRisposta = areaRisposta.getText();
+        if (testoRisposta.isBlank()) {
+            labelMessaggio.setText("La risposta non può essere vuota.");
             return;
         }
         try {
-            ServerConnection.getServer().eliminaRecensione(SessioneUtente.getUtenteCorrente(), selezionata.getId());
-            areaTesto.clear();
-            labelMessaggio.setText("Recensione eliminata.");
+            ServerConnection.getServer().rispostaRecensione(
+                    SessioneUtente.getUtenteCorrente(), selezionata.getId(), testoRisposta);
+            labelMessaggio.setText("Risposta inviata.");
             caricaRecensioni();
         } catch (RemoteException | NotBoundException e) {
-            labelMessaggio.setText("Impossibile eliminare la recensione: " + e.getMessage());
+            labelMessaggio.setText("Impossibile inviare la risposta: " + e.getMessage());
         }
     }
 

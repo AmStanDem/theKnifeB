@@ -1,4 +1,4 @@
-package org.uninsubria.menuprova.util;
+package org.uninsubria.clientTK.util;
 
 import org.uninsubria.common.rmi.ITheKnifeServer;
 
