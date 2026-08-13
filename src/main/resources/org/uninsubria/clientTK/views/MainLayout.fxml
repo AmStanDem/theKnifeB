@@ -11,13 +11,14 @@
 <BorderPane prefHeight="768.0" prefWidth="1024.0" style="-fx-background-color: -color-bg-default;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
 
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: -color-bg-overlay; -fx-border-color: -color-border-default; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+        <!-- Rimossa la variabile colore hardcoded dal Border. Usiamo solo classi o background standard -->
+        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
             </padding>
             <children>
-                <!-- Brand Identity -->
-                <Label styleClass="title-2" text="The Knife" textFill="-color-primary-emphasis" />
+                <!-- Brand Identity: textFill rimosso, il colore verrà dato dalla classe accent in CSS -->
+                <Label styleClass="title-2, accent" text="The Knife" />
 
                 <!-- Spacer elastico per spingere i bottoni verso destra -->
                 <Region HBox.hgrow="ALWAYS" />
