@@ -1,112 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.uninsubria</groupId>
     <artifactId>theKnifeB</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.2.1</version>
 
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>${project.basedir}/.env</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>12.11.0</version>
-
-                <configuration>
-                    <url>${DB_URL}</url>
-                    <user>${DB_USER}</user>
-                    <password>${DB_PASSWORD}</password>
-                    <baselineOnMigrate>true</baselineOnMigrate>
-                </configuration>
-
-                <dependencies>
-                    <!-- Driver nativo per PostgreSQL -->
-                    <dependency>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>42.7.13</version>
-                    </dependency>
-                </dependencies>
-
-                <executions>
-                    <execution>
-                        <id>esegui-migrazioni-flyway</id>
-                        <!-- Esegue le migrazioni prima di compilare il codice Java -->
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- ===================================================== -->
+    <!-- PROPERTIES                                            -->
+    <!-- ===================================================== -->
 
     <properties>
+
+        <!-- Java -->
         <maven.compiler.source>26</maven.compiler.source>
         <maven.compiler.target>26</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- JavaFX -->
+        <javafx.version>23.0.2</javafx.version>
+
+        <!-- PostgreSQL -->
+        <postgresql.version>42.7.13</postgresql.version>
+
+        <!-- Flyway -->
+        <flyway.version>12.11.0</flyway.version>
+
     </properties>
+
+
+    <!-- ===================================================== -->
+    <!-- DEPENDENCIES                                          -->
+    <!-- ===================================================== -->
+
     <dependencies>
-        <!-- Driver JDBC PostgreSQL -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.13</version> <!-- latest LTS -->
-        </dependency>
-        <!-- JAVAFX -->
+
+        <!-- ==================== -->
+        <!-- JavaFX               -->
+        <!-- ==================== -->
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>27-ea+25</version>
+            <version>${javafx.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>27-ea+25</version>
+            <version>${javafx.version}</version>
         </dependency>
-        <!-- Core Flyway -->
+
+
+        <!-- ==================== -->
+        <!-- PostgreSQL            -->
+        <!-- ==================== -->
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+        </dependency>
+
+
+        <!-- ==================== -->
+        <!-- Flyway                -->
+        <!-- ==================== -->
+
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>12.11.0</version>
+            <version>${flyway.version}</version>
         </dependency>
 
-        <!-- Support for PostgreSQL -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>12.11.0</version>
+            <version>${flyway.version}</version>
         </dependency>
+
+
+        <!-- ==================== -->
+        <!-- AtlantaFX            -->
+        <!-- ==================== -->
 
         <dependency>
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
             <version>2.1.0</version>
         </dependency>
+
     </dependencies>
+
+
+    <!-- ===================================================== -->
+    <!-- BUILD                                                  -->
+    <!-- ===================================================== -->
+
+    <build>
+
+        <plugins>
+
+            <!-- ============================== -->
+            <!-- JavaFX                         -->
+            <!-- ============================== -->
+
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+
+                <configuration>
+                    <mainClass>org.example.Main</mainClass>
+                </configuration>
+            </plugin>
+
+
+            <!-- ============================== -->
+            <!-- Maven Compiler                  -->
+            <!-- ============================== -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+
+                <configuration>
+                    <source>26</source>
+                    <target>26</target>
+                </configuration>
+            </plugin>
+
+
+            <!-- ============================== -->
+            <!-- Flyway                          -->
+            <!-- ============================== -->
+            <!--
+                Flyway NON viene eseguito automaticamente
+                durante javafx:run.
+
+                Per eseguire le migrazioni manualmente:
+                    mvn flyway:migrate
+
+                Questo richiede il file .env.
+            -->
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway.version}</version>
+
+                <configuration>
+
+                    <url>${DB_URL}</url>
+                    <user>${DB_USER}</user>
+                    <password>${DB_PASSWORD}</password>
+
+                    <baselineOnMigrate>true</baselineOnMigrate>
+
+                </configuration>
+
+                <dependencies>
+
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.version}</version>
+                    </dependency>
+
+                </dependencies>
+
+            </plugin>
+
+        </plugins>
+
+    </build>
 
 </project>
