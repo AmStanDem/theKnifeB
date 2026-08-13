@@ -1,6 +1,6 @@
 <div align="center">
 
-![Anteprima Logo](theknife.png "logo")
+![Anteprima Logo](long_logo.png "logo")
 
 </div>
 
