@@ -1,7 +1,5 @@
 <div align="center">
-
-![Anteprima Logo](long_logo.png "logo")
-
+  <img src="long_logo.png" alt="Anteprima Logo" title="logo" width="800" />
 </div>
 
 **Breve descrizione**: Questo è il progetto "theknife.TheKnife", un clone della famosa app TheFork come esercizio universitario
