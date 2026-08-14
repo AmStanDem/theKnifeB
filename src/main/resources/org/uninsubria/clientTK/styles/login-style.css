@@ -1,0 +1,136 @@
+/* ===================== COLORI BASE ===================== */
+* {
+    -fx-primary-green: #4CAF3B;
+    -fx-light-green: #7ED957;
+    -fx-dark-green: #0B3B2C;
+    -fx-darker-green: #082A20;
+    -fx-text-dark: #0F2A20;
+    -fx-text-gray: #5C7A6E;
+    -fx-border-gray: #D3DFD8;
+}
+
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ===================== PANNELLO SINISTRO ===================== */
+.left-panel {
+    -fx-background-color: #FFFFFF;
+}
+
+.logo-mark {
+    -fx-min-width: 28;
+    -fx-min-height: 28;
+}
+
+.logo-text {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.title-label {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.subtitle-label {
+    -fx-font-size: 15px;
+    -fx-text-fill: -fx-text-gray;
+}
+
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.text-input {
+    -fx-pref-height: 44px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: -fx-border-gray;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0 14 0 14;
+    -fx-font-size: 14px;
+}
+
+.text-input:focused {
+    -fx-border-color: -fx-primary-green;
+}
+
+.remember-checkbox {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.forgot-link {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-primary-green;
+    -fx-font-weight: 600;
+    -fx-border-width: 0;
+    -fx-underline: true;
+}
+
+.sign-in-button {
+    -fx-pref-height: 44px;
+    -fx-background-color: -fx-primary-green;
+    -fx-background-radius: 8px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.sign-in-button:hover {
+    -fx-background-color: #3E9330;
+}
+
+.google-button {
+    -fx-pref-height: 44px;
+    -fx-background-color: white;
+    -fx-border-color: -fx-border-gray;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: -fx-text-dark;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+}
+
+.google-button:hover {
+    -fx-background-color: #F9FAFB;
+}
+
+.signup-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-gray;
+}
+
+.signup-link {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-primary-green;
+    -fx-font-weight: bold;
+    -fx-border-width: 0;
+    -fx-underline: true;
+}
+
+/* ===================== PANNELLO DESTRO ===================== */
+.right-panel {
+    -fx-background-color: linear-gradient(to bottom right, -fx-dark-green, -fx-darker-green);
+}
+
+.illustration-circle {
+    -fx-background-color: rgba(76,175,59,0.18);
+    -fx-background-radius: 130px;
+    -fx-border-color: rgba(126,217,87,0.35);
+    -fx-border-width: 2px;
+    -fx-border-radius: 130px;
+}
+
+.illustration-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-text-fill: white;
+}
