@@ -42,9 +42,9 @@
             <children>
 
                 <Button fx:id="btnAreaPersonale" layoutX="119.0" layoutY="377.0" mnemonicParsing="false" onAction="#onAreaPersonaleClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Registrati" />
-            <PasswordField layoutX="259.0" layoutY="292.0" prefHeight="38.0" prefWidth="232.0" text="sdsdsds" />
+            <PasswordField layoutX="259.0" layoutY="292.0" prefHeight="38.0" prefWidth="232.0" text="sdsdsdds" />
             <TextField layoutX="263.0" layoutY="72.0" prefHeight="38.0" prefWidth="225.0" text="ssdsdsd" />
-            <TextArea layoutX="54.0" layoutY="73.0" prefHeight="37.0" prefWidth="177.0" text="NOME:" />
+            <TextArea layoutX="55.0" layoutY="73.0" prefHeight="14.0" prefWidth="177.0" text="NOME:" />
             <TextArea layoutX="53.0" layoutY="123.0" prefHeight="38.0" prefWidth="179.0" text="COGNOME: " />
             <TextField layoutX="262.0" layoutY="123.0" prefHeight="37.0" prefWidth="227.0" text="sdsdsdsd" />
             <TextArea layoutX="53.0" layoutY="174.0" prefHeight="38.0" prefWidth="180.0" text="RUOLO: " />

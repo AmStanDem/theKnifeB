@@ -6,6 +6,11 @@ import javafx.fxml.FXML;
 public class MainLayoutController {
 
     @FXML
+    private void onHomeClick(ActionEvent event) {
+        System.out.println("Home cliccata");
+    }
+
+    @FXML
     private void onRicercaClick(ActionEvent event) {
         System.out.println("Ricerca cliccata");
     }
