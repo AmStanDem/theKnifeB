@@ -2,40 +2,85 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
 
-<BorderPane prefHeight="768.0" prefWidth="1024.0" style="-fx-background-color: -color-bg-default;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
+<BorderPane prefHeight="768.0" prefWidth="1024.0"
+            style="-fx-background-color: -color-bg-default;"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
 
     <top>
-        <!-- Rimossa la variabile colore hardcoded dal Border. Usiamo solo classi o background standard -->
-        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
-            </padding>
-            <children>
-                <!-- Brand Identity: textFill rimosso, il colore verrà dato dalla classe accent in CSS -->
-                <Label styleClass="title-2, accent" text="The Knife" />
+        <HBox alignment="CENTER_LEFT"
+              spacing="20.0"
+              style="-fx-background-color: #1A1A1E;"
+              BorderPane.alignment="CENTER">
 
-                <!-- Spacer elastico per spingere i bottoni verso destra -->
+            <padding>
+                <Insets bottom="15.0"
+                        left="25.0"
+                        right="25.0"
+                        top="15.0" />
+            </padding>
+
+            <children>
+
+                <ImageView fitHeight="133.0"
+                           fitWidth="441.0"
+                           preserveRatio="true">
+                    <image>
+                        <Image url="/images/img_1.png" />
+                    </image>
+                </ImageView>
+
                 <Region HBox.hgrow="ALWAYS" />
 
-                <!-- Controlli di Navigazione Globali -->
-                <Button mnemonicParsing="false" onAction="#onHomeClick" styleClass="flat" text="Esplora" />
-                <Button mnemonicParsing="false" onAction="#onRicercaClick" styleClass="flat" text="Cerca" />
-
-                <!-- Bottone di Stato (Dinamico in base alla sessione) -->
-                <Button fx:id="btnAreaPersonale" mnemonicParsing="false" onAction="#onAreaPersonaleClick" styleClass="accent" text="Accedi / Registrati" />
             </children>
         </HBox>
     </top>
 
-    <center>
-        <!-- Nodo Contenitore: qui verranno iniettate le viste figlie -->
-        <StackPane fx:id="contentArea" BorderPane.alignment="CENTER" />
-    </center>
+    <left>
+        <AnchorPane prefHeight="605.0"
+                    prefWidth="1019.0"
+                    BorderPane.alignment="CENTER">
+
+            <children>
+
+                <Button layoutX="357.0"
+                        layoutY="202.0"
+                        mnemonicParsing="false"
+                        onAction="#onRicercaClick"
+                        prefHeight="65.0"
+                        prefWidth="286.0"
+                        styleClass="flat"
+                        text="Esplora" />
+
+                <Button layoutX="357.0"
+                        layoutY="303.0"
+                        mnemonicParsing="false"
+                        onAction="#onRicercaClick"
+                        prefHeight="65.0"
+                        prefWidth="286.0"
+                        styleClass="flat"
+                        text="Cerca" />
+
+                <Button fx:id="btnAreaPersonale"
+                        layoutX="357.0"
+                        layoutY="415.0"
+                        mnemonicParsing="false"
+                        onAction="#onAreaPersonaleClick"
+                        prefHeight="63.0"
+                        prefWidth="285.0"
+                        styleClass="accent"
+                        text="Accedi / Registrati" />
+
+            </children>
+        </AnchorPane>
+    </left>
 
 </BorderPane>

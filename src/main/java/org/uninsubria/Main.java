@@ -12,7 +12,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
 
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/MainLayout.fxml")
+                getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
         );
 
         Parent root = loader.load();

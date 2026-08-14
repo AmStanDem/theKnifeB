@@ -13,7 +13,7 @@ public class MainClient extends Application {
     public void start(Stage stage) throws Exception {
 
         FXMLLoader loader =
-                new FXMLLoader(MainClient.class.getResource("/MainLayout.fxml"));
+                new FXMLLoader(MainClient.class.getResource("/org/uninsubria/clientTK/views/MainLayout.fxml"));
 
         Scene scene = new Scene(loader.load());
 
