@@ -1,0 +1,110 @@
+/*
+    signUp-style.css
+    Foglio di stile per SignUp.fxml
+*/
+
+.root {
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: "Segoe UI", "System";
+}
+
+/* ---------- Logo ---------- */
+
+.logo-label {
+    -fx-background-color: #3E9330;
+    -fx-background-radius: 6;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 14 6 14;
+}
+
+/* ---------- Titolo ---------- */
+
+.title-label {
+    -fx-text-fill: #222222;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* ---------- Testi informativi ---------- */
+
+.info-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
+.hint-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+}
+
+.field-label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+}
+
+/* ---------- Campi di input ---------- */
+
+.text-field,
+.password-field,
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 14px;
+}
+
+.text-field,
+.password-field {
+    -fx-padding: 10 12 10 12;
+}
+
+.text-field:focused,
+.password-field:focused,
+.combo-box:focused {
+    -fx-border-color: #1A237E;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: #333333;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+/* ---------- Pulsante principale ---------- */
+
+.primary-button {
+    -fx-background-color: #3E9330;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 12 0 12 0;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #283593;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #0D1642;
+}
+
+/* ---------- Link "Accedi" ---------- */
+
+.link-label {
+    -fx-text-fill: #1A237E;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.link-label:hover {
+    -fx-underline: true;
+}

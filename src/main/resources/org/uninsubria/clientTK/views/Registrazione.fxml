@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane prefHeight="768.0" prefWidth="1024.0" style="-fx-background-color: -color-bg-default;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.MainLayoutController">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #1A1A1E;" BorderPane.alignment="CENTER">
+
+            <padding>
+                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
+            </padding>
+
+            <children>
+
+                <ImageView fitHeight="133.0" fitWidth="441.0" preserveRatio="true">
+                    <image>
+                        <Image url="@images/img_1.png" />
+                    </image>
+                </ImageView>
+
+                <Region HBox.hgrow="ALWAYS" />
+
+            </children>
+        </HBox>
+    </top>
+
+    <left>
+        <AnchorPane prefHeight="697.0" prefWidth="1071.0" BorderPane.alignment="CENTER">
+
+            <children>
+
+                <Button fx:id="btnAreaPersonale" layoutX="119.0" layoutY="377.0" mnemonicParsing="false" onAction="#onAreaPersonaleClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Registrati" />
+            <PasswordField layoutX="259.0" layoutY="292.0" prefHeight="38.0" prefWidth="232.0" text="sdsdsds" />
+            <TextField layoutX="263.0" layoutY="72.0" prefHeight="38.0" prefWidth="225.0" text="ssdsdsd" />
+            <TextArea layoutX="54.0" layoutY="73.0" prefHeight="37.0" prefWidth="177.0" text="NOME:" />
+            <TextArea layoutX="53.0" layoutY="123.0" prefHeight="38.0" prefWidth="179.0" text="COGNOME: " />
+            <TextField layoutX="262.0" layoutY="123.0" prefHeight="37.0" prefWidth="227.0" text="sdsdsdsd" />
+            <TextArea layoutX="53.0" layoutY="174.0" prefHeight="38.0" prefWidth="180.0" text="RUOLO: " />
+            <ChoiceBox layoutX="261.0" layoutY="174.0" prefHeight="37.0" prefWidth="228.0" />
+            <TextArea layoutX="53.0" layoutY="236.0" prefHeight="38.0" prefWidth="180.0" text="EMAIL:" />
+            <TextField layoutX="261.0" layoutY="236.0" prefHeight="37.0" prefWidth="227.0" text="SDSDSD" />
+            <TextArea layoutX="52.0" layoutY="292.0" prefHeight="38.0" prefWidth="181.0" text="PASSWORD:" />
+
+            </children>
+        </AnchorPane>
+    </left>
+
+</BorderPane>
