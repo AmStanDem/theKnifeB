@@ -25,7 +25,7 @@
 <AnchorPane prefHeight="720.0" prefWidth="600.0"
             stylesheets="@../styles/signUp-style.css"
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.SignUpController">
+            fx:controller="org.uninsubria.clientTK.controller.SignUpController">
 
     <ScrollPane fitToWidth="true" style="-fx-background: white; -fx-background-color: transparent;"
                 AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
