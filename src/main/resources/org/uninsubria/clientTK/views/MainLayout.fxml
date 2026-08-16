@@ -9,8 +9,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 
-<BorderPane prefHeight="768.0" prefWidth="1024.0"
-            style="-fx-background-color: -color-bg-default;"
+<BorderPane prefHeight="768.0"
+            prefWidth="1024.0"
+            styleClass="root"
+            stylesheets="@../styles/main-layout.css"
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
@@ -18,7 +20,7 @@
     <top>
         <HBox alignment="CENTER_LEFT"
               spacing="20.0"
-              style="-fx-background-color: #1A1A1E;"
+              styleClass="header"
               BorderPane.alignment="CENTER">
 
             <padding>
@@ -33,14 +35,17 @@
                 <ImageView fitHeight="133.0"
                            fitWidth="441.0"
                            preserveRatio="true">
+
                     <image>
                         <Image url="/images/img_1.png" />
                     </image>
+
                 </ImageView>
 
                 <Region HBox.hgrow="ALWAYS" />
 
             </children>
+
         </HBox>
     </top>
 
@@ -80,6 +85,7 @@
                         text="Accedi / Registrati" />
 
             </children>
+
         </AnchorPane>
     </left>
 

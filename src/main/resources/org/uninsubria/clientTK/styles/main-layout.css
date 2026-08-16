@@ -1,0 +1,43 @@
+.root {
+    -fx-background-color: #F5F5F5;
+}
+
+.header {
+    -fx-background-color: #1A1A1E;
+}
+
+.flat {
+    -fx-background-color: #E8E8E8;
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.flat:hover {
+    -fx-background-color: #D5D5D5;
+}
+
+.flat:pressed {
+    -fx-background-color: #C5C5C5;
+}
+
+.accent {
+    -fx-background-color: #D94A4A;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.accent:hover {
+    -fx-background-color: #C43F3F;
+}
+
+.accent:pressed {
+    -fx-background-color: #AA3535;
+}
