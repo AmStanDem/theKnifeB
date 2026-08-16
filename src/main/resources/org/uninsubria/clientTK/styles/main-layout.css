@@ -25,7 +25,7 @@
 }
 
 .accent {
-    -fx-background-color: #D94A4A;
+    -fx-background-color: #3E9330;
     -fx-text-fill: white;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
@@ -35,9 +35,9 @@
 }
 
 .accent:hover {
-    -fx-background-color: #C43F3F;
+    -fx-background-color: #3E9330;
 }
 
 .accent:pressed {
-    -fx-background-color: #AA3535;
+    -fx-background-color: #3E9330;
 }
