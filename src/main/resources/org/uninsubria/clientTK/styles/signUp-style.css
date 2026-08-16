@@ -1,71 +1,128 @@
-/*
-    signUp-style.css
-    Foglio di stile per SignUp.fxml
-*/
-
 .root {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #F4F6F3;
     -fx-font-family: "Segoe UI", "System";
 }
 
-/* ---------- Logo ---------- */
+/* =========================================================
+   SFONDO
+   ========================================================= */
+
+.main-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.main-scroll > .viewport {
+    -fx-background-color: #F4F6F3;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.signup-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(0, 0, 0, 0.12),
+                    20,
+                    0.15,
+                    0,
+                    5
+            );
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
 
 .logo-container {
     -fx-background-color: #3E9330;
-    -fx-background-radius: 10;
-    -fx-padding: 15;
+
+    -fx-background-radius: 50;
+
+    -fx-min-width: 100;
+    -fx-min-height: 100;
+
+    -fx-max-width: 100;
+    -fx-max-height: 100;
+
+    -fx-alignment: center;
 }
 
-/* ---------- Titolo ---------- */
+
+/* =========================================================
+   TITOLO
+   ========================================================= */
 
 .title-label {
     -fx-text-fill: #222222;
-    -fx-font-size: 24px;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
 }
 
-/* ---------- Testi informativi ---------- */
+
+/* =========================================================
+   TESTI
+   ========================================================= */
 
 .info-label {
-    -fx-text-fill: #666666;
+    -fx-text-fill: #777777;
     -fx-font-size: 12px;
 }
 
 .hint-label {
-    -fx-text-fill: #888888;
+    -fx-text-fill: #999999;
     -fx-font-size: 11px;
 }
 
 .field-label {
     -fx-text-fill: #333333;
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
 }
 
-/* ---------- Campi di input ---------- */
+
+/* =========================================================
+   CAMPI
+   ========================================================= */
 
 .text-field,
 .password-field,
 .combo-box {
-    -fx-background-color: white;
-    -fx-border-color: #CCCCCC;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
+    -fx-background-color: #FAFAFA;
+
+    -fx-border-color: #D5D8D5;
+    -fx-border-width: 1;
+
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+
     -fx-font-size: 14px;
 }
 
 .text-field,
 .password-field {
-    -fx-padding: 10 12 10 12;
+    -fx-padding: 11 14 11 14;
 }
 
 .text-field:focused,
 .password-field:focused,
 .combo-box:focused {
-    -fx-border-color: #1A237E;
+    -fx-background-color: white;
+    -fx-border-color: #3E9330;
+    -fx-border-width: 1.5;
 }
 
 .combo-box .list-cell {
-    -fx-padding: 8 12 8 12;
+    -fx-padding: 9 12 9 12;
     -fx-text-fill: #333333;
 }
 
@@ -73,30 +130,50 @@
     -fx-background-color: transparent;
 }
 
-/* ---------- Pulsante principale ---------- */
+
+/* =========================================================
+   SEPARATOR
+   ========================================================= */
+
+.separator .line {
+    -fx-border-color: #E5E5E5;
+    -fx-border-width: 1 0 0 0;
+}
+
+
+/* =========================================================
+   PULSANTE
+   ========================================================= */
 
 .primary-button {
     -fx-background-color: #3E9330;
     -fx-text-fill: white;
+
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-background-radius: 6;
-    -fx-padding: 12 0 12 0;
+
+    -fx-background-radius: 8;
+
+    -fx-padding: 12 20 12 20;
+
     -fx-cursor: hand;
 }
 
 .primary-button:hover {
-    -fx-background-color: #283593;
+    -fx-background-color: #347D29;
 }
 
 .primary-button:pressed {
-    -fx-background-color: #0D1642;
+    -fx-background-color: #286321;
 }
 
-/* ---------- Link "Accedi" ---------- */
+
+/* =========================================================
+   LINK
+   ========================================================= */
 
 .link-label {
-    -fx-text-fill: #1A237E;
+    -fx-text-fill: #3E9330;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
