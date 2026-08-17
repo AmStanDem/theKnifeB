@@ -60,15 +60,6 @@
             </VBox.margin>
         </PasswordField>
 
-        <!-- Remember me / Forgot password -->
-        <HBox alignment="CENTER_LEFT">
-            <CheckBox fx:id="rememberCheckBox" styleClass="remember-checkbox" text="Remember for 30 days"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Hyperlink styleClass="forgot-link" text="Forgot password"/>
-            <VBox.margin>
-                <Insets bottom="24"/>
-            </VBox.margin>
-        </HBox>
 
         <!-- Sign in button -->
         <Button fx:id="signInButton" styleClass="sign-in-button" text="Sign in" maxWidth="Infinity"
@@ -93,8 +84,8 @@
     <StackPane styleClass="right-panel" prefWidth="560" HBox.hgrow="NEVER">
         <VBox alignment="CENTER" spacing="24">
             <StackPane styleClass="illustration-circle" prefWidth="240" prefHeight="240">
-                <ImageView fitWidth="130" fitHeight="130" preserveRatio="true">
-                    <Image url="@assets/logo.png"/>
+                <ImageView fitWidth="240" fitHeight="240" preserveRatio="true">
+                    <Image url="/images/img_1.png"/>
                 </ImageView>
             </StackPane>
             <Label styleClass="illustration-text" text="Fresh ingredients, honest recipes" wrapText="true"
