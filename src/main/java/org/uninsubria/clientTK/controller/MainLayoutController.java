@@ -48,7 +48,7 @@ public class MainLayoutController {
     }
 
     @FXML
-        public void onRicercaAvanzataClick(MouseEvent mouseEvent) {
+    public void onRicercaAvanzataClick(MouseEvent mouseEvent) {
         try {
             Stage stage = (Stage) ((Node) mouseEvent.getSource())
                     .getScene()

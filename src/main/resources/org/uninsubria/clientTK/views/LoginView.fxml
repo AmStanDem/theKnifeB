@@ -31,7 +31,7 @@
             <ImageView fitWidth="34" fitHeight="34" preserveRatio="true">
                 <Image url="@../../../../images/logo.png"  />
             </ImageView>
-            <Label styleClass="logo-text" text="TheGreenKitchen"/>
+            <Label styleClass="logo-text" text="TheKnife"/>
         </HBox>
 
         <Region VBox.vgrow="ALWAYS" prefHeight="50" maxHeight="90"/>
