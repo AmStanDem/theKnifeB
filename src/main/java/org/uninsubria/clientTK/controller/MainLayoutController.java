@@ -48,15 +48,15 @@ public class MainLayoutController {
     }
 
     @FXML
-    public void onRicercaAvanzataClick(MouseEvent mouseEvent) {
+    public void onRicercaAvanzataClick(ActionEvent actionEvent) {
         try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
                     .getScene()
                     .getWindow();
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RicercaAvanzata.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml")
                     )
             ));
 

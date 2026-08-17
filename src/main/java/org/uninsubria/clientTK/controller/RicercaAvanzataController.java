@@ -44,7 +44,11 @@ public class RicercaAvanzataController {
     }
 
     @FXML
-    private void onGeolocalizzazioneClick() {
+    private void cercaRistorante() {
+    }
+
+    @FXML
+    private void reimpostaFiltri() {
     }
 
     @FXML

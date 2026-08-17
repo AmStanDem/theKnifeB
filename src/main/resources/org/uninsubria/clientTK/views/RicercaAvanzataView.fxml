@@ -23,8 +23,8 @@
 -->
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="@\..\..\..\..\clientTK\controller\RicercaAvanzataController.java"
-            stylesheets="@ricerca-avanzata.css"
+            fx:controller="org.uninsubria.clientTK.controller.RicercaAvanzataController"
+            stylesheets="@../styles/main-layout.css"
             styleClass="root-pane">
 
     <!-- ===================== HEADER ===================== -->
@@ -58,7 +58,7 @@
                         <Insets top="24" right="28" bottom="24" left="28"/>
                     </padding>
 
-                    <!-- ---- Localita (obbligatorio) ---- -->
+                    <!--- Localita (obbligatorio) - -->
                     <VBox spacing="6" styleClass="field-group">
                         <Label text="Località *" styleClass="field-label"/>
                         <TextField fx:id="txtLocalita"
@@ -69,7 +69,7 @@
 
                     <Separator/>
 
-                    <!-- ---- Tipologia di cucina ---- -->
+                    <!--- Tipologia di cucina - -->
                     <VBox spacing="6" styleClass="field-group">
                         <Label text="Tipologia di cucina" styleClass="field-label"/>
                         <ComboBox fx:id="cmbTipologiaCucina"
@@ -81,7 +81,7 @@
 
                     <Separator/>
 
-                    <!-- ---- Fascia di prezzo ---- -->
+                    <!--- Fascia di prezzo -->
                     <VBox spacing="8" styleClass="field-group">
                         <Label text="Fascia di prezzo" styleClass="field-label"/>
                         <RangeSlider fx:id="rangeSliderPrezzo"
@@ -101,7 +101,7 @@
 
                     <Separator/>
 
-                    <!-- ---- Servizi disponibili ---- -->
+                    <!--- Servizi disponibili - -->
                     <VBox spacing="10" styleClass="field-group">
                         <Label text="Servizi disponibili" styleClass="field-label"/>
                         <HBox spacing="24">
@@ -112,7 +112,7 @@
 
                     <Separator/>
 
-                    <!-- ---- Valutazione minima (stelle) ---- -->
+                    <!-- - Valutazione minima (stelle) - -->
                     <VBox spacing="8" styleClass="field-group">
                         <Label text="Valutazione minima" styleClass="field-label"/>
                         <HBox alignment="CENTER_LEFT" spacing="10">
