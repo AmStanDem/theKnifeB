@@ -34,28 +34,17 @@
 
             <children>
 
-                <!-- LOGO A SINISTRA -->
                 <ImageView fitHeight="133.0"
                            fitWidth="441.0"
                            preserveRatio="true">
 
                     <image>
-                        <Image url="@../../../../images/img_1.png" />
+                        <Image url="@../../../../images/img_1.png"  />
                     </image>
 
                 </ImageView>
 
-                <!-- SPAZIO CHE SPINGE IL PULSANTE A DESTRA -->
                 <Region HBox.hgrow="ALWAYS" />
-
-                <!-- PULSANTE REGISTRAZIONE IN ALTO A DESTRA -->
-                <Button fx:id="btnAreaPersonale"
-                        mnemonicParsing="false"
-                        onAction="#onAreaPersonaleClick"
-                        prefHeight="63.0"
-                        prefWidth="285.0"
-                        styleClass="accent"
-                        text="Accedi / Registrati" />
 
             </children>
 
@@ -75,6 +64,12 @@
 
                     <children>
 
+                        <Button mnemonicParsing="false"
+                                onAction="#onRicercaClick"
+                                prefHeight="65.0"
+                                prefWidth="286.0"
+                                styleClass="flat"
+                                text="Esplora" />
 
                         <Button mnemonicParsing="false"
                                 onAction="#onRicercaClick"
@@ -83,7 +78,13 @@
                                 styleClass="flat"
                                 text="Cerca" />
 
-
+                        <Button fx:id="btnAreaPersonale"
+                                mnemonicParsing="false"
+                                onAction="#onAreaPersonaleClick"
+                                prefHeight="63.0"
+                                prefWidth="285.0"
+                                styleClass="accent"
+                                text="Accedi / Registrati" />
 
                     </children>
 

@@ -11,10 +11,6 @@ import java.io.IOException;
 
 public class MainLayoutController {
 
-    @FXML
-    private void onHomeClick(ActionEvent event) {
-        System.out.println("Home cliccata");
-    }
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
