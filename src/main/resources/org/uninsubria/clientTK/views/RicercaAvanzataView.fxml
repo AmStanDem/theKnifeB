@@ -24,7 +24,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.clientTK.controller.RicercaAvanzataController"
-            stylesheets="@../styles/main-layout.css"
+            stylesheets="@../styles/ricerca-avanzata.css"
             styleClass="root-pane">
 
     <!-- ===================== HEADER ===================== -->
