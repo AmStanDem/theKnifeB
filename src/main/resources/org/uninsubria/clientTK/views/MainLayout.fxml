@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -45,10 +46,10 @@
 
                 </ImageView>
 
-                <!-- SPAZIO CHE SPINGE IL PULSANTE A DESTRA -->
+                <!-- SPAZIO -->
                 <Region HBox.hgrow="ALWAYS" />
 
-                <!-- PULSANTE REGISTRAZIONE IN ALTO A DESTRA -->
+                <!-- AREA PERSONALE -->
                 <Button fx:id="btnAreaPersonale"
                         mnemonicParsing="false"
                         onAction="#onAreaPersonaleClick"
@@ -63,29 +64,77 @@
     </top>
 
 
-    <!-- CONTENUTO CENTRATO -->
+    <!-- CONTENUTO CENTRALE -->
     <center>
         <StackPane alignment="CENTER">
 
             <children>
 
+                <!-- CONTENITORE DELLA RICERCA -->
                 <VBox alignment="CENTER"
-                      spacing="30.0"
-                      maxWidth="286.0">
+                      spacing="12.0">
 
-                    <children>
+                    <!-- RIGA PRINCIPALE -->
+                    <HBox alignment="CENTER"
+                          spacing="10.0">
+
+                        <!-- LOCALITÀ / GEOLOCALIZZAZIONE -->
+                        <HBox alignment="CENTER"
+                              spacing="0.0"
+                              styleClass="location-container">
+
+                            <!-- DOVE -->
+                            <TextField fx:id="txtLocalita"
+                                       prefHeight="65.0"
+                                       prefWidth="260.0"
+                                       promptText="Dove?"
+                                       styleClass="location-field" />
+
+                            <!-- GEOLOCALIZZAZIONE -->
+                            <Button fx:id="btnGeolocalizzazione"
+                                    mnemonicParsing="false"
+                                    onAction="#onGeolocalizzazioneClick"
+                                    prefHeight="65.0"
+                                    prefWidth="65.0"
+                                    styleClass="location-button"
+                                    text="📍" />
+
+                        </HBox>
 
 
-                        <Button mnemonicParsing="false"
+                        <!-- RICERCA RISTORANTE -->
+                        <TextField fx:id="txtRicerca"
+                                   prefHeight="65.0"
+                                   prefWidth="400.0"
+                                   promptText="Cerca un ristorante..."
+                                   styleClass="search-field" />
+
+
+                        <!-- PULSANTE CERCA -->
+                        <Button fx:id="btnCerca"
+                                mnemonicParsing="false"
                                 onAction="#onRicercaClick"
                                 prefHeight="65.0"
-                                prefWidth="286.0"
+                                prefWidth="150.0"
                                 styleClass="flat"
                                 text="Cerca" />
 
+                    </HBox>
 
 
-                    </children>
+                    <!-- RICERCA AVANZATA -->
+                    <HBox alignment="CENTER_RIGHT"
+                          prefWidth="885.0">
+
+                        <Button fx:id="btnRicercaAvanzata"
+                                mnemonicParsing="false"
+                                onAction="#onRicercaAvanzataClick"
+                                prefHeight="50.0"
+                                prefWidth="200.0"
+                                styleClass="advanced-search"
+                                text="Ricerca avanzata" />
+
+                    </HBox>
 
                 </VBox>
 
