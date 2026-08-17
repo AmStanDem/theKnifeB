@@ -64,7 +64,7 @@
                                preserveRatio="true">
 
                         <image>
-                            <Image url="/images/img.png"/>
+                            <Image url="/images/logo.png"/>
                         </image>
 
                     </ImageView>
