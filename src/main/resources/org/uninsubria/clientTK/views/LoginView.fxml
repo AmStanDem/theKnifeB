@@ -29,7 +29,7 @@
         <!-- Logo -->
         <HBox alignment="CENTER_LEFT" spacing="10">
             <ImageView fitWidth="34" fitHeight="34" preserveRatio="true">
-                <Image url="/images/logo.png"/>
+                <Image url="@../../../../images/logo.png"  />
             </ImageView>
             <Label styleClass="logo-text" text="TheGreenKitchen"/>
         </HBox>
@@ -85,7 +85,7 @@
         <VBox alignment="CENTER" spacing="24">
             <StackPane styleClass="illustration-circle" prefWidth="240" prefHeight="240">
                 <ImageView fitWidth="240" fitHeight="240" preserveRatio="true">
-                    <Image url="/images/img_1.png"/>
+                    <Image url="@../../../../images/img_1.png" />
                 </ImageView>
             </StackPane>
             <Label styleClass="illustration-text" text="Fresh ingredients, honest recipes" wrapText="true"

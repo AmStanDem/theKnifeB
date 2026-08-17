@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -8,11 +10,11 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 
 <!--
     Schermata di registrazione (Sign Up)
@@ -22,49 +24,28 @@
     e collega il pulsante "Registrati" manualmente dal codice.
 -->
 
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.layout.StackPane?>
+<StackPane stylesheets="@../styles/signUp-style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.SignUpController">
 
-<StackPane stylesheets="@../styles/signUp-style.css"
-           xmlns="http://javafx.com/javafx/21"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="org.uninsubria.clientTK.controller.SignUpController">
-
-    <ScrollPane fitToWidth="true"
-                fitToHeight="true"
-                hbarPolicy="NEVER"
-                styleClass="main-scroll">
+    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="main-scroll">
 
         <content>
 
-            <StackPane alignment="CENTER"
-                       minWidth="0"
-                       minHeight="0">
+            <StackPane alignment="CENTER" minHeight="0" minWidth="0">
 
-            <VBox alignment="TOP_CENTER"
-                  spacing="18.0"
-                  prefWidth="620.0"
-                  maxWidth="620.0"
-                  styleClass="signup-card">
+            <VBox alignment="TOP_CENTER" maxWidth="620.0" prefWidth="620.0" spacing="18.0" styleClass="signup-card">
 
                 <padding>
-                    <Insets bottom="40.0"
-                            left="50.0"
-                            right="50.0"
-                            top="40.0"/>
+                    <Insets bottom="40.0" left="50.0" right="50.0" top="40.0" />
                 </padding>
 
                 <!-- Logo / marchio -->
 
                 <StackPane styleClass="logo-container">
 
-                    <ImageView fitWidth="70.0"
-                               fitHeight="70.0"
-                               preserveRatio="true">
+                    <ImageView fitHeight="70.0" fitWidth="70.0" preserveRatio="true">
 
                         <image>
-                            <Image url="/images/logo.png"/>
+                            <Image url="@../../../../images/logo.png" />
                         </image>
 
                     </ImageView>
@@ -74,34 +55,33 @@
                 <!-- Titolo -->
                 <Label styleClass="title-label" text="Crea il tuo account">
                     <VBox.margin>
-                        <Insets bottom="10.0"/>
+                        <Insets bottom="10.0" />
                     </VBox.margin>
                 </Label>
 
                 <!-- Avviso campi obbligatori -->
-                <Label styleClass="info-label"
-                       text="ⓘ Tutti i campi sono obbligatori" wrapText="true"/>
+                <Label styleClass="info-label" text="ⓘ Tutti i campi sono obbligatori" wrapText="true" />
 
                 <!-- Nome -->
                 <VBox spacing="4.0">
-                    <Label styleClass="field-label" text="Nome"/>
-                    <TextField fx:id="nomeField" promptText="Inserisci il nome"/>
+                    <Label styleClass="field-label" text="Nome" />
+                    <TextField fx:id="nomeField" promptText="Inserisci il nome" />
                 </VBox>
 
                 <!-- Cognome -->
                 <VBox spacing="4.0">
-                    <Label styleClass="field-label" text="Cognome"/>
-                    <TextField fx:id="cognomeField" promptText="Inserisci il cognome"/>
+                    <Label styleClass="field-label" text="Cognome" />
+                    <TextField fx:id="cognomeField" promptText="Inserisci il cognome" />
                 </VBox>
 
                 <!-- Ruolo -->
                 <VBox spacing="4.0">
-                    <Label styleClass="field-label" text="Ruolo"/>
+                    <Label styleClass="field-label" text="Ruolo" />
                     <ComboBox fx:id="ruoloComboBox" maxWidth="Infinity" promptText="Seleziona il ruolo">
                         <items>
                             <FXCollections fx:factory="observableArrayList">
-                                <String fx:value="Cliente"/>
-                                <String fx:value="Ristoratore"/>
+                                <String fx:value="Cliente" />
+                                <String fx:value="Ristoratore" />
                             </FXCollections>
                         </items>
                     </ComboBox>
@@ -109,37 +89,34 @@
 
                 <!-- Email -->
                 <VBox spacing="4.0">
-                    <Label styleClass="field-label" text="E-mail"/>
-                    <TextField fx:id="emailField" promptText="Inserisci l'e-mail"/>
+                    <Label styleClass="field-label" text="E-mail" />
+                    <TextField fx:id="emailField" promptText="Inserisci l'e-mail" />
                 </VBox>
 
                 <!-- Password -->
                 <VBox spacing="4.0">
-                    <Label styleClass="field-label" text="Password"/>
-                    <PasswordField fx:id="passwordField" promptText="Inserisci la password"/>
-                    <Label styleClass="hint-label"
-                           text="ⓘ La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola"
-                           wrapText="true"/>
+                    <Label styleClass="field-label" text="Password" />
+                    <PasswordField fx:id="passwordField" promptText="Inserisci la password" />
+                    <Label styleClass="hint-label" text="ⓘ La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola" wrapText="true" />
                 </VBox>
 
                 <Separator>
                     <VBox.margin>
-                        <Insets bottom="6.0" top="10.0"/>
+                        <Insets bottom="6.0" top="10.0" />
                     </VBox.margin>
                 </Separator>
 
                 <!-- Pulsante di registrazione -->
-                <Button fx:id="registratiButton" maxWidth="Infinity" mnemonicParsing="false"
-                        onAction="#handleRegistrati" text="Registrati" styleClass="primary-button">
+                <Button fx:id="registratiButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleRegistrati" styleClass="primary-button" text="Registrati">
                     <VBox.margin>
-                        <Insets top="10.0"/>
+                        <Insets top="10.0" />
                     </VBox.margin>
                 </Button>
 
                 <!-- Link login -->
                 <HBox alignment="CENTER" spacing="4.0">
-                    <Label styleClass="info-label" text="Hai già un account?"/>
-                    <Label styleClass="link-label" text="Accedi" onMouseClicked="#handleAccedi"/>
+                    <Label styleClass="info-label" text="Hai già un account?" />
+                    <Label onMouseClicked="#handleAccedi" styleClass="link-label" text="Accedi" />
                 </HBox>
 
             </VBox>
