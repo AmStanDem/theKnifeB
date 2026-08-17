@@ -139,7 +139,7 @@
                 <!-- Link login -->
                 <HBox alignment="CENTER" spacing="4.0">
                     <Label styleClass="info-label" text="Hai già un account?"/>
-                    <Label styleClass="link-label" text="Accedi"/>
+                    <Label styleClass="link-label" text="Accedi" onMouseClicked="#handleAccedi"/>
                 </HBox>
 
             </VBox>
