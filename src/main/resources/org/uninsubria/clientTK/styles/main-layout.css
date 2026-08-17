@@ -42,6 +42,15 @@
     -fx-background-color: #3E9330;
 }
 
+/* =========================
+   TITOLO RICERCA
+   ========================= */
+
+.search-title {
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
 
 /* =========================
    BARRA DI RICERCA
