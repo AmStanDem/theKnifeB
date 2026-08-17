@@ -25,6 +25,9 @@
         <!-- JavaFX -->
         <javafx.version>23.0.2</javafx.version>
 
+        <!-- ControlsFX -->
+        <controlsfx.version>11.2.1</controlsfx.version>
+
         <!-- PostgreSQL -->
         <postgresql.version>42.7.13</postgresql.version>
 
@@ -54,6 +57,17 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+
+
+        <!-- ==================== -->
+        <!-- ControlsFX           -->
+        <!-- ==================== -->
+
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>${controlsfx.version}</version>
         </dependency>
 
 
@@ -140,15 +154,6 @@
             <!-- ============================== -->
             <!-- Flyway                          -->
             <!-- ============================== -->
-            <!--
-                Flyway NON viene eseguito automaticamente
-                durante javafx:run.
-
-                Per eseguire le migrazioni manualmente:
-                    mvn flyway:migrate
-
-                Questo richiede il file .env.
-            -->
 
             <plugin>
                 <groupId>org.flywaydb</groupId>

@@ -10,36 +10,22 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="768.0"
-            prefWidth="1024.0"
-            styleClass="root"
-            stylesheets="@../styles/main-layout.css"
-            xmlns="http://javafx.com/javafx/26"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
+<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/main-layout.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
 
     <!-- HEADER -->
     <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="20.0"
-              styleClass="header"
-              BorderPane.alignment="CENTER">
+        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="header" BorderPane.alignment="CENTER">
 
             <padding>
-                <Insets bottom="15.0"
-                        left="25.0"
-                        right="25.0"
-                        top="15.0" />
+                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
             </padding>
 
             <children>
 
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true">
+                <ImageView fitHeight="133.0" fitWidth="441.0" preserveRatio="true">
 
                     <image>
-                        <Image url="@../../../../images/img_1.png"  />
+                        <Image url="@../../../../images/img_1.png" />
                     </image>
 
                 </ImageView>
@@ -58,33 +44,11 @@
 
             <children>
 
-                <VBox alignment="CENTER"
-                      spacing="30.0"
-                      maxWidth="286.0">
+                <VBox alignment="CENTER" maxWidth="286.0" spacing="30.0">
 
                     <children>
 
-                        <Button mnemonicParsing="false"
-                                onAction="#onRicercaClick"
-                                prefHeight="65.0"
-                                prefWidth="286.0"
-                                styleClass="flat"
-                                text="Esplora" />
-
-                        <Button mnemonicParsing="false"
-                                onAction="#onRicercaClick"
-                                prefHeight="65.0"
-                                prefWidth="286.0"
-                                styleClass="flat"
-                                text="Cerca" />
-
-                        <Button fx:id="btnAreaPersonale"
-                                mnemonicParsing="false"
-                                onAction="#onAreaPersonaleClick"
-                                prefHeight="63.0"
-                                prefWidth="285.0"
-                                styleClass="accent"
-                                text="Accedi / Registrati" />
+                        <Button mnemonicParsing="false" onAction="#onRicercaClick" prefHeight="65.0" prefWidth="286.0" styleClass="flat" text="Cerca" />
 
                     </children>
 
