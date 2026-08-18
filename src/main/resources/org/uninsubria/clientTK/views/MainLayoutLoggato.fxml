@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+
+<BorderPane prefHeight="768.0"
+            prefWidth="1024.0"
+            styleClass="root"
+            stylesheets="@../styles/main-layout.css"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.uninsubria.clientTK.controller.MainLayoutLoggatoController">
+
+    <!-- HEADER -->
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="20.0"
+              styleClass="header"
+              BorderPane.alignment="CENTER">
+
+            <padding>
+                <Insets bottom="15.0"
+                        left="25.0"
+                        right="25.0"
+                        top="15.0" />
+            </padding>
+
+            <children>
+
+                <!-- LOGO A SINISTRA -->
+                <ImageView fitHeight="133.0"
+                           fitWidth="441.0"
+                           preserveRatio="true">
+
+                    <image>
+                        <Image url="@../../../../images/img_1.png" />
+                    </image>
+
+                </ImageView>
+
+                <!-- SPAZIO -->
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- AREA PERSONALE -->
+                <ImageView fitHeight="100.0"
+                           fitWidth="350.0"
+                           preserveRatio="true"
+                           onMouseClicked="#onAreaPersonaleClick">
+
+                    <image>
+                        <Image url="@../../../../images/user.png" />
+                    </image>
+
+                </ImageView>
+
+
+            </children>
+
+        </HBox>
+    </top>
+
+
+    <!-- CONTENUTO CENTRALE -->
+    <center>
+        <StackPane alignment="CENTER">
+
+            <children>
+
+                <!-- CONTENITORE DELLA RICERCA -->
+                <VBox alignment="CENTER"
+                      spacing="18.0">
+
+                    <!-- TITOLO -->
+                    <Label text="Prenota i migliori ristoranti per ogni occasione"
+                           styleClass="search-title" />
+
+                    <!-- RIGA PRINCIPALE -->
+                    <HBox alignment="CENTER"
+                          spacing="10.0">
+
+                        <!-- LOCALITÀ / GEOLOCALIZZAZIONE -->
+                        <HBox alignment="CENTER"
+                              spacing="0.0"
+                              styleClass="location-container">
+
+                            <!-- DOVE -->
+                            <TextField fx:id="txtLocalita"
+                                       prefHeight="65.0"
+                                       prefWidth="260.0"
+                                       promptText="Dove?"
+                                       styleClass="location-field" />
+
+                            <!-- GEOLOCALIZZAZIONE -->
+                            <Button fx:id="btnGeolocalizzazione"
+                                    mnemonicParsing="false"
+                                    onAction="#onGeolocalizzazioneClick"
+                                    prefHeight="65.0"
+                                    prefWidth="65.0"
+                                    styleClass="location-button"
+                                    text="📍" />
+
+                        </HBox>
+
+                        <!-- RICERCA RISTORANTE -->
+                        <TextField fx:id="txtRicerca"
+                                   prefHeight="65.0"
+                                   prefWidth="400.0"
+                                   promptText="Cerca un ristorante..."
+                                   styleClass="search-field" />
+
+                        <!-- PULSANTE CERCA -->
+                        <Button fx:id="btnCerca"
+                                mnemonicParsing="false"
+                                onAction="#onRicercaClick"
+                                prefHeight="65.0"
+                                prefWidth="150.0"
+                                styleClass="flat"
+                                text="Cerca" />
+
+                    </HBox>
+
+                    <!-- RICERCA AVANZATA -->
+                    <HBox alignment="CENTER_RIGHT"
+                          prefWidth="885.0">
+
+                        <Button fx:id="btnRicercaAvanzata"
+                                mnemonicParsing="false"
+                                onAction="#onRicercaAvanzataClick"
+                                prefHeight="50.0"
+                                prefWidth="200.0"
+                                styleClass="advanced-search"
+                                text="Ricerca avanzata" />
+
+                    </HBox>
+
+                </VBox>
+
+            </children>
+
+        </StackPane>
+    </center>
+
+</BorderPane>
