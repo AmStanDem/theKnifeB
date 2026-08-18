@@ -14,19 +14,10 @@ import java.io.IOException;
 
 public class RicercaAvanzataController {
 
-    @FXML
-    private TextField txtLocalita;
+
 
     @FXML
-    private Button btnGeolocalizzazione;
-
-    @FXML
-    private void onRicercaClick(ActionEvent event) {
-        System.out.println("Ricerca cliccata");
-    }
-
-    @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
+    private void cercaRistorante(ActionEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene()
@@ -34,40 +25,19 @@ public class RicercaAvanzataController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/SignUp.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/listaRistoranti.fxml")
                     )
             ));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    private void cercaRistorante() {
     }
 
     @FXML
     private void reimpostaFiltri() {
     }
 
-    @FXML
-        public void onRicercaAvanzataClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RicercaAvanzata.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 }

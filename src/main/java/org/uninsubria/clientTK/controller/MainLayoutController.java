@@ -22,7 +22,20 @@ public class MainLayoutController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
-        System.out.println("Ricerca cliccata");
+        try {
+            Stage stage = (Stage) ((Node) event.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/listaRistoranti.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
