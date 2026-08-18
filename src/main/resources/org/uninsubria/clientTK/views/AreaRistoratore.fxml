@@ -18,7 +18,7 @@
             stylesheets="@../styles/areaUtente.css"
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.uninsubria.clientTK.controller.AreaClienteController">
+            fx:controller="org.uninsubria.clientTK.controller.AreaRistoratoreController">
 
     <!-- HEADER -->
     <top>
@@ -144,23 +144,23 @@
                     <!-- SPAZIO -->
                     <Region prefHeight="10.0" />
 
-                    <!-- RISTORANTI PREFERITI -->
-                    <Button fx:id="btnPreferiti"
+                    <!-- I MIEI RISTORANTI  -->
+                    <Button fx:id="btnRistoranti"
                             mnemonicParsing="false"
-                            onAction="#onPreferitiClick"
+                            onAction="#onRistorantiClick"
                             prefHeight="55.0"
                             prefWidth="500.0"
                             styleClass="profile-button"
-                            text="I miei ristoranti preferiti" />
+                            text="I miei ristoranti" />
 
-                    <!-- RECENSIONI -->
-                    <Button fx:id="btnRecensioni"
+                    <!-- AGGIUNGI RISTORANTE -->
+                    <Button fx:id="btnAggiungi"
                             mnemonicParsing="false"
-                            onAction="#onRecensioniClick"
+                            onAction="#onAggiungiClick"
                             prefHeight="55.0"
                             prefWidth="500.0"
                             styleClass="profile-button"
-                            text="Le mie recensioni" />
+                            text="Aggiungi ristorante" />
 
                 </VBox>
 
