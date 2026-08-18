@@ -20,20 +20,20 @@ public class UtenteService {
             throws CredenzialiErrateException, SistemaIndisponibileException {
 
         if (email == null || passwordInChiaro == null) {
-            throw new CredenzialiErrateException("Email e password sono obbligatori.");
+            throw new CredenzialiErrateException();
         }
 
         UtenteConHash authData = utenteDAO.trovaPerEmail(email);
 
         if (authData == null) {
-            throw new CredenzialiErrateException("Credenziali non valide. Riprova.");
+            throw new CredenzialiErrateException();
         }
 
         // Verifica crittografica sicura tramite BCrypt (confronta password in chiaro e hash salvato)
         boolean passwordCorretta = BCrypt.checkpw(passwordInChiaro, authData.passwordHash());
 
         if (!passwordCorretta) {
-            throw new CredenzialiErrateException("Credenziali non valide. Riprova.");
+            throw new CredenzialiErrateException();
         }
 
         // Restituisce il DTO pulito, senza mai esporre l'hash o la password
@@ -60,7 +60,7 @@ public class UtenteService {
         boolean successo = utenteDAO.inserisciUtente(nuovoUtente, hashSicuro);
 
         if (!successo) {
-            throw new SistemaIndisponibileException("Errore interno durante il salvataggio. Riprova più tardi.");
+            throw new SistemaIndisponibileException();
         }
 
         return utenteDAO.trovaPerEmail(nuovoUtente.email()).utente();
