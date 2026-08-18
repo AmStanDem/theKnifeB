@@ -1,6 +1,6 @@
 package org.uninsubria.serverTK;
 
-public class Main {
+public class MainServer {
     static void main() {
         IO.readln();
     }
