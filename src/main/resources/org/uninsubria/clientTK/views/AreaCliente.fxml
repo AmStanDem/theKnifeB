@@ -50,6 +50,15 @@
                 <!-- SPAZIO -->
                 <Region HBox.hgrow="ALWAYS" />
 
+                <!-- LOGOUT -->
+                <Button fx:id="btnLogOut"
+                        mnemonicParsing="false"
+                        onAction="#onLogOutClick"
+                        prefHeight="63.0"
+                        prefWidth="285.0"
+                        styleClass="accent"
+                        text="Log out" />
+
 
             </children>
 

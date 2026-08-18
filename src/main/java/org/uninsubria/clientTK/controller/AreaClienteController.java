@@ -70,4 +70,22 @@ public class AreaClienteController {
 
     public void onRecensioniClick(ActionEvent actionEvent) {
     }
+
+    public void onLogOutClick(ActionEvent actionEvent) {
+        try {
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
