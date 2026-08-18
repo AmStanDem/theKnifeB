@@ -66,7 +66,6 @@ public class AreaClienteController {
 
 
     public void onPreferitiClick(ActionEvent actionEvent) {
-        //sdeedesedsd
     }
 
     public void onRecensioniClick(ActionEvent actionEvent) {

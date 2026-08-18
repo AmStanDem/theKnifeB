@@ -30,7 +30,7 @@ public class LoginController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
                     )
             ));
 
