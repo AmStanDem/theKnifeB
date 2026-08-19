@@ -72,7 +72,7 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
 
     @Override
     public void rispondiARecensione(Integer idRecensione, String testoRisposta, Integer idGestore) throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
-        recensioneService.aggiungiRisposta(idRecensione, idGestore, testoRisposta);
+        recensioneService.aggiungiRisposta(idRecensione, testoRisposta);
     }
 
     @Override

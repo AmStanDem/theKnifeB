@@ -47,7 +47,7 @@ public class UtenteService {
                 passwordInChiaro == null || passwordInChiaro.trim().isEmpty() ||
                 nuovoUtente.nome() == null || nuovoUtente.cognome() == null ||
                 nuovoUtente.ruolo() == null) {
-            throw new DatiMancantiException("Tutti i campi sono obbligatori per la registrazione.");
+            //throw new DatiMancantiException("Tutti i campi sono obbligatori per la registrazione.");
         }
 
         if (utenteDAO.trovaPerEmail(nuovoUtente.email()) != null) {

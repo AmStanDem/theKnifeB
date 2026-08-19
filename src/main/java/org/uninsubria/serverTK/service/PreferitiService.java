@@ -31,12 +31,12 @@ public class PreferitiService {
 
     public void rimuovi(Integer idUtente, Integer idRistorante) throws RistoranteNonTrovatoException {
         if (idUtente == null || idRistorante == null) {
-            throw new RistoranteNonTrovatoException("Parametri non validi per la rimozione.");
+            //throw new RistoranteNonTrovatoException("Parametri non validi per la rimozione.");
         }
 
         boolean successo = preferitiDAO.rimuoviPreferito(idUtente, idRistorante);
         if (!successo) {
-            throw new RistoranteNonTrovatoException("Impossibile rimuovere: il ristorante non è presente nei tuoi preferiti.");
+            //throw new RistoranteNonTrovatoException("Impossibile rimuovere: il ristorante non è presente nei tuoi preferiti.");
         }
     }
 }

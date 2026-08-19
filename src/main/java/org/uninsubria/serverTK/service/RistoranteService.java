@@ -24,7 +24,7 @@ public class RistoranteService {
                 ristorante.indirizzo() == null || ristorante.indirizzo().trim().isEmpty() ||
                 ristorante.nazione() == null || ristorante.nazione().trim().isEmpty() ||
                 ristorante.prezzoMedio() == null || ristorante.prezzoMedio() < 0.0) {
-            throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
+            //throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
         }
 
         boolean successo = ristoranteDAO.inserisciRistorante(ristorante, idGestore);

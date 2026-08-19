@@ -80,6 +80,8 @@ public class MainServer {
             System.exit(1);
         }
 
+        org.uninsubria.serverTK.utils.CsvImporter.importaSeNecessario();
+
         // 4. Esposizione dei Servizi (RMI Registry)
         try {
             TheKnifeServerImpl serverService = new TheKnifeServerImpl();
