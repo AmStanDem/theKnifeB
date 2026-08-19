@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
@@ -31,19 +30,18 @@
 
     <!-- Riga data + stelle -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
-        <Label fx:id="timeLabel" prefHeight="10.0" prefWidth="52.0" styleClass="review-time" text="data" />
         <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="277.0">
             <children>
                 <Rating fx:id="ratingControl" max="5" styleClass="review-rating" />
             </children>
         </HBox>
+        <Label fx:id="timeLabel" prefHeight="10.0" prefWidth="35.0" styleClass="review-time" text="data" />
     </HBox>
 
     <!-- Testo recensione -->
     <HBox prefHeight="0.0" prefWidth="287.0">
         <children>
-            <TextField fx:id="reviewTextField" editable="false" prefHeight="0.0" prefWidth="369.0"
-                       styleClass="review-text-field" text="recensione" />
+            <Label fx:id="reviewTextField" prefWidth="369.0" styleClass="review-text-field" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut lacinia libero turpis, eget imperdiet eros cursus sed. Integer iaculis consectetur sem. Suspendisse facilisis risus nulla, a pretium mauris venenatis at. In suscipit tristique ante, id eleifend magna. Phasellus eget lorem eros. Aliquam fermentum dolor dolor, quis semper arcu ornare sit amet. Quisque ipsum lorem, pellentesque ut porttitor vitae, vestibulum vitae libero. Proin gravida eros velit, ut varius tortor laoreet sit amet. Phasellus eleifend nunc ut justo lacinia mollis. Proin in orci eu urna sagittis ullamcorper. Sed sed nunc ac est rutrum commodo vitae sed leo. Donec luctus efficitur justo vel sagittis. Phasellus quis lacinia urna. Integer massa magna, vehicula a tellus sit amet, faucibus commodo odio. Maecenas risus ante, scelerisque commodo augue at, tincidunt bibendum velit." wrapText="true" />
         </children>
     </HBox>
 
@@ -55,8 +53,7 @@
     <!-- Testo risposta -->
     <HBox prefHeight="17.0" prefWidth="277.0">
         <children>
-            <TextField fx:id="responseTextField" editable="false" prefHeight="0.0" prefWidth="369.0"
-                       styleClass="response-text-field" text="risposta" />
+            <Label fx:id="responseTextField" prefWidth="369.0" styleClass="review-text-field" text="Nam vestibulum neque a maximus scelerisque. Curabitur in convallis quam. Mauris bibendum sodales nibh, interdum fringilla nisi maximus non. Sed id porttitor nisl, eu lobortis mauris. Cras non massa sodales, euismod nibh ac, molestie felis. Cras gravida, eros eu facilisis placerat, lacus ante porttitor odio, ut tempus neque ex ut dui. Sed at ligula sollicitudin, mollis nunc sed, interdum ante. Proin tincidunt tincidunt sem, ac placerat felis rutrum eget. Pellentesque scelerisque commodo diam sed accumsan. Fusce bibendum sem et maximus egestas. Interdum et malesuada fames ac ante ipsum primis in faucibus." wrapText="true" />
         </children>
     </HBox>
 

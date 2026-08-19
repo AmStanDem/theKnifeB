@@ -59,21 +59,31 @@
     -fx-skin-partial-rating: false;
 }
 
-.review-rating .container .button {
-    -fx-background-color: transparent;
-    -fx-shape: "M 12 2 L 15 9 L 22 9 L 16 14 L 18 21 L 12 17 L 6 21 L 8 14 L 2 9 L 9 9 Z";
-    -fx-scale-shape: true;
-    -fx-min-width: 20;
-    -fx-min-height: 20;
-    -fx-background-insets: 0;
+/* Contenitore delle stelle */
+.review-rating .container {
+    -fx-spacing: 2px;
 }
 
-/* stella non selezionata */
+/* Singola stella */
 .review-rating .container .button {
     -fx-background-color: #dadce0;
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+
+    -fx-shape: "M 12 2 L 15 9 L 22 9 L 16 14 L 18 21 L 12 17 L 6 21 L 8 14 L 2 9 L 9 9 Z";
+    -fx-scale-shape: true;
+
+    /* DIMENSIONE STELLA */
+    -fx-min-width: 14px;
+    -fx-pref-width: 14px;
+    -fx-max-width: 14px;
+
+    -fx-min-height: 14px;
+    -fx-pref-height: 14px;
+    -fx-max-height: 14px;
 }
 
-/* stella selezionata (strong) */
+/* Stella selezionata */
 .review-rating .container .button.strong {
     -fx-background-color: #4CAF50;
 }
