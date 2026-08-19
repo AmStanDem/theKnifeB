@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import org.controlsfx.control.Rating?>
+
+<fx:root spacing="10" styleClass="recensione-item" type="VBox" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+
+    <!-- Header: avatar + nome + local guide -->
+    <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="349.0" spacing="10">
+        <StackPane fx:id="avatarCircle" styleClass="avatar-circle">
+            <Circle radius="20" styleClass="avatar-bg" />
+            <Label fx:id="avatarInitial" styleClass="avatar-initial" text="M" />
+        </StackPane>
+
+        <VBox alignment="CENTER_LEFT" spacing="2">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="authorLabel" styleClass="author-name" text="Nome Autore" />
+                <Label fx:id="localGuideLabel" styleClass="local-guide-badge" text="Local Guide" />
+            </HBox>
+        </VBox>
+
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Riga data + stelle -->
+    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
+        <Label fx:id="timeLabel" prefHeight="10.0" prefWidth="52.0" styleClass="review-time" text="data" />
+        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="277.0">
+            <children>
+                <Rating fx:id="ratingControl" max="5" styleClass="review-rating" />
+            </children>
+        </HBox>
+    </HBox>
+
+    <!-- Testo recensione -->
+    <HBox prefHeight="0.0" prefWidth="287.0">
+        <children>
+            <TextField fx:id="reviewTextField" editable="false" prefHeight="0.0" prefWidth="369.0"
+                       styleClass="review-text-field" text="recensione" />
+        </children>
+    </HBox>
+
+    <!-- Etichetta sezione risposte -->
+    <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="actions-row">
+        <Label fx:id="likeCountLabel" styleClass="like-count" text="RISPOSTE" />
+    </HBox>
+
+    <!-- Testo risposta -->
+    <HBox prefHeight="17.0" prefWidth="277.0">
+        <children>
+            <TextField fx:id="responseTextField" editable="false" prefHeight="0.0" prefWidth="369.0"
+                       styleClass="response-text-field" text="risposta" />
+        </children>
+    </HBox>
+
+    <padding>
+        <Insets bottom="14" left="16" right="16" top="14" />
+    </padding>
+</fx:root>

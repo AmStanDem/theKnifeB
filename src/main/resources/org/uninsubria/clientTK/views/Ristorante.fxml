@@ -2,7 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -10,36 +10,21 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
 
-<BorderPane prefHeight="768.0"
-            prefWidth="1024.0"
-            styleClass="root"
-            stylesheets="@../styles/areaUtente.css"
-            xmlns="http://javafx.com/javafx/26"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.uninsubria.clientTK.controller.AreaClienteController">
+<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/areaUtente.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaClienteController">
 
     <!-- HEADER -->
     <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="20.0"
-              styleClass="header"
-              BorderPane.alignment="CENTER">
+        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="header" BorderPane.alignment="CENTER">
 
             <padding>
-                <Insets bottom="15.0"
-                        left="25.0"
-                        right="25.0"
-                        top="15.0" />
+                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
             </padding>
 
             <children>
 
                 <!-- LOGO A SINISTRA -->
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true">
+                <ImageView fitHeight="133.0" fitWidth="441.0" preserveRatio="true">
 
                     <image>
                         <Image url="@../../../../images/img_1.png" />
@@ -51,13 +36,7 @@
                 <Region HBox.hgrow="ALWAYS" />
 
                 <!-- LOGOUT -->
-                <Button fx:id="btnLogOut"
-                        mnemonicParsing="false"
-                        onAction="#onLogOutClick"
-                        prefHeight="63.0"
-                        prefWidth="285.0"
-                        styleClass="accent"
-                        text="Log out" />
+                <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Log out" />
 
 
             </children>
@@ -68,143 +47,94 @@
 
     <!-- CONTENUTO CENTRALE -->
     <center>
-        <StackPane alignment="CENTER_LEFT" style="-fx-padding: 0 0 0 40;">
+        <StackPane alignment="CENTER" />
+    </center>
+   <left>
 
-            <children>
+          <VBox alignment="CENTER" maxWidth="579.0" prefHeight="603.0" prefWidth="512.0" spacing="15.0" BorderPane.alignment="CENTER">
 
-                <VBox alignment="CENTER"
-                      spacing="15.0"
-                      maxWidth="550.0">
+              <!-- TITOLO -->
+              <Label styleClass="profile-title" text="Informazioni ristorante" />
 
-                    <!-- TITOLO -->
-                    <Label text="Informazioni ristorante"
-                           styleClass="profile-title" />
+                 <!-- INFORMAZIONI RISTORANTE -->
+              <VBox alignment="CENTER_LEFT" spacing="10.0" styleClass="profile-container">
 
-                    <!-- INFORMAZIONI RISTORANTE -->
-                    <VBox spacing="10.0"
-                          styleClass="profile-container">
+                     <!-- NOME RISTORANTE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Nome:" />
 
-                        <!-- NOME RISTORANTE -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Nome:"
-                                   styleClass="profile-label" />
+                         <Label fx:id="lblNomeRistorante" styleClass="profile-value" text="Nome del ristorante" />
+                  </HBox>
 
-                            <Label fx:id="lblNomeRistorante"
-                                   text="Nome del ristorante"
-                                   styleClass="profile-value" />
-                        </HBox>
+                     <!-- NAZIONE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Nazione:" />
 
-                        <!-- NAZIONE -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Nazione:"
-                                   styleClass="profile-label" />
+                         <Label fx:id="lblNazione" styleClass="profile-value" text="Italia" />
+                  </HBox>
 
-                            <Label fx:id="lblNazione"
-                                   text="Italia"
-                                   styleClass="profile-value" />
-                        </HBox>
+                     <!-- CITTÀ -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Città:" />
 
-                        <!-- CITTÀ -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Città:"
-                                   styleClass="profile-label" />
+                         <Label fx:id="lblCitta" styleClass="profile-value" text="Milano" />
+                  </HBox>
 
-                            <Label fx:id="lblCitta"
-                                   text="Milano"
-                                   styleClass="profile-value" />
-                        </HBox>
+                     <!-- INDIRIZZO -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Indirizzo:" />
 
-                        <!-- INDIRIZZO -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Indirizzo:"
-                                   styleClass="profile-label" />
-
-                            <Label fx:id="lblIndirizzo"
-                                   text="Via Roma 10"
-                                   styleClass="profile-value" />
-                        </HBox>
+                         <Label fx:id="lblIndirizzo" styleClass="profile-value" text="Via Roma 10" />
+                  </HBox>
 
                         <!-- LATITUDINE -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Latitudine:"
-                                   styleClass="profile-label" />
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Latitudine:" />
 
-                            <Label fx:id="lblLatitudine"
-                                   text="45.4642"
-                                   styleClass="profile-value" />
-                        </HBox>
+                            <Label fx:id="lblLatitudine" styleClass="profile-value" text="45.4642" />
+                  </HBox>
 
-                        <!-- LONGITUDINE -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Longitudine:"
-                                   styleClass="profile-label" />
+                     <!-- LONGITUDINE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Longitudine:" />
 
-                            <Label fx:id="lblLongitudine"
-                                   text="9.1900"
-                                   styleClass="profile-value" />
-                        </HBox>
+                         <Label fx:id="lblLongitudine" styleClass="profile-value" text="9.1900" />
+                  </HBox>
 
-                        <!-- FASCIA DI PREZZO -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Prezzo medio:"
-                                   styleClass="profile-label" />
+                     <!-- FASCIA DI PREZZO -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Prezzo medio:" />
 
-                            <Label fx:id="lblFasciaPrezzo"
-                                   text="25,00 €"
-                                   styleClass="profile-value" />
-                        </HBox>
+                         <Label fx:id="lblFasciaPrezzo" styleClass="profile-value" text="25,00 €" />
+                  </HBox>
 
-                        <!-- DELIVERY -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Delivery:"
-                                   styleClass="profile-label" />
+                     <!-- DELIVERY -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Delivery:" />
 
-                            <Label fx:id="lblDelivery"
-                                   text="Sì"
-                                   styleClass="profile-value" />
-                        </HBox>
+                         <Label fx:id="lblDelivery" styleClass="profile-value" text="Sì" />
+                  </HBox>
 
-                        <!-- PRENOTAZIONE ONLINE -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Prenotazione:"
-                                   styleClass="profile-label" />
+                     <!-- PRENOTAZIONE ONLINE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Prenotazione:" />
 
-                            <Label fx:id="lblPrenotazione"
-                                   text="Sì"
-                                   styleClass="profile-value" />
-                        </HBox>
+                         <Label fx:id="lblPrenotazione" styleClass="profile-value" text="Sì" />
+                  </HBox>
 
-                        <!-- TIPO DI CUCINA -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Tipo di cucina:"
-                                   styleClass="profile-label" />
+                     <!-- TIPO DI CUCINA -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Tipo di cucina:" />
 
-                            <Label fx:id="lblTipoCucina"
-                                   text="Italiana"
-                                   styleClass="profile-value" />
-                        </HBox>
+                         <Label fx:id="lblTipoCucina" styleClass="profile-value" text="Italiana" />
+                  </HBox>
 
-                    </VBox>
+                 </VBox>
 
-                    <!-- SPAZIO -->
-                    <Region prefHeight="10.0" />
+              <!-- SPAZIO -->
+              <Region prefHeight="10.0" prefWidth="512.0" />
 
-                </VBox>
-
-            </children>
-
-        </StackPane>
-    </center>
+          </VBox>
+   </left>
 
 </BorderPane>
-

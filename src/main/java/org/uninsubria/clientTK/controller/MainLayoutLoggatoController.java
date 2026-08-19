@@ -22,6 +22,7 @@ public class MainLayoutLoggatoController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
+        System.out.println("Ricerca cliccata");
         try {
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene()
