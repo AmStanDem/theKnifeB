@@ -114,7 +114,7 @@
                                    styleClass="profile-label" />
 
                             <Label fx:id="lblRuolo"
-                                   text="Cliente"
+                                   text="Ristoratore"
                                    styleClass="profile-value" />
                         </HBox>
 
