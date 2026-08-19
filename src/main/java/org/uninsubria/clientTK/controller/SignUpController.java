@@ -155,4 +155,21 @@ public class SignUpController {
             e.printStackTrace();
         }
     }
+
+    public void handleLogoClick(MouseEvent mouseEvent) {
+        try {
+            Stage stage = (Stage) ((Node) mouseEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

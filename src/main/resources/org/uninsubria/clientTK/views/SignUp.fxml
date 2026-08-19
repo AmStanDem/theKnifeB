@@ -39,7 +39,7 @@
         <!-- LOGO -->
         <StackPane styleClass="logo-container">
 
-            <ImageView fitHeight="65.0" fitWidth="65.0" preserveRatio="true">
+            <ImageView fitHeight="65.0" fitWidth="65.0" preserveRatio="true" onMouseClicked="#handleLogoClick">
 
                 <image>
                     <Image url="@../../../../images/logo.png" />
