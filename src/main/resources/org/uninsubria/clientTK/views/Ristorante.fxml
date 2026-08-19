@@ -68,7 +68,7 @@
 
     <!-- CONTENUTO CENTRALE -->
     <center>
-        <StackPane alignment="CENTER">
+        <StackPane alignment="CENTER_LEFT" style="-fx-padding: 0 0 0 40;">
 
             <children>
 
