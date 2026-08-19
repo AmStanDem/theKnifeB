@@ -9,10 +9,9 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.Rating?>
 
-<VBox
-        xmlns="http://javafx.com/javafx/21"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
+<fx:root spacing="10" styleClass="recensione-item" type="VBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root spacing="10" styleClass="recensione-item" type="VBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+
     <!-- Header: avatar + nome + local guide -->
     <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="349.0" spacing="10">
         <StackPane fx:id="avatarCircle" styleClass="avatar-circle">
@@ -62,4 +61,4 @@
     <padding>
         <Insets bottom="14" left="16" right="16" top="14" />
     </padding>
-</VBox>
+</fx:root>
