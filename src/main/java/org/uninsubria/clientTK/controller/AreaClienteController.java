@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -87,5 +88,22 @@ public class AreaClienteController {
             e.printStackTrace();
         }
 
+    }
+
+    public void handleLogoClick(MouseEvent mouseEvent) {
+        try {
+            Stage stage = (Stage) ((Node) mouseEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
