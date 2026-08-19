@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- JavaFX -->
-        <javafx.version>26</javafx.version>
+        <javafx.version>21</javafx.version>
 
         <!-- ControlsFX -->
         <controlsfx.version>11.2.1</controlsfx.version>
