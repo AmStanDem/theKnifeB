@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/areaUtente.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaClienteController">
+<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaClienteController">
 
     <!-- HEADER -->
     <top>
@@ -130,9 +130,7 @@
                   </HBox>
 
                  </VBox>
-
-              <!-- SPAZIO -->
-              <Region prefHeight="10.0" prefWidth="512.0" />
+         <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />
 
           </VBox>
    </left>
