@@ -39,7 +39,8 @@
                 <!-- LOGO A SINISTRA -->
                 <ImageView fitHeight="133.0"
                            fitWidth="441.0"
-                           preserveRatio="true">
+                           preserveRatio="true"
+                           onMouseClicked="#handleLogoClick">
 
                     <image>
                         <Image url="@../../../../images/img_1.png" />
