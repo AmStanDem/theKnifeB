@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/createSchema__schema iniziale.sql" value="0220899c-e573-4151-987d-4e6d78acd4b2" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/uninsubria/serverTK/dao/UtenteDAO.java" value="7eaf9183-26bb-4fbb-a89d-06bf70fd5e1b" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/uninsubria/serverTK/utils/CsvImporter.java" value="5844ff7c-59f3-4aa4-bef6-6bc2415bd12b" />
   </component>
 </project>
