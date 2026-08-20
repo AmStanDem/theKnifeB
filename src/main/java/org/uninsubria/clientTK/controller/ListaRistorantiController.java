@@ -163,12 +163,50 @@ public class ListaRistorantiController {
     /** Dati di esempio — da rimuovere quando si collega il livello dati reale. */
     private void caricaRistorantiDiTest() {
         ristorantiCompleti.addAll(
-                new RistoranteDTO(1, "Osteria del Borgo", "Via Roma 12, Milano", "Italia",
-                        45.4642, 9.1900, "Italiana", 28.0, false, true, 4.5),
-                new RistoranteDTO(2, "Sakura Sushi", "Corso Buenos Aires 5, Milano", "Italia",
-                        45.4780, 9.2050, "Giapponese", 35.0, true, true, 4.2),
-                new RistoranteDTO(3, "La Piadineria", "Piazza Duomo 1, Milano", "Italia",
-                        45.4640, 9.1900, "Pizzeria", 12.0, true, false, 3.8)
+                new RistoranteDTO(
+                        1,
+                        "Osteria del Borgo",
+                        "Via Roma 12, Milano",
+                        "Italia",
+                        "Milano",
+                        45.4642,
+                        9.1900,
+                        "Italiana",
+                        28.0,
+                        false,
+                        true,
+                        4.5
+                ),
+
+                new RistoranteDTO(
+                        2,
+                        "Sakura Sushi",
+                        "Corso Buenos Aires 5, Milano",
+                        "Italia",
+                        "Milano",
+                        45.4780,
+                        9.2050,
+                        "Giapponese",
+                        35.0,
+                        true,
+                        true,
+                        4.2
+                ),
+
+                new RistoranteDTO(
+                        3,
+                        "La Piadineria",
+                        "Piazza Duomo 1, Milano",
+                        "Italia",
+                        "Milano",
+                        45.4640,
+                        9.1900,
+                        "Pizzeria",
+                        12.0,
+                        true,
+                        false,
+                        3.8
+                )
         );
     }
 }
