@@ -6,9 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import org.controlsfx.control.Rating;
 
 import java.io.IOException;
 
@@ -19,6 +21,18 @@ public class ScriviRecensioneController {
 
     @FXML
     private Button btnGeolocalizzazione;
+
+    @FXML
+    private TextArea txtRecensione;
+
+    @FXML
+    private Rating ratingRecensione;
+
+    @FXML
+    private Button btnInviaRecensione;
+
+    @FXML
+    private Button btnAnnulla;
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
@@ -65,10 +79,11 @@ public class ScriviRecensioneController {
         }
     }
 
-
+    @FXML
     public void onPreferitiClick(ActionEvent actionEvent) {
     }
 
+    @FXML
     public void onRecensioniClick(ActionEvent actionEvent) {
         try {
             Stage stage = (Stage) ((Node) actionEvent.getSource())
@@ -86,6 +101,7 @@ public class ScriviRecensioneController {
         }
     }
 
+    @FXML
     public void onLogOutClick(ActionEvent actionEvent) {
         try {
             Stage stage = (Stage) ((Node) actionEvent.getSource())
@@ -101,9 +117,9 @@ public class ScriviRecensioneController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
+    @FXML
     public void handleLogoClick(MouseEvent mouseEvent) {
         try {
             Stage stage = (Stage) ((Node) mouseEvent.getSource())
@@ -121,6 +137,34 @@ public class ScriviRecensioneController {
         }
     }
 
+    @FXML
     public void onInviaRecensioneClick(ActionEvent actionEvent) {
+        // Logica di invio recensione
+    }
+
+    @FXML
+    public void onAnnullaClick(ActionEvent actionEvent) {
+        // Ripristina i campi del form
+        if (txtRecensione != null) {
+            txtRecensione.clear();
+        }
+        if (ratingRecensione != null) {
+            ratingRecensione.setRating(0);
+        }
+
+        // Se preferisci reindirizzare l'utente alla schermata precedente al click su Annulla:
+        try {
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
+                    )
+            ));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
