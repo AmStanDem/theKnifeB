@@ -26,7 +26,7 @@ public class UtenteDAO {
      */
     public boolean inserisciUtente(UtenteDTO utente, String passwordHash) {
         // Il cast ?::ruolo_utente mappa correttamente la stringa Java nel tipo ENUM nativo di PostgreSQL
-        String sql = "INSERT INTO Utenti (email, password_hash, nome, cognome, ruolo) VALUES (?, ?, ?, ?, ?::ruolo_utente)";
+        String sql = "INSERT INTO Utenti (email, password, nome, cognome, ruolo) VALUES (?, ?, ?, ?, ?::ruolo_utente)";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -54,7 +54,7 @@ public class UtenteDAO {
      * @return Un oggetto {@link UtenteConHash} contenente il DTO e l'hash della password, oppure null se non trovato.
      */
     public UtenteConHash trovaPerEmail(String email) {
-        String sql = "SELECT id_utente, email, password_hash, nome, cognome, ruolo FROM Utenti WHERE email = ?";
+        String sql = "SELECT id_utente, email, password, nome, cognome, ruolo FROM Utenti WHERE email = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
