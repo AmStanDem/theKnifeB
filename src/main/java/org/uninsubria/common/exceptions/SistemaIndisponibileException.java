@@ -7,12 +7,12 @@ package org.uninsubria.common.exceptions;
 public class SistemaIndisponibileException extends TheKnifeException {
 
     public SistemaIndisponibileException() {
-        super("Il servizio è temporaneamente non disponibile a causa di un problema tecnico. Riprovare più tardi.", null);
+        super("Il servizio è temporaneamente non disponibile a causa di un problema tecnico. Riprovare più tardi.");
     }
 
     public SistemaIndisponibileException(Throwable causeLoggataNelServer) {
         // La causa viene passata a null verso il supercostruttore per evitare
         // che il Client tenti di deserializzare eccezioni SQL che non conosce.
-        super("Il servizio è temporaneamente non disponibile a causa di un problema tecnico. Riprovare più tardi.", null);
+        super("Il servizio è temporaneamente non disponibile a causa di un problema tecnico. Riprovare più tardi.");
     }
 }

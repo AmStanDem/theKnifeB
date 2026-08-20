@@ -99,6 +99,28 @@ public class RistoranteDAO {
         return null;
     }
 
+    public List<RistoranteDTO> trovaPerGestore(int idGestore) {
+        List<RistoranteDTO> lista = new ArrayList<>();
+
+        // Utilizza la query base che include già le JOIN per recensioni e cucine N:M
+        String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? GROUP BY r.id_ristorante ORDER BY r.nome ASC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idGestore);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mappaResultSetRistorante(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore ricerca ristoranti del gestore: " + e.getMessage());
+        }
+        return lista;
+    }
+
     public List<RistoranteDTO> cercaConFiltri(FiltriRicercaDTO filtri) {
         List<RistoranteDTO> lista = new ArrayList<>();
         boolean usaCoordinate = (filtri != null && filtri.latitudineRiferimento() != null && filtri.longitudineRiferimento() != null);

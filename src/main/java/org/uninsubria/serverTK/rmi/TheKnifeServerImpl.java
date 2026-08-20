@@ -21,72 +21,87 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
     }
 
     @Override
-    public UtenteDTO eseguiLogin(String email, String password) throws RemoteException, CredenzialiErrateException, SistemaIndisponibileException {
+    public UtenteDTO eseguiLogin(String email, String password)
+            throws RemoteException, CredenzialiErrateException, SistemaIndisponibileException {
         return utenteService.autentica(email, password);
     }
 
     @Override
-    public UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro) throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
+    public UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
+            throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
         return utenteService.registra(nuovoUtente, passwordInChiaro);
     }
 
     @Override
-    public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws RemoteException, SistemaIndisponibileException {
+    public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
+            throws RemoteException {
         return ristoranteService.cercaRistoranti(filtri);
     }
 
     @Override
-    public RistoranteDTO getDettaglioRistorante(Integer idRistorante) throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
+    public RistoranteDTO getDettaglioRistorante(Integer idRistorante)
+            throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
         return ristoranteService.ottieniDettaglio(idRistorante);
     }
 
     @Override
-    public List<RistoranteDTO> getRistorantiGestore(Integer idGestore) throws RemoteException, SistemaIndisponibileException {
+    public List<RistoranteDTO> getRistorantiGestore(Integer idGestore)
+            throws RemoteException, SistemaIndisponibileException {
         return ristoranteService.ottieniRistorantiGestore(idGestore);
     }
 
     @Override
-    public void registraNuovoRistorante(RistoranteDTO ristorante, Integer idGestore) throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
+    public void registraNuovoRistorante(RistoranteDTO ristorante, Integer idGestore)
+            throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
         ristoranteService.aggiungiRistorante(ristorante, idGestore);
     }
 
     @Override
-    public List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante) throws RemoteException, SistemaIndisponibileException {
+    public List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
+            throws RemoteException, SistemaIndisponibileException {
         return recensioneService.ottieniPerRistorante(idRistorante);
     }
 
     @Override
-    public void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente) throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException {
+    public void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
+            throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException {
         recensioneService.aggiungiRecensione(recensione, idRistorante, idUtente);
     }
 
     @Override
-    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle) throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
+    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle)
+            throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
         recensioneService.modifica(idRecensione, idUtente, nuovoTesto, nuoveStelle);
     }
 
     @Override
-    public void eliminaRecensione(Integer idRecensione, Integer idUtente) throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, SistemaIndisponibileException {
+    public void eliminaRecensione(Integer idRecensione, Integer idUtente)
+            throws RemoteException, RecensioneNonTrovataException, SistemaIndisponibileException {
         recensioneService.elimina(idRecensione, idUtente);
     }
 
     @Override
-    public void rispondiARecensione(Integer idRecensione, String testoRisposta, Integer idGestore) throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
-        recensioneService.aggiungiRisposta(idRecensione, testoRisposta);
+    public void rispondiARecensione(Integer idRecensione, String testoRisposta, Integer idGestore)
+            throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
+        // Corretta la chiamata aggiungendo l'idGestore come parametro
+        recensioneService.aggiungiRisposta(idRecensione, idGestore, testoRisposta);
     }
 
     @Override
-    public List<RistoranteDTO> getPreferitiUtente(Integer idUtente) throws RemoteException, SistemaIndisponibileException {
+    public List<RistoranteDTO> getPreferitiUtente(Integer idUtente)
+            throws RemoteException, SistemaIndisponibileException {
         return preferitiService.getPreferiti(idUtente);
     }
 
     @Override
-    public void aggiungiPreferito(Integer idUtente, Integer idRistorante) throws RemoteException, AzioneDuplicataException, SistemaIndisponibileException {
+    public void aggiungiPreferito(Integer idUtente, Integer idRistorante)
+            throws RemoteException, AzioneDuplicataException, SistemaIndisponibileException {
         preferitiService.aggiungi(idUtente, idRistorante);
     }
 
     @Override
-    public void rimuoviPreferito(Integer idUtente, Integer idRistorante) throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
+    public void rimuoviPreferito(Integer idUtente, Integer idRistorante)
+            throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
         preferitiService.rimuovi(idUtente, idRistorante);
     }
 }
