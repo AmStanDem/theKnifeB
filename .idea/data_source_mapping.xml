@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/src/main/java/org/uninsubria/serverTK/dao/PreferitiDAO.java" value="c52b72d8-40fa-493d-87ea-988be74b0494" />
     <file url="file://$PROJECT_DIR$/src/main/java/org/uninsubria/serverTK/dao/UtenteDAO.java" value="7eaf9183-26bb-4fbb-a89d-06bf70fd5e1b" />
   </component>
 </project>
