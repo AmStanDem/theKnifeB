@@ -9,53 +9,45 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.Rating?>
 
-<VBox
-        xmlns="http://javafx.com/javafx/21"
-        xmlns:fx="http://javafx.com/fxml/1"
-        styleClass="recensione-item"
-        spacing="10"
-        fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
+<VBox spacing="10" stylesheets="@../styles/recensione-item.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
 
     <!-- Header: Avatar + Nome + Menu Opzioni (Tre Punti) -->
     <HBox alignment="CENTER_LEFT" spacing="12">
         <StackPane fx:id="avatarCircle" styleClass="avatar-circle">
-            <Circle radius="18" styleClass="avatar-bg" fill="#5f7d8c" />
-            <Label fx:id="avatarInitial" styleClass="avatar-initial" text="T" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;" />
+            <Circle fill="#5f7d8c" radius="18" styleClass="avatar-bg" />
+            <Label fx:id="avatarInitial" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;" styleClass="avatar-initial" text="T" />
         </StackPane>
 
-        <Label fx:id="authorLabel" styleClass="author-name" text="Thomas Panero" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #202124;" />
+        <Label fx:id="authorLabel" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #202124;" styleClass="author-name" text="Thomas Panero" />
 
         <Region HBox.hgrow="ALWAYS" />
 
         <!-- Icona/Label tre punti stile Google -->
-        <Label text="⋮" style="-fx-font-size: 18px; -fx-text-fill: #5f6368; -fx-cursor: hand;" />
+        <Label style="-fx-font-size: 18px; -fx-text-fill: #5f6368; -fx-cursor: hand;" text="⋮" />
     </HBox>
 
     <!-- Riga Stelle + Data -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
-        <Rating fx:id="ratingControl" max="5" rating="3"
-                styleClass="review-rating-small"  />
-
-        <Label fx:id="timeLabel" styleClass="review-time" text="30 luglio 2026"
-               style="-fx-text-fill: #5f6368; -fx-font-size: 13px;" />
+            <Rating fx:id="ratingControl"
+                    max="5"
+                    rating="3"
+                    styleClass="review-rating-small"
+                    scaleX="0.5"
+                    scaleY="0.5"
+                    />
+        <Label fx:id="timeLabel" style="-fx-text-fill: #5f6368; -fx-font-size: 13px;" styleClass="review-time" text="30 luglio 2026" />
     </HBox>
 
     <!-- Testo recensione -->
-    <Label fx:id="reviewTextField" styleClass="review-text-field"
-           text="credo sia il gioco migliore a cui abbia mai giocato: ha ambientazioni, personaggi, dialoghi e storia impeccabili. prima di giocarci non mi sarei mai aspettato una mappa così vasta e tante missioni e personaggi, non manca nulla è davvero un bellissimo open word e lo consiglio. ha piccolissimi lati negativi come le poche ricompense ma quasi impercettibili durante il gioco perché diventa continuativo ma per niente stancante."
-           wrapText="true" prefWidth="350" maxWidth="350"
-           style="-fx-font-size: 14px; -fx-text-fill: #3c4043; -fx-line-spacing: 2px;" />
+    <Label fx:id="reviewTextField" maxWidth="350" prefWidth="350" style="-fx-font-size: 14px; -fx-text-fill: #3c4043; -fx-line-spacing: 2px;" styleClass="review-text-field" text="credo sia il gioco migliore a cui abbia mai giocato: ha ambientazioni, personaggi, dialoghi e storia impeccabili. prima di giocarci non mi sarei mai aspettato una mappa così vasta e tante missioni e personaggi, non manca nulla è davvero un bellissimo open word e lo consiglio. ha piccolissimi lati negativi come le poche ricompense ma quasi impercettibili durante il gioco perché diventa continuativo ma per niente stancante." wrapText="true" />
 
     <!-- Sezione Risposta -->
     <VBox spacing="4" style="-fx-padding: 8px 0 0 0;">
         <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="actions-row">
-            <Label fx:id="likeCountLabel" styleClass="like-count" text="RISPOSTE" style="-fx-font-size: 11px; -fx-text-fill: #70757a; -fx-font-weight: bold;" />
+            <Label fx:id="likeCountLabel" style="-fx-font-size: 11px; -fx-text-fill: #70757a; -fx-font-weight: bold;" styleClass="like-count" text="RISPOSTE" />
         </HBox>
 
-        <Label fx:id="responseTextField" styleClass="response-text-field"
-               text="Nam vestibulum neque a maximus scelerisque."
-               wrapText="true" prefWidth="350" maxWidth="350"
-               style="-fx-font-size: 13px; -fx-text-fill: #5f6368;" />
+        <Label fx:id="responseTextField" maxWidth="350" prefWidth="350" style="-fx-font-size: 13px; -fx-text-fill: #5f6368;" styleClass="response-text-field" text="Nam vestibulum neque a maximus scelerisque." wrapText="true" />
     </VBox>
 
     <padding>
