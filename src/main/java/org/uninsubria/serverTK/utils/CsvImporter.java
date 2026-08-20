@@ -10,10 +10,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class CsvImporter {
 
-    private static final int BATCH_SIZE = 500; // Ottimizzazione della memoria e del network I/O
+    private static final int BATCH_SIZE = 500; // Ottimizzazione della memoria I/O
 
     public static void importaSeNecessario() {
         if (datiGiaPresenti()) {
@@ -21,9 +22,8 @@ public class CsvImporter {
             return;
         }
 
-        System.out.println("[ETL_INFO] Inizio importazione massiva del dataset Michelin...");
+        System.out.println("[ETL_INFO] Inizio importazione massiva del dataset Michelin con normalizzazione 3NF...");
 
-        // Legge il file direttamente dal Classpath (funziona sia su IDE che da JAR compilato)
         try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps.csv")) {
 
             if (is == null) {
@@ -31,74 +31,111 @@ public class CsvImporter {
                 return;
             }
 
+            String sqlRistorante = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sqlUpsertCucina = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO UPDATE SET nome = EXCLUDED.nome RETURNING id_tipologia";
+            String sqlPonte = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES (?, ?) ON CONFLICT DO NOTHING";
+
             try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                  Connection conn = DatabaseConfig.getConnection()) {
 
-                // Disabilita l'autocommit per gestire il batch in un'unica transazione
-                conn.setAutoCommit(false);
+                conn.setAutoCommit(false); // Avvio transazione esplicita
 
-                String sql = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, tipo_cucina, prezzo_medio, delivery, booking_online) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement stmtRest = conn.prepareStatement(sqlRistorante, Statement.RETURN_GENERATED_KEYS);
+                     PreparedStatement stmtCucina = conn.prepareStatement(sqlUpsertCucina);
+                     PreparedStatement stmtPonte = conn.prepareStatement(sqlPonte)) {
 
-                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     String line;
                     boolean isFirstLine = true;
                     int count = 0;
 
                     while ((line = br.readLine()) != null) {
                         if (isFirstLine) {
-                            isFirstLine = false; // Salta l'intestazione
+                            isFirstLine = false;
                             continue;
                         }
 
                         // Regex per splittare sulle virgole ignorando quelle all'interno delle virgolette ("")
                         String[] colonne = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                        if (colonne.length < 7) continue; // Salta righe malformate
+                        if (colonne.length < 7) continue;
 
                         try {
                             String nome = pulisciStringa(colonne[0]);
                             String indirizzo = pulisciStringa(colonne[1]);
                             String citta = pulisciStringa(colonne[2]);
-                            String tipoCucina = pulisciStringa(colonne[4]);
-
-                            // Estrazione Coordinate
+                            String cucineRaw = pulisciStringa(colonne[4]);
                             double longitudine = Double.parseDouble(pulisciStringa(colonne[5]));
                             double latitudine = Double.parseDouble(pulisciStringa(colonne[6]));
 
-                            stmt.setInt(1, 1); // Assegniamo bulk al gestore con ID 1
-                            stmt.setString(2, nome.isEmpty() ? "Sconosciuto" : nome);
-                            stmt.setString(3, indirizzo.isEmpty() ? "Indirizzo non disponibile" : indirizzo);
-                            stmt.setString(4, citta.isEmpty() ? "Sconosciuta" : citta);
-                            stmt.setString(5, "Non specificata"); // Nazione assente nel CSV base
-                            stmt.setDouble(6, latitudine);
-                            stmt.setDouble(7, longitudine);
-                            stmt.setString(8, tipoCucina.isEmpty() ? "Generica" : tipoCucina);
-                            stmt.setDouble(9, 100.00); // Prezzo medio di fallback
-                            stmt.setBoolean(10, false);
-                            stmt.setBoolean(11, false);
+                            // 1. Inserimento Ristorante
+                            stmtRest.setInt(1, 1); // Assegnazione al gestore fittizio con ID 1
+                            stmtRest.setString(2, nome.isEmpty() ? "Sconosciuto" : nome);
+                            stmtRest.setString(3, indirizzo.isEmpty() ? "Indirizzo non disponibile" : indirizzo);
+                            stmtRest.setString(4, citta.isEmpty() ? "Sconosciuta" : citta);
+                            stmtRest.setString(5, "Non specificata"); // Il dataset non prevede nazione
+                            stmtRest.setDouble(6, latitudine);
+                            stmtRest.setDouble(7, longitudine);
+                            stmtRest.setDouble(8, 100.00); // Prezzo medio di fallback
+                            stmtRest.setBoolean(9, false);
+                            stmtRest.setBoolean(10, false);
 
-                            stmt.addBatch();
+                            stmtRest.executeUpdate();
+
+                            // 2. Recupero ID Ristorante generato
+                            int idRistorante;
+                            try (ResultSet rsKeys = stmtRest.getGeneratedKeys()) {
+                                if (rsKeys.next()) {
+                                    idRistorante = rsKeys.getInt(1);
+                                } else {
+                                    continue;
+                                }
+                            }
+
+                            // 3. Inserimento Cucine multiple e Tabella Ponte
+                            if (!cucineRaw.isEmpty()) {
+                                String[] tipologie = cucineRaw.split(",");
+                                for (String tipo : tipologie) {
+                                    String cleanTipo = tipo.trim();
+                                    if (cleanTipo.isEmpty()) continue;
+
+                                    // Upsert Cucina
+                                    stmtCucina.setString(1, cleanTipo);
+                                    int idCucina;
+                                    try (ResultSet rsCucina = stmtCucina.executeQuery()) {
+                                        if (rsCucina.next()) {
+                                            idCucina = rsCucina.getInt(1);
+                                        } else {
+                                            continue;
+                                        }
+                                    }
+
+                                    // Collegamento
+                                    stmtPonte.setInt(1, idRistorante);
+                                    stmtPonte.setInt(2, idCucina);
+                                    stmtPonte.executeUpdate();
+                                }
+                            }
+
                             count++;
 
-                            // Esegue il flush del batch ogni 500 record
+                            // Flush a blocchi per liberare memoria ed evitare transazioni infinite
                             if (count % BATCH_SIZE == 0) {
-                                stmt.executeBatch();
+                                conn.commit();
                             }
+
                         } catch (NumberFormatException e) {
-                            // Ignora silenziosamente la singola riga se le coordinate sono sporche/mancanti
+                            // Si ignora il singolo record se le coordinate sono assenti o corrotte nel CSV
                         }
                     }
 
-                    // Esegue i record residui
-                    stmt.executeBatch();
-                    conn.commit();
-                    System.out.println("[ETL_SUCCESS] Importati con successo " + count + " ristoranti.");
+                    conn.commit(); // Commit dei record residui
+                    System.out.println("[ETL_SUCCESS] Importati con successo " + count + " ristoranti con cucina N:M normalizzata.");
+
                 } catch (SQLException e) {
                     conn.rollback();
-                    System.err.println("[ETL_ERROR] Fallimento durante l'inserimento batch. Rollback eseguito. " + e.getMessage());
+                    System.err.println("[ETL_ERROR] Fallimento durante l'inserimento. Rollback eseguito. " + e.getMessage());
                 } finally {
-                    conn.setAutoCommit(true); // Ripristina lo stato del connection pool
+                    conn.setAutoCommit(true);
                 }
             }
         } catch (Exception e) {
@@ -122,9 +159,6 @@ public class CsvImporter {
         return false;
     }
 
-    /**
-     * Rimuove i doppi apici (") di escape che il formato CSV aggiunge attorno ai campi contenenti virgole.
-     */
     private static String pulisciStringa(String input) {
         if (input == null) return "";
         String trimmed = input.trim();

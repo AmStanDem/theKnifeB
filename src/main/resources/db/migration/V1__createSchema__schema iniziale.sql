@@ -5,6 +5,8 @@
 DROP TABLE IF EXISTS Preferiti CASCADE;
 DROP TABLE IF EXISTS Risposte_Recensioni CASCADE;
 DROP TABLE IF EXISTS Recensioni CASCADE;
+DROP TABLE IF EXISTS Ristoranti_Tipologie CASCADE;
+DROP TABLE IF EXISTS Tipologia_Cucina CASCADE;
 DROP TABLE IF EXISTS RistorantiTheKnife CASCADE;
 DROP TABLE IF EXISTS Utenti CASCADE;
 
@@ -17,17 +19,17 @@ CREATE TABLE Utenti (
                         password VARCHAR(255) NOT NULL,
                         nome VARCHAR(100) NOT NULL,
                         cognome VARCHAR(100) NOT NULL,
-                        data_nascita DATE,
-                        domicilio VARCHAR(255) NOT NULL,
-                        ruolo VARCHAR(20) NOT NULL,
+                        data_nascita DATE,                  -- Facoltativo come da specifiche
+                        domicilio VARCHAR(255) NOT NULL,    -- Obbligatorio come da specifiche
+                        ruolo VARCHAR(20) NOT NULL,         -- Cliente o Gestore
                         data_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         CONSTRAINT chk_ruolo CHECK (ruolo IN ('cliente', 'gestore'))
 );
 
 -- ==============================================================================
--- 2. DOMINIO CORE: RISTORANTI
+-- 2. DOMINIO CORE: RISTORANTI E TIPOLOGIE CUCINA (3NF)
 -- ==============================================================================
--- Denominata "RistorantiTheKnife" come richiesto esplicitamente dalle specifiche.
+-- Tabella principale denominata "RistorantiTheKnife" come da specifiche.
 CREATE TABLE RistorantiTheKnife (
                                     id_ristorante SERIAL PRIMARY KEY,
                                     id_gestore INT NOT NULL,
@@ -37,7 +39,6 @@ CREATE TABLE RistorantiTheKnife (
                                     nazione VARCHAR(100) NOT NULL,
                                     latitudine NUMERIC(10, 7) NOT NULL,
                                     longitudine NUMERIC(10, 7) NOT NULL,
-                                    tipo_cucina VARCHAR(100) NOT NULL,
                                     prezzo_medio NUMERIC(6, 2) NOT NULL,
                                     delivery BOOLEAN NOT NULL DEFAULT FALSE,
                                     booking_online BOOLEAN NOT NULL DEFAULT FALSE,
@@ -47,8 +48,25 @@ CREATE TABLE RistorantiTheKnife (
                                     CONSTRAINT chk_prezzo_medio CHECK (prezzo_medio >= 0)
 );
 
+-- Tabella di Dominio per le Cucine
+CREATE TABLE Tipologia_Cucina (
+                                  id_tipologia SERIAL PRIMARY KEY,
+                                  nome VARCHAR(100) UNIQUE NOT NULL -- UNIQUE previene duplicati come "Italiana" e "Italiana"
+);
+
+-- Tabella Ponte (Relazione Molti-a-Molti)
+CREATE TABLE Ristoranti_Tipologie (
+                                      id_ristorante INT NOT NULL,
+                                      id_tipologia INT NOT NULL,
+                                      PRIMARY KEY (id_ristorante, id_tipologia),
+                                      CONSTRAINT fk_rt_ristorante FOREIGN KEY (id_ristorante)
+                                          REFERENCES RistorantiTheKnife(id_ristorante) ON DELETE CASCADE,
+                                      CONSTRAINT fk_rt_tipologia FOREIGN KEY (id_tipologia)
+                                          REFERENCES Tipologia_Cucina(id_tipologia) ON DELETE CASCADE
+);
+
 -- ==============================================================================
--- 3. FEEDBACK: RECENSIONI 
+-- 3. FEEDBACK: RECENSIONI
 -- ==============================================================================
 CREATE TABLE Recensioni (
                             id_recensione SERIAL PRIMARY KEY,
@@ -99,6 +117,7 @@ CREATE TABLE Preferiti (
 -- ==============================================================================
 CREATE INDEX idx_ristoranti_gestore ON RistorantiTheKnife(id_gestore);
 CREATE INDEX idx_ristoranti_citta ON RistorantiTheKnife(LOWER(citta));
+CREATE INDEX idx_rt_tipologia ON Ristoranti_Tipologie(id_tipologia);
 CREATE INDEX idx_recensioni_ristorante ON Recensioni(id_ristorante);
 CREATE INDEX idx_recensioni_utente ON Recensioni(id_utente);
 CREATE INDEX idx_preferiti_ristorante ON Preferiti(id_ristorante);
