@@ -1,11 +1,12 @@
 package org.uninsubria.common.dto;
+
 import java.io.Serializable;
 
 public record FiltriRicercaDTO(
-        String locazione, // Obbligatorio
+        String locazione,
         String tipoCucina,
-        Double prezzoMax,
         Double prezzoMin,
+        Double prezzoMax,
         Boolean delivery,
         Boolean bookingOnline,
         Integer mediaStelleMinima
