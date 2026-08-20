@@ -1,6 +1,7 @@
 package org.uninsubria.common.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public record RistoranteDTO(
         Integer idRistorante,
@@ -10,10 +11,9 @@ public record RistoranteDTO(
         String citta,
         Double latitudine,
         Double longitudine,
-        String tipoCucina,
+        List<String> tipologieCucina,
         Double prezzoMedio,
         Boolean delivery,
         Boolean bookingOnline,
-        Double mediaStelle // Valore aggregato, non presente come colonna fissa nel DB
+        Double mediaStelle
 ) implements Serializable {}
-
