@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class MainLayoutController {
+public class MainLayoutLoggatoController {
 
     @FXML
     private TextField txtLocalita;
@@ -22,6 +22,7 @@ public class MainLayoutController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
+        System.out.println("Ricerca cliccata");
         try {
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene()
@@ -36,10 +37,11 @@ public class MainLayoutController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
+    private void onAreaPersonaleClick(MouseEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene()
@@ -47,7 +49,7 @@ public class MainLayoutController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/SignUp.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/AreaCliente.fxml")
                     )
             ));
 
@@ -87,7 +89,7 @@ public class MainLayoutController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
                     )
             ));
 

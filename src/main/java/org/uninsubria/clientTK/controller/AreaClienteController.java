@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class MainLayoutController {
+public class AreaClienteController {
 
     @FXML
     private TextField txtLocalita;
@@ -22,20 +22,7 @@ public class MainLayoutController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/listaRistoranti.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Ricerca cliccata");
     }
 
     @FXML
@@ -79,6 +66,44 @@ public class MainLayoutController {
     }
 
 
+    public void onPreferitiClick(ActionEvent actionEvent) {
+    }
+
+    public void onRecensioniClick(ActionEvent actionEvent) {
+        try {
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/RecensioneItem.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onLogOutClick(ActionEvent actionEvent) {
+        try {
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void handleLogoClick(MouseEvent mouseEvent) {
         try {
             Stage stage = (Stage) ((Node) mouseEvent.getSource())
@@ -87,7 +112,7 @@ public class MainLayoutController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
                     )
             ));
 

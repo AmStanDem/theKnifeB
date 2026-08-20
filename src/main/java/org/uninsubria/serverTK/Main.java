@@ -2,6 +2,6 @@ package org.uninsubria.serverTK;
 
 public class Main {
     static void main() {
-        IO.readln();
+        System.out.println("...");
     }
 }

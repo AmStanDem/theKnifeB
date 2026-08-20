@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import org.controlsfx.control.Rating?>
+
+<VBox
+        xmlns="http://javafx.com/javafx/21"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
+    <!-- Header: avatar + nome + local guide -->
+    <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="349.0" spacing="10">
+        <StackPane fx:id="avatarCircle" styleClass="avatar-circle">
+            <Circle radius="20" styleClass="avatar-bg" />
+            <Label fx:id="avatarInitial" styleClass="avatar-initial" text="M" />
+        </StackPane>
+
+        <VBox alignment="CENTER_LEFT" spacing="2">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="authorLabel" styleClass="author-name" text="Nome Autore" />
+                <Label fx:id="localGuideLabel" styleClass="local-guide-badge" text="Local Guide" />
+            </HBox>
+        </VBox>
+
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Riga data + stelle -->
+    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
+        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="277.0">
+            <children>
+                <Rating fx:id="ratingControl" max="5" styleClass="review-rating" />
+            </children>
+        </HBox>
+        <Label fx:id="timeLabel" prefHeight="10.0" prefWidth="35.0" styleClass="review-time" text="data" />
+    </HBox>
+
+    <!-- Testo recensione -->
+    <HBox prefHeight="0.0" prefWidth="287.0">
+        <children>
+            <Label fx:id="reviewTextField" prefWidth="369.0" styleClass="review-text-field" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut lacinia libero turpis, eget imperdiet eros cursus sed. Integer iaculis consectetur sem. Suspendisse facilisis risus nulla, a pretium mauris venenatis at. In suscipit tristique ante, id eleifend magna. Phasellus eget lorem eros. Aliquam fermentum dolor dolor, quis semper arcu ornare sit amet. Quisque ipsum lorem, pellentesque ut porttitor vitae, vestibulum vitae libero. Proin gravida eros velit, ut varius tortor laoreet sit amet. Phasellus eleifend nunc ut justo lacinia mollis. Proin in orci eu urna sagittis ullamcorper. Sed sed nunc ac est rutrum commodo vitae sed leo. Donec luctus efficitur justo vel sagittis. Phasellus quis lacinia urna. Integer massa magna, vehicula a tellus sit amet, faucibus commodo odio. Maecenas risus ante, scelerisque commodo augue at, tincidunt bibendum velit." wrapText="true" />
+        </children>
+    </HBox>
+
+    <!-- Etichetta sezione risposte -->
+    <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="actions-row">
+        <Label fx:id="likeCountLabel" styleClass="like-count" text="RISPOSTE" />
+    </HBox>
+
+    <!-- Testo risposta -->
+    <HBox prefHeight="17.0" prefWidth="277.0">
+        <children>
+            <Label fx:id="responseTextField" prefWidth="369.0" styleClass="review-text-field" text="Nam vestibulum neque a maximus scelerisque. Curabitur in convallis quam. Mauris bibendum sodales nibh, interdum fringilla nisi maximus non. Sed id porttitor nisl, eu lobortis mauris. Cras non massa sodales, euismod nibh ac, molestie felis. Cras gravida, eros eu facilisis placerat, lacus ante porttitor odio, ut tempus neque ex ut dui. Sed at ligula sollicitudin, mollis nunc sed, interdum ante. Proin tincidunt tincidunt sem, ac placerat felis rutrum eget. Pellentesque scelerisque commodo diam sed accumsan. Fusce bibendum sem et maximus egestas. Interdum et malesuada fames ac ante ipsum primis in faucibus." wrapText="true" />
+        </children>
+    </HBox>
+
+    <padding>
+        <Insets bottom="14" left="16" right="16" top="14" />
+    </padding>
+</VBox>

@@ -18,7 +18,7 @@
             stylesheets="@../styles/main-layout.css"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
+            fx:controller="org.uninsubria.clientTK.controller.MainLayoutLoggatoController">
 
     <!-- HEADER -->
     <top>
@@ -52,13 +52,17 @@
                 <Region HBox.hgrow="ALWAYS" />
 
                 <!-- AREA PERSONALE -->
-                <Button fx:id="btnAreaPersonale"
-                        mnemonicParsing="false"
-                        onAction="#onAreaPersonaleClick"
-                        prefHeight="63.0"
-                        prefWidth="285.0"
-                        styleClass="accent"
-                        text="Accedi / Registrati" />
+                <ImageView fitHeight="100.0"
+                           fitWidth="350.0"
+                           preserveRatio="true"
+                           onMouseClicked="#onAreaPersonaleClick">
+
+                    <image>
+                        <Image url="@../../../../images/user.png" />
+                    </image>
+
+                </ImageView>
+
 
             </children>
 

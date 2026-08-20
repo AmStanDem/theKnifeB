@@ -1,0 +1,209 @@
+/* ==========================================================
+   TheKnife - Stile pagina di Ricerca Avanzata
+   Palette:
+     - Verde primario:  #4CAF50
+     - Verde scuro:      #388E3C
+     - Header scuro:     #1c1c1e
+     - Grigio bordo:     #dcdcdc
+     - Grigio testo:     #6b6b6b
+   ========================================================== */
+
+.root-pane {
+    -fx-background-color: #f4f4f4;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.header-bar {
+    -fx-background-color: #1c1c1e;
+}
+
+.logo-text-white {
+    -fx-fill: #ffffff;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.logo-text-green {
+    -fx-fill: #4CAF50;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.header-subtitle {
+    -fx-text-fill: #cfcfcf;
+    -fx-font-size: 13px;
+}
+
+/* ---------------- CONTENITORE ---------------- */
+
+.scroll-container {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.form-container {
+    -fx-background-color: transparent;
+}
+
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1c1c1e;
+    -fx-padding: 0 0 6 0;
+}
+
+.form-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e2e2;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 3);
+}
+
+/* ---------------- CAMPI DI INPUT ---------------- */
+
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1c1c1e;
+}
+
+.field-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9a9a9a;
+}
+
+.field-input {
+    -fx-background-color: #f7f7f7;
+    -fx-background-radius: 8;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 8 10 8 10;
+    -fx-font-size: 13px;
+}
+
+.field-input:focused {
+    -fx-border-color: #4CAF50;
+    -fx-background-color: #ffffff;
+}
+
+.field-checkbox {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1c1c1e;
+}
+
+.field-checkbox .box {
+    -fx-background-color: #f7f7f7;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.field-checkbox:selected .box {
+    -fx-background-color: #4CAF50;
+    -fx-border-color: #4CAF50;
+}
+
+.field-checkbox:selected .mark {
+    -fx-background-color: #ffffff;
+}
+
+/* ---------------- FASCIA DI PREZZO (RangeSlider ControlsFX) ---------------- */
+
+.price-range-slider .track {
+    -fx-background-color: #e0e0e0;
+    -fx-background-radius: 4;
+}
+
+.price-range-slider .range-bar {
+    -fx-background-color: #4CAF50;
+    -fx-background-radius: 4;
+}
+
+.price-range-slider .low-thumb,
+.price-range-slider .high-thumb {
+    -fx-background-color: #ffffff, #388E3C;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 12;
+    -fx-border-color: #388E3C;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 3, 0, 0, 1);
+}
+
+.price-range-slider .axis {
+    -fx-tick-label-fill: #9a9a9a;
+    -fx-font-size: 10px;
+}
+
+.price-value {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #388E3C;
+}
+
+.price-separator {
+    -fx-text-fill: #9a9a9a;
+}
+
+/* ---------------- VALUTAZIONE (Rating ControlsFX) ---------------- */
+
+.star-rating {
+    -fx-skin: "org.controlsfx.control.skin.RatingSkin";
+}
+
+/* Stelle non selezionate */
+.star-rating > .container > .button {
+    -fx-background-color: transparent;
+    -fx-shape: "M50,0 L61,35 L98,35 L68,57 L79,91 L50,70 L21,91 L32,57 L2,35 L39,35 Z";
+    -fx-scale-shape: true;
+    -fx-background-insets: 0;
+    -fx-padding: 8px;
+    -fx-background-color: #dcdcdc;
+}
+
+/* Stelle selezionate / evidenziate */
+.star-rating > .container > .button.strong {
+    -fx-background-color: #f5a623;
+}
+
+/* ---------------- BOTTONIERA ---------------- */
+
+.button-bar {
+    -fx-padding: 6 0 0 0;
+}
+
+.btn-primary {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 24;
+    -fx-padding: 10 32 10 32;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #388E3C;
+}
+
+.btn-primary:armed {
+    -fx-background-color: #2e7d32;
+}
+
+.btn-secondary {
+    -fx-background-color: #e8e8e8;
+    -fx-text-fill: #1c1c1e;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 24;
+    -fx-padding: 10 24 10 24;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #d8d8d8;
+}

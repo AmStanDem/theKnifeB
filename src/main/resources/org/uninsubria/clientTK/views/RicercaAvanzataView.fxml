@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+<?import org.controlsfx.control.Rating?>
+<?import org.controlsfx.control.RangeSlider?>
+
+<!--
+    Pagina di Ricerca Avanzata - TheKnife
+    Controller di riferimento: RicercaAvanzataController
+    Dipendenza richiesta: ControlsFX (org.controlsfx:controlsfx) per Rating e RangeSlider
+-->
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.uninsubria.clientTK.controller.RicercaAvanzataController"
+            stylesheets="@../styles/ricerca-avanzata.css"
+            styleClass="root-pane">
+
+    <!-- ===================== HEADER ===================== -->
+    <top>
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="10">
+            <padding>
+                <Insets top="16" right="24" bottom="16" left="24"/>
+            </padding>
+            <TextFlow>
+                <Text text="The" styleClass="logo-text-white"/>
+                <Text text="Knife" styleClass="logo-text-green"/>
+            </TextFlow>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label text="Ricerca Avanzata" styleClass="header-subtitle"/>
+        </HBox>
+    </top>
+
+    <!-- ===================== CONTENUTO ===================== -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-container">
+            <VBox alignment="TOP_CENTER" spacing="20" styleClass="form-container">
+                <padding>
+                    <Insets top="30" right="24" bottom="40" left="24"/>
+                </padding>
+
+                <Label text="Trova il ristorante perfetto per te" styleClass="page-title"/>
+
+                <!-- Card contenitore del form -->
+                <VBox spacing="22" styleClass="form-card" maxWidth="560">
+                    <padding>
+                        <Insets top="24" right="28" bottom="24" left="28"/>
+                    </padding>
+
+                    <!--- Localita (obbligatorio) - -->
+                    <VBox spacing="6" styleClass="field-group">
+                        <Label text="Località *" styleClass="field-label"/>
+                        <TextField fx:id="txtLocalita"
+                                   promptText="Es. Milano, Via Roma 12, oppure CAP"
+                                   styleClass="field-input"/>
+                        <Label text="Campo obbligatorio" styleClass="field-hint"/>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!--- Tipologia di cucina - -->
+                    <VBox spacing="6" styleClass="field-group">
+                        <Label text="Tipologia di cucina" styleClass="field-label"/>
+                        <ComboBox fx:id="cmbTipologiaCucina"
+                                  promptText="Tutte le tipologie"
+                                  editable="false"
+                                  maxWidth="Infinity"
+                                  styleClass="field-input"/>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!--- Fascia di prezzo -->
+                    <VBox spacing="8" styleClass="field-group">
+                        <Label text="Fascia di prezzo" styleClass="field-label"/>
+                        <RangeSlider fx:id="rangeSliderPrezzo"
+                                     min="0" max="150"
+                                     lowValue="0" highValue="50"
+                                     blockIncrement="5"
+                                     majorTickUnit="25"
+                                     showTickLabels="true"
+                                     showTickMarks="true"
+                                     styleClass="price-range-slider"/>
+                        <HBox alignment="CENTER" spacing="6">
+                            <Label fx:id="lblPrezzoMin" text="0 €" styleClass="price-value"/>
+                            <Label text="—" styleClass="price-separator"/>
+                            <Label fx:id="lblPrezzoMax" text="50 €" styleClass="price-value"/>
+                        </HBox>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!--- Servizi disponibili - -->
+                    <VBox spacing="10" styleClass="field-group">
+                        <Label text="Servizi disponibili" styleClass="field-label"/>
+                        <HBox spacing="24">
+                            <CheckBox fx:id="chkDelivery" text="Servizio di delivery" styleClass="field-checkbox"/>
+                            <CheckBox fx:id="chkPrenotazione" text="Prenotazione online" styleClass="field-checkbox"/>
+                        </HBox>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!-- - Valutazione minima (stelle) - -->
+                    <VBox spacing="8" styleClass="field-group">
+                        <Label text="Valutazione minima" styleClass="field-label"/>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Rating fx:id="ratingStelleMinime"
+                                    max="5"
+                                    rating="0"
+                                    partialRating="true"
+                                    styleClass="star-rating"/>
+                            <Label fx:id="lblRatingValore" text="Nessun minimo" styleClass="field-hint"/>
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+
+                <!-- - Pulsanti azione - -->
+                <HBox spacing="14" alignment="CENTER" styleClass="button-bar">
+                    <Button fx:id="btnReimposta"
+                            text="Reimposta"
+                            onAction="#reimpostaFiltri"
+                            styleClass="btn-secondary"/>
+                    <Button fx:id="btnCerca"
+                            text="Cerca"
+                            onAction="#cercaRistorante"
+                            defaultButton="true"
+                            styleClass="btn-primary"/>
+                </HBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

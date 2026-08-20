@@ -1,0 +1,144 @@
+.root {
+    -fx-background-color: #F5F5F5;
+}
+
+.header {
+    -fx-background-color: #1A1A1E;
+}
+
+.flat {
+    -fx-background-color: #E8E8E8;
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.flat:hover {
+    -fx-background-color: #D5D5D5;
+}
+
+.flat:pressed {
+    -fx-background-color: #C5C5C5;
+}
+
+.accent {
+    -fx-background-color: #3E9330;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.accent:hover {
+    -fx-background-color: #3E9330;
+}
+
+.accent:pressed {
+    -fx-background-color: #3E9330;
+}
+
+/* =========================
+   TITOLO RICERCA
+   ========================= */
+
+.search-title {
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+/* =========================
+   BARRA DI RICERCA
+   ========================= */
+
+.search-field {
+    -fx-background-color: white;
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 18px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #D0D0D0;
+    -fx-border-width: 1px;
+    -fx-padding: 0 15px 0 15px;
+}
+
+.search-field:focused {
+    -fx-border-color: #3E9330;
+    -fx-border-width: 2px;
+}
+
+.search-field .text {
+    -fx-fill: #1A1A1E;
+}
+
+
+/* =========================
+   LOCALITÀ
+   ========================= */
+
+.location-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #D0D0D0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+
+/* Campo "Dove?" */
+
+.location-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 18px;
+    -fx-background-radius: 10px 0 0 10px;
+    -fx-border-width: 0;
+    -fx-padding: 0 10px 0 15px;
+}
+
+.location-field .text {
+    -fx-fill: #1A1A1E;
+}
+
+
+/* Pulsante posizione */
+
+.location-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3E9330;
+    -fx-font-size: 22px;
+    -fx-background-radius: 0 10px 10px 0;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+}
+
+.location-button:hover {
+    -fx-background-color: #F0F0F0;
+}
+
+.location-button:pressed {
+    -fx-background-color: #E5E5E5;
+}
+
+
+/* =========================
+   RICERCA AVANZATA
+   ========================= */
+
+.advanced-search {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3E9330;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.advanced-search:hover {
+    -fx-text-fill: #2E7525;
+    -fx-underline: true;
+}

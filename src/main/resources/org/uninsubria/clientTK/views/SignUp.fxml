@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/signUp-style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.SignUpController">
+
+<!-- CONTENUTO -->
+<center>
+<StackPane alignment="CENTER">
+
+    <VBox alignment="TOP_CENTER"
+          maxWidth="Infinity"
+          maxHeight="Infinity"
+          spacing="15.0"
+          styleClass="signup-card">
+
+        <padding>
+            <Insets bottom="30.0"
+                    left="60.0"
+                    right="60.0"
+                    top="25.0" />
+        </padding>
+
+
+        <!-- LOGO -->
+        <StackPane styleClass="logo-container">
+
+            <ImageView fitHeight="65.0" fitWidth="65.0" preserveRatio="true" onMouseClicked="#handleLogoClick">
+
+                <image>
+                    <Image url="@../../../../images/logo.png" />
+                </image>
+
+            </ImageView>
+
+        </StackPane>
+
+
+        <!-- TITOLO -->
+        <Label styleClass="title-label" text="Crea il tuo account">
+
+            <VBox.margin>
+                <Insets bottom="5.0" />
+            </VBox.margin>
+
+        </Label>
+
+
+        <!-- INFO -->
+        <Label styleClass="info-label" text="ⓘ Tutti i campi sono obbligatori" />
+
+
+        <!-- NOME -->
+        <VBox spacing="4.0">
+
+            <Label styleClass="field-label" text="Nome" />
+
+            <TextField fx:id="nomeField" prefHeight="45.0" promptText="Inserisci il nome" />
+
+        </VBox>
+
+
+        <!-- COGNOME -->
+        <VBox spacing="4.0">
+
+            <Label styleClass="field-label" text="Cognome" />
+
+            <TextField fx:id="cognomeField" prefHeight="45.0" promptText="Inserisci il cognome" />
+
+        </VBox>
+
+
+        <!-- RUOLO -->
+        <VBox spacing="4.0">
+
+            <Label styleClass="field-label" text="Ruolo" />
+
+            <ComboBox fx:id="ruoloComboBox" maxWidth="Infinity" prefHeight="45.0" promptText="Seleziona il ruolo">
+
+                <items>
+
+                    <FXCollections fx:factory="observableArrayList">
+
+                        <String fx:value="Cliente" />
+
+                        <String fx:value="Ristoratore" />
+
+                    </FXCollections>
+
+                </items>
+
+            </ComboBox>
+
+        </VBox>
+
+
+        <!-- EMAIL -->
+        <VBox spacing="4.0">
+
+            <Label styleClass="field-label" text="E-mail" />
+
+            <TextField fx:id="emailField" prefHeight="45.0" promptText="Inserisci l'e-mail" />
+
+        </VBox>
+
+
+        <!-- PASSWORD -->
+        <VBox spacing="4.0">
+
+            <Label styleClass="field-label" text="Password" />
+
+            <PasswordField fx:id="passwordField" prefHeight="45.0" promptText="Inserisci la password" />
+
+            <Label styleClass="hint-label" text="ⓘ La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola" wrapText="true" />
+
+        </VBox>
+
+
+        <!-- SEPARATORE -->
+        <Separator>
+            <VBox.margin>
+                <Insets bottom="5.0" top="5.0" />
+            </VBox.margin>
+        </Separator>
+
+
+        <!-- REGISTRA -->
+        <Button fx:id="registratiButton" maxWidth="Infinity" mnemonicParsing="false" onAction="#handleRegistrati" prefHeight="50.0" styleClass="primary-button" text="Registrati" />
+
+
+        <!-- LOGIN -->
+        <HBox alignment="CENTER" spacing="4.0">
+
+            <Label styleClass="info-label" text="Hai già un account?" />
+
+            <Label onMouseClicked="#handleAccedi" styleClass="link-label" text="Accedi" />
+
+        </HBox>
+
+    </VBox>
+
+</StackPane>
+</center>
+
+</BorderPane>
