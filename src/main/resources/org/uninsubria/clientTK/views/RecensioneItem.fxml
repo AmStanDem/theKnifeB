@@ -12,54 +12,53 @@
 <VBox
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
+        styleClass="recensione-item"
+        spacing="10"
         fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
-    <!-- Header: avatar + nome + local guide -->
-    <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="349.0" spacing="10">
+
+    <!-- Header: Avatar + Nome + Menu Opzioni (Tre Punti) -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
         <StackPane fx:id="avatarCircle" styleClass="avatar-circle">
-            <Circle radius="20" styleClass="avatar-bg" />
-            <Label fx:id="avatarInitial" styleClass="avatar-initial" text="M" />
+            <Circle radius="18" styleClass="avatar-bg" fill="#5f7d8c" />
+            <Label fx:id="avatarInitial" styleClass="avatar-initial" text="T" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;" />
         </StackPane>
 
-        <VBox alignment="CENTER_LEFT" spacing="2">
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label fx:id="authorLabel" styleClass="author-name" text="Nome Autore" />
-                <Label fx:id="localGuideLabel" styleClass="local-guide-badge" text="Local Guide" />
-            </HBox>
-        </VBox>
+        <Label fx:id="authorLabel" styleClass="author-name" text="Thomas Panero" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #202124;" />
 
         <Region HBox.hgrow="ALWAYS" />
+
+        <!-- Icona/Label tre punti stile Google -->
+        <Label text="⋮" style="-fx-font-size: 18px; -fx-text-fill: #5f6368; -fx-cursor: hand;" />
     </HBox>
 
-    <!-- Riga data + stelle -->
+    <!-- Riga Stelle + Data -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
-        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="277.0">
-            <children>
-                <Rating fx:id="ratingControl" max="5" styleClass="review-rating" />
-            </children>
-        </HBox>
-        <Label fx:id="timeLabel" prefHeight="10.0" prefWidth="35.0" styleClass="review-time" text="data" />
+        <Rating fx:id="ratingControl" max="5" rating="3"
+                styleClass="review-rating-small"  />
+
+        <Label fx:id="timeLabel" styleClass="review-time" text="30 luglio 2026"
+               style="-fx-text-fill: #5f6368; -fx-font-size: 13px;" />
     </HBox>
 
     <!-- Testo recensione -->
-    <HBox prefHeight="0.0" prefWidth="287.0">
-        <children>
-            <Label fx:id="reviewTextField" prefWidth="369.0" styleClass="review-text-field" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut lacinia libero turpis, eget imperdiet eros cursus sed. Integer iaculis consectetur sem. Suspendisse facilisis risus nulla, a pretium mauris venenatis at. In suscipit tristique ante, id eleifend magna. Phasellus eget lorem eros. Aliquam fermentum dolor dolor, quis semper arcu ornare sit amet. Quisque ipsum lorem, pellentesque ut porttitor vitae, vestibulum vitae libero. Proin gravida eros velit, ut varius tortor laoreet sit amet. Phasellus eleifend nunc ut justo lacinia mollis. Proin in orci eu urna sagittis ullamcorper. Sed sed nunc ac est rutrum commodo vitae sed leo. Donec luctus efficitur justo vel sagittis. Phasellus quis lacinia urna. Integer massa magna, vehicula a tellus sit amet, faucibus commodo odio. Maecenas risus ante, scelerisque commodo augue at, tincidunt bibendum velit." wrapText="true" />
-        </children>
-    </HBox>
+    <Label fx:id="reviewTextField" styleClass="review-text-field"
+           text="credo sia il gioco migliore a cui abbia mai giocato: ha ambientazioni, personaggi, dialoghi e storia impeccabili. prima di giocarci non mi sarei mai aspettato una mappa così vasta e tante missioni e personaggi, non manca nulla è davvero un bellissimo open word e lo consiglio. ha piccolissimi lati negativi come le poche ricompense ma quasi impercettibili durante il gioco perché diventa continuativo ma per niente stancante."
+           wrapText="true" prefWidth="350" maxWidth="350"
+           style="-fx-font-size: 14px; -fx-text-fill: #3c4043; -fx-line-spacing: 2px;" />
 
-    <!-- Etichetta sezione risposte -->
-    <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="actions-row">
-        <Label fx:id="likeCountLabel" styleClass="like-count" text="RISPOSTE" />
-    </HBox>
+    <!-- Sezione Risposta -->
+    <VBox spacing="4" style="-fx-padding: 8px 0 0 0;">
+        <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="actions-row">
+            <Label fx:id="likeCountLabel" styleClass="like-count" text="RISPOSTE" style="-fx-font-size: 11px; -fx-text-fill: #70757a; -fx-font-weight: bold;" />
+        </HBox>
 
-    <!-- Testo risposta -->
-    <HBox prefHeight="17.0" prefWidth="277.0">
-        <children>
-            <Label fx:id="responseTextField" prefWidth="369.0" styleClass="review-text-field" text="Nam vestibulum neque a maximus scelerisque. Curabitur in convallis quam. Mauris bibendum sodales nibh, interdum fringilla nisi maximus non. Sed id porttitor nisl, eu lobortis mauris. Cras non massa sodales, euismod nibh ac, molestie felis. Cras gravida, eros eu facilisis placerat, lacus ante porttitor odio, ut tempus neque ex ut dui. Sed at ligula sollicitudin, mollis nunc sed, interdum ante. Proin tincidunt tincidunt sem, ac placerat felis rutrum eget. Pellentesque scelerisque commodo diam sed accumsan. Fusce bibendum sem et maximus egestas. Interdum et malesuada fames ac ante ipsum primis in faucibus." wrapText="true" />
-        </children>
-    </HBox>
+        <Label fx:id="responseTextField" styleClass="response-text-field"
+               text="Nam vestibulum neque a maximus scelerisque."
+               wrapText="true" prefWidth="350" maxWidth="350"
+               style="-fx-font-size: 13px; -fx-text-fill: #5f6368;" />
+    </VBox>
 
     <padding>
-        <Insets bottom="14" left="16" right="16" top="14" />
+        <Insets bottom="16" left="16" right="16" top="16" />
     </padding>
 </VBox>
