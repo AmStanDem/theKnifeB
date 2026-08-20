@@ -17,7 +17,7 @@
 <BorderPane prefHeight="768.0"
             prefWidth="1024.0"
             styleClass="root"
-            stylesheets="@../styles/areaUtente.css"
+            stylesheets="@../styles/scriviRecensione.css"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.clientTK.controller.ScriviRecensioneController">
