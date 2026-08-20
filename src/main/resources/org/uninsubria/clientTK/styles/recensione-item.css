@@ -139,7 +139,7 @@
     -fx-min-height: 13px;
     -fx-max-height: 13px;
     -fx-pref-height: 13px;
-    -fx-padding: 0;
+    -fx-padding: 2px;
 }
 
 /* Stelle non selezionate (Grigio) */
@@ -182,3 +182,5 @@
     -fx-font-weight: bold;
     -fx-font-size: 10px;
 }
+
+
