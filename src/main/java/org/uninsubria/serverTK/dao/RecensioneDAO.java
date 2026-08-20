@@ -15,14 +15,11 @@ public class RecensioneDAO {
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, idCliente);
             stmt.setInt(2, idRistorante);
             stmt.setInt(3, r.valutazione());
             stmt.setString(4, r.testo());
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore inserimento recensione: " + e.getMessage());
             return false;
@@ -31,7 +28,6 @@ public class RecensioneDAO {
 
     public List<RecensioneDTO> trovaPerRistorante(int idRistorante) {
         List<RecensioneDTO> lista = new ArrayList<>();
-        // Uniamo Utenti per l'autore e Risposte_Recensioni per l'eventuale risposta del gestore
         String sql = "SELECT rec.*, u.nome as nome_autore, resp.testo as risposta_gestore " +
                 "FROM Recensioni rec " +
                 "JOIN Utenti u ON rec.id_utente = u.id_utente " +
@@ -49,15 +45,14 @@ public class RecensioneDAO {
                     Timestamp timestamp = rs.getTimestamp("data_creazione");
                     LocalDateTime dataCreazione = timestamp != null ? timestamp.toLocalDateTime() : null;
 
-                    RecensioneDTO r = new RecensioneDTO(
+                    lista.add(new RecensioneDTO(
                             rs.getInt("id_recensione"),
                             rs.getInt("valutazione"),
                             rs.getString("testo"),
                             rs.getString("nome_autore"),
                             dataCreazione,
                             rs.getString("risposta_gestore")
-                    );
-                    lista.add(r);
+                    ));
                 }
             }
         } catch (SQLException e) {
@@ -67,20 +62,16 @@ public class RecensioneDAO {
     }
 
     public boolean modificaRecensione(int idRecensione, int idCliente, String nuovoTesto, int nuoveStelle) {
-        // Protezione IDOR tramite id_cliente = ?
         String sql = "UPDATE Recensioni SET valutazione = ?, testo = ?, data_modifica = CURRENT_TIMESTAMP " +
                 "WHERE id_recensione = ? AND id_utente = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, nuoveStelle);
             stmt.setString(2, nuovoTesto);
             stmt.setInt(3, idRecensione);
             stmt.setInt(4, idCliente);
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
             return false;
@@ -92,29 +83,24 @@ public class RecensioneDAO {
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, idRecensione);
             stmt.setInt(2, idCliente);
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore eliminazione recensione: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean aggiungiRispostaGestore(int idRecensione, String testoRisposta) {
-        String sql = "INSERT INTO Risposte_Recensioni (id_recensione , testo) VALUES (?, ?)";
+    public boolean aggiungiRispostaGestore(int idRecensione, int idGestore, String testoRisposta) {
+        String sql = "INSERT INTO Risposte_Recensioni (id_recensione, id_gestore, testo) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, idRecensione);
-            stmt.setString(2, testoRisposta);
-
+            stmt.setInt(2, idGestore); // Inserimento tracciato con l'ID del gestore per auditing
+            stmt.setString(3, testoRisposta);
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore inserimento risposta recensione: " + e.getMessage());
             return false;

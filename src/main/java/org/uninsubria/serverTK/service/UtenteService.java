@@ -45,9 +45,11 @@ public class UtenteService {
 
         if (nuovoUtente.email() == null || nuovoUtente.email().trim().isEmpty() ||
                 passwordInChiaro == null || passwordInChiaro.trim().isEmpty() ||
-                nuovoUtente.nome() == null || nuovoUtente.cognome() == null ||
+                nuovoUtente.nome() == null || nuovoUtente.nome().trim().isEmpty() ||
+                nuovoUtente.cognome() == null || nuovoUtente.cognome().trim().isEmpty() ||
+                nuovoUtente.domicilio() == null || nuovoUtente.domicilio().trim().isEmpty() ||
                 nuovoUtente.ruolo() == null) {
-            //throw new DatiMancantiException("Tutti i campi sono obbligatori per la registrazione.");
+            throw new DatiMancantiException("Tutti i campi (incluso il domicilio) sono obbligatori per la registrazione.");
         }
 
         if (utenteDAO.trovaPerEmail(nuovoUtente.email()) != null) {

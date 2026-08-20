@@ -5,6 +5,7 @@ import org.uninsubria.serverTK.config.DatabaseConfig;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PreferitiDAO {
@@ -14,12 +15,9 @@ public class PreferitiDAO {
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, idUtente);
             stmt.setInt(2, idRistorante);
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore aggiunta preferito: " + e.getMessage());
             return false;
@@ -31,12 +29,9 @@ public class PreferitiDAO {
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setInt(1, idUtente);
             stmt.setInt(2, idRistorante);
-
             return stmt.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore rimozione preferito: " + e.getMessage());
             return false;
@@ -45,11 +40,13 @@ public class PreferitiDAO {
 
     public List<RistoranteDTO> ottieniPreferitiUtente(int idUtente) {
         List<RistoranteDTO> lista = new ArrayList<>();
-        // Esegue una JOIN tra la tabella di giunzione e i ristoranti, calcolando anche la media delle stelle
-        String sql = "SELECT r.*, COALESCE(AVG(rec.valutazione), 0.0) as media_stelle " +
-                "FROM ristorantitheknife r " +
+
+        String sql = "SELECT r.*, COALESCE(AVG(rec.valutazione), 0.0) as media_stelle, STRING_AGG(DISTINCT tc.nome, ',') as tipi_cucina " +
+                "FROM RistorantiTheKnife r " +
                 "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
                 "LEFT JOIN Recensioni rec ON r.id_ristorante = rec.id_ristorante " +
+                "LEFT JOIN Ristoranti_Tipologie rt ON r.id_ristorante = rt.id_ristorante " +
+                "LEFT JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia " +
                 "WHERE p.id_utente = ? " +
                 "GROUP BY r.id_ristorante";
 
@@ -60,6 +57,10 @@ public class PreferitiDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    String tipiCucinaRaw = rs.getString("tipi_cucina");
+                    List<String> tipologie = tipiCucinaRaw != null && !tipiCucinaRaw.isEmpty()
+                            ? Arrays.asList(tipiCucinaRaw.split(",")) : new ArrayList<>();
+
                     lista.add(new RistoranteDTO(
                             rs.getInt("id_ristorante"),
                             rs.getString("nome"),
@@ -68,7 +69,7 @@ public class PreferitiDAO {
                             rs.getString("nazione"),
                             rs.getDouble("latitudine"),
                             rs.getDouble("longitudine"),
-                            rs.getString("tipo_cucina"),
+                            tipologie,
                             rs.getDouble("prezzo_medio"),
                             rs.getBoolean("delivery"),
                             rs.getBoolean("booking_online"),
