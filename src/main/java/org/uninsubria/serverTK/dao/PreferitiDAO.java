@@ -47,7 +47,7 @@ public class PreferitiDAO {
         List<RistoranteDTO> lista = new ArrayList<>();
         // Esegue una JOIN tra la tabella di giunzione e i ristoranti, calcolando anche la media delle stelle
         String sql = "SELECT r.*, COALESCE(AVG(rec.valutazione), 0.0) as media_stelle " +
-                "FROM Ristoranti r " +
+                "FROM ristorantitheknife r " +
                 "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
                 "LEFT JOIN Recensioni rec ON r.id_ristorante = rec.id_ristorante " +
                 "WHERE p.id_utente = ? " +
@@ -65,6 +65,7 @@ public class PreferitiDAO {
                             rs.getString("nome"),
                             rs.getString("indirizzo"),
                             rs.getString("nazione"),
+                            rs.getString("citta"),
                             rs.getDouble("latitudine"),
                             rs.getDouble("longitudine"),
                             rs.getString("tipo_cucina"),

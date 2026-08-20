@@ -7,6 +7,7 @@ public record RistoranteDTO(
         String nome,
         String indirizzo,
         String nazione,
+        String citta,
         Double latitudine,
         Double longitudine,
         String tipoCucina,
