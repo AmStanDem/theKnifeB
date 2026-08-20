@@ -160,7 +160,7 @@ public class ScriviRecensioneController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/Ristorante.fxml")
                     )
             ));
         } catch (IOException e) {
