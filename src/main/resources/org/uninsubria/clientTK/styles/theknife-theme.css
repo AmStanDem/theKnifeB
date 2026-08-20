@@ -1,0 +1,27 @@
+root {
+        /* ========================================================
+        SFONDI E SUPERFICI (Dal verde bosco scuro del logo)
+        ======================================================== */
+        -color-bg-default: #0A2E23;  /* Sfondo principale (finestre) */
+        -color-bg-overlay: #104233;  /* Sfondo per menu a tendina e dialoghi */
+        -color-bg-subtle:  #155341;  /* Sfondo per elementi secondari (es. righe tabella pari) */
+
+        /* ========================================================
+        TESTI E ICONE (Dal bianco puro delle linee)
+        ======================================================== */
+        -color-fg-default: #FFFFFF;  /* Testo primario */
+        -color-fg-muted:   #9ABBAF;  /* Testo secondario/disabilitato (verde desaturato) */
+
+        /* ========================================================
+        ACCENTI E INTERAZIONI (Dal verde lime vibrante del manico)
+        ======================================================== */
+        -color-primary-emphasis:     #39FF14; /* Colore primario (bottoni principali, focus) */
+        -color-primary-emphasis-alt: #2ED111; /* Colore primario al passaggio del mouse (hover) */
+        -color-primary-fg:           #000000; /* Il testo sopra un bottone lime deve essere nero per accessibilità WCAG */
+
+        /* ========================================================
+        CONFINI E BORDI
+        ======================================================== */
+        -color-border-default: #1B6E55;
+        -color-border-muted:   #155341;
+}
