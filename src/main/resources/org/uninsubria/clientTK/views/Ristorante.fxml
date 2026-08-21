@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.ScrollPane?>
 <BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaRistoranteController">
 
     <!-- HEADER -->
@@ -46,8 +47,54 @@
 
 
     <!-- CONTENUTO CENTRALE -->
+    <!-- CONTENUTO CENTRALE -->
     <center>
-        <StackPane alignment="CENTER" />
+
+        <VBox
+                spacing="12.0"
+                styleClass="reviews-box"
+                BorderPane.alignment="CENTER">
+
+            <padding>
+                <Insets
+                        top="20.0"
+                        right="25.0"
+                        bottom="20.0"
+                        left="25.0"/>
+            </padding>
+
+            <!-- TITOLO -->
+            <Label
+                    styleClass="profile-title"
+                    text="Recensioni"/>
+
+            <!-- NUMERO RECENSIONI -->
+            <Label
+                    fx:id="resultsCountLabel"
+                    styleClass="results-count"
+                    text="0 recensioni trovate"/>
+
+            <!-- LISTA RECENSIONI -->
+            <ScrollPane
+                    fx:id="reviewScrollPane"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    styleClass="restaurant-scroll-pane"
+                    VBox.vgrow="ALWAYS">
+
+                <content>
+
+                    <VBox
+                            fx:id="reviewContainer"
+                            spacing="14.0"
+                            styleClass="restaurant-container"/>
+
+                </content>
+
+            </ScrollPane>
+
+        </VBox>
+
     </center>
    <left>
 
@@ -133,6 +180,8 @@
          <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onRecensioniClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />
 
           </VBox>
+
+
    </left>
 
 </BorderPane>

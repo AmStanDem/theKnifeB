@@ -76,4 +76,5 @@ public class RecensioneItemController {
         likeCountLabel.setVisible(presente);
         likeCountLabel.setManaged(presente);
     }
+
 }

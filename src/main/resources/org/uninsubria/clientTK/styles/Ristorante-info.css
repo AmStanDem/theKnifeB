@@ -217,3 +217,54 @@
     -fx-background-color: #2E7025;
 }
 
+
+/* ---------- CONTENUTO / RISULTATI ---------- */
+.content-box {
+    -fx-background-color: #F7F8F9;
+}
+
+.results-count {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6B7280;
+    -fx-padding: 12 0 8 4;
+}
+
+/* ---------- SCROLLPANE + CONTAINER LISTA ---------- */
+.restaurant-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.restaurant-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.restaurant-container {
+    -fx-background-color: transparent;
+    -fx-padding: 4 4 20 4;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #D1D5DB;
+    -fx-background-radius: 8;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #9CA3AF;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical .increment-button,
+.restaurant-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.restaurant-scroll-pane .corner {
+    -fx-background-color: transparent;
+}

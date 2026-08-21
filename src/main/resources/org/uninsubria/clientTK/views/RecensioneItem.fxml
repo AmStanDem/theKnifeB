@@ -19,7 +19,11 @@
         </StackPane>
 
         <Label fx:id="authorLabel" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #202124;" styleClass="author-name" text="Thomas Panero" />
-
+        <Label fx:id="localGuideLabel"
+               style="-fx-font-size: 12px; -fx-text-fill: #5f6368;"
+               text="Local Guide"
+               visible="false"
+               managed="false" />
         <Region HBox.hgrow="ALWAYS" />
 
         <!-- Icona/Label tre punti stile Google -->
