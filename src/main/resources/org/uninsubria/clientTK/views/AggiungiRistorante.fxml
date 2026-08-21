@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.CheckComboBox?>
+
+<StackPane prefHeight="768.0" prefWidth="1024.0" styleClass="root-pane" stylesheets="@../styles/registraRistorante.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AggiungiRistoranteController">
+
+    <!-- Card bianca centrale contenente il Form -->
+    <VBox alignment="CENTER" maxWidth="650.0" maxHeight="700.0" styleClass="card-container">
+
+        <ScrollPane fitToWidth="true" styleClass="form-scroll-pane">
+            <content>
+                <VBox alignment="TOP_LEFT" spacing="16.0" styleClass="form-body">
+                    <padding>
+                        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+                    </padding>
+
+                    <!-- Titolo e Sottotitolo -->
+                    <VBox spacing="4.0">
+                        <Label styleClass="form-title" text="Registra Ristorante" />
+                        <Label styleClass="form-subtitle" text="Inserisci i dettagli della tua attività su TheKnife" />
+                    </VBox>
+
+                    <!-- Nome Ristorante -->
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Nome Ristorante *" />
+                        <TextField fx:id="txtNome" promptText="Es. Trattoria Bella Italia" styleClass="custom-text-field" />
+                    </VBox>
+
+                    <!-- Indirizzo e Città -->
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Indirizzo *" />
+                            <TextField fx:id="txtIndirizzo" promptText="Via Roma 12" styleClass="custom-text-field" />
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Città *" />
+                            <TextField fx:id="txtCitta" promptText="Milano" styleClass="custom-text-field" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Nazione e Prezzo Medio -->
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Nazione *" />
+                            <TextField fx:id="txtNazione" promptText="Italia" styleClass="custom-text-field" />
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Prezzo Medio (€) *" />
+                            <TextField fx:id="txtPrezzoMedio" promptText="25.50" styleClass="custom-text-field" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Latitudine e Longitudine -->
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Latitudine *" />
+                            <TextField fx:id="txtLatitudine" promptText="45.4642" styleClass="custom-text-field" />
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Longitudine *" />
+                            <TextField fx:id="txtLongitudine" promptText="9.1900" styleClass="custom-text-field" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Tipologie di Cucina (ControlsFX) -->
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Tipologie di Cucina *" />
+                        <CheckComboBox fx:id="comboCucine" maxWidth="Infinity" styleClass="custom-check-combo" />
+                    </VBox>
+
+                    <!-- Servizi Offerti -->
+                    <VBox spacing="8.0">
+                        <Label styleClass="input-label" text="Servizi Offerti" />
+                        <HBox spacing="20.0">
+                            <CheckBox fx:id="chkDelivery" mnemonicParsing="false" styleClass="custom-checkbox" text="Servizio Delivery" />
+                            <CheckBox fx:id="chkBookingOnline" mnemonicParsing="false" styleClass="custom-checkbox" text="Prenotazione Online" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Pulsanti Invia / Annulla -->
+                    <HBox alignment="CENTER" spacing="15.0">
+                        <padding>
+                            <Insets top="10.0" />
+                        </padding>
+                        <Button fx:id="btnAnnulla" mnemonicParsing="false" onAction="#onAnnullaClick" prefHeight="45.0" prefWidth="180.0" styleClass="btn-secondary" text="Annulla" />
+                        <Button fx:id="btnSalva" mnemonicParsing="false" onAction="#onSalvaClick" prefHeight="45.0" prefWidth="220.0" styleClass="btn-primary" text="Salva Ristorante" />
+                    </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+
+    </VBox>
+
+</StackPane>

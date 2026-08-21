@@ -1,0 +1,117 @@
+/* Sfondo principale dell'intera schermata */
+.root-pane {
+    -fx-background-color: #063221;
+}
+
+/* Card centrale bianca con angoli arrotondati */
+.card-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 15, 0, 0, 4);
+}
+
+/* ScrollPane trasparente per adattarsi alla card */
+.form-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.form-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.form-body {
+    -fx-background-color: transparent;
+}
+
+/* Tipografia */
+.form-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #063221;
+}
+
+.form-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666666;
+}
+
+.input-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* Input di testo e Controlli ControlsFX */
+.custom-text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+}
+
+.custom-text-field:focused {
+    -fx-border-color: #48b33c;
+    -fx-border-width: 2px;
+}
+
+.custom-check-combo {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 2px;
+}
+
+.custom-check-combo:focused {
+    -fx-border-color: #48b33c;
+}
+
+/* Checkbox stile TheKnife */
+.custom-checkbox {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+}
+
+.custom-checkbox .box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #E0E0E0;
+    -fx-border-radius: 4px;
+}
+
+.custom-checkbox:selected .box {
+    -fx-background-color: #48b33c;
+    -fx-border-color: #48b33c;
+}
+
+/* Bottoni verde brand e secondario */
+.btn-primary {
+    -fx-background-color: #48b33c;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #3ca031;
+}
+
+.btn-secondary {
+    -fx-background-color: #E8E8E8;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #D5D5D5;
+}
