@@ -103,6 +103,31 @@ public class AreaRistoratoreController {
             e.printStackTrace();
         }
     }
+    @FXML
+    public void ListaRistorantiRistoratore(ActionEvent actionEvent) {
+        try {
+            // Recupera la finestra corrente
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            // Carica la nuova scena da AggiungiRistorante.fxml
+            Scene scene = new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/RistorantiRistoratore.fxml")
+                    )
+            );
+
+            // Imposta la scena sullo stage
+            stage.setScene(scene);
+
+        } catch (IOException e) {
+            System.err.println("Errore durante il caricamento di RistorantiRistoratore.fxml");
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void handleLogoClick(MouseEvent mouseEvent) {
         try {
