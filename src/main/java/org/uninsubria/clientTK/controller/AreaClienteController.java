@@ -67,6 +67,20 @@ public class AreaClienteController {
 
 
     public void onPreferitiClick(ActionEvent actionEvent) {
+        try {
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/Preferiti.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onRecensioniClick(ActionEvent actionEvent) {

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+
+<BorderPane prefHeight="768.0"
+            prefWidth="1024.0"
+            styleClass="root"
+            stylesheets="@../styles/main-layout.css"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.uninsubria.clientTK.controller.MainLayoutLoggatoController">
+
+    <!-- HEADER -->
+    <top>
+        <HBox alignment="CENTER_LEFT"
+              spacing="20.0"
+              styleClass="header"
+              BorderPane.alignment="CENTER">
+
+            <padding>
+                <Insets bottom="15.0"
+                        left="25.0"
+                        right="25.0"
+                        top="15.0" />
+            </padding>
+
+            <children>
+
+                <!-- LOGO A SINISTRA -->
+                <ImageView fitHeight="133.0"
+                           fitWidth="441.0"
+                           preserveRatio="true"
+                           onMouseClicked="#handleLogoClick">
+
+                    <image>
+                        <Image url="@../../../../images/img_1.png" />
+                    </image>
+
+                </ImageView>
+
+                <!-- SPAZIO -->
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- AREA PERSONALE -->
+                <ImageView fitHeight="100.0"
+                           fitWidth="350.0"
+                           preserveRatio="true"
+                           onMouseClicked="#onAreaPersonaleClick">
+
+                    <image>
+                        <Image url="@../../../../images/user.png" />
+                    </image>
+
+                </ImageView>
+
+
+            </children>
+
+        </HBox>
+    </top>
+
+
+    <!-- CONTENUTO CENTRALE -->
+    <center>
+        <StackPane alignment="CENTER">
+
+            <children>
+
+
+            </children>
+
+        </StackPane>
+    </center>
+
+</BorderPane>
