@@ -201,8 +201,15 @@
                   </HBox>
 
                  </VBox>
-         <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onRecensioniClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />
-
+                  <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onRecensioniClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />
+                  <Button
+                          fx:id="aggiungiPreferito"
+                          mnemonicParsing="false"
+                          onAction="#onPreferitiClick"
+                          prefHeight="63.0"
+                          prefWidth="285.0"
+                          styleClass="recensione"
+                          text="Aggiungi ai preferiti" />
           </VBox>
 
 
