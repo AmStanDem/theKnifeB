@@ -80,7 +80,28 @@ public class AreaRistoratoreController {
     public void onRistorantiClick(ActionEvent actionEvent) {
     }
 
+    @FXML
     public void onAggiungiClick(ActionEvent actionEvent) {
+        try {
+            // Recupera la finestra corrente
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            // Carica la nuova scena da AggiungiRistorante.fxml
+            Scene scene = new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/AggiungiRistorante.fxml")
+                    )
+            );
+
+            // Imposta la scena sullo stage
+            stage.setScene(scene);
+
+        } catch (IOException e) {
+            System.err.println("Errore durante il caricamento di AggiungiRistorante.fxml");
+            e.printStackTrace();
+        }
     }
 
     public void handleLogoClick(MouseEvent mouseEvent) {

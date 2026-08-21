@@ -18,6 +18,9 @@ public class MainLayoutController {
     private TextField txtLocalita;
 
     @FXML
+    private TextField txtRicerca;
+
+    @FXML
     private Button btnGeolocalizzazione;
 
     @FXML
@@ -55,6 +58,25 @@ public class MainLayoutController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void onAreaRistoratoreClick(ActionEvent event) {
+        try {
+            Stage stage = (Stage) ((Node) event.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/AreaRistoratore.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @FXML
     private void onGeolocalizzazioneClick() {
