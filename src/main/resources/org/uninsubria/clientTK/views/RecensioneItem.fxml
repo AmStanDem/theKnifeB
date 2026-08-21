@@ -32,13 +32,13 @@
 
     <!-- Riga Stelle + Data -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
-            <Rating fx:id="ratingControl"
-                    max="5"
-                    rating="3"
-                    styleClass="review-rating-small"
-                    scaleX="0.5"
-                    scaleY="0.5"
-                    />
+        <Rating fx:id="ratingControl"
+                max="5"
+                rating="3"
+                mouseTransparent="true"
+                styleClass="review-rating-small"
+                scaleX="0.5"
+                scaleY="0.5"/>
         <Label fx:id="timeLabel" style="-fx-text-fill: #5f6368; -fx-font-size: 13px;" styleClass="review-time" text="30 luglio 2026" />
     </HBox>
 

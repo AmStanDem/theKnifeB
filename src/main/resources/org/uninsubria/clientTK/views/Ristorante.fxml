@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.Rating?>
 
 <?import javafx.scene.control.ScrollPane?>
 <BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaRistoranteController">
@@ -69,10 +70,33 @@
                     text="Recensioni"/>
 
             <!-- NUMERO RECENSIONI -->
+            <!-- NUMERO RECENSIONI -->
             <Label
                     fx:id="resultsCountLabel"
                     styleClass="results-count"
                     text="0 recensioni trovate"/>
+
+            <!-- MEDIA STELLE -->
+            <HBox
+                    alignment="CENTER_LEFT"
+                    spacing="10.0"
+                    styleClass="average-rating-row">
+
+                <Rating
+                        fx:id="averageRating"
+                        max="5"
+                        rating="0"
+                        partialRating="true"
+                        mouseTransparent="true"
+                        focusTraversable="false"
+                        styleClass="average-rating"/>
+
+                <Label
+                        fx:id="averageRatingLabel"
+                        styleClass="average-rating-label"
+                        text="0.0 / 5"/>
+
+            </HBox>
 
             <!-- LISTA RECENSIONI -->
             <ScrollPane
