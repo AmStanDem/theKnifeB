@@ -48,7 +48,7 @@ public class PreferitiController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/listaRistoranti.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/listaPreferiti.fxml")
                     )
             ));
 
@@ -164,10 +164,10 @@ public class PreferitiController {
     private Node creaCardRistorante(RistoranteDTO ristorante) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/org/uninsubria/clientTK/views/RestaurantItem.fxml"));
+                    "/org/uninsubria/clientTK/views/PreferitoItem.fxml"));
             Pane cardPane = loader.load();
 
-            RestaurantItemController controller = loader.getController();
+            PreferitoItemController controller = loader.getController();
             controller.setRistorante(ristorante);
             controller.setOnDettagliAction(this::apriDettagliRistorante);
 
@@ -233,4 +233,6 @@ public class PreferitiController {
                 )
         );
     }
+
+
 }

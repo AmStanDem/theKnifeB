@@ -3,17 +3,17 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.Rating?>
 
-<?import javafx.scene.control.ScrollPane?>
-<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaRistoranteController">
+<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AreaRistoranteController">
 
     <!-- HEADER -->
     <top>
@@ -51,67 +51,93 @@
     <!-- CONTENUTO CENTRALE -->
     <center>
 
-        <VBox
-                spacing="12.0"
-                styleClass="reviews-box"
-                BorderPane.alignment="CENTER">
+        <VBox spacing="12.0" styleClass="reviews-box" BorderPane.alignment="CENTER">
 
             <padding>
-                <Insets
-                        top="20.0"
-                        right="25.0"
-                        bottom="20.0"
-                        left="25.0"/>
+                <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
             </padding>
 
             <!-- TITOLO -->
-            <Label
-                    styleClass="profile-title"
-                    text="Recensioni"/>
+            <Label styleClass="profile-title" text="Recensioni" /><!-- RIEPILOGO RECENSIONI -->
+            <HBox alignment="CENTER_LEFT" spacing="45.0" styleClass="rating-summary">
 
-            <!-- NUMERO RECENSIONI -->
-            <!-- NUMERO RECENSIONI -->
-            <Label
-                    fx:id="resultsCountLabel"
-                    styleClass="results-count"
-                    text="0 recensioni trovate"/>
+                <!-- MEDIA A SINISTRA -->
+                <VBox alignment="CENTER" prefWidth="190.0" spacing="5.0" styleClass="rating-average-box">
 
-            <!-- MEDIA STELLE -->
-            <HBox
-                    alignment="CENTER_LEFT"
-                    spacing="10.0"
-                    styleClass="average-rating-row">
+                    <!-- NUMERO MEDIA -->
+                    <Label fx:id="averageRatingLabel" styleClass="rating-average-number" text="0,0" />
 
-                <Rating
-                        fx:id="averageRating"
-                        max="5"
-                        rating="0"
-                        partialRating="true"
-                        mouseTransparent="true"
-                        focusTraversable="false"
-                        styleClass="average-rating"/>
+                    <!-- STELLE -->
+                    <Rating fx:id="averageRating" focusTraversable="false" max="5" mouseTransparent="true" partialRating="true" rating="0" styleClass="average-rating" />
 
-                <Label
-                        fx:id="averageRatingLabel"
-                        styleClass="average-rating-label"
-                        text="0.0 / 5"/>
+                    <!-- NUMERO RECENSIONI -->
+                    <Label fx:id="resultsCountLabel" styleClass="rating-total-reviews" text="0 recensioni" />
+
+                </VBox>
+
+
+                <!-- DISTRIBUZIONE STELLE -->
+                <VBox prefWidth="600.0" spacing="9.0" styleClass="rating-distribution">
+
+                    <!-- 5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="5" />
+
+                        <ProgressBar fx:id="bar5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+
+                    <!-- 4 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="4" />
+
+                        <ProgressBar fx:id="bar4" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+
+                    <!-- 3 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="3" />
+
+                        <ProgressBar fx:id="bar3" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+
+                    <!-- 2 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="2" />
+
+                        <ProgressBar fx:id="bar2" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+
+                    <!-- 1 STELLA -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="1" />
+
+                        <ProgressBar fx:id="bar1" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                </VBox>
 
             </HBox>
 
             <!-- LISTA RECENSIONI -->
-            <ScrollPane
-                    fx:id="reviewScrollPane"
-                    fitToWidth="true"
-                    hbarPolicy="NEVER"
-                    styleClass="restaurant-scroll-pane"
-                    VBox.vgrow="ALWAYS">
+            <ScrollPane fx:id="reviewScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="restaurant-scroll-pane" VBox.vgrow="ALWAYS">
 
                 <content>
 
-                    <VBox
-                            fx:id="reviewContainer"
-                            spacing="14.0"
-                            styleClass="restaurant-container"/>
+                    <VBox fx:id="reviewContainer" spacing="14.0" styleClass="restaurant-container" />
 
                 </content>
 
@@ -202,14 +228,7 @@
 
                  </VBox>
                   <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onRecensioniClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />
-                  <Button
-                          fx:id="aggiungiPreferito"
-                          mnemonicParsing="false"
-                          onAction="#onPreferitiClick"
-                          prefHeight="63.0"
-                          prefWidth="285.0"
-                          styleClass="recensione"
-                          text="Aggiungi ai preferiti" />
+                  <Button fx:id="aggiungiPreferito" mnemonicParsing="false" onAction="#onPreferitiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Aggiungi ai preferiti" />
           </VBox>
 
 
