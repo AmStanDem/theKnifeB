@@ -114,7 +114,7 @@ public class AreaRistoratoreController {
             // Carica la nuova scena da AggiungiRistorante.fxml
             Scene scene = new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RistorantiRistoratore.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/ListaRistoranti.fxml")
                     )
             );
 
