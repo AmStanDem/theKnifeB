@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.uninsubria.clientTK.controller.PreferitoItemController"
+      stylesheets="@../styles/preferito-item.css"
+      styleClass="card"
+      spacing="10"
+      prefWidth="1000">
+
+    <padding>
+        <Insets top="18" right="22" bottom="18" left="22"/>
+    </padding>
+
+    <!-- RIGA SUPERIORE: nome + rating -->
+    <HBox spacing="12" alignment="TOP_LEFT">
+
+        <Label fx:id="nameLabel"
+               text="Nome ristorante"
+               styleClass="card-title"
+               wrapText="true"
+               HBox.hgrow="ALWAYS"
+               maxWidth="Infinity"/>
+
+        <Region HBox.hgrow="NEVER"/>
+
+        <VBox alignment="CENTER"
+              styleClass="rating-badge">
+
+            <Label fx:id="ratingValueLabel"
+                   text="4.5"
+                   styleClass="rating-value"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- INDIRIZZO -->
+    <Label fx:id="addressLabel"
+           text="Indirizzo ristorante"
+           styleClass="card-address"/>
+
+    <!-- CUCINA + PREZZO -->
+    <Label fx:id="metaLabel"
+           text="Tipo cucina • Prezzo medio 20 €"
+           styleClass="card-meta"/>
+
+    <!-- TAG: delivery / prenotazione online -->
+    <HBox spacing="8"
+          alignment="CENTER_LEFT">
+
+        <Label fx:id="deliveryTag"
+               text="Delivery disponibile"
+               styleClass="tag-delivery"
+               visible="false"
+               managed="false"/>
+
+        <Label fx:id="bookingTag"
+               text="Prenotazione online"
+               styleClass="tag-booking"
+               visible="false"
+               managed="false"/>
+
+    </HBox>
+
+    <!-- AZIONI -->
+    <HBox alignment="CENTER_RIGHT"
+          spacing="10">
+
+        <!-- Rimuovi dai preferiti -->
+        <Button fx:id="removeFavoriteButton"
+                text="Rimuovi dai preferiti"
+                styleClass="remove-favorite-button"
+                onAction="#onRemoveFavoriteClicked"/>
+
+        <!-- Dettagli -->
+        <Button fx:id="detailsButton"
+                text="Dettagli"
+                styleClass="details-button"
+                onAction="#onDetailsClicked"/>
+
+    </HBox>
+
+</VBox>
