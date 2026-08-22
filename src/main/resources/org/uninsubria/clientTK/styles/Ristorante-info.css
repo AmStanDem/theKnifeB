@@ -268,7 +268,6 @@
 .restaurant-scroll-pane .corner {
     -fx-background-color: transparent;
 }
-
 /* =========================
    RIEPILOGO RECENSIONI
    ========================= */
@@ -276,10 +275,13 @@
 .rating-summary {
     -fx-padding: 15 10 20 10;
     -fx-alignment: CENTER_LEFT;
+    -fx-background-color: white;
 }
 
 
-/* MEDIA */
+/* =========================
+   MEDIA A SINISTRA
+   ========================= */
 
 .rating-average-box {
     -fx-alignment: CENTER;
@@ -293,10 +295,59 @@
 
 .rating-total-reviews {
     -fx-font-size: 17px;
-    -fx-text-fill: #5f6368;
+    -fx-text-fill: #5A5A5D;
 }
 
 
+/* =========================
+   STELLE
+   ========================= */
+
+.average-rating {
+    -fx-pref-width: 125px;
+    -fx-pref-height: 25px;
+}
+
+
+/* =========================
+   DISTRIBUZIONE
+   ========================= */
+
+.rating-distribution {
+    -fx-padding: 5 0 5 0;
+}
+
+.rating-star-number {
+    -fx-pref-width: 20px;
+    -fx-min-width: 20px;
+
+    -fx-font-size: 16px;
+    -fx-text-fill: #5A5A5D;
+    -fx-alignment: CENTER;
+}
+
+
+/* =========================
+   BARRE
+   ========================= */
+
+.rating-progress {
+    -fx-pref-height: 15px;
+    -fx-min-height: 15px;
+    -fx-max-height: 15px;
+}
+
+.rating-progress > .track {
+    -fx-background-color: #E8EAED;
+    -fx-background-radius: 10px;
+    -fx-background-insets: 0;
+}
+
+.rating-progress > .bar {
+    -fx-background-color: #2B885F;
+    -fx-background-radius: 10px;
+    -fx-background-insets: 0;
+}
 /* STELLE */
 
 .average-rating {
@@ -341,3 +392,5 @@
     -fx-background-radius: 10px;
     -fx-background-insets: 0;
 }
+
+TODO lavorare all istogramma della media delle stelle
