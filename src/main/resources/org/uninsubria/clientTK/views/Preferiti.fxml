@@ -12,13 +12,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
 
+<?import javafx.scene.control.ScrollPane?>
 <BorderPane prefHeight="768.0"
             prefWidth="1024.0"
             styleClass="root"
-            stylesheets="@../styles/main-layout.css"
+            stylesheets="@../styles/preferiti.css"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.uninsubria.clientTK.controller.MainLayoutLoggatoController">
+            fx:controller="org.uninsubria.clientTK.controller.PreferitiController">
 
     <!-- HEADER -->
     <top>
@@ -72,14 +73,26 @@
 
     <!-- CONTENUTO CENTRALE -->
     <center>
-        <StackPane alignment="CENTER">
+        <VBox styleClass="content-box">
+            <padding>
+                <Insets top="8" right="32" bottom="24" left="32"/>
+            </padding>
 
-            <children>
+            <Label fx:id="resultsCountLabel"
+                   text="0 ristoranti trovati"
+                   styleClass="results-count"/>
 
-
-            </children>
-
-        </StackPane>
+            <ScrollPane fx:id="restaurantScrollPane"
+                        styleClass="restaurant-scroll-pane"
+                        fitToWidth="true"
+                        VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="restaurantContainer"
+                          spacing="14"
+                          styleClass="restaurant-container"/>
+                </content>
+            </ScrollPane>
+        </VBox>
     </center>
 
 </BorderPane>
