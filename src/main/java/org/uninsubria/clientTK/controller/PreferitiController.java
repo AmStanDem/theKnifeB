@@ -58,7 +58,7 @@ public class PreferitiController {
     }
 
     @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
+    private void onAreaPersonaleClick(MouseEvent  event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene()
@@ -66,7 +66,7 @@ public class PreferitiController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/SignUp.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/areaCliente.fxml")
                     )
             ));
 
