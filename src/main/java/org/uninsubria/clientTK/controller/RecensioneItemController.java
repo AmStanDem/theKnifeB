@@ -1,10 +1,17 @@
 package org.uninsubria.clientTK.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import org.controlsfx.control.Rating;
+
+import java.io.IOException;
 
 /**
  * Controller del singolo item "recensione-item".
@@ -100,4 +107,20 @@ public class RecensioneItemController {
         }
     }
 
+    public void onRispondiClicked(ActionEvent actionEvent) {
+        try {
+            Stage stage = (Stage) ((Node) actionEvent.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(
+                    FXMLLoader.load(
+                            getClass().getResource("/org/uninsubria/clientTK/views/RispondiRecensione.fxml")
+                    )
+            ));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
