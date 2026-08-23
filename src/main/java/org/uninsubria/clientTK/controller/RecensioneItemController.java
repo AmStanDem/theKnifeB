@@ -10,39 +10,109 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.controlsfx.control.Rating;
+import org.uninsubria.common.dto.RecensioneDTO;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
- * Controller del singolo item "recensione-item".
- * Non estende più VBox: viene istanziato tramite FXMLLoader classico
- * (fx:controller nel FXML), quindi va caricato così:
- *
- *   FXMLLoader loader = new FXMLLoader(getClass().getResource("/.../RecensioneItem.fxml"));
- *   Parent root = loader.load();
- *   RecensioneItemController controller = loader.getController();
- *   controller.setDati(...);
- *   contenitore.getChildren().add(root);
- *
- * Questo pattern è quello usato da ListaRecensioniController per popolare
- * dinamicamente la lista scorrevole.
+ * Controller del singolo item "RecensioneItem".
  */
 public class RecensioneItemController {
 
-    @FXML private StackPane avatarCircle;
-    @FXML private Label avatarInitial;
-    @FXML private Label authorLabel;
-    @FXML private Label localGuideLabel;
-    @FXML private Rating ratingControl;
-    @FXML private Label timeLabel;
-    @FXML private Label reviewTextField;
-    @FXML private Label likeCountLabel;
-    @FXML private Label responseTextField;
-    @FXML private Button replyButton;
+    @FXML
+    private StackPane avatarCircle;
 
-    /** Imposta tutti i dati della recensione in un colpo solo. */
-    public void setDati(String nomeAutore, boolean isLocalGuide, String data,
-                         int valutazione, String testoRecensione, String testoRisposta) {
+    @FXML
+    private Label avatarInitial;
+
+    @FXML
+    private Label authorLabel;
+
+    @FXML
+    private Label localGuideLabel;
+
+    @FXML
+    private Rating ratingControl;
+
+    @FXML
+    private Label timeLabel;
+
+    @FXML
+    private Label reviewTextField;
+
+    @FXML
+    private Label likeCountLabel;
+
+    @FXML
+    private Label responseTextField;
+
+    @FXML
+    private Button replyButton;
+
+    /**
+     * Formatta la data nel formato:
+     *
+     * 30 luglio 2026
+     */
+    private static final DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormatter.ofPattern(
+                    "d MMMM yyyy",
+                    Locale.ITALIAN
+            );
+
+    /**
+     * Imposta direttamente i dati provenienti dal RecensioneDTO.
+     */
+    public void setRecensione(RecensioneDTO recensione) {
+
+        if (recensione == null) {
+            return;
+        }
+
+        // Autore
+        setAutore(recensione.nomeAutore());
+
+        // Non abbiamo questa informazione nel DTO,
+        // quindi non mostriamo "Local Guide".
+        setLocalGuide(false);
+
+        // Data
+        if (recensione.dataCreazione() != null) {
+            setData(
+                    recensione.dataCreazione()
+                            .format(DATE_FORMATTER)
+            );
+        } else {
+            setData("");
+        }
+
+        // Valutazione
+        if (recensione.valutazione() != null) {
+            setValutazione(recensione.valutazione());
+        } else {
+            setValutazione(0);
+        }
+
+        // Testo recensione
+        setTesto(recensione.testo());
+
+        // Risposta del gestore
+        setRisposta(recensione.rispostaGestore());
+    }
+
+    /**
+     * Metodo generico per impostare tutti i dati.
+     */
+    public void setDati(
+            String nomeAutore,
+            boolean isLocalGuide,
+            String data,
+            int valutazione,
+            String testoRecensione,
+            String testoRisposta) {
+
         setAutore(nomeAutore);
         setLocalGuide(isLocalGuide);
         setData(data);
@@ -52,37 +122,73 @@ public class RecensioneItemController {
     }
 
     public void setAutore(String nome) {
-        authorLabel.setText(nome);
-        if (nome != null && !nome.isBlank()) {
-            avatarInitial.setText(String.valueOf(nome.trim().charAt(0)).toUpperCase());
+
+        if (nome == null || nome.isBlank()) {
+            authorLabel.setText("Utente");
+            avatarInitial.setText("U");
+            return;
         }
+
+        nome = nome.trim();
+
+        authorLabel.setText(nome);
+
+        avatarInitial.setText(
+                String.valueOf(nome.charAt(0))
+                        .toUpperCase()
+        );
     }
 
     public void setLocalGuide(boolean isLocalGuide) {
+
         localGuideLabel.setVisible(isLocalGuide);
         localGuideLabel.setManaged(isLocalGuide);
     }
 
     public void setData(String data) {
-        timeLabel.setText(data);
+
+        timeLabel.setText(
+                data != null ? data : ""
+        );
     }
 
-    /** Valutazione da 0 a 5 stelle. */
+    /**
+     * Valutazione da 0 a 5 stelle.
+     */
     public void setValutazione(int stelle) {
+
+        // Sicurezza: mantiene il valore tra 0 e 5
+        stelle = Math.max(0, Math.min(5, stelle));
+
         ratingControl.setRating(stelle);
     }
 
     public void setTesto(String testo) {
-        reviewTextField.setText(testo);
+
+        reviewTextField.setText(
+                testo != null ? testo : ""
+        );
     }
 
-    /** Se non c'è ancora una risposta, nasconde la riga corrispondente. */
-
+    /**
+     * Gestisce la risposta del gestore.
+     *
+     * Se esiste:
+     * - mostra la risposta
+     * - nasconde "Rispondi"
+     *
+     * Se NON esiste:
+     * - nasconde la risposta
+     * - mostra "Rispondi"
+     */
     public void setRisposta(String risposta) {
-        boolean presente = risposta != null && !risposta.isBlank();
+
+        boolean presente =
+                risposta != null &&
+                        !risposta.isBlank();
 
         if (presente) {
-            // C'è già una risposta
+
             responseTextField.setText(risposta);
 
             responseTextField.setVisible(true);
@@ -95,7 +201,7 @@ public class RecensioneItemController {
             replyButton.setManaged(false);
 
         } else {
-            // Non c'è una risposta
+
             responseTextField.setVisible(false);
             responseTextField.setManaged(false);
 
@@ -107,17 +213,28 @@ public class RecensioneItemController {
         }
     }
 
+    /**
+     * Apertura della schermata per rispondere alla recensione.
+     */
+    @FXML
     public void onRispondiClicked(ActionEvent actionEvent) {
+
         try {
+
             Stage stage = (Stage) ((Node) actionEvent.getSource())
                     .getScene()
                     .getWindow();
 
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RispondiRecensione.fxml")
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource(
+                            "/org/uninsubria/clientTK/views/RispondiRecensione.fxml"
                     )
-            ));
+            );
+
+            Scene scene = new Scene(loader.load());
+
+            stage.setScene(scene);
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();

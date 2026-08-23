@@ -91,7 +91,7 @@ public class AreaClienteController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RecensioneItem.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/MieRecensioni.fxml")
                     )
             ));
 
