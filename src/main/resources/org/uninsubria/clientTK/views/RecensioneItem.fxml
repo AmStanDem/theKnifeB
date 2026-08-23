@@ -9,6 +9,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import org.controlsfx.control.Rating?>
 
+<?import javafx.scene.control.Button?>
 <VBox spacing="10" stylesheets="@../styles/recensione-item.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
 
     <!-- Header: Avatar + Nome + Menu Opzioni (Tre Punti) -->
@@ -47,11 +48,32 @@
 
     <!-- Sezione Risposta -->
     <VBox spacing="4" style="-fx-padding: 8px 0 0 0;">
-        <HBox alignment="CENTER_RIGHT" spacing="6" styleClass="actions-row">
-            <Label fx:id="likeCountLabel" style="-fx-font-size: 11px; -fx-text-fill: #70757a; -fx-font-weight: bold;" styleClass="like-count" text="RISPOSTE" />
+
+        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="actions-row">
+
+            <Label fx:id="likeCountLabel"
+                   style="-fx-font-size: 11px; -fx-text-fill: #70757a; -fx-font-weight: bold;"
+                   styleClass="like-count"
+                   text="RISPOSTE" />
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="replyButton"
+                    text="Rispondi"
+                    styleClass="reply-button"
+                    visible="false"
+                    managed="false" />
+
         </HBox>
 
-        <Label fx:id="responseTextField" maxWidth="350" prefWidth="350" style="-fx-font-size: 13px; -fx-text-fill: #5f6368;" styleClass="response-text-field" text="Nam vestibulum neque a maximus scelerisque." wrapText="true" />
+        <Label fx:id="responseTextField"
+               maxWidth="350"
+               prefWidth="350"
+               style="-fx-font-size: 13px; -fx-text-fill: #5f6368;"
+               styleClass="response-text-field"
+               text="Nam vestibulum neque a maximus scelerisque."
+               wrapText="true" />
+
     </VBox>
 
     <padding>

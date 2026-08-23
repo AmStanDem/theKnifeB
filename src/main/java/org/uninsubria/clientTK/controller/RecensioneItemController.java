@@ -1,6 +1,7 @@
 package org.uninsubria.clientTK.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import org.controlsfx.control.Rating;
@@ -30,6 +31,7 @@ public class RecensioneItemController {
     @FXML private Label reviewTextField;
     @FXML private Label likeCountLabel;
     @FXML private Label responseTextField;
+    @FXML private Button replyButton;
 
     /** Imposta tutti i dati della recensione in un colpo solo. */
     public void setDati(String nomeAutore, boolean isLocalGuide, String data,
@@ -68,13 +70,34 @@ public class RecensioneItemController {
     }
 
     /** Se non c'è ancora una risposta, nasconde la riga corrispondente. */
+
     public void setRisposta(String risposta) {
         boolean presente = risposta != null && !risposta.isBlank();
-        responseTextField.setText(presente ? risposta : "");
-        responseTextField.setVisible(presente);
-        responseTextField.setManaged(presente);
-        likeCountLabel.setVisible(presente);
-        likeCountLabel.setManaged(presente);
+
+        if (presente) {
+            // C'è già una risposta
+            responseTextField.setText(risposta);
+
+            responseTextField.setVisible(true);
+            responseTextField.setManaged(true);
+
+            likeCountLabel.setVisible(true);
+            likeCountLabel.setManaged(true);
+
+            replyButton.setVisible(false);
+            replyButton.setManaged(false);
+
+        } else {
+            // Non c'è una risposta
+            responseTextField.setVisible(false);
+            responseTextField.setManaged(false);
+
+            likeCountLabel.setVisible(false);
+            likeCountLabel.setManaged(false);
+
+            replyButton.setVisible(true);
+            replyButton.setManaged(true);
+        }
     }
 
 }
