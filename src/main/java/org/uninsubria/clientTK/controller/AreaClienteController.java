@@ -12,6 +12,21 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller JavaFX dell'interfaccia principale dell'area cliente.
+ * <p>
+ * Gestisce le interazioni dell'utente con la schermata dell'area cliente,
+ * occupandosi principalmente della gestione degli eventi associati ai
+ * pulsanti dell'interfaccia e della navigazione tra le diverse viste
+ * dell'applicazione.
+ * </p>
+ *
+ * <p>
+ * Il controller è associato alla relativa vista FXML tramite JavaFX e
+ * utilizza i componenti dichiarati nella vista per ricevere input
+ * dall'utente e modificare la schermata visualizzata.
+ * </p>
+ */
 public class AreaClienteController {
 
     @FXML
@@ -26,6 +41,15 @@ public class AreaClienteController {
     }
 
     @FXML
+    /**
+     * Gestisce l'accesso all'area personale dell'utente.
+     * <p>
+     * Recupera la finestra attualmente visualizzata e sostituisce
+     * la scena corrente caricando la vista {@code SignUp.fxml}.
+     * </p>
+     *
+     * @param event evento generato dal click sul pulsante
+     */
     private void onAreaPersonaleClick(ActionEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource())
@@ -44,10 +68,25 @@ public class AreaClienteController {
     }
 
     @FXML
+    /**
+     * Gestisce il click sul pulsante di geolocalizzazione.
+     * <p>
+     * DA COMPLETARE
+     * </p>
+     */
     private void onGeolocalizzazioneClick() {
     }
 
     @FXML
+    /**
+     * Gestisce l'accesso alla schermata di ricerca avanzata.
+     * <p>
+     * Sostituisce la scena corrente caricando la vista
+     * {@code RicercaAvanzataView.fxml}.
+     * </p>
+     *
+     * @param actionEvent evento generato dal click dell'utente
+     */
     public void onRicercaAvanzataClick(ActionEvent actionEvent) {
         try {
             Stage stage = (Stage) ((Node) actionEvent.getSource())
@@ -65,10 +104,24 @@ public class AreaClienteController {
         }
     }
 
-
+    /**
+     * Gestisce l'accesso alla sezione dei preferiti dell'utente.
+     * <p>
+     * DA COMPLETARE
+     * </p>
+     */
     public void onPreferitiClick(ActionEvent actionEvent) {
     }
 
+    /**
+     * Gestisce l'accesso alla sezione delle recensioni.
+     * <p>
+     * Sostituisce la scena corrente caricando la vista
+     * {@code RecensioneItem.fxml}.
+     * </p>
+     *
+     * @param actionEvent evento generato dal click dell'utente
+     */
     public void onRecensioniClick(ActionEvent actionEvent) {
         try {
             Stage stage = (Stage) ((Node) actionEvent.getSource())
@@ -86,6 +139,16 @@ public class AreaClienteController {
         }
     }
 
+    /**
+     * Gestisce il logout dell'utente.
+     * <p>
+     * Termina la visualizzazione dell'area autenticata caricando
+     * la schermata principale dell'applicazione tramite
+     * {@code MainLayout.fxml}.
+     * </p>
+     *
+     * @param actionEvent evento generato dal click dell'utente
+     */
     public void onLogOutClick(ActionEvent actionEvent) {
         try {
             Stage stage = (Stage) ((Node) actionEvent.getSource())
@@ -104,6 +167,16 @@ public class AreaClienteController {
 
     }
 
+    /**
+     * Gestisce il click sul logo dell'applicazione.
+     * <p>
+     * Riporta l'utente alla schermata principale dell'applicazione
+     * mantenendo lo stato di autenticazione, caricando
+     * {@code MainLayoutLoggato.fxml}.
+     * </p>
+     *
+     * @param mouseEvent evento generato dal click sul logo
+     */
     public void handleLogoClick(MouseEvent mouseEvent) {
         try {
             Stage stage = (Stage) ((Node) mouseEvent.getSource())
