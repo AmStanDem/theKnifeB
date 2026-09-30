@@ -73,6 +73,12 @@
             <version>${flyway.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>13.7.0</version>
+        </dependency>
+
         <!-- AtlantaFX -->
         <dependency>
             <groupId>io.github.mkpaz</groupId>
