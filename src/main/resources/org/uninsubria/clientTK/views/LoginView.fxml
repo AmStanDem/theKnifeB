@@ -36,7 +36,7 @@
 
         <!-- Email -->
         <Label styleClass="field-label" text="Email address" />
-        <TextField fx:id="emailField" promptText="" styleClass="text-input">
+        <TextField fx:id="campoEmail" promptText="" styleClass="text-input">
             <VBox.margin>
                 <Insets bottom="22" top="6" />
             </VBox.margin>
@@ -44,15 +44,19 @@
 
         <!-- Password -->
         <Label styleClass="field-label" text="Password" />
-        <PasswordField fx:id="passwordField" promptText="" styleClass="text-input">
+        <PasswordField fx:id="campoPassword" promptText="" styleClass="text-input">
             <VBox.margin>
                 <Insets bottom="18" top="6" />
             </VBox.margin>
         </PasswordField>
 
 
+        <!-- Messaggio di errore -->
+        <Label fx:id="labelErrore" styleClass="error-label" />
+
+
         <!-- Sign in button -->
-        <Button fx:id="signInButton" maxWidth="Infinity" onAction="#handleSignIn" styleClass="sign-in-button" text="Sign in">
+        <Button fx:id="signInButton" maxWidth="Infinity" onAction="#onAccedi" styleClass="sign-in-button" text="Sign in">
             <VBox.margin>
                 <Insets bottom="14" />
             </VBox.margin>

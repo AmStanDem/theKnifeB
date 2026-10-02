@@ -37,7 +37,7 @@ public class PreferitoItemController {
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
-        metaLabel.setText(formattaMeta(ristorante.tipoCucina(), ristorante.prezzoMedio()));
+        metaLabel.setText(formattaMeta(String.valueOf(ristorante.tipologieCucina()), ristorante.prezzoMedio()));
 
         aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.delivery()));
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));

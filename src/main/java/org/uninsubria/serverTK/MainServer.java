@@ -86,7 +86,7 @@ public class MainServer {
         try {
             TheKnifeServerImpl serverService = new TheKnifeServerImpl();
             Registry registry = LocateRegistry.createRegistry(rmiPort);
-            registry.rebind("TheKnifeService", serverService);
+            registry.rebind("TheKnifeServer", serverService);
 
             System.out.println("[RMI] Registro creato e in ascolto sulla porta " + rmiPort);
             System.out.println("[SYSTEM] Server THE KNIFE operativo e pronto a ricevere connessioni.\n");

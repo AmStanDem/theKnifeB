@@ -52,7 +52,7 @@ public final class ServerConnection {
      * @throws RemoteException se la connessione al registry o la lookup falliscono
      * @throws NotBoundException se il servizio non è registrato sul registry indicato
      */
-    public static ITheKnifeServer getServer() throws RemoteException, NotBoundException {
+    public static synchronized ITheKnifeServer getServer() throws RemoteException, NotBoundException {
         if (server == null) {
             Registry registry = LocateRegistry.getRegistry(host, port);
             server = (ITheKnifeServer) registry.lookup(SERVICE_NAME);

@@ -6,6 +6,7 @@ import org.uninsubria.serverTK.config.DatabaseConfig;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RistoranteDAO {
@@ -24,7 +25,7 @@ public class RistoranteDAO {
             stmt.setString(5, r.nazione());
             stmt.setDouble(6, r.latitudine() != null ? r.latitudine() : 0.0);
             stmt.setDouble(7, r.longitudine() != null ? r.longitudine() : 0.0);
-            stmt.setString(8, r.tipoCucina());
+            stmt.setString(8, String.valueOf(r.tipologieCucina()));
             stmt.setDouble(9, r.prezzoMedio() != null ? r.prezzoMedio() : 0.0);
             stmt.setBoolean(10, r.delivery() != null ? r.delivery() : false);
             stmt.setBoolean(11, r.bookingOnline() != null && r.bookingOnline());
@@ -142,7 +143,7 @@ public class RistoranteDAO {
                 rs.getString("nazione"),
                 rs.getDouble("latitudine"),
                 rs.getDouble("longitudine"),
-                rs.getString("tipo_cucina"),
+                Collections.singletonList(rs.getString("tipo_cucina")),
                 rs.getDouble("prezzo_medio"),
                 rs.getBoolean("delivery"),
                 rs.getBoolean("booking_online"),

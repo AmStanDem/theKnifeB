@@ -53,7 +53,9 @@ public class ListaRistorantiController {
         for (RistoranteDTO r : ristorantiCompleti) {
             boolean matchNome = r.nome() != null && r.nome().toLowerCase().contains(query);
             boolean matchIndirizzo = r.indirizzo() != null && r.indirizzo().toLowerCase().contains(query);
-            boolean matchCucina = r.tipoCucina() != null && r.tipoCucina().toLowerCase().contains(query);
+            boolean matchCucina = r.tipologieCucina() != null &&
+                    r.tipologieCucina().stream()
+                            .anyMatch(c -> c != null && c.toLowerCase().contains(query));
 
             if (query.isEmpty() || matchNome || matchIndirizzo || matchCucina) {
                 filtrati.add(r);
@@ -92,7 +94,9 @@ public class ListaRistorantiController {
                     || (r.mediaStelle() != null && r.mediaStelle() >= parseRatingMinimo(ratingSelezionato));
 
             boolean okCucina = cucinaSelezionata == null
-                    || (r.tipoCucina() != null && r.tipoCucina().equalsIgnoreCase(cucinaSelezionata));
+                    || (r.tipologieCucina() != null &&
+                    r.tipologieCucina().stream()
+                            .anyMatch(c -> c.equalsIgnoreCase(cucinaSelezionata)));
 
             if (okPrezzo && okRating && okCucina) {
                 filtrati.add(r);
@@ -171,7 +175,7 @@ public class ListaRistorantiController {
                         "Milano",
                         45.4642,
                         9.1900,
-                        "Italiana",
+                        List.of("Italiana"),
                         28.0,
                         false,
                         true,
@@ -186,7 +190,7 @@ public class ListaRistorantiController {
                         "Milano",
                         45.4780,
                         9.2050,
-                        "Giapponese",
+                        List.of("Giapponese"),
                         35.0,
                         true,
                         true,
@@ -201,7 +205,7 @@ public class ListaRistorantiController {
                         "Milano",
                         45.4640,
                         9.1900,
-                        "Pizzeria",
+                        List.of("Pizzeria"),
                         12.0,
                         true,
                         false,
