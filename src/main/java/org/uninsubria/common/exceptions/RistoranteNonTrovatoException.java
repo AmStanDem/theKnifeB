@@ -2,6 +2,9 @@ package org.uninsubria.common.exceptions;
 
 public class RistoranteNonTrovatoException extends TheKnifeException {
     public RistoranteNonTrovatoException(Integer idRistorante) {
-        super("Il ristorante con ID " + idRistorante + " non esiste o è stato rimosso.", null);
+        super("Il ristorante con ID " + idRistorante + " non esiste o è stato rimosso.");
+    }
+    public RistoranteNonTrovatoException() {
+        super("Il ristorante con ID non esiste o è stato rimosso.");
     }
 }

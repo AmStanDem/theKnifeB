@@ -22,9 +22,15 @@ public class RistoranteService {
 
         if (ristorante.nome() == null || ristorante.nome().trim().isEmpty() ||
                 ristorante.indirizzo() == null || ristorante.indirizzo().trim().isEmpty() ||
+                ristorante.citta() == null || ristorante.citta().trim().isEmpty() ||
                 ristorante.nazione() == null || ristorante.nazione().trim().isEmpty() ||
                 ristorante.prezzoMedio() == null || ristorante.prezzoMedio() < 0.0) {
-            //throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
+            throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
+        }
+
+        // Validazione della relazione Molti-a-Molti introdotta
+        if (ristorante.tipologieCucina() == null || ristorante.tipologieCucina().isEmpty()) {
+            throw new DatiMancantiException("È necessario specificare almeno una tipologia di cucina.");
         }
 
         boolean successo = ristoranteDAO.inserisciRistorante(ristorante, idGestore);
@@ -50,8 +56,6 @@ public class RistoranteService {
     }
 
     public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) {
-        // Poiché il record FiltriRicercaDTO valida già la locazione nel suo costruttore,
-        // possiamo passare direttamente i filtri al DAO in piena sicurezza.
         if (filtri == null) {
             return List.of();
         }
