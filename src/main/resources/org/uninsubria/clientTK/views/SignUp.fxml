@@ -94,7 +94,7 @@
 
             <Label styleClass="field-label" text="Domicilio" />
 
-            <TextField fx:id="domicilioField"
+            <TextField fx:id="indirizzo"
                        prefHeight="45.0"
                        promptText="Inserisci il tuo indirizzo: via/piazza, numero civico, città, cap" />
 

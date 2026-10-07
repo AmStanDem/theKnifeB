@@ -34,7 +34,7 @@ public class SignUpController {
     private ComboBox<String> ruoloComboBox;
 
     @FXML
-    private DatePicker data;
+    private DatePicker dataNascitaPicker;
 
     @FXML
     private TextField indirizzo;
@@ -83,7 +83,7 @@ public class SignUpController {
         String nome = nomeField.getText();
         String cognome = cognomeField.getText();
         String ruolo = ruoloComboBox.getValue();
-        LocalDate dataNascita = data.getValue();
+        LocalDate dataNascita = dataNascitaPicker.getValue();
         String domicilio = indirizzo.getText();
         String email = emailField.getText();
         String password = passwordField.getText();
