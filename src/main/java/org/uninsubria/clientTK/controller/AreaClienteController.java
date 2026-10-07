@@ -10,17 +10,67 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.enums.RuoloUtente;
 
 import java.io.IOException;
 
 public class AreaClienteController {
 
-    public Label lblData;
     @FXML
-    private TextField txtLocalita;
+    private Label lblNome;
 
     @FXML
-    private Button btnGeolocalizzazione;
+    private Label lblCognome;
+
+    @FXML
+    private Label lblData;
+
+    @FXML
+    private Label lblDomicilio;
+
+    @FXML
+    private Label lblRuolo;
+
+    @FXML
+    private Label lblEmail;
+
+
+    @FXML
+    private void initialize() {
+
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+
+        // Controllo di sicurezza
+        if (utente == null) {
+            return;
+        }
+
+        lblNome.setText(utente.nome());
+        lblCognome.setText(utente.cognome());
+        lblEmail.setText(utente.email());
+        lblDomicilio.setText(utente.domicilio());
+
+        // Data di nascita
+        if (utente.dataNascita() != null) {
+            lblData.setText(utente.dataNascita().toString());
+        } else {
+            lblData.setText("-");
+        }
+
+        // Ruolo
+        if (utente.ruolo() != null) {
+            if (utente.ruolo() == RuoloUtente.CLIENTE) {
+                lblRuolo.setText("Cliente");
+            } else if (utente.ruolo() == RuoloUtente.GESTORE) {
+                lblRuolo.setText("Ristoratore");
+            }
+        } else {
+            lblRuolo.setText("-");
+        }
+    }
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
