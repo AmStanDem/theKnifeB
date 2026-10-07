@@ -13,6 +13,7 @@ import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.enums.RuoloUtente;
 import org.uninsubria.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
@@ -162,7 +163,16 @@ public class SignUpController {
             return;
         }
 
+        try {
 
+            RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
+            UtenteDTO utente = new UtenteDTO(null, nome, cognome, email,dataNascita, domicilio, ruoloEnum);
+            utente = ServerConnection.getServer().registraCliente(utente,password);
+        } catch (Exception e) {
+            labelErrore.setText(
+                    "Errore durante la registrazione."
+            );
+        }
 
 
         try {
