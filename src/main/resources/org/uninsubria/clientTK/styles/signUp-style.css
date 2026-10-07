@@ -73,10 +73,6 @@
    TESTI
    ========================================================= */
 
-.info-label {
-    -fx-text-fill: #777777;
-    -fx-font-size: 12px;
-}
 
 .hint-label {
     -fx-text-fill: #999999;

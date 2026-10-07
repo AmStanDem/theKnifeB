@@ -54,8 +54,7 @@
         </Label>
 
 
-        <!-- INFO -->
-        <Label styleClass="info-label" text="ⓘ Tutti i campi sono obbligatori" />
+
 
 
         <!-- NOME -->
@@ -86,7 +85,18 @@
             <DatePicker fx:id="dataNascitaPicker"
                         maxWidth="Infinity"
                         prefHeight="45.0"
-                        promptText="Seleziona la data di nascita" />
+                        promptText="Seleziona la tua data di nascita" />
+
+        </VBox>
+
+        <!-- DOMICILIO -->
+        <VBox spacing="4.0">
+
+            <Label styleClass="field-label" text="Domicilio" />
+
+            <TextField fx:id="domicilioField"
+                       prefHeight="45.0"
+                       promptText="Inserisci il tuo indirizzo: via/piazza, numero civico, città, cap" />
 
         </VBox>
 
