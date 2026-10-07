@@ -49,7 +49,7 @@ public class MainLayoutLoggatoController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/AreaCliente.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/AreaPersonale.fxml")
                     )
             ));
 
