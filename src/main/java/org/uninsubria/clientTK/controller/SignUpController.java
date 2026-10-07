@@ -9,13 +9,13 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import javafx.scene.input.MouseEvent;
-import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.enums.RuoloUtente;
-import org.uninsubria.common.exceptions.CredenzialiErrateException;
+import org.uninsubria.common.exceptions.DatiMancantiException;
 import org.uninsubria.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.common.exceptions.UtenteGiaEsistenteException;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -163,14 +163,15 @@ public class SignUpController {
             return;
         }
 
-        try {
+        /* try {
 
             RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
             UtenteDTO utente = new UtenteDTO(null, nome, cognome, email,dataNascita, domicilio, ruoloEnum);
             utente = ServerConnection.getServer().registraCliente(utente,password);
-        } catch (Exception e) {
+        } catch (UtenteGiaEsistenteException | RemoteException | NotBoundException | DatiMancantiException |
+                 SistemaIndisponibileException e) {
             labelErrore.setText(
-                    "Errore durante la registrazione."
+                    e.getMessage()
             );
         }
 
@@ -187,6 +188,42 @@ public class SignUpController {
             ));
 
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+         */
+        try {
+            // 1. Creazione del DTO
+            RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
+            UtenteDTO utente = new UtenteDTO(null, nome, cognome, email, dataNascita, domicilio, ruoloEnum);
+
+            // 2. Chiamata bloccante al Server
+            utente = ServerConnection.getServer().registraCliente(utente, password);
+
+            // 3. SE IL CODICE ARRIVA QUI, LA REGISTRAZIONE HA AVUTO SUCCESSO.
+            // Aggiorniamo la sessione (usando la tua classe di utilità)
+            SessioneUtente.login(utente);
+
+            // 4. Eseguiamo il cambio scena
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(
+                    FXMLLoader.load(getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml"))
+            ));
+
+        } catch (UtenteGiaEsistenteException e) {
+            // L'eccezione blocca il try prima del cambio scena, e finisce qui.
+            labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");
+            emailField.requestFocus();
+
+        } catch (DatiMancantiException e) {
+            labelErrore.setText("Errore nei dati: " + e.getMessage());
+
+        } catch (SistemaIndisponibileException | RemoteException | NotBoundException e) {
+            labelErrore.setText("Errore di connessione al server.");
+            e.printStackTrace();
+
+        } catch (IOException e) {
+            labelErrore.setText("Errore interno: impossibile caricare la schermata successiva.");
             e.printStackTrace();
         }
     }
