@@ -147,6 +147,9 @@
 
 
 
+        <!-- Messaggio di errore -->
+        <Label fx:id="labelErrore" styleClass="error-label" />
+
 
         <!-- SEPARATORE -->
         <Separator>

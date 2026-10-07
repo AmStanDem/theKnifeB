@@ -5,13 +5,21 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import javafx.scene.input.MouseEvent;
+import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.CredenzialiErrateException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
+
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.time.LocalDate;
 
 public class SignUpController {
 
@@ -25,17 +33,57 @@ public class SignUpController {
     private ComboBox<String> ruoloComboBox;
 
     @FXML
+    private DatePicker data;
+
+    @FXML
+    private TextField indirizzo;
+
+    @FXML
     private TextField emailField;
 
     @FXML
     private PasswordField passwordField;
 
     @FXML
+    private Label labelErrore;
+
+/*
+    @FXML
+    private void onAccedi() {
+        labelErrore.setText("");
+        String email = campoEmail.getText();
+        String password = campoPassword.getText();
+
+        if (email.isBlank() || password.isBlank()) {
+            labelErrore.setText("Inserisci email e password.");
+            return;
+        }
+
+        try {
+            UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
+            SessioneUtente.login(utente);
+            SceneManager.mostraSchermata("MainLayoutLoggato.fxml", "Home");
+
+        } catch (CredenzialiErrateException e) {
+            labelErrore.setText("Email o password non corretti.");
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            e.printStackTrace();
+            labelErrore.setText("Errore server: " + e.getClass().getSimpleName()
+                    + " - " + e.getMessage());
+        } catch (IOException e) {
+            labelErrore.setText("Errore nel caricamento della schermata successiva.");
+        }
+    }
+*/
+    @FXML
     private void handleRegistrati(ActionEvent event) {
 
+        labelErrore.setText("");
         String nome = nomeField.getText();
         String cognome = cognomeField.getText();
         String ruolo = ruoloComboBox.getValue();
+        LocalDate dataNascita = data.getValue();
+        String domicilio = indirizzo.getText();
         String email = emailField.getText();
         String password = passwordField.getText();
 
@@ -43,22 +91,23 @@ public class SignUpController {
                 cognome.isEmpty() ||
                 ruolo == null ||
                 email.isEmpty() ||
-                password.isEmpty()) {
+                password.isEmpty() ||
+                domicilio.isEmpty()) {
 
-            System.out.println("Compila tutti i campi!");
+            labelErrore.setText("Compila i campi obbligatori!");
             return;
         }
 
         if (!ruolo.equals("Cliente") &&
                 !ruolo.equals("Ristoratore")) {
 
-            System.out.println("Il ruolo selezionato non è valido.");
+            labelErrore.setText("Il ruolo selezionato non è valido.");
             ruoloComboBox.requestFocus();
             return;
         }
 
         if (password.length() < 8) {
-            System.out.println(
+            labelErrore.setText(
                     "La password deve contenere almeno 8 caratteri."
             );
             passwordField.requestFocus();
@@ -66,7 +115,7 @@ public class SignUpController {
         }
 
         if (password.length() > 64) {
-            System.out.println(
+            labelErrore.setText(
                     "La password non può superare 64 caratteri."
             );
             passwordField.requestFocus();
@@ -74,7 +123,7 @@ public class SignUpController {
         }
 
         if (password.contains(" ")) {
-            System.out.println(
+            labelErrore.setText(
                     "La password non può contenere spazi."
             );
             passwordField.requestFocus();
@@ -82,7 +131,7 @@ public class SignUpController {
         }
 
         if (!password.matches(".*[a-z].*")) {
-            System.out.println(
+            labelErrore.setText(
                     "La password deve contenere almeno una lettera minuscola."
             );
             passwordField.requestFocus();
@@ -90,7 +139,7 @@ public class SignUpController {
         }
 
         if (!password.matches(".*[A-Z].*")) {
-            System.out.println(
+            labelErrore.setText(
                     "La password deve contenere almeno una lettera maiuscola."
             );
             passwordField.requestFocus();
@@ -98,7 +147,7 @@ public class SignUpController {
         }
 
         if (!password.matches(".*\\d.*")) {
-            System.out.println(
+            labelErrore.setText(
                     "La password deve contenere almeno un numero."
             );
             passwordField.requestFocus();
@@ -106,7 +155,7 @@ public class SignUpController {
         }
 
         if (!password.matches(".*[^A-Za-z0-9].*")) {
-            System.out.println(
+            labelErrore.setText(
                     "La password deve contenere almeno un carattere speciale."
             );
             passwordField.requestFocus();
@@ -114,11 +163,6 @@ public class SignUpController {
         }
 
 
-        System.out.println("Registrazione:");
-        System.out.println("Nome: " + nome);
-        System.out.println("Cognome: " + cognome);
-        System.out.println("Ruolo: " + ruolo);
-        System.out.println("Email: " + email);
 
 
         try {
