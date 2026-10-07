@@ -107,6 +107,29 @@
                                    styleClass="profile-value" />
                         </HBox>
 
+
+                        <!-- Data di nascita -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Data di nascita:"
+                                   styleClass="profile-label" />
+
+                            <Label fx:id="lblData"
+                                   text="10/10/2010"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                        <!-- Domicilio -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Domicilio:"
+                                   styleClass="profile-label" />
+
+                            <Label fx:id="lblDomicilio"
+                                   text="Via tal dei tali,2,Busto Arsizio,21052"
+                                   styleClass="profile-value" />
+                        </HBox>
+
                         <!-- RUOLO -->
                         <HBox alignment="CENTER_LEFT"
                               spacing="10.0">
@@ -126,17 +149,6 @@
 
                             <Label fx:id="lblEmail"
                                    text="email@example.com"
-                                   styleClass="profile-value" />
-                        </HBox>
-
-                        <!-- PASSWORD -->
-                        <HBox alignment="CENTER_LEFT"
-                              spacing="10.0">
-                            <Label text="Password:"
-                                   styleClass="profile-label" />
-
-                            <Label fx:id="lblPassword"
-                                   text="********"
                                    styleClass="profile-value" />
                         </HBox>
 
