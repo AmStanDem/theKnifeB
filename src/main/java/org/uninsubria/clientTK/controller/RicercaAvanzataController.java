@@ -12,11 +12,27 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller JavaFX dell'interfaccia dedicata alla ricerca avanzata
+ * dei ristoranti.
+ * <p>
+ * Gestisce le interazioni dell'utente con la schermata di ricerca
+ * avanzata e la navigazione verso la lista dei ristoranti.
+ * </p>
+ */
 public class RicercaAvanzataController {
 
-
-
     @FXML
+    /**
+     * Gestisce la ricerca di un ristorante.
+     * <p>
+     * Recupera la finestra attualmente visualizzata e sostituisce
+     * la scena corrente caricando la vista {@code listaRistoranti.fxml},
+     * nella quale vengono visualizzati i risultati della ricerca.
+     * </p>
+     *
+     * @param event evento generato dal click dell'utente
+     */
     private void cercaRistorante(ActionEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource())

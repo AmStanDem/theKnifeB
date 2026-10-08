@@ -13,6 +13,21 @@ import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
 import java.io.IOException;
 
+/**
+ * Controller JavaFX dell'interfaccia dedicata alla registrazione
+ * di un nuovo utente.
+ * <p>
+ * Gestisce la raccolta e la validazione dei dati inseriti dall'utente,
+ * verificando la correttezza dei campi anagrafici, del ruolo selezionato
+ * e dei requisiti di sicurezza della password.
+ * </p>
+ *
+ * <p>
+ * Il controller gestisce inoltre la navigazione verso la schermata
+ * principale dell'applicazione dopo la registrazione e verso la schermata
+ * di accesso o quella principale tramite le relative azioni dell'interfaccia.
+ * </p>
+ */
 public class SignUpController {
 
     @FXML
@@ -30,6 +45,24 @@ public class SignUpController {
     @FXML
     private PasswordField passwordField;
 
+    /**
+     * Gestisce la registrazione di un nuovo utente.
+     * <p>
+     * Recupera i dati inseriti nei campi della schermata e verifica
+     * che siano stati compilati correttamente. Controlla inoltre che
+     * il ruolo selezionato sia valido e che la password rispetti
+     * i requisiti minimi di lunghezza e complessità.
+     * </p>
+     *
+     * <p>
+     * Se uno dei controlli non viene superato, viene mostrato un messaggio
+     * nella console e il campo interessato riceve nuovamente il focus.
+     * In caso di validazione positiva, viene caricata la schermata
+     * {@code MainLayoutLoggato.fxml}.
+     * </p>
+     *
+     * @param event evento generato dal click sul pulsante di registrazione
+     */
     @FXML
     private void handleRegistrati(ActionEvent event) {
 
@@ -137,8 +170,15 @@ public class SignUpController {
         }
     }
 
-
-
+    /**
+     * Gestisce l'accesso alla schermata di login.
+     * <p>
+     * Recupera la finestra attualmente visualizzata e sostituisce
+     * la scena corrente caricando la vista {@code LoginView.fxml}.
+     * </p>
+     *
+     * @param mouseEvent evento generato dal click dell'utente
+     */
     public void handleAccedi(MouseEvent mouseEvent) {
         try {
             Stage stage = (Stage) ((Node) mouseEvent.getSource())
@@ -156,6 +196,15 @@ public class SignUpController {
         }
     }
 
+    /**
+     * Gestisce il click sul logo dell'applicazione.
+     * <p>
+     * Riporta l'utente alla schermata principale caricando
+     * la vista {@code MainLayout.fxml}.
+     * </p>
+     *
+     * @param mouseEvent evento generato dal click sul logo
+     */
     public void handleLogoClick(MouseEvent mouseEvent) {
         try {
             Stage stage = (Stage) ((Node) mouseEvent.getSource())
