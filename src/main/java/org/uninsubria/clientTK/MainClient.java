@@ -1,31 +1,16 @@
 package org.uninsubria.clientTK;
 
-
-// Oppure per il tema chiaro: import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.image.Image;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.uninsubria.clientTK.util.SceneManager;
 
 public class MainClient extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-
-        SceneManager.init(stage);
-
-        Image icon = new Image(getClass().getResourceAsStream("/assets/icon.png"));
-        stage.getIcons().add(icon);
-
-        FXMLLoader loader =
-                new FXMLLoader(MainClient.class.getResource("/org/uninsubria/clientTK/views/MainLayout.fxml"));
-
-        Scene scene = new Scene(loader.load());
-
+    public void start(Stage stage) {
         stage.setTitle("TheKnife");
-        stage.setScene(scene);
+        // Carica la prima schermata tramite il SceneManager per ereditare subito il CSS globale e la gestione corretta
+        SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/MainLayout.fxml");
         stage.show();
     }
 

@@ -2,9 +2,7 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -17,7 +15,6 @@ import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
-import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -32,52 +29,22 @@ public class LoginController {
     @FXML
     private Label labelErrore;
 
-
-
     @FXML
     private void handleSignIn(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
     }
 
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @FXML
+    public void handleLogoClick(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
-
-
-
 
     /**
      * Gestisce il click sul pulsante "Accedi": invoca il login remoto e,
      * se le credenziali sono corrette, apre la home dell'utente.
      */
     @FXML
-    private void onAccedi() {
+    private void onAccedi(ActionEvent event) {
         labelErrore.setText("");
         String email = campoEmail.getText();
         String password = campoPassword.getText();
@@ -90,7 +57,7 @@ public class LoginController {
         try {
             UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
             SessioneUtente.login(utente);
-            SceneManager.mostraSchermata("MainLayoutLoggato.fxml", "Home");
+            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
 
         } catch (CredenzialiErrateException e) {
             labelErrore.setText("Email o password non corretti.");
@@ -98,8 +65,6 @@ public class LoginController {
             e.printStackTrace();
             labelErrore.setText("Errore server: " + e.getClass().getSimpleName()
                     + " - " + e.getMessage());
-        } catch (IOException e) {
-            labelErrore.setText("Errore nel caricamento della schermata successiva.");
         }
     }
 
@@ -107,25 +72,16 @@ public class LoginController {
      * Passa alla schermata di registrazione di un nuovo utente.
      */
     @FXML
-    private void onVaiRegistrazione() {
-        try {
-            SceneManager.mostraSchermata("registrazione.fxml", "Registrati");
-        } catch (IOException e) {
-            labelErrore.setText("Impossibile aprire la schermata di registrazione.");
-        }
+    private void onVaiRegistrazione(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/registrazione.fxml");
     }
 
     /**
-     * Salta l'autenticazione e prosegue come utente ospite (guest), con
-     * accesso solo alle funzionalitÃ che non richiedono login.
+     * Salta l'autenticazione e prosegue come utente ospite (guest).
      */
     @FXML
-    private void onContinuaComeGuest() {
+    private void onContinuaComeGuest(ActionEvent event) {
         SessioneUtente.logout();
-        try {
-            SceneManager.mostraSchermata("home.fxml", "Home (ospite)");
-        } catch (IOException e) {
-            labelErrore.setText("Impossibile aprire la home.");
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/home.fxml");
     }
 }
