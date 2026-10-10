@@ -30,6 +30,28 @@ public class SceneManager {
     }
 
     /**
+
+     Carica una vista FXML e la mostra sullo stage principale.*
+     @param nomeFxml nome del file FXML (senza path), es. {@code "login.fxml"}
+     @param titolo   titolo da mostrare sulla finestra
+     @throws IOException se il file FXML non viene trovato o non è valido*/
+    public static void mostraSchermata(String nomeFxml, String titolo) throws IOException {
+        FXMLLoader loader = new FXMLLoader(
+                SceneManager.class.getResource("/org/uninsubria/clientTK/views/" + nomeFxml));
+        Parent root = loader.load();
+
+        Scene scena = stagePrincipale.getScene();
+        if (scena == null) {
+            scena = new Scene(root, 900, 600);
+            stagePrincipale.setScene(scena);
+        } else {
+            scena.setRoot(root);
+        }
+        stagePrincipale.setTitle("TheKnife - " + titolo);
+        stagePrincipale.show();
+    }
+
+    /**
      * Cambia la root della scena corrente mantenendo lo stato dello Stage.
      */
     public static void switchScene(Stage stage, String fxmlPath) {
