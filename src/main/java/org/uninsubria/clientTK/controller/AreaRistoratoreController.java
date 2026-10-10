@@ -2,15 +2,10 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
-
-import java.io.IOException;
+import org.uninsubria.clientTK.util.SceneManager;
 
 public class AreaRistoratoreController {
 
@@ -27,20 +22,7 @@ public class AreaRistoratoreController {
 
     @FXML
     private void onAreaPersonaleClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/SignUp.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/SignUp.fxml");
     }
 
     @FXML
@@ -48,101 +30,37 @@ public class AreaRistoratoreController {
     }
 
     @FXML
-    public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-
+    public void onRicercaAvanzataClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml");
     }
 
-
-    public void onPreferitiClick(ActionEvent actionEvent) {
+    public void onPreferitiClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/Preferiti.fxml");
     }
 
-    public void onRecensioniClick(ActionEvent actionEvent) {
+    public void onRecensioniClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MieRecensioni.fxml");
     }
 
-    public void onLogOutClick(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public void onLogOutClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
-    public void onRistorantiClick(ActionEvent actionEvent) {
+    public void onRistorantiClick(ActionEvent event) {
     }
 
     @FXML
-    public void onAggiungiClick(ActionEvent actionEvent) {
-        try {
-            // Recupera la finestra corrente
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            // Carica la nuova scena da AggiungiRistorante.fxml
-            Scene scene = new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/AggiungiRistorante.fxml")
-                    )
-            );
-
-            // Imposta la scena sullo stage
-            stage.setScene(scene);
-
-        } catch (IOException e) {
-            System.err.println("Errore durante il caricamento di AggiungiRistorante.fxml");
-            e.printStackTrace();
-        }
+    public void onAggiungiClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AggiungiRistorante.fxml");
     }
+
     @FXML
-    public void ListaRistorantiRistoratore(ActionEvent actionEvent) {
-        try {
-            // Recupera la finestra corrente
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            // Carica la nuova scena da AggiungiRistorante.fxml
-            Scene scene = new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/ListaRistoranti.fxml")
-                    )
-            );
-
-            // Imposta la scena sullo stage
-            stage.setScene(scene);
-
-        } catch (IOException e) {
-            System.err.println("Errore durante il caricamento di RistorantiRistoratore.fxml");
-            e.printStackTrace();
-        }
+    public void ListaRistorantiRistoratore(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/ListaRistoranti.fxml");
     }
 
-
-
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @FXML
+    public void handleLogoClick(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
     }
 }

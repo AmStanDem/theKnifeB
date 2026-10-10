@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- HeaderBar.fxml -->
+<?import javafx.scene.image.ImageView?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.uninsubria.clientTK.controller.HeaderController"
+      alignment="CENTER_LEFT" spacing="15" styleClass="header-bar">
+
+    <ImageView fx:id="imgLogo" onMouseClicked="#handleLogoClick" pickOnBounds="true" preserveRatio="true"/>
+    <TextField fx:id="txtLocalita" promptText="Cerca località..."/>
+    <Button text="Ricerca Avanzata" onAction="#onRicercaAvanzataClick"/>
+    <Button text="Area Personale" onAction="#onAreaPersonaleClick"/>
+    <Button text="Logout" onAction="#onLogOutClick"/>
+
+</HBox>

@@ -6,7 +6,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -14,11 +13,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PreferitiController {
@@ -38,61 +36,20 @@ public class PreferitiController {
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
 
-
     @FXML
     private void onRicercaClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/listaPreferiti.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/listaPreferiti.fxml");
     }
 
     @FXML
-    private void onAreaPersonaleClick(MouseEvent  event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/areaCliente.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void onAreaPersonaleClick(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/areaCliente.fxml");
     }
 
     @FXML
     private void onAreaRistoratoreClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/AreaRistoratore.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AreaRistoratore.fxml");
     }
-
 
     @FXML
     private void onGeolocalizzazioneClick() {
@@ -100,51 +57,19 @@ public class PreferitiController {
 
     @FXML
     public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml");
     }
 
-
+    @FXML
     public void handleLogoClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(mouseEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     @FXML
     public void initialize() {
-        caricaRistorantiDiTest(); // TODO: sostituire con chiamata al servizio/socket reale verso il server
+        caricaRistorantiDiTest();
         aggiornaLista(ristorantiCompleti);
     }
-
-
-
-
-
-
 
     private void aggiornaLista(List<RistoranteDTO> nuovaLista) {
         restaurantContainer.getChildren().clear();
@@ -157,14 +82,12 @@ public class PreferitiController {
         }
 
         resultsCountLabel.setText(nuovaLista.size() + " ristoranti trovati");
-        restaurantScrollPane.setVvalue(0); // torna in cima alla lista dopo ricerca/filtro
+        restaurantScrollPane.setVvalue(0);
     }
 
-    /** Carica la card FXML per un singolo ristorante e collega il controller. */
     private Node creaCardRistorante(RistoranteDTO ristorante) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/org/uninsubria/clientTK/views/PreferitoItem.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/clientTK/views/PreferitoItem.fxml"));
             Pane cardPane = loader.load();
 
             PreferitoItemController controller = loader.getController();
@@ -180,11 +103,9 @@ public class PreferitiController {
     }
 
     private void apriDettagliRistorante(RistoranteDTO ristorante) {
-        // TODO: navigazione verso la schermata di dettaglio ristorante (usare idRistorante())
         System.out.println("Apertura dettagli per: " + ristorante.nome());
     }
 
-    /** Dati di esempio — da rimuovere quando si collega il livello dati reale. */
     private void caricaRistorantiDiTest() {
         ristorantiCompleti.addAll(
                 new RistoranteDTO(
@@ -201,7 +122,6 @@ public class PreferitiController {
                         true,
                         4.5
                 ),
-
                 new RistoranteDTO(
                         2,
                         "Sakura Sushi",
@@ -216,7 +136,6 @@ public class PreferitiController {
                         true,
                         4.2
                 ),
-
                 new RistoranteDTO(
                         3,
                         "La Piadineria",
@@ -233,6 +152,4 @@ public class PreferitiController {
                 )
         );
     }
-
-
 }

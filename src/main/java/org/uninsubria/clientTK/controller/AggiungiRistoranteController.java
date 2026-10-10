@@ -4,17 +4,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import org.controlsfx.control.CheckComboBox;
-
-import java.io.IOException;
+import org.uninsubria.clientTK.util.SceneManager;
 
 public class AggiungiRistoranteController {
 
@@ -56,7 +51,6 @@ public class AggiungiRistoranteController {
 
     @FXML
     public void initialize() {
-        // Popola la CheckComboBox di ControlsFX con le tipologie di cucina
         ObservableList<String> tipologieCucina = FXCollections.observableArrayList(
                 "Italiana", "Pizzeria", "Giapponese", "Cinese",
                 "Messicana", "Indiana", "Vegetariana", "Vegan"
@@ -66,7 +60,6 @@ public class AggiungiRistoranteController {
 
     @FXML
     public void onSalvaClick(ActionEvent event) {
-        // 1. Validazione campi obbligatori
         if (txtNome.getText().trim().isEmpty() ||
                 txtIndirizzo.getText().trim().isEmpty() ||
                 txtCitta.getText().trim().isEmpty() ||
@@ -79,7 +72,6 @@ public class AggiungiRistoranteController {
             return;
         }
 
-        // 2. Validazione e parsing dei campi numerici
         try {
             double prezzoMedio = Double.parseDouble(txtPrezzoMedio.getText().trim().replace(",", "."));
             double latitudine = Double.parseDouble(txtLatitudine.getText().trim().replace(",", "."));
@@ -90,7 +82,6 @@ public class AggiungiRistoranteController {
                 return;
             }
 
-            // Recupera la lista delle cucine selezionate
             ObservableList<String> cucineSelezionate = comboCucine.getCheckModel().getCheckedItems();
             if (cucineSelezionate.isEmpty()) {
                 mostraMessaggio(Alert.AlertType.WARNING, "Selezione Mancante", "Seleziona almeno una tipologia di cucina.");
@@ -100,7 +91,6 @@ public class AggiungiRistoranteController {
             boolean delivery = chkDelivery.isSelected();
             boolean bookingOnline = chkBookingOnline.isSelected();
 
-            // TODO: Invia i dati al servizio/DAO per l'inserimento nel database
             System.out.println("Ristorante salvato: " + txtNome.getText() + " | Prezzo: " + prezzoMedio + "€");
 
             mostraMessaggio(Alert.AlertType.INFORMATION, "Successo", "Ristorante registrato con successo!");
@@ -117,14 +107,7 @@ public class AggiungiRistoranteController {
     }
 
     private void tornaAllaHome(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(
-                    FXMLLoader.load(getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml"))
-            ));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
     }
 
     private void mostraMessaggio(Alert.AlertType alertType, String titolo, String contenuto) {

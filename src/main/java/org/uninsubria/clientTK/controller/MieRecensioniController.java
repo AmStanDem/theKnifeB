@@ -6,14 +6,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RecensioneDTO;
 
 import java.io.IOException;
@@ -44,49 +43,18 @@ public class MieRecensioniController {
     private final ObservableList<RecensioneDTO> recensioniComplete =
             FXCollections.observableArrayList();
 
-
     // =========================================================
     // NAVIGAZIONE
     // =========================================================
 
     @FXML
     private void onAreaPersonaleClick(MouseEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource(
-                                    "/org/uninsubria/clientTK/views/areaCliente.fxml"
-                            )
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/areaCliente.fxml");
     }
 
     @FXML
     private void onAreaRistoratoreClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource(
-                                    "/org/uninsubria/clientTK/views/AreaRistoratore.fxml"
-                            )
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AreaRistoratore.fxml");
     }
 
     @FXML
@@ -96,44 +64,13 @@ public class MieRecensioniController {
 
     @FXML
     public void onRicercaAvanzataClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource(
-                                    "/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml"
-                            )
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml");
     }
 
     @FXML
     public void handleLogoClick(MouseEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource(
-                                    "/org/uninsubria/clientTK/views/MainLayout.fxml"
-                            )
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
-
 
     // =========================================================
     // INIZIALIZZAZIONE
@@ -141,27 +78,17 @@ public class MieRecensioniController {
 
     @FXML
     public void initialize() {
-
-        // TODO:
-        // sostituire con chiamata al server/socket reale
         caricaRecensioniDiTest();
-
         aggiornaLista(recensioniComplete);
     }
 
-
     // =========================================================
-    // RICERCA
+    // RICERCA E LISTA
     // =========================================================
 
     @FXML
     private void onSearch() {
-
-        String query = txtRicerca.getText() == null
-                ? ""
-                : txtRicerca.getText()
-                .trim()
-                .toLowerCase();
+        String query = txtRicerca.getText() == null ? "" : txtRicerca.getText().trim().toLowerCase();
 
         if (query.isEmpty()) {
             aggiornaLista(recensioniComplete);
@@ -169,144 +96,68 @@ public class MieRecensioniController {
         }
 
         List<RecensioneDTO> filtrate = new ArrayList<>();
-
         for (RecensioneDTO recensione : recensioniComplete) {
-
-            boolean matchTesto =
-                    recensione.testo() != null
-                            && recensione.testo()
-                            .toLowerCase()
-                            .contains(query);
-
-            boolean matchAutore =
-                    recensione.nomeAutore() != null
-                            && recensione.nomeAutore()
-                            .toLowerCase()
-                            .contains(query);
+            boolean matchTesto = recensione.testo() != null && recensione.testo().toLowerCase().contains(query);
+            boolean matchAutore = recensione.nomeAutore() != null && recensione.nomeAutore().toLowerCase().contains(query);
 
             if (matchTesto || matchAutore) {
                 filtrate.add(recensione);
             }
         }
-
         aggiornaLista(filtrate);
     }
 
-
-    // =========================================================
-    // AGGIORNAMENTO LISTA
-    // =========================================================
-
-    private void aggiornaLista(
-            List<RecensioneDTO> nuovaLista) {
-
+    private void aggiornaLista(List<RecensioneDTO> nuovaLista) {
         restaurantContainer.getChildren().clear();
 
         for (RecensioneDTO recensione : nuovaLista) {
-
             Node card = creaCardRecensione(recensione);
-
             if (card != null) {
                 restaurantContainer.getChildren().add(card);
             }
         }
 
-        resultsCountLabel.setText(
-                nuovaLista.size() + " recensioni trovate"
-        );
-
+        resultsCountLabel.setText(nuovaLista.size() + " recensioni trovate");
         restaurantScrollPane.setVvalue(0);
     }
 
-
-    // =========================================================
-    // CREAZIONE CARD RECENSIONE
-    // =========================================================
-
-    private Node creaCardRecensione(
-            RecensioneDTO recensione) {
-
+    private Node creaCardRecensione(RecensioneDTO recensione) {
         try {
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource(
-                            "/org/uninsubria/clientTK/views/RecensioneItem.fxml"
-                    )
-            );
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/clientTK/views/RecensioneItem.fxml"));
             Node card = loader.load();
-
-            RecensioneItemController controller =
-                    loader.getController();
-
+            RecensioneItemController controller = loader.getController();
             controller.setRecensione(recensione);
-
             return card;
-
         } catch (IOException e) {
-
             e.printStackTrace();
-
             return null;
         }
     }
 
-
-    // =========================================================
-    // DATI DI TEST
-    // =========================================================
-
     private void caricaRecensioniDiTest() {
-
         recensioniComplete.addAll(
-
                 new RecensioneDTO(
                         1,
                         5,
-                        "Credo sia il gioco migliore "
-                                + "a cui abbia mai giocato. "
-                                + "Ambientazioni, personaggi, "
-                                + "dialoghi e storia impeccabili.",
+                        "Credo sia il gioco migliore a cui abbia mai giocato. Ambientazioni, personaggi, dialoghi e storia impeccabili.",
                         "Giovanni",
-                        LocalDateTime.of(
-                                2026,
-                                7,
-                                30,
-                                15,
-                                30
-                        ),
+                        LocalDateTime.of(2026, 7, 30, 15, 30),
                         null
                 ),
-
                 new RecensioneDTO(
                         2,
                         4,
-                        "Ottima esperienza, personale "
-                                + "gentile e servizio veloce.",
+                        "Ottima esperienza, personale gentile e servizio veloce.",
                         "Giovanni",
-                        LocalDateTime.of(
-                                2026,
-                                7,
-                                25,
-                                18,
-                                20
-                        ),
+                        LocalDateTime.of(2026, 7, 25, 18, 20),
                         "Grazie mille per la recensione!"
                 ),
-
                 new RecensioneDTO(
                         3,
                         3,
-                        "Il posto è carino, ma secondo me "
-                                + "si potrebbe migliorare il servizio.",
+                        "Il posto è carino, ma secondo me si potrebbe migliorare il servizio.",
                         "Giovanni",
-                        LocalDateTime.of(
-                                2026,
-                                7,
-                                20,
-                                12,
-                                10
-                        ),
+                        LocalDateTime.of(2026, 7, 20, 12, 10),
                         null
                 )
         );
