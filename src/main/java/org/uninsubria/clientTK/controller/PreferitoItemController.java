@@ -2,16 +2,11 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
-import java.util.function.Consumer;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 public class PreferitoItemController {
@@ -26,11 +21,8 @@ public class PreferitoItemController {
 
     private RistoranteDTO ristorante;
     private Consumer<RistoranteDTO> onDettagliAction;
-
     private Consumer<RistoranteDTO> onRemoveFavoriteAction;
 
-
-    /** Popola la card con i dati del ristorante passato. */
     public void setRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
 
@@ -43,30 +35,15 @@ public class PreferitoItemController {
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));
     }
 
-    /** Permette al chiamante (controller lista) di reagire al click su "Dettagli". */
     public void setOnDettagliAction(Consumer<RistoranteDTO> onDettagliAction) {
         this.onDettagliAction = onDettagliAction;
     }
 
     @FXML
     private void onDetailsClicked(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/Ristorante.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
     }
 
-    /** Mostra o nasconde il tag, riservando/liberando lo spazio nel layout. */
     private void aggiornaTag(Label tagLabel, boolean visibile) {
         tagLabel.setVisible(visibile);
         tagLabel.setManaged(visibile);

@@ -2,16 +2,11 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
 import javafx.scene.input.MouseEvent;
-import java.io.IOException;
+import org.uninsubria.clientTK.util.SceneManager;
 
 public class SignUpController {
 
@@ -58,61 +53,46 @@ public class SignUpController {
         }
 
         if (password.length() < 8) {
-            System.out.println(
-                    "La password deve contenere almeno 8 caratteri."
-            );
+            System.out.println("La password deve contenere almeno 8 caratteri.");
             passwordField.requestFocus();
             return;
         }
 
         if (password.length() > 64) {
-            System.out.println(
-                    "La password non può superare 64 caratteri."
-            );
+            System.out.println("La password non può superare 64 caratteri.");
             passwordField.requestFocus();
             return;
         }
 
         if (password.contains(" ")) {
-            System.out.println(
-                    "La password non può contenere spazi."
-            );
+            System.out.println("La password non può contenere spazi.");
             passwordField.requestFocus();
             return;
         }
 
         if (!password.matches(".*[a-z].*")) {
-            System.out.println(
-                    "La password deve contenere almeno una lettera minuscola."
-            );
+            System.out.println("La password deve contenere almeno una lettera minuscola.");
             passwordField.requestFocus();
             return;
         }
 
         if (!password.matches(".*[A-Z].*")) {
-            System.out.println(
-                    "La password deve contenere almeno una lettera maiuscola."
-            );
+            System.out.println("La password deve contenere almeno una lettera maiuscola.");
             passwordField.requestFocus();
             return;
         }
 
         if (!password.matches(".*\\d.*")) {
-            System.out.println(
-                    "La password deve contenere almeno un numero."
-            );
+            System.out.println("La password deve contenere almeno un numero.");
             passwordField.requestFocus();
             return;
         }
 
         if (!password.matches(".*[^A-Za-z0-9].*")) {
-            System.out.println(
-                    "La password deve contenere almeno un carattere speciale."
-            );
+            System.out.println("La password deve contenere almeno un carattere speciale.");
             passwordField.requestFocus();
             return;
         }
-
 
         System.out.println("Registrazione:");
         System.out.println("Nome: " + nome);
@@ -120,56 +100,14 @@ public class SignUpController {
         System.out.println("Ruolo: " + ruolo);
         System.out.println("Email: " + email);
 
-
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
     }
 
-
-
     public void handleAccedi(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/LoginView.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(mouseEvent, "/org/uninsubria/clientTK/views/LoginView.fxml");
     }
 
     public void handleLogoClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(mouseEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 }

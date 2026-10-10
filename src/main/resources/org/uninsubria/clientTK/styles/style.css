@@ -1,0 +1,88 @@
+/* ===================== TEMA E VARIABILI GLOBALI ===================== */
+.root {
+    /* Palette Colori Principale */
+    -fx-primary-green: #4CAF3B;
+    -fx-light-green: #7ED957;
+    -fx-dark-green: #0B3B2C;
+    -fx-darker-green: #082A20;
+    -fx-text-dark: #0F2A20;
+    -fx-text-gray: #5C7A6E;
+    -fx-border-gray: #D3DFD8;
+
+    /* Font Globale */
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-background-color: #F9FAFB;
+}
+
+/* ===================== CAMPI DI TESTO GLOBALI ===================== */
+.text-input {
+    -fx-pref-height: 44px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: -fx-border-gray;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0 14 0 14;
+    -fx-font-size: 14px;
+}
+
+.text-input:focused {
+    -fx-border-color: -fx-primary-green;
+}
+
+/* ===================== BOTTONI GLOBALI ===================== */
+.button {
+    -fx-pref-height: 44px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* Bottone Primario Verde (es. Conferma, Login, Invia) */
+.button-primary {
+    -fx-background-color: -fx-primary-green;
+    -fx-text-fill: white;
+}
+
+.button-primary:hover {
+    -fx-background-color: #3E9330;
+}
+
+/* Bottone Secondario/Bordato */
+.button-outline {
+    -fx-background-color: white;
+    -fx-border-color: -fx-border-gray;
+    -fx-border-radius: 8px;
+    -fx-text-fill: -fx-text-dark;
+    -fx-font-weight: 600;
+}
+
+.button-outline:hover {
+    -fx-background-color: #F9FAFB;
+}
+
+/* ===================== TESTI E LINK GLOBALI ===================== */
+.hyperlink {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-primary-green;
+    -fx-font-weight: 600;
+    -fx-border-width: 0;
+    -fx-underline: true;
+}
+
+.label-title {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-dark;
+}
+
+.label-subtitle {
+    -fx-font-size: 15px;
+    -fx-text-fill: -fx-text-gray;
+}
+
+.label-field {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -fx-text-dark;
+}

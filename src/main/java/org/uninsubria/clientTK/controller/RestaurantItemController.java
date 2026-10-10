@@ -1,16 +1,12 @@
 package org.uninsubria.clientTK.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
-import javafx.event.ActionEvent;
-import java.io.IOException;
 import java.util.function.Consumer;
 
 public class RestaurantItemController {
@@ -46,20 +42,7 @@ public class RestaurantItemController {
 
     @FXML
     private void onDetailsClicked(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/Ristorante.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
     }
 
     /** Mostra o nasconde il tag, riservando/liberando lo spazio nel layout. */
