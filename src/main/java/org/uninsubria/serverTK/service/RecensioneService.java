@@ -17,6 +17,30 @@ public class RecensioneService {
         return recensioneDAO.trovaPerRistorante(idRistorante);
     }
 
+    /**
+     * Recupera le recensioni di un ristorante oscurando l'identità dell'autore.
+     * Utilizzato per la visualizzazione da parte degli utenti non loggati (Guest).
+     */
+    public List<RecensioneDTO> ottieniPerRistoranteAnonimo(Integer idRistorante) {
+        if (idRistorante == null) {
+            return List.of();
+        }
+
+        List<RecensioneDTO> recensioniReali = recensioneDAO.trovaPerRistorante(idRistorante);
+
+        // Trasforma la lista oscurando il campo del nome autore
+        return recensioniReali.stream()
+                .map(r -> new RecensioneDTO(
+                        r.idRecensione(),
+                        r.valutazione(),
+                        r.testo(),
+                        "",
+                        r.dataCreazione(),
+                        r.rispostaGestore()
+                ))
+                .toList();
+    }
+
     public void aggiungiRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws DatiMancantiException, AzioneDuplicataException {
 

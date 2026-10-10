@@ -63,6 +63,12 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
     }
 
     @Override
+    public List<RecensioneDTO> getRecensioniRistoranteAnonimo(Integer idRistorante)
+            throws RemoteException, SistemaIndisponibileException {
+        return recensioneService.ottieniPerRistoranteAnonimo(idRistorante);
+    }
+
+    @Override
     public void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException {
         recensioneService.aggiungiRecensione(recensione, idRistorante, idUtente);
