@@ -12,6 +12,11 @@ import java.io.IOException;
 
 public class SceneManager {
 
+    private static Stage stagePrincipale;
+
+    public static void init(Stage stage) {
+        stagePrincipale = stage;}
+
     // Percorso opzionale al foglio di stile globale (modifica o rimuovi se non usi un CSS unico)
     private static final String GLOBAL_CSS = "/org/uninsubria/clientTK/styles/style.css";
 
