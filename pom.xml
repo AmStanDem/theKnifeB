@@ -9,67 +9,53 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-
         <!-- Java -->
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- JavaFX -->
+        <!-- Versions -->
         <javafx.version>21.0.2</javafx.version>
-
-        <!-- ControlsFX -->
         <controlsfx.version>11.2.1</controlsfx.version>
-
-        <!-- PostgreSQL -->
         <postgresql.version>42.7.13</postgresql.version>
-
-        <!-- Flyway -->
         <flyway.version>12.11.0</flyway.version>
-
+        <jbcrypt.version>0.4</jbcrypt.version>
+        <atlantafx.version>2.1.0</atlantafx.version>
     </properties>
-
 
     <build>
         <plugins>
-            <!-- JavaFX -->
+            <!-- JavaFX Maven Plugin -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
-
                 <configuration>
                     <mainClass>org.uninsubria.clientTK.MainClient</mainClass>
                 </configuration>
             </plugin>
+
+            <!-- Flyway Maven Plugin -->
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>12.11.0</version>
-
+                <version>${flyway.version}</version>
                 <configuration>
-                    <!-- Credenziali e coordinate del database -->
                     <url>jdbc:postgresql://localhost:5433/theknife</url>
                     <user>admin</user>
                     <password>admin</password>
-
-                    <!-- Crea il database se non esiste (se supportato dal driver) o gestisce schemi vuoti -->
                     <baselineOnMigrate>true</baselineOnMigrate>
                 </configuration>
-
                 <dependencies>
-                    <!-- Driver nativo per PostgreSQL -->
                     <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>42.7.13</version>
+                        <version>${postgresql.version}</version>
                     </dependency>
                 </dependencies>
-
                 <executions>
                     <execution>
                         <id>esegui-migrazioni-flyway</id>
-                        <!-- Esegue le migrazioni prima di compilare il codice Java -->
                         <phase>process-resources</phase>
                         <goals>
                             <goal>migrate</goal>
@@ -80,58 +66,47 @@
         </plugins>
     </build>
 
-
     <dependencies>
-        <!-- Driver JDBC PostgreSQL -->
+        <!-- PostgreSQL JDBC Driver -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.13</version> <!-- latest LTS -->
+            <version>${postgresql.version}</version>
         </dependency>
-        <!-- JAVAFX -->
+
+        <!-- JavaFX Controls -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>27-ea+25</version>
+            <version>${javafx.version}</version>
         </dependency>
+
+        <!-- JavaFX FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>27-ea+25</version>
+            <version>${javafx.version}</version>
         </dependency>
-        <!-- Core Flyway -->
+
+        <!-- Flyway Core -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>12.11.0</version>
+            <version>${flyway.version}</version>
         </dependency>
 
-        <!-- Support for PostgreSQL -->
+        <!-- Flyway PostgreSQL Support -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>12.11.0</version>
+            <version>${flyway.version}</version>
         </dependency>
+
+        <!-- jBCrypt -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
-            <version>0.4</version>
-            <scope>compile</scope>
-        </dependency>
-
-
-
-        <!-- JavaFX -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
+            <version>${jbcrypt.version}</version>
         </dependency>
 
         <!-- ControlsFX -->
@@ -141,31 +116,11 @@
             <version>${controlsfx.version}</version>
         </dependency>
 
-        <!-- PostgreSQL -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>0.4</version>
-        </dependency>
-
-        <!-- Flyway -->
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
-        </dependency>
-
-        <!-- AtlantaFX -->
+        <!-- AtlantaFX Base -->
         <dependency>
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
-            <version>2.1.0</version>
+            <version>${atlantafx.version}</version>
         </dependency>
     </dependencies>
 
