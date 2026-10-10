@@ -82,7 +82,7 @@
                             <outfile>${project.build.directory}/${project.artifactId}.exe</outfile>
 
                             <!-- Assicurati di posizionare un file .ico valido in questo percorso -->
-                            <icon>src/main/resources/icon.ico</icon>
+                            <icon>src/main/resources/assets/icon.ico</icon>
 
                             <jre>
                                 <minVersion>21</minVersion>
