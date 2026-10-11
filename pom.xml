@@ -32,6 +32,12 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>org.uninsubria.clientTK.MainClient</mainClass>
+                    <options>
+                        <!-- Aumenta la RAM massima allocabile (es. 2 Gigabyte) -->
+                        <option>-Xmx2G</option>
+                        <!-- Rimuove il warning sul restricted method di Java 21 -->
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
                 </configuration>
             </plugin>
 

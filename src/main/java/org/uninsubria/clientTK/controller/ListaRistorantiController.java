@@ -8,9 +8,13 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.uninsubria.common.dto.FiltriRicercaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
+import org.uninsubria.common.rmi.ITheKnifeServer;
 
 import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +34,50 @@ public class ListaRistorantiController {
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
 
+    // Riferimento al server RMI
+    private ITheKnifeServer serverRMI;
+
     @FXML
     public void initialize() {
         configuraFiltri();
-        caricaRistorantiDiTest(); // TODO: sostituire con chiamata al servizio/socket reale verso il server
-        aggiornaLista(ristorantiCompleti);
+        connettiAlServer();
+        caricaRistorantiDalServer();
+    }
+
+    /**
+     * Stabilisce la connessione RMI col server.
+     * Assicurati che l'IP, la porta e il nome dell'oggetto registrato corrispondano a quelli del server.
+     */
+    private void connettiAlServer() {
+        try {
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            serverRMI = (ITheKnifeServer) registry.lookup("TheKnifeServer");
+        } catch (Exception e) {
+            System.err.println("Errore di connessione al server RMI: " + e.getMessage());
+            mostraErrore("Connessione fallita", "Impossibile collegarsi al server TheKnife.");
+        }
+    }
+
+    /**
+     * Recupera l'elenco dei ristoranti dal database tramite RMI.
+     */
+    private void caricaRistorantiDalServer() {
+        if (serverRMI == null) return;
+
+        try {
+            FiltriRicercaDTO filtri = new FiltriRicercaDTO("Milano",null,null,null,null,null,null,null,null);
+            // Chiede al server tutti i ristoranti (filtri null)
+            List<RistoranteDTO> datiDalDB = serverRMI.cercaRistoranti(filtri);
+
+            if (datiDalDB != null) {
+                ristorantiCompleti.clear();
+                ristorantiCompleti.addAll(datiDalDB);
+                aggiornaLista(ristorantiCompleti);
+            }
+        } catch (Exception e) {
+            System.err.println("Errore durante il caricamento dei ristoranti: " + e.getMessage());
+            mostraErrore("Errore dati", "Impossibile caricare la lista dei ristoranti dal server.");
+        }
     }
 
     /** Popola le ComboBox dei filtri. */
@@ -78,7 +121,7 @@ public class ListaRistorantiController {
         aggiornaLista(ristorantiCompleti);
     }
 
-    /** Applica congiuntamente i filtri di prezzo, rating e cucina selezionati. */
+    /** Applica congiuntamente i filtri di prezzo, rating e cucina selezionati localmente. */
     private void applicaFiltri() {
         String prezzoSelezionato = priceFilterCombo.getValue();
         String ratingSelezionato = ratingFilterCombo.getValue();
@@ -109,11 +152,6 @@ public class ListaRistorantiController {
         return Double.parseDouble(etichetta.replace("+", ""));
     }
 
-    /**
-     * Converte il prezzo medio reale (es. 12.50€) in una fascia 1-4,
-     * usata sia per il filtro sia per la visualizzazione nelle card.
-     * Soglie indicative, personalizzabili in base ai dati reali.
-     */
     static int fasciaPrezzoDaImporto(Double prezzoMedio) {
         if (prezzoMedio == null) return 1;
         if (prezzoMedio < 15) return 1;
@@ -123,8 +161,7 @@ public class ListaRistorantiController {
     }
 
     /**
-     * Ricostruisce il contenuto del VBox all'interno dello ScrollPane,
-     * caricando una card RestaurantItem.fxml per ogni ristorante.
+     * Ricostruisce il contenuto del VBox all'interno dello ScrollPane.
      */
     private void aggiornaLista(List<RistoranteDTO> nuovaLista) {
         restaurantContainer.getChildren().clear();
@@ -137,7 +174,7 @@ public class ListaRistorantiController {
         }
 
         resultsCountLabel.setText(nuovaLista.size() + " ristoranti trovati");
-        restaurantScrollPane.setVvalue(0); // torna in cima alla lista dopo ricerca/filtro
+        restaurantScrollPane.setVvalue(0);
     }
 
     /** Carica la card FXML per un singolo ristorante e collega il controller. */
@@ -147,6 +184,7 @@ public class ListaRistorantiController {
                     "/org/uninsubria/clientTK/views/RestaurantItem.fxml"));
             Pane cardPane = loader.load();
 
+            // Scommentare e adattare se RestaurantItemController è stato creato
             RestaurantItemController controller = loader.getController();
             controller.setRistorante(ristorante);
             controller.setOnDettagliAction(this::apriDettagliRistorante);
@@ -160,57 +198,16 @@ public class ListaRistorantiController {
     }
 
     private void apriDettagliRistorante(RistoranteDTO ristorante) {
-        // TODO: navigazione verso la schermata di dettaglio ristorante (usare idRistorante())
+        // TODO: navigazione verso la schermata di dettaglio ristorante
         System.out.println("Apertura dettagli per: " + ristorante.nome());
     }
 
-    /** Dati di esempio — da rimuovere quando si collega il livello dati reale. */
-    private void caricaRistorantiDiTest() {
-        ristorantiCompleti.addAll(
-                new RistoranteDTO(
-                        1,
-                        "Osteria del Borgo",
-                        "Via Roma 12, Milano",
-                        "Italia",
-                        "Milano",
-                        45.4642,
-                        9.1900,
-                        List.of("Italiana"),
-                        28.0,
-                        false,
-                        true,
-                        4.5
-                ),
-
-                new RistoranteDTO(
-                        2,
-                        "Sakura Sushi",
-                        "Corso Buenos Aires 5, Milano",
-                        "Italia",
-                        "Milano",
-                        45.4780,
-                        9.2050,
-                        List.of("Giapponese"),
-                        35.0,
-                        true,
-                        true,
-                        4.2
-                ),
-
-                new RistoranteDTO(
-                        3,
-                        "La Piadineria",
-                        "Piazza Duomo 1, Milano",
-                        "Italia",
-                        "Milano",
-                        45.4640,
-                        9.1900,
-                        List.of("Pizzeria"),
-                        12.0,
-                        true,
-                        false,
-                        3.8
-                )
-        );
+    /** Mostra un alert all'utente in caso di problemi di rete. */
+    private void mostraErrore(String titolo, String messaggio) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titolo);
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.showAndWait();
     }
 }
