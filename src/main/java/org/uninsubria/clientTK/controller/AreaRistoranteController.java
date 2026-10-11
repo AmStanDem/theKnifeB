@@ -6,9 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.common.dto.RecensioneDTO;
@@ -63,6 +65,29 @@ public class AreaRistoranteController {
     private Label resultsCountLabel;
 
     private RistoranteDTO ristorante;
+
+
+    @FXML
+    private Label averageRatingLabel;
+
+    @FXML
+    private Rating averageRating;
+
+
+    @FXML
+    private ProgressBar bar5;
+
+    @FXML
+    private ProgressBar bar4;
+
+    @FXML
+    private ProgressBar bar3;
+
+    @FXML
+    private ProgressBar bar2;
+
+    @FXML
+    private ProgressBar bar1;
 
     // =========================================================
     // INIZIALIZZAZIONE
@@ -128,7 +153,8 @@ public class AreaRistoranteController {
         try {
             List<RecensioneDTO> recensioni = ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
 
-
+            aggiornaMediaRecensioni(recensioni);
+            aggiornaDistribuzioneRecensioni(recensioni);
 
             if (reviewContainer == null) {
                 System.out.println("ERRORE: reviewContainer è NULL");
@@ -138,32 +164,7 @@ public class AreaRistoranteController {
             System.out.println("reviewContainer trovato!");
             reviewContainer.getChildren().clear();
 
-            /*List<RecensioneDTO> recensioni = List.of(
-                    new RecensioneDTO(
-                            1,
-                            5,
-                            "Ottimo ristorante, cibo davvero molto buono!",
-                            "Thomas Panero",
-                            java.time.LocalDateTime.of(2026, 7, 30, 12, 30),
-                            "Grazie mille per la recensione!"
-                    ),
-                    new RecensioneDTO(
-                            2,
-                            4,
-                            "Personale gentile e servizio molto veloce.",
-                            "Marco Rossi",
-                            java.time.LocalDateTime.of(2026, 7, 28, 19, 15),
-                            null
-                    ),
-                    new RecensioneDTO(
-                            3,
-                            5,
-                            "Piatti molto buoni, sicuramente ci tornerò.",
-                            "Luca Bianchi",
-                            java.time.LocalDateTime.of(2026, 7, 25, 20, 45),
-                            null
-                    )
-            );*/
+
 
             System.out.println("Numero recensioni: " + recensioni.size());
             resultsCountLabel.setText(recensioni.size() + " recensioni trovate");
@@ -207,6 +208,60 @@ public class AreaRistoranteController {
         } catch (NotBoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    private void aggiornaMediaRecensioni(List<RecensioneDTO> recensioni) {
+
+        if (recensioni == null || recensioni.isEmpty()) {
+            averageRatingLabel.setText("0,0");
+            averageRating.setRating(0);
+            return;
+        }
+
+        double somma = 0;
+
+        for (RecensioneDTO recensione : recensioni) {
+            somma += recensione.valutazione();
+        }
+
+        double media = somma / recensioni.size();
+
+        averageRatingLabel.setText(
+                String.format(java.util.Locale.ITALY, "%.1f", media)
+        );
+
+        averageRating.setRating(media);
+    }
+
+    private void aggiornaDistribuzioneRecensioni(List<RecensioneDTO> recensioni) {
+
+        int[] conteggi = new int[6];
+
+        for (RecensioneDTO recensione : recensioni) {
+            int valutazione = recensione.valutazione();
+
+            if (valutazione >= 1 && valutazione <= 5) {
+                conteggi[valutazione]++;
+            }
+        }
+
+        int totale = recensioni.size();
+
+        if (totale == 0) {
+            bar5.setProgress(0);
+            bar4.setProgress(0);
+            bar3.setProgress(0);
+            bar2.setProgress(0);
+            bar1.setProgress(0);
+            return;
+        }
+
+        bar5.setProgress((double) conteggi[5] / totale);
+        bar4.setProgress((double) conteggi[4] / totale);
+        bar3.setProgress((double) conteggi[3] / totale);
+        bar2.setProgress((double) conteggi[2] / totale);
+        bar1.setProgress((double) conteggi[1] / totale);
     }
 
     // =========================================================
