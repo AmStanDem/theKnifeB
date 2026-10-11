@@ -11,20 +11,40 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RecensioneDTO;
+import org.uninsubria.common.dto.RistoranteDTO;
+import org.uninsubria.clientTK.util.RistoranteSelezionato;
 
 import java.util.List;
 
 public class AreaRistoranteController {
 
-    // =========================================================
-    // COMPONENTI FXML
-    // =========================================================
 
     @FXML
-    private TextField txtLocalita;
+    private Label lblNomeRistorante;
 
     @FXML
-    private Button btnGeolocalizzazione;
+    private Label lblNazione;
+
+    @FXML
+    private Label lblCitta;
+
+    @FXML
+    private Label lblIndirizzo;
+
+
+    @FXML
+    private Label lblFasciaPrezzo;
+
+    @FXML
+    private Label lblDelivery;
+
+    @FXML
+    private Label lblPrenotazione;
+
+    @FXML
+    private Label lblTipoCucina;
+
+
 
     // =========================================================
     // RECENSIONI
@@ -36,14 +56,63 @@ public class AreaRistoranteController {
     @FXML
     private Label resultsCountLabel;
 
+    private RistoranteDTO ristorante;
+
     // =========================================================
     // INIZIALIZZAZIONE
     // =========================================================
 
     @FXML
     public void initialize() {
+
         System.out.println("AreaRistoranteController inizializzato");
+
+        // Recupera il ristorante selezionato nella pagina precedente
+        ristorante = RistoranteSelezionato.getRistorante();
+
+        if (ristorante != null) {
+            System.out.println("Ristorante selezionato: " + ristorante.nome());
+            mostraDatiRistorante();
+        } else {
+            System.out.println("Nessun ristorante selezionato");
+        }
+
         caricaRecensioni();
+    }
+
+    private void mostraDatiRistorante() {
+        if (ristorante == null) {
+            return;
+        }
+
+
+
+        lblNomeRistorante.setText(ristorante.nome());
+        lblIndirizzo.setText(ristorante.indirizzo());
+
+        lblCitta.setText(ristorante.citta());
+        System.out.println("citta: " + ristorante.citta());
+        lblNazione.setText(ristorante.nazione());
+        System.out.println("citta: " + ristorante.nazione());
+        lblFasciaPrezzo.setText(
+                ristorante.prezzoMedio() != null
+                        ? String.format("%.2f €", ristorante.prezzoMedio())
+                        : "N/D"
+        );
+
+        lblDelivery.setText(
+                Boolean.TRUE.equals(ristorante.delivery()) ? "Sì" : "No"
+        );
+
+        lblPrenotazione.setText(
+                Boolean.TRUE.equals(ristorante.bookingOnline()) ? "Sì" : "No"
+        );
+
+        lblTipoCucina.setText(
+                ristorante.tipologieCucina() != null
+                        ? String.valueOf(ristorante.tipologieCucina())
+                        : "Non specificata"
+        );
     }
 
     private void caricaRecensioni() {

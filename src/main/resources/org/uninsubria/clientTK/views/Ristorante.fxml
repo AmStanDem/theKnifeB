@@ -160,70 +160,57 @@
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Nome:" />
 
-                         <Label fx:id="lblNomeRistorante" styleClass="profile-value" text="Nome del ristorante" />
+                         <Label fx:id="lblNomeRistorante" styleClass="profile-value" />
                   </HBox>
 
                      <!-- NAZIONE -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Nazione:" />
 
-                         <Label fx:id="lblNazione" styleClass="profile-value" text="Italia" />
+                         <Label fx:id="lblNazione" styleClass="profile-value" />
                   </HBox>
 
                      <!-- CITTÀ -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Città:" />
 
-                         <Label fx:id="lblCitta" styleClass="profile-value" text="Milano" />
+                         <Label fx:id="lblCitta" styleClass="profile-value" />
                   </HBox>
 
                      <!-- INDIRIZZO -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Indirizzo:" />
 
-                         <Label fx:id="lblIndirizzo" styleClass="profile-value" text="Via Roma 10" />
+                         <Label fx:id="lblIndirizzo" styleClass="profile-value"  />
                   </HBox>
 
-                        <!-- LATITUDINE -->
-                  <HBox alignment="CENTER_LEFT" spacing="10.0">
-                      <Label styleClass="profile-label" text="Latitudine:" />
-
-                            <Label fx:id="lblLatitudine" styleClass="profile-value" text="45.4642" />
-                  </HBox>
-
-                     <!-- LONGITUDINE -->
-                  <HBox alignment="CENTER_LEFT" spacing="10.0">
-                      <Label styleClass="profile-label" text="Longitudine:" />
-
-                         <Label fx:id="lblLongitudine" styleClass="profile-value" text="9.1900" />
-                  </HBox>
 
                      <!-- FASCIA DI PREZZO -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Prezzo medio:" />
 
-                         <Label fx:id="lblFasciaPrezzo" styleClass="profile-value" text="25,00 €" />
+                         <Label fx:id="lblFasciaPrezzo" styleClass="profile-value"  />
                   </HBox>
 
                      <!-- DELIVERY -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Delivery:" />
 
-                         <Label fx:id="lblDelivery" styleClass="profile-value" text="Sì" />
+                         <Label fx:id="lblDelivery" styleClass="profile-value"  />
                   </HBox>
 
                      <!-- PRENOTAZIONE ONLINE -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Prenotazione:" />
 
-                         <Label fx:id="lblPrenotazione" styleClass="profile-value" text="Sì" />
+                         <Label fx:id="lblPrenotazione" styleClass="profile-value"  />
                   </HBox>
 
                      <!-- TIPO DI CUCINA -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Tipo di cucina:" />
 
-                         <Label fx:id="lblTipoCucina" styleClass="profile-value" text="Italiana" />
+                         <Label fx:id="lblTipoCucina" styleClass="profile-value"  />
                   </HBox>
 
                  </VBox>

@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
@@ -25,7 +26,7 @@ public class RestaurantItemController {
     /** Popola la card con i dati del ristorante passato. */
     public void setRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
-
+        System.out.println(ristorante.toString());
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
@@ -42,6 +43,7 @@ public class RestaurantItemController {
 
     @FXML
     private void onDetailsClicked(ActionEvent actionEvent) {
+        RistoranteSelezionato.setRistorante(ristorante);
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
     }
 
