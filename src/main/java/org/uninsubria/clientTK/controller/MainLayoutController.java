@@ -28,10 +28,6 @@ public class MainLayoutController {
         SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/SignUp.fxml");
     }
 
-    @FXML
-    private void onAreaRistoratoreClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AreaRistoratore.fxml");
-    }
 
     @FXML
     private void onGeolocalizzazioneClick() {
