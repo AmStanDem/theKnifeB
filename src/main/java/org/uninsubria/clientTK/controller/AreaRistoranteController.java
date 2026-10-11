@@ -10,11 +10,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.List;
+
+import static org.uninsubria.clientTK.util.ServerConnection.getServer;
 
 public class AreaRistoranteController {
 
@@ -118,73 +124,88 @@ public class AreaRistoranteController {
     private void caricaRecensioni() {
         System.out.println("caricaRecensioni() chiamato");
 
-        if (reviewContainer == null) {
-            System.out.println("ERRORE: reviewContainer è NULL");
-            return;
-        }
 
-        System.out.println("reviewContainer trovato!");
-        reviewContainer.getChildren().clear();
+        try {
+            List<RecensioneDTO> recensioni = ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
 
-        List<RecensioneDTO> recensioni = List.of(
-                new RecensioneDTO(
-                        1,
-                        5,
-                        "Ottimo ristorante, cibo davvero molto buono!",
-                        "Thomas Panero",
-                        java.time.LocalDateTime.of(2026, 7, 30, 12, 30),
-                        "Grazie mille per la recensione!"
-                ),
-                new RecensioneDTO(
-                        2,
-                        4,
-                        "Personale gentile e servizio molto veloce.",
-                        "Marco Rossi",
-                        java.time.LocalDateTime.of(2026, 7, 28, 19, 15),
-                        null
-                ),
-                new RecensioneDTO(
-                        3,
-                        5,
-                        "Piatti molto buoni, sicuramente ci tornerò.",
-                        "Luca Bianchi",
-                        java.time.LocalDateTime.of(2026, 7, 25, 20, 45),
-                        null
-                )
-        );
 
-        System.out.println("Numero recensioni: " + recensioni.size());
-        resultsCountLabel.setText(recensioni.size() + " recensioni trovate");
 
-        for (RecensioneDTO recensione : recensioni) {
-            try {
-                System.out.println("Carico recensione di: " + recensione.nomeAutore());
-
-                FXMLLoader loader = new FXMLLoader(
-                        getClass().getResource("/org/uninsubria/clientTK/views/RecensioneItem.fxml")
-                );
-
-                Node item = loader.load();
-                RecensioneItemController controller = loader.getController();
-
-                controller.setDati(
-                        recensione.nomeAutore(),
-                        false,
-                        recensione.dataCreazione().format(
-                                java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy")
-                        ),
-                        recensione.valutazione(),
-                        recensione.testo(),
-                        recensione.rispostaGestore()
-                );
-
-                reviewContainer.getChildren().add(item);
-                System.out.println("Recensione aggiunta!");
-
-            } catch (Exception e) {
-                System.out.println("ERRORE caricando la recensione:");
-                e.printStackTrace();
+            if (reviewContainer == null) {
+                System.out.println("ERRORE: reviewContainer è NULL");
+                return;
             }
+
+            System.out.println("reviewContainer trovato!");
+            reviewContainer.getChildren().clear();
+
+            /*List<RecensioneDTO> recensioni = List.of(
+                    new RecensioneDTO(
+                            1,
+                            5,
+                            "Ottimo ristorante, cibo davvero molto buono!",
+                            "Thomas Panero",
+                            java.time.LocalDateTime.of(2026, 7, 30, 12, 30),
+                            "Grazie mille per la recensione!"
+                    ),
+                    new RecensioneDTO(
+                            2,
+                            4,
+                            "Personale gentile e servizio molto veloce.",
+                            "Marco Rossi",
+                            java.time.LocalDateTime.of(2026, 7, 28, 19, 15),
+                            null
+                    ),
+                    new RecensioneDTO(
+                            3,
+                            5,
+                            "Piatti molto buoni, sicuramente ci tornerò.",
+                            "Luca Bianchi",
+                            java.time.LocalDateTime.of(2026, 7, 25, 20, 45),
+                            null
+                    )
+            );*/
+
+            System.out.println("Numero recensioni: " + recensioni.size());
+            resultsCountLabel.setText(recensioni.size() + " recensioni trovate");
+
+            for (RecensioneDTO recensione : recensioni) {
+                try {
+                    System.out.println("Carico recensione di: " + recensione.nomeAutore());
+
+                    FXMLLoader loader = new FXMLLoader(
+                            getClass().getResource("/org/uninsubria/clientTK/views/RecensioneItem.fxml")
+                    );
+
+                    Node item = loader.load();
+                    RecensioneItemController controller = loader.getController();
+
+                    controller.setDati(
+                            recensione.nomeAutore(),
+                            false,
+                            recensione.dataCreazione().format(
+                                    java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy")
+                            ),
+                            recensione.valutazione(),
+                            recensione.testo(),
+                            recensione.rispostaGestore()
+                    );
+
+                    reviewContainer.getChildren().add(item);
+                    System.out.println("Recensione aggiunta!");
+
+                } catch (Exception e) {
+                    System.out.println("ERRORE caricando la recensione:");
+                    e.printStackTrace();
+                }
+            }
+
+
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        } catch (SistemaIndisponibileException e) {
+            throw new RuntimeException(e);
+        } catch (NotBoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
