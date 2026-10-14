@@ -82,7 +82,7 @@ public class SignUpController {
             SessioneUtente.login(utente);
 
             // Cambio scena pulito tramite SceneManager centralizzato
-            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
+            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
 
         } catch (UtenteGiaEsistenteException e) {
             labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");

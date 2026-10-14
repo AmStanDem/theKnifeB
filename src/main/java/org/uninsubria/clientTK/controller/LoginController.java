@@ -31,7 +31,7 @@ public class LoginController {
 
     @FXML
     private void handleSignIn(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     @FXML
@@ -57,7 +57,7 @@ public class LoginController {
         try {
             UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
             SessioneUtente.login(utente);
-            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
+            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
 
         } catch (CredenzialiErrateException e) {
             labelErrore.setText("Email o password non corretti.");

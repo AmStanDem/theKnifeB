@@ -209,7 +209,7 @@ public class AreaPersonaleController {
 
         cambiaPagina(
                 event,
-                "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml"
+                "/org/uninsubria/clientTK/views/MainLayout.fxml"
         );
     }
 

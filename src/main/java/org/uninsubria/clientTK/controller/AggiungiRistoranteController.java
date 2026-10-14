@@ -107,7 +107,7 @@ public class AggiungiRistoranteController {
     }
 
     private void tornaAllaHome(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     private void mostraMessaggio(Alert.AlertType alertType, String titolo, String contenuto) {

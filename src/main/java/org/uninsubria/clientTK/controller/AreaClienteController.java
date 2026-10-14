@@ -178,7 +178,7 @@ public class AreaClienteController {
 
             stage.setScene(new Scene(
                     FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
+                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
                     )
             ));
 

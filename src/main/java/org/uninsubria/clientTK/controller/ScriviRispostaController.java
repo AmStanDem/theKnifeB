@@ -64,7 +64,7 @@ public class ScriviRispostaController {
 
     @FXML
     public void handleLogoClick(MouseEvent mouseEvent) {
-        SceneManager.switchScene(mouseEvent, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
+        SceneManager.switchScene(mouseEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     @FXML

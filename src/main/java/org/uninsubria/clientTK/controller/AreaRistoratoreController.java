@@ -61,6 +61,6 @@ public class AreaRistoratoreController {
 
     @FXML
     public void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 }
