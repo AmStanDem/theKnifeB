@@ -155,19 +155,32 @@
     -fx-skin: "org.controlsfx.control.skin.RatingSkin";
 }
 
-/* Stelle non selezionate */
-.star-rating > .container > .button {
-    -fx-background-color: transparent;
-    -fx-shape: "M50,0 L61,35 L98,35 L68,57 L79,91 L50,70 L21,91 L32,57 L2,35 L39,35 Z";
-    -fx-scale-shape: true;
-    -fx-background-insets: 0;
-    -fx-padding: 8px;
-    -fx-background-color: #dcdcdc;
+.star-rating > .container {
+    -fx-alignment: center-left;
+    -fx-spacing: 4px;
 }
 
-/* Stelle selezionate / evidenziate */
+/* Tutte le stelle di base (spente) */
+.star-rating > .container > .button {
+    -fx-shape: "M50,0 L61,35 L98,35 L68,57 L79,91 L50,70 L21,91 L32,57 L2,35 L39,35 Z";
+    -fx-scale-shape: true;
+    -fx-min-width: 22px;
+    -fx-min-height: 22px;
+    -fx-pref-width: 22px;
+    -fx-pref-height: 22px;
+    -fx-max-width: 22px;
+    -fx-max-height: 22px;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-background-color: #dcdcdc; /* Grigio spento a tinta unita */
+    -fx-effect: none; /* Rimuove eventuali ombreggiature sfumate */
+}
+
+/* Stelle selezionate / evidenziate (accese) */
+.star-rating > .container > .button.full,
 .star-rating > .container > .button.strong {
-    -fx-background-color: #f5a623;
+    -fx-background-color: #4CAF50; /* Verde a tinta unita */
+    -fx-effect: none;
 }
 
 /* ---------------- BOTTONIERA ---------------- */
