@@ -9,6 +9,17 @@ import javafx.scene.input.MouseEvent;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.SessioneUtente;
 
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
+
 public class MainLayoutController {
 
     @FXML
@@ -32,6 +43,40 @@ public class MainLayoutController {
                 SessioneUtente.getUtenteCorrente() != null;
 
         aggiornaHeader(loggato);
+        suggerisciLocalita();
+    }
+
+    private void suggerisciLocalita() {
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                HttpClient client = HttpClient.newHttpClient();
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://ipapi.co/city/"))
+                        .GET()
+                        .build();
+
+                HttpResponse<String> response = client.send(
+                        request,
+                        HttpResponse.BodyHandlers.ofString()
+                );
+
+                if (response.statusCode() == 200) {
+                    return response.body().trim();
+                }
+
+            } catch (Exception e) {
+                System.err.println(
+                        "Impossibile rilevare la località: " + e.getMessage()
+                );
+            }
+
+            return "";
+        }).thenAccept(citta -> Platform.runLater(() -> {
+            if (!citta.isBlank() && txtLocalita.getText().isBlank()) {
+                txtLocalita.setText(citta);
+            }
+        }));
     }
 
     private void aggiornaHeader(boolean loggato) {
