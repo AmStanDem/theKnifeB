@@ -21,8 +21,8 @@ INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruo
 -- 2. RISTORANTI THE KNIFE
 -- ==============================================================================
 INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online) VALUES
-                                                                                                                                                  (1, 'Osteria Francescana', 'Via Stella 22', 'Modena', 'Italia', 44.6447600, 10.9202500, 320.00, FALSE, TRUE),
-                                                                                                                                                  (1, 'Franceschetta58', 'Strada Vignolese 58', 'Modena', 'Italia', 44.6393400, 10.9388300, 75.00, TRUE, TRUE),
+                                                                                                                                                  (1, 'La Corte del Gusto', 'Via dei Tigli 14', 'Modena', 'Italia', 44.6451200, 10.9213400, 320.00, FALSE, TRUE),
+                                                                                                                                                  (1, 'Trattoria Il Girasole', 'Via delle Magnolie 27', 'Modena', 'Italia', 44.6389200,  10.9391200, 75.00, TRUE, TRUE),
                                                                                                                                                   (2, 'Restaurant Gordon Ramsay', '68 Royal Hospital Rd', 'Londra', 'Regno Unito', 51.4854500, -0.1620200, 210.00, FALSE, TRUE),
                                                                                                                                                   (2, 'Street Burger', 'St Paul''s', 'Londra', 'Regno Unito', 51.5140000, -0.0980000, 25.00, TRUE, FALSE);
 
@@ -44,17 +44,13 @@ INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES
                                                                    (1, 1), -- Osteria Francescana -> Contemporanea
                                                                    (1, 5), -- Osteria Francescana -> Creativa (Esempio di cucina multipla)
                                                                    (2, 2), -- Franceschetta58 -> Emiliana
-                                                                   (3, 1), -- Gordon Ramsay -> Contemporanea
-                                                                   (3, 3), -- Gordon Ramsay -> Francese
-                                                                   (4, 4), -- Street Burger -> Hamburger
-                                                                   (4, 6); -- Street Burger -> Fast Food
+
 
 -- ==============================================================================
 -- 5. RECENSIONI
 -- ==============================================================================
 INSERT INTO Recensioni (id_utente, id_ristorante, valutazione, testo) VALUES
                                                                           (3, 1, 5, 'Un percorso degustazione incredibile, l''anguilla risalendo il fiume Po è geniale.'),
-                                                                          (3, 4, 3, 'Hamburger buono ma servizio troppo frettoloso, c''era molta confusione.'),
                                                                           (4, 2, 4, 'Ottima reinterpretazione della tradizione emiliana. Tortellini perfetti.');
 
 -- ==============================================================================
