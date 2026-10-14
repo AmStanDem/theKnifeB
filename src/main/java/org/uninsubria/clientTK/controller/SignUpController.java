@@ -97,7 +97,7 @@ public class SignUpController {
 
     @FXML
     public void handleAccedi(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria.clientTK/views/LoginView.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/LoginView.fxml");
     }
 
     @FXML

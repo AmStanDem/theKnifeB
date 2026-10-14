@@ -43,7 +43,7 @@ INSERT INTO Tipologia_Cucina (nome) VALUES
 INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES
                                                                    (1, 1), -- Osteria Francescana -> Contemporanea
                                                                    (1, 5), -- Osteria Francescana -> Creativa (Esempio di cucina multipla)
-                                                                   (2, 2), -- Franceschetta58 -> Emiliana
+                                                                   (2, 2); -- Franceschetta58 -> Emiliana
 
 
 -- ==============================================================================
