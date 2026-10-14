@@ -120,12 +120,15 @@ public class RistoranteDAO {
         return lista;
     }
 
+
     public List<RistoranteDTO> cercaConFiltri(FiltriRicercaDTO filtri) {
         List<RistoranteDTO> lista = new ArrayList<>();
         StringBuilder sql = new StringBuilder(costruisciQueryBase() + " WHERE 1=1");
         List<Object> parametri = new ArrayList<>();
 
         if (filtri != null) {
+
+            // --- RICERCA 1: PER NOME CITTA' O NAZIONE (Classica) ---
             if (filtri.locazione() != null && !filtri.locazione().trim().isEmpty()) {
                 sql.append(" AND (LOWER(r.nazione) LIKE LOWER(?) OR LOWER(r.citta) LIKE LOWER(?))");
                 String locPattern = "%" + filtri.locazione().trim() + "%";
@@ -133,7 +136,22 @@ public class RistoranteDAO {
                 parametri.add(locPattern);
             }
 
-            // Sub-query per verificare la corrispondenza con la tabella tipologie
+            // --- RICERCA 2: PER PROSSIMITA' CON FORMULA DI HAVERSINE ---
+            if (filtri.latitudineRiferimento() != null && filtri.longitudineRiferimento() != null && filtri.raggioKm() != null) {
+                // Raggio medio della terra: 6371 Km.
+                sql.append(" AND (6371.0 * acos(least(1.0, " +
+                        "cos(radians(?)) * cos(radians(r.latitudine)) * " +
+                        "cos(radians(r.longitudine) - radians(?)) + " +
+                        "sin(radians(?)) * sin(radians(r.latitudine))))) <= ?");
+
+                // Nomi corretti per prelevare i dati dal DTO
+                parametri.add(filtri.latitudineRiferimento()); // 1° cos
+                parametri.add(filtri.longitudineRiferimento()); // Diff longitudine
+                parametri.add(filtri.latitudineRiferimento()); // 1° sin
+                parametri.add(filtri.raggioKm());  // <= distanza massima
+            }
+
+            // --- ALTRI FILTRI ESISTENTI ---
             if (filtri.tipoCucina() != null && !filtri.tipoCucina().trim().isEmpty()) {
                 sql.append(" AND r.id_ristorante IN (" +
                         "SELECT rt_sub.id_ristorante FROM Ristoranti_Tipologie rt_sub " +
@@ -164,6 +182,16 @@ public class RistoranteDAO {
         if (filtri != null && filtri.mediaStelleMinima() != null) {
             sql.append(" HAVING COALESCE(AVG(rec.valutazione), 0.0) >= ?");
             parametri.add(filtri.mediaStelleMinima().doubleValue());
+        }
+
+        // ORDINAMENTO DINAMICO: Usiamo i nomi corretti anche qui
+        if (filtri != null && filtri.latitudineRiferimento() != null && filtri.longitudineRiferimento() != null && filtri.raggioKm() != null) {
+            sql.append(" ORDER BY (6371.0 * acos(least(1.0, " +
+                    "cos(radians(").append(filtri.latitudineRiferimento()).append(")) * cos(radians(r.latitudine)) * " +
+                    "cos(radians(r.longitudine) - radians(").append(filtri.longitudineRiferimento()).append(")) + " +
+                    "sin(radians(").append(filtri.latitudineRiferimento()).append(")) * sin(radians(r.latitudine))))) ASC");
+        } else {
+            sql.append(" ORDER BY r.nome ASC");
         }
 
         try (Connection conn = DatabaseConfig.getConnection();

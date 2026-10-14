@@ -1,4 +1,5 @@
 package org.uninsubria.common.dto;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -9,4 +10,7 @@ public record RecensioneDTO(
         String nomeAutore,         // Denormalizzato dalla tabella Utenti
         LocalDateTime dataCreazione,
         String rispostaGestore     // Null se il gestore non ha ancora risposto
-) implements Serializable {}
+) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+}
