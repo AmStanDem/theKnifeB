@@ -16,10 +16,9 @@ public class RistoranteDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlTipologiaCheck = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO NOTHING";
         String sqlTipologiaId = "SELECT id_tipologia FROM Tipologia_Cucina WHERE nome = ?";
-        String sqlRistoTipo = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES (?, ?)";
+        String sqlRistoTipo = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES (?, ?) ON CONFLICT DO NOTHING";
 
         try (Connection conn = DatabaseConfig.getConnection()) {
-            // Disabilito l'autocommit per gestire gli inserimenti multipli in una singola transazione
             conn.setAutoCommit(false);
 
             try (PreparedStatement stmt = conn.prepareStatement(sqlRisto, Statement.RETURN_GENERATED_KEYS)) {
@@ -39,32 +38,39 @@ public class RistoranteDAO {
                     return false;
                 }
 
-                // Recupero l'ID autogenerato del nuovo ristorante
                 int idRistorante = -1;
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) idRistorante = rs.getInt(1);
+                    if (rs.next()) {
+                        idRistorante = rs.getInt(1);
+                    }
                 }
 
-                // Inserimento relazione molti-a-molti (Cucine)
-                if (r.tipologieCucina() != null && idRistorante != -1) {
-                    for (String tipo : r.tipologieCucina()) {
+                if (idRistorante == -1) {
+                    conn.rollback();
+                    return false;
+                }
 
-                        // 1. Assicura che la tipologia esista (ignora se già presente)
+                // Inserimento cucine e associazioni
+                if (r.tipologieCucina() != null) {
+                    for (String tipo : r.tipologieCucina()) {
+                        if (tipo == null || tipo.trim().isEmpty()) continue;
+                        String tipoClean = tipo.trim();
+
                         try (PreparedStatement sCheck = conn.prepareStatement(sqlTipologiaCheck)) {
-                            sCheck.setString(1, tipo.trim());
+                            sCheck.setString(1, tipoClean);
                             sCheck.executeUpdate();
                         }
 
-                        // 2. Recupera l'ID della tipologia
                         int idTipo = -1;
                         try (PreparedStatement sId = conn.prepareStatement(sqlTipologiaId)) {
-                            sId.setString(1, tipo.trim());
+                            sId.setString(1, tipoClean);
                             try (ResultSet rsId = sId.executeQuery()) {
-                                if (rsId.next()) idTipo = rsId.getInt(1);
+                                if (rsId.next()) {
+                                    idTipo = rsId.getInt(1);
+                                }
                             }
                         }
 
-                        // 3. Collega ristorante e tipologia nella tabella ponte
                         if (idTipo != -1) {
                             try (PreparedStatement sLink = conn.prepareStatement(sqlRistoTipo)) {
                                 sLink.setInt(1, idRistorante);
@@ -75,18 +81,17 @@ public class RistoranteDAO {
                     }
                 }
 
-                // Transazione completata con successo
                 conn.commit();
                 return true;
 
             } catch (SQLException ex) {
-                conn.rollback(); // Annulla tutte le modifiche in caso di errore
+                conn.rollback();
                 throw ex;
             } finally {
                 conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore inserimento ristorante e tipologie: " + e.getMessage());
+            System.err.println("[DAO_ERROR] Errore inserimento ristorante: " + e.getMessage());
             return false;
         }
     }
@@ -107,7 +112,7 @@ public class RistoranteDAO {
 
     public List<RistoranteDTO> trovaPerGestore(int idGestore) {
         List<RistoranteDTO> lista = new ArrayList<>();
-        String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? GROUP BY r.id_ristorante";
+        String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? GROUP BY r.id_ristorante ORDER BY r.nome ASC";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idGestore);
@@ -120,15 +125,13 @@ public class RistoranteDAO {
         return lista;
     }
 
-
     public List<RistoranteDTO> cercaConFiltri(FiltriRicercaDTO filtri) {
         List<RistoranteDTO> lista = new ArrayList<>();
         StringBuilder sql = new StringBuilder(costruisciQueryBase() + " WHERE 1=1");
         List<Object> parametri = new ArrayList<>();
 
         if (filtri != null) {
-
-            // --- RICERCA 1: PER NOME CITTA' O NAZIONE (Classica) ---
+            // Ricerca per città o nazione
             if (filtri.locazione() != null && !filtri.locazione().trim().isEmpty()) {
                 sql.append(" AND (LOWER(r.nazione) LIKE LOWER(?) OR LOWER(r.citta) LIKE LOWER(?))");
                 String locPattern = "%" + filtri.locazione().trim() + "%";
@@ -136,28 +139,30 @@ public class RistoranteDAO {
                 parametri.add(locPattern);
             }
 
-            // --- RICERCA 2: PER PROSSIMITA' CON FORMULA DI HAVERSINE ---
-            if (filtri.latitudineRiferimento() != null && filtri.longitudineRiferimento() != null && filtri.raggioKm() != null) {
-                // Raggio medio della terra: 6371 Km.
-                sql.append(" AND (6371.0 * acos(least(1.0, " +
+            // Formula di Haversine per distanza
+            boolean usaCoordinate = filtri.latitudineRiferimento() != null &&
+                    filtri.longitudineRiferimento() != null &&
+                    filtri.raggioKm() != null;
+
+            if (usaCoordinate) {
+                String haversineFormula = "(6371.0 * acos(LEAST(1.0::double precision, " +
                         "cos(radians(?)) * cos(radians(r.latitudine)) * " +
                         "cos(radians(r.longitudine) - radians(?)) + " +
-                        "sin(radians(?)) * sin(radians(r.latitudine))))) <= ?");
+                        "sin(radians(?)) * sin(radians(r.latitudine)))))";
 
-                // Nomi corretti per prelevare i dati dal DTO
-                parametri.add(filtri.latitudineRiferimento()); // 1° cos
-                parametri.add(filtri.longitudineRiferimento()); // Diff longitudine
-                parametri.add(filtri.latitudineRiferimento()); // 1° sin
-                parametri.add(filtri.raggioKm());  // <= distanza massima
+                sql.append(" AND ").append(haversineFormula).append(" <= ?");
+                parametri.add(filtri.latitudineRiferimento());
+                parametri.add(filtri.longitudineRiferimento());
+                parametri.add(filtri.latitudineRiferimento());
+                parametri.add(filtri.raggioKm());
             }
 
-            // --- ALTRI FILTRI ESISTENTI ---
+            // Filtro tipologia cucina
             if (filtri.tipoCucina() != null && !filtri.tipoCucina().trim().isEmpty()) {
                 sql.append(" AND r.id_ristorante IN (" +
                         "SELECT rt_sub.id_ristorante FROM Ristoranti_Tipologie rt_sub " +
                         "JOIN Tipologia_Cucina tc_sub ON rt_sub.id_tipologia = tc_sub.id_tipologia " +
-                        "WHERE LOWER(tc_sub.nome) LIKE LOWER(?) " +
-                        ")");
+                        "WHERE LOWER(tc_sub.nome) LIKE LOWER(?))");
                 parametri.add("%" + filtri.tipoCucina().trim() + "%");
             }
 
@@ -175,23 +180,29 @@ public class RistoranteDAO {
             if (filtri.bookingOnline() != null && filtri.bookingOnline()) {
                 sql.append(" AND r.booking_online = TRUE");
             }
-        }
 
-        sql.append(" GROUP BY r.id_ristorante");
+            sql.append(" GROUP BY r.id_ristorante");
 
-        if (filtri != null && filtri.mediaStelleMinima() != null) {
-            sql.append(" HAVING COALESCE(AVG(rec.valutazione), 0.0) >= ?");
-            parametri.add(filtri.mediaStelleMinima().doubleValue());
-        }
+            if (filtri.mediaStelleMinima() != null) {
+                sql.append(" HAVING COALESCE(AVG(rec_stat.valutazione), 0.0) >= ?");
+                parametri.add(filtri.mediaStelleMinima());
+            }
 
-        // ORDINAMENTO DINAMICO: Usiamo i nomi corretti anche qui
-        if (filtri != null && filtri.latitudineRiferimento() != null && filtri.longitudineRiferimento() != null && filtri.raggioKm() != null) {
-            sql.append(" ORDER BY (6371.0 * acos(least(1.0, " +
-                    "cos(radians(").append(filtri.latitudineRiferimento()).append(")) * cos(radians(r.latitudine)) * " +
-                    "cos(radians(r.longitudine) - radians(").append(filtri.longitudineRiferimento()).append(")) + " +
-                    "sin(radians(").append(filtri.latitudineRiferimento()).append(")) * sin(radians(r.latitudine))))) ASC");
+            // Ordinamento
+            if (usaCoordinate) {
+                String haversineOrder = "(6371.0 * acos(LEAST(1.0::double precision, " +
+                        "cos(radians(?)) * cos(radians(r.latitudine)) * " +
+                        "cos(radians(r.longitudine) - radians(?)) + " +
+                        "sin(radians(?)) * sin(radians(r.latitudine)))))";
+                sql.append(" ORDER BY ").append(haversineOrder).append(" ASC");
+                parametri.add(filtri.latitudineRiferimento());
+                parametri.add(filtri.longitudineRiferimento());
+                parametri.add(filtri.latitudineRiferimento());
+            } else {
+                sql.append(" ORDER BY r.nome ASC");
+            }
         } else {
-            sql.append(" ORDER BY r.nome ASC");
+            sql.append(" GROUP BY r.id_ristorante ORDER BY r.nome ASC");
         }
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -202,30 +213,31 @@ public class RistoranteDAO {
             }
 
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) lista.add(mappaResultSetRistorante(rs));
+                while (rs.next()) {
+                    lista.add(mappaResultSetRistorante(rs));
+                }
             }
         } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore durante la ricerca filtrata ristoranti: " + e.getMessage());
+            System.err.println("[DAO_ERROR] Errore ricerca filtrata: " + e.getMessage());
         }
         return lista;
     }
 
     private String costruisciQueryBase() {
-        // Uso STRING_AGG per riunire le n tipologie di cucina di un ristorante in un'unica stringa separata da virgola.
+        // Separiamo le recensioni per evitare righe duplicate provocate dalle molteplici tipologie cucina
         return "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, r.latitudine, r.longitudine, " +
                 "r.prezzo_medio, r.delivery, r.booking_online, " +
-                "COALESCE(AVG(rec.valutazione), 0.0) as media_stelle, " +
+                "COALESCE(AVG(rec_stat.valutazione), 0.0) as media_stelle, " +
                 "STRING_AGG(DISTINCT tc.nome, ',') as tipologie_cucina " +
                 "FROM RistorantiTheKnife r " +
-                "LEFT JOIN Recensioni rec ON r.id_ristorante = rec.id_ristorante " +
+                "LEFT JOIN Recensioni rec_stat ON r.id_ristorante = rec_stat.id_ristorante " +
                 "LEFT JOIN Ristoranti_Tipologie rt ON r.id_ristorante = rt.id_ristorante " +
                 "LEFT JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia";
     }
 
     private RistoranteDTO mappaResultSetRistorante(ResultSet rs) throws SQLException {
-        // Separo la stringa aggregata fornita da PostgreSQL in una lista per il DTO
         String stringaCucine = rs.getString("tipologie_cucina");
-        List<String> tipologie = stringaCucine != null && !stringaCucine.isEmpty()
+        List<String> tipologie = (stringaCucine != null && !stringaCucine.isBlank())
                 ? Arrays.asList(stringaCucine.split(","))
                 : new ArrayList<>();
 

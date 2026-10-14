@@ -65,7 +65,7 @@ public class ListaRistorantiController {
         if (serverRMI == null) return;
 
         try {
-            FiltriRicercaDTO filtri = new FiltriRicercaDTO("Modena",null,null,null,null,null,null,null,null);
+            FiltriRicercaDTO filtri = new FiltriRicercaDTO("Modena",null,null,null,null,null,null,null, null,null);
             // Chiede al server tutti i ristoranti (filtri null)
             List<RistoranteDTO> datiDalDB = serverRMI.cercaRistoranti(filtri);
 
