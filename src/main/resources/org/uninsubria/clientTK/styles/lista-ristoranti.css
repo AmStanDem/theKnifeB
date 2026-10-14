@@ -153,3 +153,94 @@
 .restaurant-scroll-pane .corner {
     -fx-background-color: transparent;
 }
+
+/* Stile uniforme per ComboBox e MenuButton */
+.filter-combo {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 10px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e293b;
+    -fx-cursor: hand;
+}
+
+.filter-combo:hover {
+    -fx-border-color: #2ecc71;
+    -fx-background-color: #f8fafc;
+}
+
+/* Assicura che la cella interna sia sempre visibile con testo scuro */
+.filter-combo .list-cell {
+    -fx-text-fill: #1e293b !important;
+    -fx-background-color: transparent;
+    -fx-padding: 0 4px 0 0;
+}
+
+/* Stile freccetta a tendina */
+.filter-combo .arrow-button {
+    -fx-background-color: transparent;
+}
+.filter-combo .arrow {
+    -fx-background-color: #64748b;
+}
+
+/* Menu a comparsa personalizzato per Cucine */
+.menu-button .context-menu {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+}
+
+/* Sfondo pulito per il menu a tendina */
+.context-menu {
+    -fx-background-color: #ffffff !important;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+}
+
+/* Disabilita il blu (-fx-selection-bar) di JavaFX su hover e focus del menu */
+.context-menu .menu-item,
+.context-menu .menu-item:focused,
+.context-menu .menu-item:hover,
+.context-menu .custom-menu-item,
+.context-menu .custom-menu-item:focused,
+.context-menu .custom-menu-item:hover {
+    -fx-background-color: transparent !important;
+    -fx-background: transparent !important;
+}
+
+/* Forza il testo delle checkbox a rimanere SEMPRE scuro */
+.context-menu .check-box {
+    -fx-text-fill: #1e293b !important;
+}
+
+.context-menu .check-box .text {
+    -fx-fill: #1e293b !important;
+}
+
+.context-menu .check-box:focused .text,
+.context-menu .check-box:hover .text {
+    -fx-fill: #1e293b !important;
+}
+
+/* Campo di ricerca interno al menu */
+.search-cuisine-input {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 10px;
+    -fx-text-fill: #1e293b;
+}
+
+.search-cuisine-input:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #2ecc71;
+}

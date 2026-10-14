@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.MenuButton?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.uninsubria.clientTK.controller.ListaRistorantiController"
@@ -42,19 +43,18 @@
                 <Label text="Filtri:" styleClass="filters-label"/>
 
                 <ComboBox fx:id="priceFilterCombo"
-                          promptText="Fascia di prezzo"
                           styleClass="filter-combo"
                           onAction="#onFilterChanged"/>
 
                 <ComboBox fx:id="ratingFilterCombo"
-                          promptText="Rating minimo"
                           styleClass="filter-combo"
                           onAction="#onFilterChanged"/>
 
-                <ComboBox fx:id="cuisineFilterCombo"
-                          promptText="Tipo di cucina"
-                          styleClass="filter-combo"
-                          onAction="#onFilterChanged"/>
+                <!-- MenuButton per selezione multipla cucine -->
+                <MenuButton fx:id="cuisineMenuButton"
+                            text="Tipo di cucina"
+                            styleClass="filter-combo">
+                </MenuButton>
 
                 <Button fx:id="resetFiltersButton"
                         text="Azzera filtri"

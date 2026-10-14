@@ -39,6 +39,11 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
     }
 
     @Override
+    public List<String> ottieniTutteTipologieCucina() throws RemoteException {
+        return ristoranteService.ottieniTutteTipologieCucina();
+    }
+
+    @Override
     public RistoranteDTO getDettaglioRistorante(Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
         return ristoranteService.ottieniDettaglio(idRistorante);

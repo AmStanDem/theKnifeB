@@ -235,6 +235,21 @@ public class RistoranteDAO {
                 "LEFT JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia";
     }
 
+    public List<String> ottieniTutteTipologieCucina() {
+        List<String> tipologie = new ArrayList<>();
+        String sql = "SELECT DISTINCT nome FROM Tipologia_Cucina ORDER BY nome";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                tipologie.add(rs.getString("nome"));
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore caricamento tipologie cucina: " + e.getMessage());
+        }
+        return tipologie;
+    }
+
     private RistoranteDTO mappaResultSetRistorante(ResultSet rs) throws SQLException {
         String stringaCucine = rs.getString("tipologie_cucina");
         List<String> tipologie = (stringaCucine != null && !stringaCucine.isBlank())

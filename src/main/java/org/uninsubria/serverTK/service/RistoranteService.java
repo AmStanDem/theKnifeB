@@ -51,6 +51,10 @@ public class RistoranteService {
         return ristorante;
     }
 
+    public List<String> ottieniTutteTipologieCucina() {
+        return ristoranteDAO.ottieniTutteTipologieCucina();
+    }
+
     public List<RistoranteDTO> ottieniRistorantiGestore(Integer idGestore) {
         return ristoranteDAO.trovaPerGestore(idGestore);
     }
