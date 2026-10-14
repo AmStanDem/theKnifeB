@@ -4,7 +4,7 @@
 }
 
 /* =========================================================
-   SFONDO
+   SCROLLPANE CONFIGURAZIONE TRASPARENTE
    ========================================================= */
 
 .main-scroll {
@@ -26,7 +26,6 @@
     -fx-background-color: white;
     -fx-background-radius: 18;
     -fx-border-radius: 18;
-
     -fx-effect:
             dropshadow(
                     gaussian,
@@ -45,34 +44,24 @@
 
 .logo-container {
     -fx-background-color: #3E9330;
-
     -fx-background-radius: 50;
-
-    -fx-min-width: 100;
-    -fx-min-height: 100;
-
-    -fx-max-width: 100;
-    -fx-max-height: 100;
-
+    -fx-min-width: 90;
+    -fx-min-height: 90;
+    -fx-max-width: 90;
+    -fx-max-height: 90;
     -fx-alignment: center;
 }
 
 
 /* =========================================================
-   TITOLO
+   TITOLO E TESTI
    ========================================================= */
 
 .title-label {
     -fx-text-fill: #222222;
-    -fx-font-size: 26px;
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
 }
-
-
-/* =========================================================
-   TESTI
-   ========================================================= */
-
 
 .hint-label {
     -fx-text-fill: #999999;
@@ -85,33 +74,43 @@
     -fx-font-weight: bold;
 }
 
+.error-label {
+    -fx-text-fill: #D9534F;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.info-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
 
 /* =========================================================
-   CAMPI
+   CAMPI DI INPUT
    ========================================================= */
 
 .text-field,
 .password-field,
-.combo-box {
+.combo-box,
+.date-picker {
     -fx-background-color: #FAFAFA;
-
     -fx-border-color: #D5D8D5;
     -fx-border-width: 1;
-
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-
     -fx-font-size: 14px;
 }
 
 .text-field,
 .password-field {
-    -fx-padding: 11 14 11 14;
+    -fx-padding: 9 14 9 14;
 }
 
 .text-field:focused,
 .password-field:focused,
-.combo-box:focused {
+.combo-box:focused,
+.date-picker:focused {
     -fx-background-color: white;
     -fx-border-color: #3E9330;
     -fx-border-width: 1.5;
@@ -122,7 +121,8 @@
     -fx-text-fill: #333333;
 }
 
-.combo-box .arrow-button {
+.combo-box .arrow-button,
+.date-picker .arrow-button {
     -fx-background-color: transparent;
 }
 
@@ -144,14 +144,10 @@
 .primary-button {
     -fx-background-color: #3E9330;
     -fx-text-fill: white;
-
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-
     -fx-background-radius: 8;
-
-    -fx-padding: 12 20 12 20;
-
+    -fx-padding: 11 20 11 20;
     -fx-cursor: hand;
 }
 
