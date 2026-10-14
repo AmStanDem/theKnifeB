@@ -16,7 +16,6 @@ public class SceneManager {
 
     /**
      * Cambia vista ricavando lo Stage dall'evento (ActionEvent, MouseEvent, ecc.)
-     * mantenendo lo stato di Fullscreen o Massimizzato.
      */
     public static void switchScene(Event event, String fxmlPath) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -24,20 +23,18 @@ public class SceneManager {
     }
 
     /**
-     * Cambia la root della scena corrente mantenendo lo stato dello Stage.
+     * Cambia la root della scena corrente sullo Stage specificato.
      */
     public static void switchScene(Stage stage, String fxmlPath) {
         switchSceneAndGetController(stage, fxmlPath);
     }
 
     /**
-     * Cambia la scena e restituisce il Controller tipizzato della nuova vista.
+     * Cambia la scena, applica il CSS globale, restituisce il Controller tipizzato
+     * e forza l'apertura a schermo intero/massimizzato di default.
      */
     public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath) {
         try {
-            boolean isFullScreen = stage.isFullScreen();
-            boolean isMaximized = stage.isMaximized();
-
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
 
@@ -49,11 +46,9 @@ public class SceneManager {
                 stage.setScene(scene);
             }
 
-            if (isFullScreen) {
-                stage.setFullScreen(true);
-            } else if (isMaximized) {
-                stage.setMaximized(true);
-            }
+            // IMPOSTAZIONE DI DEFAULT: Apre sempre massimizzato
+            // (l'utente potrà comunque ridurorlo con il tasto riduci della finestra se vuole)
+            stage.setMaximized(true);
 
             return loader.getController();
 
