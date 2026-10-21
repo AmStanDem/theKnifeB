@@ -67,4 +67,5 @@ public interface ITheKnifeServer extends Remote {
     // Metodo AGGIUNTO per Area Cliente
     void rimuoviPreferito(Integer idUtente, Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException;
+
 }
