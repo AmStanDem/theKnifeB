@@ -60,33 +60,6 @@ public class SceneManager {
     }
 
     /**
-     * Sovrapposizione: Apri una nuova finestra Modale (Popup).
-     */
-    public static <T> T openModal(String fxmlPath, String title) {
-        try {
-            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
-            Parent root = loader.load();
-
-            Stage modalStage = new Stage();
-            modalStage.setTitle(title);
-
-            Scene scene = new Scene(root);
-            applyCssIfAvailable(scene);
-            modalStage.setScene(scene);
-
-            modalStage.initModality(Modality.APPLICATION_MODAL);
-            modalStage.show();
-
-            return loader.getController();
-
-        } catch (IOException e) {
-            System.err.println("Errore nell'apertura della finestra modale: " + fxmlPath);
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Helper privato per applicare il CSS globale se presente.
      */
     private static void applyCssIfAvailable(Scene scene) {
