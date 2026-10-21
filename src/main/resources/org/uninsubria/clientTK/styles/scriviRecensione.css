@@ -221,6 +221,38 @@
 .cancel-button:pressed {
     -fx-background-color: #C5C5C5;
 }
+
+.review-text-area {
+    -fx-font-size: 15px;
+    -fx-control-inner-background: white;
+    -fx-text-fill: #1A1A1E;
+    -fx-background-radius: 10px;
+    -fx-border-color: #D0D0D0;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.review-text-area:focused {
+    -fx-border-color: #3E9330;
+    -fx-border-width: 2px;
+}
+
+.review-rating .container {
+    -fx-alignment: center;
+    -fx-spacing: 4px;
+}
+
+.review-rating .container > .button {
+    -fx-padding: 4px;
+    -fx-min-width: 40px;
+    -fx-pref-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 40px;
+    -fx-pref-height: 40px;
+    -fx-max-height: 40px;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
 /* =========================
 
    ========================= */

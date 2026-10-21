@@ -9,8 +9,22 @@ public record RecensioneDTO(
         String testo,
         String nomeAutore,         // Denormalizzato dalla tabella Utenti
         LocalDateTime dataCreazione,
-        String rispostaGestore     // Null se il gestore non ha ancora risposto
+        String rispostaGestore,    // Null se il gestore non ha ancora risposto
+        Integer idRistorante,
+        String nomeRistorante
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public RecensioneDTO(
+            Integer idRecensione,
+            Integer valutazione,
+            String testo,
+            String nomeAutore,
+            LocalDateTime dataCreazione,
+            String rispostaGestore
+    ) {
+        this(idRecensione, valutazione, testo, nomeAutore, dataCreazione,
+                rispostaGestore, null, null);
+    }
 }

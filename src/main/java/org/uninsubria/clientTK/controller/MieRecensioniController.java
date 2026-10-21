@@ -6,17 +6,27 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.RecensioneSelezionata;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
+import org.uninsubria.common.exceptions.RecensioneNonTrovataException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,8 +88,26 @@ public class MieRecensioniController {
 
     @FXML
     public void initialize() {
-        caricaRecensioniDiTest();
+        caricaRecensioni();
         aggiornaLista(recensioniComplete);
+    }
+
+    private void caricaRecensioni() {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
+                    "Accedi come cliente per visualizzare le tue recensioni.");
+            recensioniComplete.clear();
+            return;
+        }
+
+        try {
+            recensioniComplete.setAll(ServerConnection.getServer().getRecensioniUtente(utente.idUtente()));
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile caricare le tue recensioni. Riprova più tardi.");
+            recensioniComplete.clear();
+        }
     }
 
     // =========================================================
@@ -99,8 +127,10 @@ public class MieRecensioniController {
         for (RecensioneDTO recensione : recensioniComplete) {
             boolean matchTesto = recensione.testo() != null && recensione.testo().toLowerCase().contains(query);
             boolean matchAutore = recensione.nomeAutore() != null && recensione.nomeAutore().toLowerCase().contains(query);
+            boolean matchRistorante = recensione.nomeRistorante() != null
+                    && recensione.nomeRistorante().toLowerCase().contains(query);
 
-            if (matchTesto || matchAutore) {
+            if (matchTesto || matchAutore || matchRistorante) {
                 filtrate.add(recensione);
             }
         }
@@ -127,39 +157,59 @@ public class MieRecensioniController {
             Node card = loader.load();
             RecensioneItemController controller = loader.getController();
             controller.setRecensione(recensione);
+            controller.setAzioniProprie(this::modificaRecensione, this::confermaEliminazione);
             return card;
         } catch (IOException e) {
-            e.printStackTrace();
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore",
+                    "Impossibile visualizzare una delle tue recensioni.");
             return null;
         }
     }
 
-    private void caricaRecensioniDiTest() {
-        recensioniComplete.addAll(
-                new RecensioneDTO(
-                        1,
-                        5,
-                        "Credo sia il gioco migliore a cui abbia mai giocato. Ambientazioni, personaggi, dialoghi e storia impeccabili.",
-                        "Giovanni",
-                        LocalDateTime.of(2026, 7, 30, 15, 30),
-                        null
-                ),
-                new RecensioneDTO(
-                        2,
-                        4,
-                        "Ottima esperienza, personale gentile e servizio veloce.",
-                        "Giovanni",
-                        LocalDateTime.of(2026, 7, 25, 18, 20),
-                        "Grazie mille per la recensione!"
-                ),
-                new RecensioneDTO(
-                        3,
-                        3,
-                        "Il posto è carino, ma secondo me si potrebbe migliorare il servizio.",
-                        "Giovanni",
-                        LocalDateTime.of(2026, 7, 20, 12, 10),
-                        null
-                )
-        );
+    private void modificaRecensione(RecensioneDTO recensione) {
+        RecensioneSelezionata.imposta(recensione);
+        Stage stage = (Stage) restaurantContainer.getScene().getWindow();
+        SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/ScriviRecensione.fxml");
+    }
+
+    private void confermaEliminazione(RecensioneDTO recensione) {
+        Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
+        conferma.setTitle("Elimina recensione");
+        conferma.setHeaderText("Vuoi eliminare la recensione per " + recensione.nomeRistorante() + "?");
+        conferma.setContentText("Questa operazione non può essere annullata.");
+        if (conferma.showAndWait().orElse(javafx.scene.control.ButtonType.CANCEL)
+                != javafx.scene.control.ButtonType.OK) {
+            return;
+        }
+
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
+                    "Accedi come cliente per eliminare una recensione.");
+            return;
+        }
+
+        try {
+            ServerConnection.getServer().eliminaRecensione(recensione.idRecensione(), utente.idUtente());
+            recensioniComplete.removeIf(elemento ->
+                    java.util.Objects.equals(elemento.idRecensione(), recensione.idRecensione()));
+            aggiornaLista(recensioniComplete);
+        } catch (RecensioneNonTrovataException | OperazioneNonConsentitaException e) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Recensione non trovata",
+                    "La recensione è già stata eliminata o non è più disponibile.");
+            caricaRecensioni();
+            aggiornaLista(recensioniComplete);
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile eliminare la recensione. Riprova più tardi.");
+        }
+    }
+
+    private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titolo);
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.showAndWait();
     }
 }

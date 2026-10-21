@@ -85,7 +85,7 @@
 
                     <!-- TEXT AREA RECENSIONE -->
                     <TextArea fx:id="txtRecensione"
-                              promptText="Scrivi qui la tua recensione..."
+                              promptText="Scrivi qui la tua risposta..."
                               wrapText="true"
                               prefWidth="600.0"
                               prefHeight="300.0"
@@ -123,4 +123,3 @@
     </center>
 
 </BorderPane>
-

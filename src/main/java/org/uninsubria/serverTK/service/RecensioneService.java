@@ -4,6 +4,7 @@ import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.exceptions.*;
 import org.uninsubria.serverTK.dao.RecensioneDAO;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class RecensioneService {
@@ -36,18 +37,43 @@ public class RecensioneService {
                         r.testo(),
                         "",
                         r.dataCreazione(),
-                        r.rispostaGestore()
+                        r.rispostaGestore(),
+                        r.idRistorante(),
+                        r.nomeRistorante()
                 ))
                 .toList();
     }
 
+    public List<RecensioneDTO> ottieniPerUtente(Integer idUtente) throws SistemaIndisponibileException {
+        if (idUtente == null) {
+            throw new SistemaIndisponibileException();
+        }
+        try {
+            return recensioneDAO.trovaPerUtente(idUtente);
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore recupero recensioni utente: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
+    }
+
     public void aggiungiRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
-            throws DatiMancantiException, AzioneDuplicataException {
+            throws DatiMancantiException, OperazioneNonConsentitaException,
+            AzioneDuplicataException, SistemaIndisponibileException {
 
         if (recensione == null ||
                 recensione.testo() == null || recensione.testo().trim().isEmpty() ||
-                recensione.valutazione() == null || recensione.valutazione() < 1 || recensione.valutazione() > 5) {
-            throw new DatiMancantiException("Il testo non può essere vuoto e la valutazione deve essere compresa tra 1 e 5.");
+                recensione.valutazione() == null || recensione.valutazione() < 1 || recensione.valutazione() > 5 ||
+                idRistorante == null || idUtente == null) {
+            throw new DatiMancantiException("Ristorante, utente, testo e valutazione da 1 a 5 sono obbligatori.");
+        }
+
+        try {
+            if (!recensioneDAO.utenteCliente(idUtente)) {
+                throw new OperazioneNonConsentitaException("Solo un cliente registrato può inserire una recensione.");
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore verifica ruolo per inserimento recensione: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
 
         boolean successo = recensioneDAO.inserisciRecensione(idUtente, idRistorante, recensione);
@@ -80,15 +106,23 @@ public class RecensioneService {
     }
 
     public void aggiungiRisposta(Integer idRecensione, Integer idGestore, String testoRisposta)
-            throws DatiMancantiException, OperazioneNonConsentitaException {
+            throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
 
-        if (testoRisposta == null || testoRisposta.trim().isEmpty()) {
-            throw new DatiMancantiException("Il testo della risposta non può essere vuoto.");
+        if (idRecensione == null || idGestore == null
+                || testoRisposta == null || testoRisposta.trim().isEmpty()) {
+            throw new DatiMancantiException("Recensione, gestore e testo della risposta sono obbligatori.");
         }
 
-        boolean successo = recensioneDAO.aggiungiRispostaGestore(idRecensione, idGestore, testoRisposta);
-        if (!successo) {
-            throw new OperazioneNonConsentitaException("Impossibile rispondere: potresti non essere il gestore del ristorante o esiste già una risposta.");
+        try {
+            boolean successo = recensioneDAO.aggiungiRispostaGestore(
+                    idRecensione, idGestore, testoRisposta.trim());
+            if (!successo) {
+                throw new OperazioneNonConsentitaException(
+                        "solo il gestore del ristorante può rispondere e ogni recensione può avere una sola risposta.");
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore inserimento risposta recensione: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
     }
 }

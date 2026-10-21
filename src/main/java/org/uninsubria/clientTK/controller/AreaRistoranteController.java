@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
@@ -14,17 +15,21 @@ import javafx.scene.layout.VBox;
 import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
+import org.uninsubria.clientTK.util.RecensioneSelezionata;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.exceptions.AzioneDuplicataException;
+import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
+import org.uninsubria.common.exceptions.RecensioneNonTrovataException;
 import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.uninsubria.clientTK.util.ServerConnection.getServer;
 
@@ -78,9 +83,19 @@ public class AreaRistoranteController {
     private Rating averageRating;
 
     @FXML
+    private Button recensisci;
+
+    @FXML
+    private Button modificaRecensione;
+
+    @FXML
+    private Button rimuoviRecensione;
+
+    @FXML
     private Button aggiungiPreferito;
 
     private boolean ristorantePreferito;
+    private RecensioneDTO recensioneUtente;
 
 
     @FXML
@@ -117,8 +132,48 @@ public class AreaRistoranteController {
         } else {
             System.out.println("Nessun ristorante selezionato");
         }
-
+        boolean clienteLoggato = SessioneUtente.isCliente();
+        aggiornaAzioniRecensione(clienteLoggato);
         caricaRecensioni();
+    }
+
+    private void aggiornaAzioniRecensione(boolean clienteLoggato) {
+        recensisci.setVisible(clienteLoggato && recensioneUtente == null);
+        recensisci.setManaged(clienteLoggato && recensioneUtente == null);
+        modificaRecensione.setVisible(clienteLoggato && recensioneUtente != null);
+        modificaRecensione.setManaged(clienteLoggato && recensioneUtente != null);
+        rimuoviRecensione.setVisible(clienteLoggato && recensioneUtente != null);
+        rimuoviRecensione.setManaged(clienteLoggato && recensioneUtente != null);
+
+        if (!clienteLoggato || ristorante == null || ristorante.idRistorante() == null) {
+            recensioneUtente = null;
+            recensisci.setVisible(false);
+            recensisci.setManaged(false);
+            modificaRecensione.setVisible(false);
+            modificaRecensione.setManaged(false);
+            rimuoviRecensione.setVisible(false);
+            rimuoviRecensione.setManaged(false);
+            return;
+        }
+
+        try {
+            recensioneUtente = ServerConnection.getServer()
+                    .getRecensioniUtente(SessioneUtente.getUtenteCorrente().idUtente())
+                    .stream()
+                    .filter(recensione -> Objects.equals(
+                            recensione.idRistorante(), ristorante.idRistorante()))
+                    .findFirst()
+                    .orElse(null);
+            recensisci.setVisible(recensioneUtente == null);
+            recensisci.setManaged(recensioneUtente == null);
+            modificaRecensione.setVisible(recensioneUtente != null);
+            modificaRecensione.setManaged(recensioneUtente != null);
+            rimuoviRecensione.setVisible(recensioneUtente != null);
+            rimuoviRecensione.setManaged(recensioneUtente != null);
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile verificare se hai già recensito questo ristorante.");
+        }
     }
 
     private void mostraDatiRistorante() {
@@ -161,7 +216,12 @@ public class AreaRistoranteController {
 
 
         try {
-            List<RecensioneDTO> recensioni = ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
+            if (ristorante == null || ristorante.idRistorante() == null) {
+                return;
+            }
+            List<RecensioneDTO> recensioni = SessioneUtente.isLoggato()
+                    ? ServerConnection.getServer().getRecensioniRistorante(ristorante.idRistorante())
+                    : ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
 
             aggiornaMediaRecensioni(recensioni);
             aggiornaDistribuzioneRecensioni(recensioni);
@@ -190,16 +250,8 @@ public class AreaRistoranteController {
                     Node item = loader.load();
                     RecensioneItemController controller = loader.getController();
 
-                    controller.setDati(
-                            recensione.nomeAutore(),
-                            false,
-                            recensione.dataCreazione().format(
-                                    java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy")
-                            ),
-                            recensione.valutazione(),
-                            recensione.testo(),
-                            recensione.rispostaGestore()
-                    );
+                    controller.setRecensione(recensione);
+                    controller.setRispostaAbilitata(SessioneUtente.isGestore());
 
                     reviewContainer.getChildren().add(item);
                     System.out.println("Recensione aggiunta!");
@@ -381,7 +433,57 @@ public class AreaRistoranteController {
 
     @FXML
     public void onRecensioniClick(ActionEvent actionEvent) {
+        RecensioneSelezionata.pulisci();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/ScriviRecensione.fxml");
+    }
+
+    @FXML
+    private void onModificaRecensioneClick(ActionEvent actionEvent) {
+        if (recensioneUtente == null) {
+            return;
+        }
+        RecensioneSelezionata.imposta(recensioneUtente);
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/ScriviRecensione.fxml");
+    }
+
+    @FXML
+    private void onRimuoviRecensioneClick() {
+        if (recensioneUtente == null) {
+            return;
+        }
+
+        Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
+        conferma.setTitle("Rimuovi recensione");
+        conferma.setHeaderText("Vuoi rimuovere la tua recensione?");
+        conferma.setContentText("Questa operazione non può essere annullata.");
+        if (conferma.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
+                    "Accedi come cliente per rimuovere una recensione.");
+            return;
+        }
+
+        try {
+            ServerConnection.getServer().eliminaRecensione(
+                    recensioneUtente.idRecensione(), utente.idUtente());
+            recensioneUtente = null;
+            aggiornaAzioniRecensione(true);
+            caricaRecensioni();
+            mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione rimossa",
+                    "La tua recensione è stata rimossa.");
+        } catch (RecensioneNonTrovataException | OperazioneNonConsentitaException e) {
+            recensioneUtente = null;
+            aggiornaAzioniRecensione(true);
+            mostraMessaggio(Alert.AlertType.WARNING, "Recensione non disponibile",
+                    "La recensione è già stata rimossa o non è più modificabile.");
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile rimuovere la recensione. Riprova più tardi.");
+        }
     }
 
     // =========================================================

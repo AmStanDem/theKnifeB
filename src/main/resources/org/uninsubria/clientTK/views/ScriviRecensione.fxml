@@ -80,7 +80,8 @@
                       maxWidth="650.0">
 
                     <!-- TITOLO -->
-                    <Label text="Scrivi una recensione"
+                    <Label fx:id="titoloLabel"
+                           text="Scrivi una recensione"
                            styleClass="profile-title" />
 
                     <!-- TEXT AREA RECENSIONE -->
@@ -88,7 +89,8 @@
                               promptText="Scrivi qui la tua recensione..."
                               wrapText="true"
                               prefWidth="600.0"
-                              prefHeight="300.0"
+                              minHeight="180.0"
+                              prefHeight="220.0"
                               maxWidth="600.0"
                               maxHeight="300.0"
                               styleClass="review-text-area" />
@@ -98,6 +100,9 @@
                             max="5"
                             partialRating="false"
                             rating="0"
+                            minHeight="44.0"
+                            prefHeight="44.0"
+                            maxHeight="44.0"
                             styleClass="review-rating" />
 
                     <!-- RIGA BOTTONI AFFIANCATI E SEPARATI -->
@@ -129,4 +134,3 @@
     </center>
 
 </BorderPane>
-

@@ -42,6 +42,9 @@ public interface ITheKnifeServer extends Remote {
     List<RecensioneDTO> getRecensioniRistoranteAnonimo(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException;
 
+    List<RecensioneDTO> getRecensioniUtente(Integer idUtente)
+            throws RemoteException, SistemaIndisponibileException;
+
     void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException;
 

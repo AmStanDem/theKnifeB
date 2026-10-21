@@ -20,6 +20,10 @@
         </StackPane>
 
         <Label fx:id="authorLabel" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #202124;" styleClass="author-name" text="Thomas Panero" />
+        <Label fx:id="restaurantLabel"
+               style="-fx-font-size: 13px; -fx-text-fill: #5f6368;"
+               visible="false"
+               managed="false" />
         <Label fx:id="localGuideLabel"
                style="-fx-font-size: 12px; -fx-text-fill: #5f6368;"
                text="Local Guide"
@@ -58,6 +62,16 @@
 
             <Region HBox.hgrow="ALWAYS" />
 
+            <Button fx:id="editButton"
+                    text="Modifica"
+                    onAction="#onModificaClicked"
+                    visible="false"
+                    managed="false" />
+            <Button fx:id="deleteButton"
+                    text="Elimina"
+                    onAction="#onEliminaClicked"
+                    visible="false"
+                    managed="false" />
             <Button fx:id="replyButton"
                     text="Rispondi"
                     styleClass="reply-button"

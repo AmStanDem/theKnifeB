@@ -11,9 +11,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.RecensioneSelezionata;
+import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
+import org.uninsubria.common.exceptions.RecensioneNonTrovataException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,11 +58,23 @@ public class ListaMieRecensioniController {
     public void initialize() {
 
         configuraFiltri();
-
-        // TODO: sostituire con chiamata al server/socket
-        caricaRecensioniDiTest();
+        caricaRecensioni();
 
         aggiornaLista(recensioniComplete);
+    }
+
+    private void caricaRecensioni() {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            recensioniComplete.clear();
+            return;
+        }
+        try {
+            recensioniComplete.setAll(ServerConnection.getServer().getRecensioniUtente(utente.idUtente()));
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraErrore("Impossibile caricare le tue recensioni. Riprova più tardi.");
+            recensioniComplete.clear();
+        }
     }
 
     /**
@@ -217,54 +240,49 @@ public class ListaMieRecensioniController {
 
 
 
-    /**
-     * Dati di test.
-     *
-     * TODO: rimuovere quando verranno
-     * caricati dal server.
-     */
-    private void caricaRecensioniDiTest() {
+    private void modificaRecensione(RecensioneDTO recensione) {
+        RecensioneSelezionata.imposta(recensione);
+        Stage stage = (Stage) reviewContainer.getScene().getWindow();
+        SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/ScriviRecensione.fxml");
+    }
 
-        recensioniComplete.addAll(
+    private void eliminaRecensione(RecensioneDTO recensione) {
+        javafx.scene.control.Alert conferma = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        conferma.setTitle("Elimina recensione");
+        conferma.setHeaderText("Vuoi eliminare la recensione?");
+        conferma.setContentText("Questa operazione non può essere annullata.");
+        if (conferma.showAndWait().orElse(javafx.scene.control.ButtonType.CANCEL)
+                != javafx.scene.control.ButtonType.OK) {
+            return;
+        }
 
-                new RecensioneDTO(
-                        1,
-                        5,
-                        "Credo sia il gioco migliore "
-                                + "a cui abbia mai giocato. "
-                                + "Ambientazioni, personaggi, "
-                                + "dialoghi e storia impeccabili.",
-                        "Giovanni",
-                        java.time.LocalDateTime.of(
-                                2026, 7, 30, 15, 30
-                        ),
-                        null
-                ),
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraErrore("Accedi come cliente per eliminare una recensione.");
+            return;
+        }
+        try {
+            ServerConnection.getServer().eliminaRecensione(recensione.idRecensione(), utente.idUtente());
+            recensioniComplete.removeIf(elemento ->
+                    java.util.Objects.equals(elemento.idRecensione(), recensione.idRecensione()));
+            aggiornaLista(recensioniComplete);
+        } catch (RecensioneNonTrovataException | OperazioneNonConsentitaException e) {
+            mostraErrore("La recensione è già stata eliminata o non è più disponibile.");
+            caricaRecensioni();
+            aggiornaLista(recensioniComplete);
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraErrore("Impossibile eliminare la recensione. Riprova più tardi.");
+        }
+    }
 
-                new RecensioneDTO(
-                        2,
-                        4,
-                        "Ottima esperienza, personale "
-                                + "gentile e servizio veloce.",
-                        "Giovanni",
-                        java.time.LocalDateTime.of(
-                                2026, 7, 25, 18, 20
-                        ),
-                        "Grazie mille per la recensione!"
-                ),
-
-                new RecensioneDTO(
-                        3,
-                        3,
-                        "Il posto è carino, ma secondo me "
-                                + "si potrebbe migliorare il servizio.",
-                        "Giovanni",
-                        java.time.LocalDateTime.of(
-                                2026, 7, 20, 12, 10
-                        ),
-                        null
-                )
-        );
+    private void mostraErrore(String messaggio) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle("Recensioni");
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.showAndWait();
     }
 
     private Node creaCardRecensione(RecensioneDTO recensione) {
@@ -283,6 +301,7 @@ public class ListaMieRecensioniController {
                     loader.getController();
 
             controller.setRecensione(recensione);
+            controller.setAzioniProprie(this::modificaRecensione, this::eliminaRecensione);
 
             return card;
 

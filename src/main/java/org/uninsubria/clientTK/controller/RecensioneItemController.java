@@ -7,10 +7,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.RecensioneDaRispondere;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class RecensioneItemController {
 
@@ -22,6 +25,9 @@ public class RecensioneItemController {
 
     @FXML
     private Label authorLabel;
+
+    @FXML
+    private Label restaurantLabel;
 
     @FXML
     private Label localGuideLabel;
@@ -44,6 +50,18 @@ public class RecensioneItemController {
     @FXML
     private Button replyButton;
 
+    @FXML
+    private Button editButton;
+
+    @FXML
+    private Button deleteButton;
+
+    private RecensioneDTO recensione;
+    private Consumer<RecensioneDTO> onModificaAction;
+    private Consumer<RecensioneDTO> onEliminaAction;
+    private boolean rispostaAbilitata;
+    private boolean rispostaPresente;
+
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ITALIAN);
 
@@ -51,9 +69,15 @@ public class RecensioneItemController {
         if (recensione == null) {
             return;
         }
+        this.recensione = recensione;
 
         setAutore(recensione.nomeAutore());
         setLocalGuide(false);
+        boolean mostraRistorante = recensione.nomeRistorante() != null
+                && !recensione.nomeRistorante().isBlank();
+        restaurantLabel.setText(mostraRistorante ? recensione.nomeRistorante() : "");
+        restaurantLabel.setVisible(mostraRistorante);
+        restaurantLabel.setManaged(mostraRistorante);
 
         if (recensione.dataCreazione() != null) {
             setData(recensione.dataCreazione().format(DATE_FORMATTER));
@@ -69,6 +93,20 @@ public class RecensioneItemController {
 
         setTesto(recensione.testo());
         setRisposta(recensione.rispostaGestore());
+    }
+
+    public void setAzioniProprie(
+            Consumer<RecensioneDTO> onModificaAction,
+            Consumer<RecensioneDTO> onEliminaAction
+    ) {
+        this.onModificaAction = onModificaAction;
+        this.onEliminaAction = onEliminaAction;
+        editButton.setVisible(true);
+        editButton.setManaged(true);
+        deleteButton.setVisible(true);
+        deleteButton.setManaged(true);
+        replyButton.setVisible(false);
+        replyButton.setManaged(false);
     }
 
     public void setDati(
@@ -118,28 +156,56 @@ public class RecensioneItemController {
     }
 
     public void setRisposta(String risposta) {
-        boolean presente = risposta != null && !risposta.isBlank();
+        rispostaPresente = risposta != null && !risposta.isBlank();
 
-        if (presente) {
+        if (rispostaPresente) {
             responseTextField.setText(risposta);
             responseTextField.setVisible(true);
             responseTextField.setManaged(true);
             likeCountLabel.setVisible(true);
             likeCountLabel.setManaged(true);
-            replyButton.setVisible(false);
-            replyButton.setManaged(false);
         } else {
             responseTextField.setVisible(false);
             responseTextField.setManaged(false);
             likeCountLabel.setVisible(false);
             likeCountLabel.setManaged(false);
-            replyButton.setVisible(true);
-            replyButton.setManaged(true);
         }
+        aggiornaPulsanteRisposta();
+    }
+
+    public void setRispostaAbilitata(boolean abilitata) {
+        rispostaAbilitata = abilitata;
+        aggiornaPulsanteRisposta();
+    }
+
+    private void aggiornaPulsanteRisposta() {
+        boolean visibile = rispostaAbilitata && !rispostaPresente;
+        replyButton.setVisible(visibile);
+        replyButton.setManaged(visibile);
+        replyButton.setDisable(!visibile);
     }
 
     @FXML
     public void onRispondiClicked(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/RispondiRecensione.fxml");
+        if (rispostaAbilitata && SessioneUtente.isGestore()
+                && !rispostaPresente && recensione != null
+                && recensione.idRecensione() != null) {
+            RecensioneDaRispondere.imposta(recensione);
+            SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/RispondiRecensione.fxml");
+        }
+    }
+
+    @FXML
+    private void onModificaClicked() {
+        if (recensione != null && onModificaAction != null) {
+            onModificaAction.accept(recensione);
+        }
+    }
+
+    @FXML
+    private void onEliminaClicked() {
+        if (recensione != null && onEliminaAction != null) {
+            onEliminaAction.accept(recensione);
+        }
     }
 }
