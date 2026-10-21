@@ -52,17 +52,10 @@ public class PreferitiController {
 
     @FXML
     private void onAreaPersonaleClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/areaCliente.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AreaPersonale.fxml");
     }
 
-    @FXML
-    private void onAreaRistoratoreClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AreaRistoratore.fxml");
-    }
 
-    @FXML
-    private void onGeolocalizzazioneClick() {
-    }
 
     @FXML
     public void onRicercaAvanzataClick(ActionEvent actionEvent) {
