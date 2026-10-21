@@ -57,10 +57,6 @@ public class PreferitiController {
 
 
 
-    @FXML
-    public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml");
-    }
 
     @FXML
     public void handleLogoClick(MouseEvent mouseEvent) {
