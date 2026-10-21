@@ -41,14 +41,18 @@ public class PreferitiDAO {
     public List<RistoranteDTO> ottieniPreferitiUtente(int idUtente) {
         List<RistoranteDTO> lista = new ArrayList<>();
 
-        String sql = "SELECT r.*, COALESCE(AVG(rec.valutazione), 0.0) as media_stelle, STRING_AGG(DISTINCT tc.nome, ',') as tipi_cucina " +
+        String sql = "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, " +
+                "r.latitudine, r.longitudine, r.prezzo_medio, r.delivery, r.booking_online, " +
+                "COALESCE(rec.media_stelle, 0.0) AS media_stelle, cucine.tipi_cucina " +
                 "FROM RistorantiTheKnife r " +
                 "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
-                "LEFT JOIN Recensioni rec ON r.id_ristorante = rec.id_ristorante " +
-                "LEFT JOIN Ristoranti_Tipologie rt ON r.id_ristorante = rt.id_ristorante " +
-                "LEFT JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia " +
-                "WHERE p.id_utente = ? " +
-                "GROUP BY r.id_ristorante";
+                "LEFT JOIN (SELECT id_ristorante, AVG(valutazione) AS media_stelle " +
+                "FROM Recensioni GROUP BY id_ristorante) rec ON r.id_ristorante = rec.id_ristorante " +
+                "LEFT JOIN (SELECT rt.id_ristorante, STRING_AGG(tc.nome, ',') AS tipi_cucina " +
+                "FROM Ristoranti_Tipologie rt JOIN Tipologia_Cucina tc " +
+                "ON rt.id_tipologia = tc.id_tipologia GROUP BY rt.id_ristorante) cucine " +
+                "ON r.id_ristorante = cucine.id_ristorante " +
+                "WHERE p.id_utente = ? ORDER BY r.nome";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -65,8 +69,8 @@ public class PreferitiDAO {
                             rs.getInt("id_ristorante"),
                             rs.getString("nome"),
                             rs.getString("indirizzo"),
-                            rs.getString("nazione"),
                             rs.getString("citta"),
+                            rs.getString("nazione"),
                             rs.getDouble("latitudine"),
                             rs.getDouble("longitudine"),
                             tipologie,

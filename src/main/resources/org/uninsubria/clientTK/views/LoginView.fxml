@@ -67,7 +67,7 @@
         <!-- Sign up -->
         <HBox alignment="CENTER" spacing="6">
             <Label styleClass="signup-label" text="Don't have an account?" />
-            <Hyperlink styleClass="signup-link" text="Sign up" />
+            <Hyperlink styleClass="signup-link" text="Sign up" onAction="#onVaiRegistrazione" />
         </HBox>
 
         <Region VBox.vgrow="ALWAYS" />

@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -14,10 +15,18 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RistoranteDTO;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.RistoranteNonTrovatoException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
 import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Objects;
 
 public class PreferitiController {
 
@@ -67,8 +76,26 @@ public class PreferitiController {
 
     @FXML
     public void initialize() {
-        caricaRistorantiDiTest();
-        aggiornaLista(ristorantiCompleti);
+        caricaPreferiti();
+    }
+
+    private void caricaPreferiti() {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
+                    "Accedi come cliente per visualizzare i tuoi ristoranti preferiti.");
+            aggiornaLista(List.of());
+            return;
+        }
+
+        try {
+            List<RistoranteDTO> preferiti = ServerConnection.getServer().getPreferitiUtente(utente.idUtente());
+            ristorantiCompleti.setAll(preferiti);
+            aggiornaLista(ristorantiCompleti);
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile caricare i ristoranti preferiti. Riprova più tardi.");
+        }
     }
 
     private void aggiornaLista(List<RistoranteDTO> nuovaLista) {
@@ -92,64 +119,45 @@ public class PreferitiController {
 
             PreferitoItemController controller = loader.getController();
             controller.setRistorante(ristorante);
-            controller.setOnDettagliAction(this::apriDettagliRistorante);
+            controller.setOnRemoveFavoriteAction(this::rimuoviPreferito);
 
             return cardPane;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore",
+                    "Impossibile visualizzare una scheda ristorante.");
             return null;
         }
     }
 
-    private void apriDettagliRistorante(RistoranteDTO ristorante) {
-        System.out.println("Apertura dettagli per: " + ristorante.nome());
+    private void rimuoviPreferito(RistoranteDTO ristorante) {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
+                    "Accedi come cliente per modificare i preferiti.");
+            return;
+        }
+
+        try {
+            ServerConnection.getServer().rimuoviPreferito(utente.idUtente(), ristorante.idRistorante());
+            ristorantiCompleti.removeIf(preferito ->
+                    Objects.equals(preferito.idRistorante(), ristorante.idRistorante()));
+            aggiornaLista(ristorantiCompleti);
+        } catch (RistoranteNonTrovatoException e) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Preferito non trovato",
+                    "Questo ristorante non risulta più presente nei tuoi preferiti.");
+            caricaPreferiti();
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile rimuovere il ristorante dai preferiti. Riprova più tardi.");
+        }
     }
 
-    private void caricaRistorantiDiTest() {
-        ristorantiCompleti.addAll(
-                new RistoranteDTO(
-                        1,
-                        "Osteria del Borgo",
-                        "Via Roma 12, Milano",
-                        "Italia",
-                        "Milano",
-                        45.4642,
-                        9.1900,
-                        List.of("Italiana"),
-                        28.0,
-                        false,
-                        true,
-                        4.5
-                ),
-                new RistoranteDTO(
-                        2,
-                        "Sakura Sushi",
-                        "Corso Buenos Aires 5, Milano",
-                        "Italia",
-                        "Milano",
-                        45.4780,
-                        9.2050,
-                        List.of("Giapponese"),
-                        35.0,
-                        true,
-                        true,
-                        4.2
-                ),
-                new RistoranteDTO(
-                        3,
-                        "La Piadineria",
-                        "Piazza Duomo 1, Milano",
-                        "Italia",
-                        "Milano",
-                        45.4640,
-                        9.1900,
-                        List.of("Pizzeria"),
-                        12.0,
-                        true,
-                        false,
-                        3.8
-                )
-        );
+    private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titolo);
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.showAndWait();
     }
 }

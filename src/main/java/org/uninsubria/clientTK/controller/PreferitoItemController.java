@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
@@ -39,8 +40,19 @@ public class PreferitoItemController {
         this.onDettagliAction = onDettagliAction;
     }
 
+    public void setOnRemoveFavoriteAction(Consumer<RistoranteDTO> onRemoveFavoriteAction) {
+        this.onRemoveFavoriteAction = onRemoveFavoriteAction;
+    }
+
     @FXML
     private void onDetailsClicked(ActionEvent actionEvent) {
+        if (ristorante == null) {
+            return;
+        }
+        RistoranteSelezionato.setRistorante(ristorante);
+        if (onDettagliAction != null) {
+            onDettagliAction.accept(ristorante);
+        }
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
     }
 

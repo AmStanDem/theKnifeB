@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -12,11 +13,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
-import org.uninsubria.clientTK.util.RistoranteSelezionato;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
 import java.rmi.NotBoundException;
@@ -74,6 +77,11 @@ public class AreaRistoranteController {
     @FXML
     private Rating averageRating;
 
+    @FXML
+    private Button aggiungiPreferito;
+
+    private boolean ristorantePreferito;
+
 
     @FXML
     private ProgressBar bar5;
@@ -105,6 +113,7 @@ public class AreaRistoranteController {
         if (ristorante != null) {
             System.out.println("Ristorante selezionato: " + ristorante.nome());
             mostraDatiRistorante();
+            aggiornaStatoPreferito();
         } else {
             System.out.println("Nessun ristorante selezionato");
         }
@@ -289,6 +298,81 @@ public class AreaRistoranteController {
     }
 
     public void onPreferitiClick(ActionEvent actionEvent) {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente == null || !SessioneUtente.isCliente()) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
+                    "Accedi come cliente per aggiungere ristoranti ai preferiti.");
+            return;
+        }
+        if (ristorante == null || ristorante.idRistorante() == null) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore",
+                    "Impossibile identificare il ristorante selezionato.");
+            return;
+        }
+
+        try {
+            if (ristorantePreferito) {
+                ServerConnection.getServer().rimuoviPreferito(utente.idUtente(), ristorante.idRistorante());
+                ristorantePreferito = false;
+                mostraMessaggio(Alert.AlertType.INFORMATION, "Preferiti",
+                        "Ristorante rimosso dai preferiti.");
+            } else {
+                ServerConnection.getServer().aggiungiPreferito(utente.idUtente(), ristorante.idRistorante());
+                ristorantePreferito = true;
+                mostraMessaggio(Alert.AlertType.INFORMATION, "Preferiti",
+                        "Ristorante aggiunto ai preferiti.");
+            }
+            aggiornaTestoPulsantePreferito();
+        } catch (AzioneDuplicataException e) {
+            ristorantePreferito = true;
+            aggiornaTestoPulsantePreferito();
+            mostraMessaggio(Alert.AlertType.INFORMATION, "Preferiti",
+                    "Il ristorante è già presente nei tuoi preferiti.");
+        } catch (org.uninsubria.common.exceptions.RistoranteNonTrovatoException e) {
+            ristorantePreferito = false;
+            aggiornaTestoPulsantePreferito();
+            mostraMessaggio(Alert.AlertType.WARNING, "Preferiti",
+                    "Il ristorante non risulta più presente nei tuoi preferiti.");
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile aggiornare i preferiti. Riprova più tardi.");
+        }
+    }
+
+    private void aggiornaStatoPreferito() {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        boolean clienteLoggato = utente != null && SessioneUtente.isCliente();
+        aggiungiPreferito.setVisible(clienteLoggato);
+        aggiungiPreferito.setManaged(clienteLoggato);
+        if (!clienteLoggato) {
+            return;
+        }
+
+        try {
+            ristorantePreferito = ServerConnection.getServer()
+                    .getPreferitiUtente(utente.idUtente())
+                    .stream()
+                    .anyMatch(preferito -> preferito.idRistorante().equals(ristorante.idRistorante()));
+            aggiornaTestoPulsantePreferito();
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            aggiungiPreferito.setDisable(true);
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile verificare lo stato dei preferiti.");
+        }
+    }
+
+    private void aggiornaTestoPulsantePreferito() {
+        aggiungiPreferito.setText(ristorantePreferito
+                ? "Rimuovi dai preferiti"
+                : "Aggiungi ai preferiti");
+    }
+
+    private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titolo);
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.showAndWait();
     }
 
     // =========================================================
@@ -304,11 +388,14 @@ public class AreaRistoranteController {
     // LOGOUT
     // =========================================================
 
+    /*
     @FXML
     public void onLogOutClick(ActionEvent actionEvent) {
         SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
+
+     */
 
     // =========================================================
     // LOGO

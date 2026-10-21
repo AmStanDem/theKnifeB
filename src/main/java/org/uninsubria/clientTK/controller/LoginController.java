@@ -73,7 +73,7 @@ public class LoginController {
      */
     @FXML
     private void onVaiRegistrazione(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/registrazione.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/SignUp.fxml");
     }
 
     /**
