@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.enums.RuoloUtente;
@@ -153,21 +154,8 @@ public class AreaClienteController {
     }
 
     public void onLogOutClick(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        SessioneUtente.logout();
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     public void handleLogoClick(MouseEvent mouseEvent) {

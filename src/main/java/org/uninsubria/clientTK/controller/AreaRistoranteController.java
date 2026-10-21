@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
@@ -305,6 +306,7 @@ public class AreaRistoranteController {
 
     @FXML
     public void onLogOutClick(ActionEvent actionEvent) {
+        SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 

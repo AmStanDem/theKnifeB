@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.SessioneUtente;
 
 public class AreaRistoratoreController {
 
@@ -43,6 +44,7 @@ public class AreaRistoratoreController {
     }
 
     public void onLogOutClick(ActionEvent event) {
+        SessioneUtente.logout();
         SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 

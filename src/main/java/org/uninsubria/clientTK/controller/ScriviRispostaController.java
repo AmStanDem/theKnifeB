@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.SessioneUtente;
 
 public class ScriviRispostaController {
 
@@ -59,6 +60,7 @@ public class ScriviRispostaController {
 
     @FXML
     public void onLogOutClick(ActionEvent actionEvent) {
+        SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 

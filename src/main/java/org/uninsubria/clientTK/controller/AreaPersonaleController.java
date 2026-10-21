@@ -196,7 +196,7 @@ public class AreaPersonaleController {
 
     @FXML
     private void onLogOutClick(ActionEvent event) {
-
+        SessioneUtente.logout();
         cambiaPagina(
                 event,
                 "/org/uninsubria/clientTK/views/MainLayout.fxml"
