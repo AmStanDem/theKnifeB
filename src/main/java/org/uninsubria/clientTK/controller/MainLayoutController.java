@@ -99,7 +99,7 @@ public class MainLayoutController {
     private void onAreaPersonaleClick(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/clientTK/views/SignUp.fxml"
+                "/org/uninsubria/clientTK/views/LoginView.fxml"
         );
     }
 

@@ -51,7 +51,7 @@
                         prefHeight="63.0"
                         prefWidth="285.0"
                         styleClass="accent"
-                        text="Accedi / Registrati" />
+                        text="Accedi" />
 
                 <!-- IMMAGINE PER UTENTE LOGGATO -->
                 <ImageView fx:id="imgUtente"
