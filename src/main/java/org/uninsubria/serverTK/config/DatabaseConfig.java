@@ -27,7 +27,7 @@ public class DatabaseConfig {
      * Inizializza l'infrastruttura di persistenza.
      * Viene chiamato dal MainServer durante la fase di bootstrapping.
      *
-     * @param url      L'URL JDBC completo (es. jdbc:postgresql://localhost:5433/theknife)
+     * @param url      L'URL JDBC completo, con la porta pubblicata del database (es. localhost:5432)
      * @param username L'utente del database
      * @param password La password del database
      */
