@@ -222,6 +222,15 @@ public class AreaRistoranteController {
             List<RecensioneDTO> recensioni = SessioneUtente.isLoggato()
                     ? ServerConnection.getServer().getRecensioniRistorante(ristorante.idRistorante())
                     : ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
+            boolean gestoreProprietario = false;
+            if (SessioneUtente.isGestore()) {
+                UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
+                gestoreProprietario = gestore != null
+                        && ServerConnection.getServer().getRistorantiGestore(gestore.idUtente())
+                        .stream()
+                        .anyMatch(proprio -> Objects.equals(
+                                proprio.idRistorante(), ristorante.idRistorante()));
+            }
 
             aggiornaMediaRecensioni(recensioni);
             aggiornaDistribuzioneRecensioni(recensioni);
@@ -251,7 +260,7 @@ public class AreaRistoranteController {
                     RecensioneItemController controller = loader.getController();
 
                     controller.setRecensione(recensione);
-                    controller.setRispostaAbilitata(SessioneUtente.isGestore());
+                    controller.setRispostaAbilitata(gestoreProprietario);
 
                     reviewContainer.getChildren().add(item);
                     System.out.println("Recensione aggiunta!");
@@ -263,12 +272,9 @@ public class AreaRistoranteController {
             }
 
 
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        } catch (SistemaIndisponibileException e) {
-            throw new RuntimeException(e);
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
+        } catch (RemoteException | SistemaIndisponibileException | NotBoundException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
+                    "Impossibile caricare le recensioni o verificare la proprietà del ristorante.");
         }
     }
 
