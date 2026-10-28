@@ -21,6 +21,7 @@ import org.uninsubria.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.common.exceptions.DatiMancantiException;
 import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.common.exceptions.RecensioneNonTrovataException;
+import org.uninsubria.common.exceptions.RistoranteNonTrovatoException;
 import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
 import java.rmi.NotBoundException;
@@ -148,7 +149,7 @@ public class ScriviRecensioneController {
                 RecensioneSelezionata.pulisci();
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione aggiornata",
                         "Le modifiche sono state salvate.");
-                SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MieRecensioni.fxml");
+                tornaAlRistoranteRecensito(actionEvent);
             } else {
                 RecensioneDTO recensione = new RecensioneDTO(
                         null,
@@ -178,7 +179,7 @@ public class ScriviRecensioneController {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione non disponibile",
                     "La recensione è stata eliminata o non è più modificabile.");
             RecensioneSelezionata.pulisci();
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MieRecensioni.fxml");
+            tornaAlRistoranteRecensito(actionEvent);
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
                     "Impossibile salvare la recensione. Riprova più tardi.");
@@ -189,10 +190,30 @@ public class ScriviRecensioneController {
     public void onAnnullaClick(ActionEvent actionEvent) {
         boolean modificaInCorso = recensioneDaModificare != null;
         RecensioneSelezionata.pulisci();
-        String destinazione = modificaInCorso
-                ? "/org/uninsubria/clientTK/views/MieRecensioni.fxml"
-                : "/org/uninsubria/clientTK/views/Ristorante.fxml";
-        SceneManager.switchScene(actionEvent, destinazione);
+        if (modificaInCorso) {
+            tornaAlRistoranteRecensito(actionEvent);
+        } else {
+            SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
+        }
+    }
+
+    private void tornaAlRistoranteRecensito(ActionEvent actionEvent) {
+        if (recensioneDaModificare == null || recensioneDaModificare.idRistorante() == null) {
+            SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MieRecensioni.fxml");
+            return;
+        }
+
+        try {
+            RistoranteDTO ristoranteRecensito = ServerConnection.getServer()
+                    .getDettaglioRistorante(recensioneDaModificare.idRistorante());
+            RistoranteSelezionato.setRistorante(ristoranteRecensito);
+            SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
+        } catch (RemoteException | NotBoundException | RistoranteNonTrovatoException
+                 | SistemaIndisponibileException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Ristorante non disponibile",
+                    "La recensione è stata gestita, ma non è stato possibile aprire la scheda del ristorante.");
+            SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MieRecensioni.fxml");
+        }
     }
 
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
