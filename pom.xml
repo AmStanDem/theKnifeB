@@ -21,6 +21,7 @@
         <flyway.version>12.11.0</flyway.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <atlantafx.version>2.1.0</atlantafx.version>
+        <db.host.port>5432</db.host.port>
     </properties>
 
     <build>
@@ -47,7 +48,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>${flyway.version}</version>
                 <configuration>
-                    <url>jdbc:postgresql://localhost:5433/theknife</url>
+                    <url>jdbc:postgresql://localhost:${db.host.port}/theknife</url>
                     <user>admin</user>
                     <password>admin</password>
                     <baselineOnMigrate>true</baselineOnMigrate>

@@ -19,7 +19,7 @@ import java.util.Scanner;
 public class MainServer {
 
     private static final String DEFAULT_DB_HOST = "localhost";
-    private static final int DEFAULT_DB_PORT = 5433;
+    private static final int DEFAULT_DB_PORT = 5432;
     private static final String DEFAULT_DB_NAME = "theknife";
     private static final String DEFAULT_DB_USER = "admin";
     private static final String DEFAULT_DB_PASSWORD = "admin";
@@ -30,11 +30,21 @@ public class MainServer {
         System.out.println("=================================================\n");
 
         int rmiPort = 1099;
+        int defaultDbPort = DEFAULT_DB_PORT;
         File envFile = new File(".env");
         if (envFile.exists()) {
             try (FileInputStream fis = new FileInputStream(envFile)) {
                 Properties props = new Properties();
                 props.load(fis);
+                String dbPortProp = props.getProperty("DB_HOST_PORT");
+                if (dbPortProp != null && !dbPortProp.isBlank()) {
+                    try {
+                        defaultDbPort = parseDbPort(dbPortProp);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("[CONFIG_WARN] DB_HOST_PORT non valida; uso la porta "
+                                + DEFAULT_DB_PORT + ".");
+                    }
+                }
                 String portProp = props.getProperty("RMI_PORT");
                 if (portProp != null && !portProp.isEmpty()) {
                     rmiPort = Integer.parseInt(portProp.trim());
@@ -50,7 +60,7 @@ public class MainServer {
         Console console = System.console();
         Scanner scanner = new Scanner(System.in);
         String dbHost = prompt(scanner, console, "[CONFIG] Host DB", DEFAULT_DB_HOST);
-        int dbPort = promptPort(scanner, console);
+        int dbPort = promptPort(scanner, console, defaultDbPort);
         String dbName = prompt(scanner, console, "[CONFIG] Nome database", DEFAULT_DB_NAME);
         String dbUser = prompt(scanner, console, "[CONFIG] Utente PostgreSQL", DEFAULT_DB_USER);
         String dbPassword = promptPassword(scanner, console);
@@ -100,20 +110,30 @@ public class MainServer {
         return value == null || value.isBlank() ? defaultValue : value.trim();
     }
 
-    private static int promptPort(Scanner scanner, Console console) {
+    private static int promptPort(Scanner scanner, Console console, int defaultPort) {
         while (true) {
             String value = prompt(scanner, console, "[CONFIG] Porta PostgreSQL",
-                    Integer.toString(DEFAULT_DB_PORT));
+                    Integer.toString(defaultPort));
             try {
-                int port = Integer.parseInt(value);
-                if (port >= 1 && port <= 65535) {
-                    return port;
-                }
-            } catch (NumberFormatException ignored) {
+                return parseDbPort(value);
+            } catch (IllegalArgumentException ignored) {
                 // Keep prompting until a valid TCP port is provided.
             }
             System.out.println("[CONFIG] Porta non valida. Inserisci un valore compreso tra 1 e 65535.");
         }
+    }
+
+    private static int parseDbPort(String value) {
+        int port;
+        try {
+            port = Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("La porta deve essere numerica.", e);
+        }
+        if (port < 1 || port > 65535) {
+            throw new IllegalArgumentException("La porta deve essere compresa tra 1 e 65535.");
+        }
+        return port;
     }
 
     private static String promptPassword(Scanner scanner, Console console) {
