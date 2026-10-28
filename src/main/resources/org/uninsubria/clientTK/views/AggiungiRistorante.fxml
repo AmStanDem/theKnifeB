@@ -59,17 +59,7 @@
                         </VBox>
                     </HBox>
 
-                    <!-- Latitudine e Longitudine -->
-                    <HBox spacing="15.0">
-                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="input-label" text="Latitudine *" />
-                            <TextField fx:id="txtLatitudine" promptText="45.4642" styleClass="custom-text-field" />
-                        </VBox>
-                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="input-label" text="Longitudine *" />
-                            <TextField fx:id="txtLongitudine" promptText="9.1900" styleClass="custom-text-field" />
-                        </VBox>
-                    </HBox>
+
 
                     <!-- Tipologie di Cucina (ControlsFX) -->
                     <VBox spacing="5.0">

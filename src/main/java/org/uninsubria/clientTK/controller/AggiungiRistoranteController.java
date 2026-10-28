@@ -15,8 +15,11 @@ import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
+
+import org.uninsubria.clientTK.util.GeocodingService;
 
 public class AggiungiRistoranteController {
 
@@ -35,11 +38,6 @@ public class AggiungiRistoranteController {
     @FXML
     private TextField txtPrezzoMedio;
 
-    @FXML
-    private TextField txtLatitudine;
-
-    @FXML
-    private TextField txtLongitudine;
 
     @FXML
     private CheckComboBox<String> comboCucine;
@@ -81,15 +79,14 @@ public class AggiungiRistoranteController {
                 || txtIndirizzo.getText().trim().isEmpty()
                 || txtCitta.getText().trim().isEmpty()
                 || txtNazione.getText().trim().isEmpty()
-                || txtPrezzoMedio.getText().trim().isEmpty()
-                || txtLatitudine.getText().trim().isEmpty()
-                || txtLongitudine.getText().trim().isEmpty()) {
+                || txtPrezzoMedio.getText().trim().isEmpty()) {
 
             mostraMessaggio(
                     Alert.AlertType.WARNING,
                     "Campi mancanti",
                     "Compila tutti i campi obbligatori (*)."
             );
+
             return;
         }
 
@@ -105,19 +102,60 @@ public class AggiungiRistoranteController {
             return;
         }
 
+
         try {
+
+            // 6. Recupero degli altri dati.
+            String nome = txtNome.getText().trim();
+            String indirizzo = txtIndirizzo.getText().trim();
+            String citta = txtCitta.getText().trim();
+            String nazione = txtNazione.getText().trim();
+
+            boolean delivery = chkDelivery.isSelected();
+            boolean bookingOnline = chkBookingOnline.isSelected();
+
             // 3. Conversione dei campi numerici.
             double prezzoMedio = Double.parseDouble(
                     txtPrezzoMedio.getText().trim().replace(",", ".")
             );
 
-            double latitudine = Double.parseDouble(
-                    txtLatitudine.getText().trim().replace(",", ".")
-            );
+            // Recupera automaticamente le coordinate dall'indirizzo.
+            GeocodingService.Coordinate coordinate;
 
-            double longitudine = Double.parseDouble(
-                    txtLongitudine.getText().trim().replace(",", ".")
-            );
+            try {
+                coordinate = GeocodingService.ottieniCoordinate(
+                        indirizzo,
+                        citta,
+                        nazione
+                );
+
+            } catch (IOException | InterruptedException e) {
+
+                Thread.currentThread().interrupt();
+
+                mostraMessaggio(
+                        Alert.AlertType.ERROR,
+                        "Errore di geolocalizzazione",
+                        "Non è stato possibile recuperare le coordinate. "
+                                + "Controlla la connessione e riprova."
+                );
+
+                return;
+            }
+
+            if (coordinate == null) {
+                mostraMessaggio(
+                        Alert.AlertType.WARNING,
+                        "Indirizzo non trovato",
+                        "Non è stato possibile trovare l'indirizzo inserito. "
+                                + "Verifica indirizzo, città e nazione."
+                );
+
+                return;
+            }
+
+            double latitudine = coordinate.latitudine();
+            double longitudine = coordinate.longitudine();
 
             // 4. Controllo dei valori inseriti.
             if (!Double.isFinite(prezzoMedio)
@@ -173,14 +211,7 @@ public class AggiungiRistoranteController {
                 return;
             }
 
-            // 6. Recupero degli altri dati.
-            String nome = txtNome.getText().trim();
-            String indirizzo = txtIndirizzo.getText().trim();
-            String citta = txtCitta.getText().trim();
-            String nazione = txtNazione.getText().trim();
 
-            boolean delivery = chkDelivery.isSelected();
-            boolean bookingOnline = chkBookingOnline.isSelected();
 
             // 7. Creazione del DTO da inviare al server.
             RistoranteDTO ristorante = new RistoranteDTO(
