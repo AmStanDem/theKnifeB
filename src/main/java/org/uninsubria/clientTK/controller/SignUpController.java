@@ -41,6 +41,9 @@ public class SignUpController {
     private PasswordField passwordField;
 
     @FXML
+    private PasswordField confermaPasswordField;
+
+    @FXML
     private Label labelErrore;
 
     @FXML
@@ -53,9 +56,17 @@ public class SignUpController {
         String domicilio = indirizzo.getText();
         String email = emailField.getText();
         String password = passwordField.getText();
+        String confermaPassword = confermaPasswordField.getText();
 
-        if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty() || password.isEmpty() || domicilio.isEmpty()) {
+        if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
+                || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
             labelErrore.setText("Compila tutti i campi obbligatori!");
+            return;
+        }
+
+        if (!password.equals(confermaPassword)) {
+            labelErrore.setText("Le password non coincidono.");
+            confermaPasswordField.requestFocus();
             return;
         }
 

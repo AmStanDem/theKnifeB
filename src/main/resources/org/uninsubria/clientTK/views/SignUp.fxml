@@ -100,6 +100,12 @@
                             <Label styleClass="hint-label" text="ⓘ La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola" wrapText="true" />
                         </VBox>
 
+                        <!-- CONFERMA PASSWORD -->
+                        <VBox spacing="4.0">
+                            <Label styleClass="field-label" text="Conferma password" />
+                            <PasswordField fx:id="confermaPasswordField" prefHeight="40.0" promptText="Ripeti la password" />
+                        </VBox>
+
                         <!-- Messaggio di errore -->
                         <Label fx:id="labelErrore" styleClass="error-label" />
 
