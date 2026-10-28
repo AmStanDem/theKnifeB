@@ -52,6 +52,12 @@ Metodo 2. Avvio tramite interfaccia grafica
   2.	Fai click destro sul file 
   3.	Seleziona Apri con -> Java (oppure Java(TM) Platform SE binary)
 
+### Avvio del serverTK
+
+Avvia la classe `org.uninsubria.serverTK.MainServer` separatamente dal client. A ogni avvio il server richiede host, porta, nome del database e credenziali PostgreSQL; premi Invio per accettare i valori predefiniti (`localhost`, `5433`, `theknife`, utente `admin` e password `admin`). La password non viene mostrata quando il server è avviato da un terminale. Se si usa un IDE senza terminale associato, viene letta dalla console di input e può risultare visibile durante la digitazione.
+
+Il file `.env` non fornisce più automaticamente le credenziali DB; può continuare a specificare `RMI_PORT`.
+
 ---
 
 ## 🖥️ **Utilizzo**

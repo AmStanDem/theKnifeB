@@ -14,66 +14,57 @@ import java.util.Scanner;
 
 /**
  * Punto di ingresso principale (Entry Point) per l'infrastruttura di backend.
- * Supporta l'autofill delle configurazioni tramite file .env o input interattivo.
+ * Richiede all'avvio i parametri del database, proponendo valori predefiniti.
  */
 public class MainServer {
+
+    private static final String DEFAULT_DB_HOST = "localhost";
+    private static final int DEFAULT_DB_PORT = 5433;
+    private static final String DEFAULT_DB_NAME = "theknife";
+    private static final String DEFAULT_DB_USER = "admin";
+    private static final String DEFAULT_DB_PASSWORD = "admin";
 
     public static void main(String[] args) {
         System.out.println("=================================================");
         System.out.println("      THE KNIFE - CORE SERVER INITIALIZATION     ");
         System.out.println("=================================================\n");
 
-        String dbUrl = null;
-        String dbUser = null;
-        String dbPassword = null;
-        int rmiPort = 1099; // Porta di default
-
-        // 1. Fase di Bootstrapping: Ricerca automatica del file .env
+        int rmiPort = 1099;
         File envFile = new File(".env");
         if (envFile.exists()) {
-            System.out.println("[CONFIG] File .env rilevato. Caricamento variabili d'ambiente in corso...");
             try (FileInputStream fis = new FileInputStream(envFile)) {
                 Properties props = new Properties();
                 props.load(fis);
-
-                dbUrl = props.getProperty("DB_URL");
-                dbUser = props.getProperty("DB_USER");
-                dbPassword = props.getProperty("DB_PASSWORD");
-
                 String portProp = props.getProperty("RMI_PORT");
                 if (portProp != null && !portProp.isEmpty()) {
-                    rmiPort = Integer.parseInt(portProp);
+                    rmiPort = Integer.parseInt(portProp.trim());
                 }
             } catch (IOException e) {
-                System.err.println("[CONFIG_WARN] Impossibile leggere il file .env, fallback manuale.");
+                System.err.println("[CONFIG_WARN] Impossibile leggere RMI_PORT da .env; uso la porta 1099.");
+            } catch (NumberFormatException e) {
+                System.err.println("[CONFIG_WARN] RMI_PORT non valida; uso la porta 1099.");
             }
         }
 
-        // 2. Fallback Mechanism: Se mancano i dati (file assente o incompleto), chiedi interattivamente
-        if (dbUrl == null || dbUser == null || dbPassword == null) {
-            System.out.println("[CONFIG] Variabili mancanti. Passaggio all'inserimento manuale...\n");
-            Scanner scanner = new Scanner(System.in);
+        System.out.println("[CONFIG] Configurazione del database (premi Invio per usare il valore predefinito).");
+        Console console = System.console();
+        Scanner scanner = new Scanner(System.in);
+        String dbHost = prompt(scanner, console, "[CONFIG] Host DB", DEFAULT_DB_HOST);
+        int dbPort = promptPort(scanner, console);
+        String dbName = prompt(scanner, console, "[CONFIG] Nome database", DEFAULT_DB_NAME);
+        String dbUser = prompt(scanner, console, "[CONFIG] Utente PostgreSQL", DEFAULT_DB_USER);
+        String dbPassword = promptPassword(scanner, console);
+        String dbUrl = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
 
-            System.out.print("[CONFIG] Inserisci il DB_URL (es. jdbc:postgresql://localhost:5433/theknife): ");
-            dbUrl = scanner.nextLine().trim();
-
-            System.out.print("[CONFIG] Inserisci l'username PostgreSQL: ");
-            dbUser = scanner.nextLine().trim();
-
-            Console console = System.console();
-            if (console != null) {
-                char[] passChars = console.readPassword("[CONFIG] Inserisci la password PostgreSQL: ");
-                dbPassword = new String(passChars);
-            } else {
-                System.out.print("[CONFIG] Inserisci la password PostgreSQL: ");
-                dbPassword = scanner.nextLine().trim();
-            }
+        if (dbHost.isBlank() || dbName.isBlank() || dbUser.isBlank()) {
+            System.err.println("[FATAL ERROR] Host, nome database e utente PostgreSQL non possono essere vuoti.");
+            System.exit(1);
+            return;
         }
 
-        // 3. Inizializzazione della Persistenza (DatabaseConfig)
+        // Inizializzazione della persistenza con i parametri inseriti all'avvio.
         try {
             System.out.println("\n[SYSTEM] Tentativo di connessione al database in corso...");
-            // Passiamo direttamente il DB_URL
             DatabaseConfig.init(dbUrl, dbUser, dbPassword);
         } catch (Exception e) {
             System.err.println("[FATAL ERROR] Inizializzazione database fallita: " + e.getMessage());
@@ -82,7 +73,7 @@ public class MainServer {
 
         org.uninsubria.serverTK.utils.CsvImporter.importaSeNecessario();
 
-        // 4. Esposizione dei Servizi (RMI Registry)
+        // Esposizione dei servizi tramite RMI.
         try {
             TheKnifeServerImpl serverService = new TheKnifeServerImpl();
             Registry registry = LocateRegistry.createRegistry(rmiPort);
@@ -99,5 +90,47 @@ public class MainServer {
             System.err.println("[FATAL ERROR] Impossibile avviare il registro RMI: " + e.getMessage());
             System.exit(1);
         }
+    }
+
+    private static String prompt(Scanner scanner, Console console, String label, String defaultValue) {
+        String prompt = label + " [" + defaultValue + "]: ";
+        String value = console != null
+                ? console.readLine(prompt)
+                : promptFromScanner(scanner, prompt);
+        return value == null || value.isBlank() ? defaultValue : value.trim();
+    }
+
+    private static int promptPort(Scanner scanner, Console console) {
+        while (true) {
+            String value = prompt(scanner, console, "[CONFIG] Porta PostgreSQL",
+                    Integer.toString(DEFAULT_DB_PORT));
+            try {
+                int port = Integer.parseInt(value);
+                if (port >= 1 && port <= 65535) {
+                    return port;
+                }
+            } catch (NumberFormatException ignored) {
+                // Keep prompting until a valid TCP port is provided.
+            }
+            System.out.println("[CONFIG] Porta non valida. Inserisci un valore compreso tra 1 e 65535.");
+        }
+    }
+
+    private static String promptPassword(Scanner scanner, Console console) {
+        String prompt = "[CONFIG] Password PostgreSQL [admin predefinita]: ";
+        String value;
+        if (console != null) {
+            char[] password = console.readPassword(prompt);
+            value = password == null ? "" : new String(password);
+        } else {
+            value = promptFromScanner(scanner, prompt);
+        }
+        return value.isBlank() ? DEFAULT_DB_PASSWORD : value;
+    }
+
+    private static String promptFromScanner(Scanner scanner, String prompt) {
+        System.out.print(prompt);
+        System.out.flush();
+        return scanner.nextLine();
     }
 }
