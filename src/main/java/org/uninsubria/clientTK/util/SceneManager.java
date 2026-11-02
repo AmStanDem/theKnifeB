@@ -1,10 +1,16 @@
 package org.uninsubria.clientTK.util;
 
 import javafx.event.Event;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -39,8 +45,8 @@ public class SceneManager {
     }
 
     /**
-     * Cambia la scena, applica il CSS globale, restituisce il Controller tipizzato
-     * e forza l'apertura a schermo intero/massimizzato di default.
+     * Cambia la scena, applica il CSS globale e mantiene la finestra principale
+     * a schermo intero.
      *
      * DA ELIMINARE DOPO LA PULIZIA
      */
@@ -62,18 +68,19 @@ public class SceneManager {
 
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
+            StackPane applicationRoot = creaRootApplicativa(stage, root);
 
             if (stage.getScene() != null) {
-                stage.getScene().setRoot(root);
+                stage.getScene().setRoot(applicationRoot);
             } else {
-                Scene scene = new Scene(root);
+                Scene scene = new Scene(applicationRoot);
                 applyCssIfAvailable(scene);
                 stage.setScene(scene);
             }
 
-            // IMPOSTAZIONE DI DEFAULT: Apre sempre massimizzato
-            // (l'utente potrà comunque ridurorlo con il tasto riduci della finestra se vuole)
-            stage.setMaximized(true);
+            stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+            stage.setFullScreenExitHint("");
+            stage.setFullScreen(true);
 
             return loader.getController();
 
@@ -82,6 +89,25 @@ public class SceneManager {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static StackPane creaRootApplicativa(Stage stage, Parent contenuto) {
+        StackPane root = new StackPane(contenuto);
+        root.setPickOnBounds(false);
+
+        Button esci = new Button("×");
+        esci.getStyleClass().add("app-exit-button");
+        esci.setAccessibleText("Esci dall'applicazione");
+        esci.setTooltip(new javafx.scene.control.Tooltip("Esci dall'applicazione"));
+        esci.setOnAction(event -> {
+            stage.close();
+            Platform.exit();
+        });
+
+        root.getChildren().add(esci);
+        StackPane.setAlignment(esci, Pos.TOP_RIGHT);
+        StackPane.setMargin(esci, new Insets(10, 12, 0, 0));
+        return root;
     }
 
     /**

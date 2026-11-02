@@ -61,6 +61,26 @@
     -fx-background-color: #F9FAFB;
 }
 
+.app-exit-button {
+    -fx-pref-width: 38px;
+    -fx-min-width: 38px;
+    -fx-max-width: 38px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-padding: 0;
+    -fx-background-color: #D92D20;
+    -fx-background-radius: 19px;
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.app-exit-button:hover {
+    -fx-background-color: #B42318;
+}
+
 /* ===================== TESTI E LINK GLOBALI ===================== */
 .hyperlink {
     -fx-font-size: 13px;
