@@ -45,88 +45,99 @@ public class MainLayoutController {
                 SessioneUtente.getUtenteCorrente() != null;
 
         aggiornaHeader(loggato);
-        suggerisciLocalita();
+        suggerisciLocalita(loggato);
     }
 
-    private void suggerisciLocalita() {
-        CompletableFuture.supplyAsync(() -> {
-            try {
-                HttpClient client = HttpClient.newHttpClient();
+    private void suggerisciLocalita(boolean loggato) {
 
-                // 1. Recupera le coordinate approssimative dell'IP
-                HttpRequest requestIp = HttpRequest.newBuilder()
-                        .uri(URI.create("https://ipwho.is/"))
-                        .GET()
-                        .build();
+        if(loggato){
+            String domicilio = SessioneUtente.getUtenteCorrente().domicilio();
 
-                HttpResponse<String> responseIp = client.send(
-                        requestIp,
-                        HttpResponse.BodyHandlers.ofString()
-                );
-
-                if (responseIp.statusCode() != 200) {
-                    return "";
-                }
-
-                String jsonIp = responseIp.body();
-
-                System.out.println("Risposta completa ipapi.co:");
-                System.out.println(jsonIp);
-
-                double lat = estraiCoordinata(jsonIp, "latitude");
-                double lon = estraiCoordinata(jsonIp, "longitude");
-
-                if (Double.isNaN(lat) || Double.isNaN(lon)) {
-                    return "";
-                }
-
-                System.out.println("Coordinate IP: " + lat + ", " + lon);
-
-                // 2. Cerca la città corrispondente alle coordinate
-                String url = String.format(
-                        java.util.Locale.US,
-                        "https://nominatim.openstreetmap.org/reverse"
-                                + "?format=jsonv2&lat=%.6f&lon=%.6f"
-                                + "&zoom=10&addressdetails=1"
-                                + "&accept-language=it",
-                        lat,
-                        lon
-                );
-
-                HttpRequest requestGeo = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .header("User-Agent", "TheKnifeB/1.0")
-                        .GET()
-                        .build();
-
-                HttpResponse<String> responseGeo = client.send(
-                        requestGeo,
-                        HttpResponse.BodyHandlers.ofString()
-                );
-
-                if (responseGeo.statusCode() == 200) {
-                    String jsonGeo = responseGeo.body();
-
-                    String citta = estraiCampoLocalita(jsonGeo);
-
-                    System.out.println("Località rilevata: " + citta);
-
-                    return citta;
-                }
-
-            } catch (Exception e) {
-                System.err.println(
-                        "Errore nella geolocalizzazione: "
-                                + e.getMessage()
-                );
+            if (domicilio != null && !domicilio.isBlank()) {
+                txtLocalita.setText(domicilio);
             }
 
-            return "";
-        }).thenAccept(citta -> Platform.runLater(() -> {
-            if (!citta.isBlank() && txtLocalita.getText().isBlank()) {
-                txtLocalita.setText(citta);
-            }
-        }));
+        }else{
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    HttpClient client = HttpClient.newHttpClient();
+
+                    // 1. Recupera le coordinate approssimative dell'IP
+                    HttpRequest requestIp = HttpRequest.newBuilder()
+                            .uri(URI.create("https://ipwho.is/"))
+                            .GET()
+                            .build();
+
+                    HttpResponse<String> responseIp = client.send(
+                            requestIp,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
+
+                    if (responseIp.statusCode() != 200) {
+                        return "";
+                    }
+
+                    String jsonIp = responseIp.body();
+
+                    System.out.println("Risposta completa ipapi.co:");
+                    System.out.println(jsonIp);
+
+                    double lat = estraiCoordinata(jsonIp, "latitude");
+                    double lon = estraiCoordinata(jsonIp, "longitude");
+
+                    if (Double.isNaN(lat) || Double.isNaN(lon)) {
+                        return "";
+                    }
+
+                    System.out.println("Coordinate IP: " + lat + ", " + lon);
+
+                    // 2. Cerca la città corrispondente alle coordinate
+                    String url = String.format(
+                            java.util.Locale.US,
+                            "https://nominatim.openstreetmap.org/reverse"
+                                    + "?format=jsonv2&lat=%.6f&lon=%.6f"
+                                    + "&zoom=10&addressdetails=1"
+                                    + "&accept-language=it",
+                            lat,
+                            lon
+                    );
+
+                    HttpRequest requestGeo = HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header("User-Agent", "TheKnifeB/1.0")
+                            .GET()
+                            .build();
+
+                    HttpResponse<String> responseGeo = client.send(
+                            requestGeo,
+                            HttpResponse.BodyHandlers.ofString()
+                    );
+
+                    if (responseGeo.statusCode() == 200) {
+                        String jsonGeo = responseGeo.body();
+
+                        String citta = estraiCampoLocalita(jsonGeo);
+
+                        System.out.println("Località rilevata: " + citta);
+
+                        return citta;
+                    }
+
+                } catch (Exception e) {
+                    System.err.println(
+                            "Errore nella geolocalizzazione: "
+                                    + e.getMessage()
+                    );
+                }
+
+                return "";
+            }).thenAccept(citta -> Platform.runLater(() -> {
+                if (!citta.isBlank() && txtLocalita.getText().isBlank()) {
+                    txtLocalita.setText(citta);
+                }
+            }));
+        }
+
     }
 
     private double estraiCoordinata(String json, String campo) {
