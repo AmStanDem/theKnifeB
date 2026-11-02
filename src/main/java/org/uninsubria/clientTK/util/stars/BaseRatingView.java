@@ -8,8 +8,13 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.SVGPath;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Superclasse base per il rendering statico delle stelle di valutazione.
+ * Superclasse base per il rendering delle stelle di valutazione.
+ * Le stelle vengono create UNA SOLA VOLTA; per aggiornare la grafica
+ * si cambia soltanto il riempimento (paintStars), senza ricreare i nodi.
  */
 public class BaseRatingView extends HBox {
 
@@ -21,22 +26,32 @@ public class BaseRatingView extends HBox {
     protected Color filledColor = Color.web("#66CC33");
     protected Color emptyColor = Color.web("#334d40");
 
+    protected final List<SVGPath> stars = new ArrayList<>();
+
     public BaseRatingView(int maxStarsIgnored, double initialRating) {
         this.rating = initialRating;
         setSpacing(6);
         setPadding(new Insets(5));
         setStyle("-fx-background-color: transparent;");
-        drawStars(rating);
+        buildStars();
+        paintStars(rating);
     }
 
-    protected void drawStars(double targetRating) {
-        getChildren().clear();
-        for (int i = 1; i <= maxStars; i++) {
+    private void buildStars() {
+        for (int i = 0; i < maxStars; i++) {
             SVGPath star = new SVGPath();
             star.setContent(STAR_SVG);
             star.setScaleX(1.2);
             star.setScaleY(1.2);
+            stars.add(star);
+            getChildren().add(star);
+        }
+    }
 
+    /** Aggiorna solo il colore delle stelle esistenti. */
+    protected void paintStars(double targetRating) {
+        for (int i = 1; i <= maxStars; i++) {
+            SVGPath star = stars.get(i - 1);
             if (i <= targetRating) {
                 star.setFill(filledColor);
             } else if (i - 0.5 == targetRating) {
@@ -44,7 +59,6 @@ public class BaseRatingView extends HBox {
             } else {
                 star.setFill(emptyColor);
             }
-            getChildren().add(star);
         }
     }
 
@@ -61,7 +75,7 @@ public class BaseRatingView extends HBox {
     public void setColors(Color filled, Color empty) {
         this.filledColor = filled;
         this.emptyColor = empty;
-        drawStars(rating);
+        paintStars(rating);
     }
 
     public double getRating() {
