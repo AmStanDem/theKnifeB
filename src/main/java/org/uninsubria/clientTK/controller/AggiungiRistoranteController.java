@@ -15,11 +15,11 @@ import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.uninsubria.clientTK.util.GeocodingService;
+import org.uninsubria.clientTK.util.LuogoInput;
 
 public class AggiungiRistoranteController {
 
@@ -27,7 +27,7 @@ public class AggiungiRistoranteController {
     private TextField txtNome;
 
     @FXML
-    private TextField txtIndirizzo;
+    private LuogoInput txtIndirizzo;
 
     @FXML
     private TextField txtCitta;
@@ -69,6 +69,13 @@ public class AggiungiRistoranteController {
                 );
 
         comboCucine.getItems().setAll(tipologieCucina);
+        txtIndirizzo.addTextFieldStyleClass("custom-text-field");
+        txtCitta.setEditable(false);
+        txtNazione.setEditable(false);
+        txtIndirizzo.setOnLuogoSelezionato(luogo -> {
+            txtCitta.setText(luogo.localita());
+            txtNazione.setText(luogo.nazione());
+        });
     }
 
     @FXML
@@ -120,43 +127,23 @@ public class AggiungiRistoranteController {
                     txtPrezzoMedio.getText().trim().replace(",", ".")
             );
 
-            // Recupera automaticamente le coordinate dall'indirizzo.
-            GeocodingService.Coordinate coordinate;
-
-            try {
-                coordinate = GeocodingService.ottieniCoordinate(
-                        indirizzo,
-                        citta,
-                        nazione
-                );
-
-            } catch (IOException | InterruptedException e) {
-
-                Thread.currentThread().interrupt();
-
-                mostraMessaggio(
-                        Alert.AlertType.ERROR,
-                        "Errore di geolocalizzazione",
-                        "Non è stato possibile recuperare le coordinate. "
-                                + "Controlla la connessione e riprova."
-                );
-
-                return;
-            }
-
-            if (coordinate == null) {
+            GeocodingService.Luogo luogoSelezionato =
+                    txtIndirizzo.getLuogoSelezionato();
+            if (luogoSelezionato == null
+                    || !luogoSelezionato.etichetta().equals(indirizzo)
+                    || !luogoSelezionato.localita().equalsIgnoreCase(citta)
+                    || !luogoSelezionato.nazione().equalsIgnoreCase(nazione)) {
                 mostraMessaggio(
                         Alert.AlertType.WARNING,
-                        "Indirizzo non trovato",
-                        "Non è stato possibile trovare l'indirizzo inserito. "
-                                + "Verifica indirizzo, città e nazione."
+                        "Indirizzo da verificare",
+                        "Seleziona un luogo valido dai suggerimenti. Città e nazione devono corrispondere al risultato scelto."
                 );
-
+                txtIndirizzo.requestFocus();
                 return;
             }
-
-            double latitudine = coordinate.latitudine();
-            double longitudine = coordinate.longitudine();
+            double latitudine = luogoSelezionato.latitudine();
+            double longitudine = luogoSelezionato.longitudine();
+            indirizzo = luogoSelezionato.indirizzo();
 
             // 4. Controllo dei valori inseriti.
             if (!Double.isFinite(prezzoMedio)

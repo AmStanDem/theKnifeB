@@ -7,6 +7,8 @@ import javafx.scene.input.MouseEvent;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.clientTK.util.LuogoInput;
+import org.uninsubria.clientTK.util.GeocodingService;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.enums.RuoloUtente;
 import org.uninsubria.common.exceptions.DatiMancantiException;
@@ -32,7 +34,7 @@ public class SignUpController {
     private DatePicker dataNascitaPicker;
 
     @FXML
-    private TextField indirizzo;
+    private LuogoInput indirizzo;
 
     @FXML
     private TextField emailField;
@@ -47,13 +49,18 @@ public class SignUpController {
     private Label labelErrore;
 
     @FXML
+    private void initialize() {
+        indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
+    }
+
+    @FXML
     private void handleRegistrati(ActionEvent event) {
         labelErrore.setText("");
         String nome = nomeField.getText();
         String cognome = cognomeField.getText();
         String ruolo = ruoloComboBox.getValue();
         LocalDate dataNascita = dataNascitaPicker.getValue();
-        String domicilio = indirizzo.getText();
+        String domicilio = indirizzo.getText().trim();
         String email = emailField.getText();
         String password = passwordField.getText();
         String confermaPassword = confermaPasswordField.getText();
@@ -61,6 +68,13 @@ public class SignUpController {
         if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
                 || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
             labelErrore.setText("Compila tutti i campi obbligatori!");
+            return;
+        }
+
+        GeocodingService.Luogo luogo = indirizzo.getLuogoSelezionato();
+        if (luogo == null || !luogo.etichetta().equals(domicilio.trim())) {
+            labelErrore.setText("Seleziona un domicilio valido dai suggerimenti.");
+            indirizzo.requestFocus();
             return;
         }
 

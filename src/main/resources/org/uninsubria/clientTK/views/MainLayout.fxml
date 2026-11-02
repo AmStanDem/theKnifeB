@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.clientTK.util.LuogoInput?>
 
 
 <BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/main-layout.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.MainLayoutController">
@@ -88,15 +89,8 @@
                     <HBox alignment="CENTER" spacing="10.0">
 
                         <!-- LOCALITÀ / GEOLOCALIZZAZIONE -->
-                        <HBox alignment="CENTER" spacing="0.0" styleClass="location-container">
-
-                            <!-- DOVE -->
-                            <TextField fx:id="txtLocalita" prefHeight="65.0" prefWidth="260.0" promptText="Dove?" styleClass="location-field" />
-
-                            <!-- GEOLOCALIZZAZIONE -->
-                            <Button fx:id="btnGeolocalizzazione" mnemonicParsing="false" onAction="#onGeolocalizzazioneClick" prefHeight="65.0" prefWidth="65.0" styleClass="location-button" text="📍" />
-
-                        </HBox>
+                        <LuogoInput fx:id="txtLocalita" prefHeight="65.0" prefWidth="335.0"
+                                    promptText="Dove? Cerca una città o un indirizzo" />
 
                         <!-- RICERCA RISTORANTE -->
                         <TextField fx:id="txtRicerca" prefHeight="65.0" prefWidth="400.0" promptText="Cerca un ristorante..." styleClass="search-field" />

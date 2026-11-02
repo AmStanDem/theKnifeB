@@ -28,8 +28,16 @@ public class RistoranteService {
                 ristorante.indirizzo() == null || ristorante.indirizzo().trim().isEmpty() ||
                 ristorante.citta() == null || ristorante.citta().trim().isEmpty() ||
                 ristorante.nazione() == null || ristorante.nazione().trim().isEmpty() ||
-                ristorante.prezzoMedio() == null || ristorante.prezzoMedio() < 0.0) {
+                ristorante.prezzoMedio() == null || !Double.isFinite(ristorante.prezzoMedio())
+                || ristorante.prezzoMedio() < 0.0) {
             throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
+        }
+
+        if (ristorante.latitudine() == null || !Double.isFinite(ristorante.latitudine())
+                || ristorante.latitudine() < -90 || ristorante.latitudine() > 90
+                || ristorante.longitudine() == null || !Double.isFinite(ristorante.longitudine())
+                || ristorante.longitudine() < -180 || ristorante.longitudine() > 180) {
+            throw new DatiMancantiException("Seleziona un luogo valido con coordinate geografiche corrette.");
         }
 
         // Validazione della relazione Molti-a-Molti introdotta

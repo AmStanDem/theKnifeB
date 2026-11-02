@@ -81,6 +81,31 @@
     -fx-background-color: #B42318;
 }
 
+.location-input-field {
+    -fx-background-color: white;
+    -fx-background-radius: 6px 0 0 6px;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 6px 0 0 6px;
+    -fx-padding: 8px 12px;
+}
+
+.location-input-map-button {
+    -fx-min-width: 42px;
+    -fx-pref-width: 42px;
+    -fx-min-height: 40px;
+    -fx-background-color: #218838;
+    -fx-background-radius: 0 6px 6px 0;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.location-input-map-button:hover {
+    -fx-background-color: #176b2a;
+}
+
 /* ===================== TESTI E LINK GLOBALI ===================== */
 .hyperlink {
     -fx-font-size: 13px;

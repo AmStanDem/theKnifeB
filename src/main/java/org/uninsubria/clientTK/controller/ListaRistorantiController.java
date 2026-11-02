@@ -15,6 +15,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.uninsubria.clientTK.util.RicercaSessione;
 import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.RicercaIniziale;
 import org.uninsubria.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
@@ -53,10 +54,18 @@ public class ListaRistorantiController {
     private boolean hasMore;
     private boolean caricamentoInCorso;
     private boolean tipologieCaricate;
+    private Double latitudineRicerca;
+    private Double longitudineRicerca;
 
     @FXML
     public void initialize() {
         System.out.println("[DEBUG] Inizializzazione ListaRistorantiController...");
+        RicercaIniziale.Criteri criteri = RicercaIniziale.consuma();
+        if (criteri != null) {
+            searchField.setText(criteri.testo() == null ? "" : criteri.testo());
+            latitudineRicerca = criteri.latitudine();
+            longitudineRicerca = criteri.longitudine();
+        }
         configuraFiltriFissi();
         searchDebounce = new PauseTransition(javafx.util.Duration.millis(350));
         searchDebounce.setOnFinished(event -> caricaPagina(true));
@@ -195,7 +204,10 @@ public class ListaRistorantiController {
                 prezzoMax,
                 valutazioneMinima,
                 offset,
-                PAGE_SIZE
+                PAGE_SIZE,
+                latitudineRicerca,
+                longitudineRicerca,
+                latitudineRicerca == null ? null : RicercaIniziale.RAGGIO_RICERCA_KM
         );
     }
 

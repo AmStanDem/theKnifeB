@@ -76,18 +76,24 @@ public class SceneManager {
                 Scene scene = new Scene(applicationRoot);
                 applyCssIfAvailable(scene);
                 stage.setScene(scene);
+                stage.sizeToScene();
             }
 
             stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
             stage.setFullScreenExitHint("");
-            stage.setFullScreen(true);
+            Platform.runLater(() -> {
+                if (stage.isShowing()) {
+                    stage.setFullScreen(true);
+                }
+            });
 
             return loader.getController();
 
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento del file FXML: " + fxmlPath);
-            e.printStackTrace();
-            return null;
+            throw new IllegalStateException(
+                    "Impossibile caricare la schermata FXML: " + fxmlPath,
+                    e
+            );
         }
     }
 

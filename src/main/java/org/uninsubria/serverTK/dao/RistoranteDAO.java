@@ -240,6 +240,17 @@ public class RistoranteDAO {
             parametri.add(testo);
         }
 
+        if (richiesta.latitudineRiferimento() != null) {
+            sql.append(" AND (6371.0 * acos(GREATEST(-1.0::double precision, LEAST(1.0::double precision, ")
+                    .append("cos(radians(?)) * cos(radians(r.latitudine)) * ")
+                    .append("cos(radians(r.longitudine) - radians(?)) + ")
+                    .append("sin(radians(?)) * sin(radians(r.latitudine)))))) <= ?");
+            parametri.add(richiesta.latitudineRiferimento());
+            parametri.add(richiesta.longitudineRiferimento());
+            parametri.add(richiesta.latitudineRiferimento());
+            parametri.add(richiesta.raggioKm());
+        }
+
         if (!richiesta.tipologieCucina().isEmpty()) {
             String placeholders = String.join(", ", java.util.Collections.nCopies(
                     richiesta.tipologieCucina().size(), "LOWER(?)"));
@@ -267,7 +278,18 @@ public class RistoranteDAO {
             sql.append(" HAVING COALESCE(AVG(rec_stat.valutazione), 0.0) >= ?");
             parametri.add(richiesta.mediaStelleMinima());
         }
-        sql.append(" ORDER BY r.nome ASC LIMIT ? OFFSET ?");
+        if (richiesta.latitudineRiferimento() != null) {
+            sql.append(" ORDER BY (6371.0 * acos(GREATEST(-1.0::double precision, LEAST(1.0::double precision, ")
+                    .append("cos(radians(?)) * cos(radians(r.latitudine)) * ")
+                    .append("cos(radians(r.longitudine) - radians(?)) + ")
+                    .append("sin(radians(?)) * sin(radians(r.latitudine)))))) ASC, r.nome ASC");
+            parametri.add(richiesta.latitudineRiferimento());
+            parametri.add(richiesta.longitudineRiferimento());
+            parametri.add(richiesta.latitudineRiferimento());
+        } else {
+            sql.append(" ORDER BY r.nome ASC");
+        }
+        sql.append(" LIMIT ? OFFSET ?");
         parametri.add(richiesta.limite() + 1);
         parametri.add(richiesta.offset());
 
