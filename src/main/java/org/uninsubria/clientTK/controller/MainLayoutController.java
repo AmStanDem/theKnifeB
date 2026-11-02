@@ -31,9 +31,19 @@ public class MainLayoutController {
     public void initialize() {
         boolean loggato = SessioneUtente.getUtenteCorrente() != null;
         aggiornaHeader(loggato);
+
+        if(loggato) {
+            String domicilio = SessioneUtente.getUtenteCorrente().domicilio();
+            if (domicilio != null && !domicilio.isBlank()) {
+                txtLocalita.setText(domicilio);
+            }
+        }
+
         txtLocalita.setTextFieldPrefHeight(65);
         txtLocalita.setMapButtonPrefWidth(65);
     }
+
+
 
     private void aggiornaHeader(boolean loggato) {
         btnAccediRegistrati.setVisible(!loggato);
