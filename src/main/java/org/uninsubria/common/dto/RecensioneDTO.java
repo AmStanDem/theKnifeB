@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record RecensioneDTO(
         Integer idRecensione,
-        Integer valutazione,
+        Double valutazione,
         String testo,
         String nomeAutore,         // Denormalizzato dalla tabella Utenti
         LocalDateTime dataCreazione,
@@ -18,7 +18,7 @@ public record RecensioneDTO(
 
     public RecensioneDTO(
             Integer idRecensione,
-            Integer valutazione,
+            Double valutazione,
             String testo,
             String nomeAutore,
             LocalDateTime dataCreazione,

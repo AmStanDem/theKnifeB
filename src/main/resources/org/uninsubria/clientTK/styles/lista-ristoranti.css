@@ -19,6 +19,21 @@
     -fx-text-fill: #1F2937;
 }
 
+.title-bar {
+    -fx-alignment: center-left;
+}
+
+.home-button {
+    -fx-background-color: transparent;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+}
+
+.home-button:hover {
+    -fx-background-color: #F3F4F6;
+    -fx-background-radius: 20;
+}
+
 /* ---------- SEARCH BAR ---------- */
 .search-bar {
     -fx-background-color: #FFFFFF;

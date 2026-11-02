@@ -312,13 +312,17 @@ public class AreaRistoranteController {
 
     private void aggiornaDistribuzioneRecensioni(List<RecensioneDTO> recensioni) {
 
-        int[] conteggi = new int[6];
+        double[] conteggi = new double[6];
 
         for (RecensioneDTO recensione : recensioni) {
-            int valutazione = recensione.valutazione();
-
+            double valutazione = recensione.valutazione();
             if (valutazione >= 1 && valutazione <= 5) {
-                conteggi[valutazione]++;
+                int stellaInferiore = (int) Math.floor(valutazione);
+                double frazione = valutazione - stellaInferiore;
+                conteggi[stellaInferiore] += 1 - frazione;
+                if (frazione > 0 && stellaInferiore < 5) {
+                    conteggi[stellaInferiore + 1] += frazione;
+                }
             }
         }
 

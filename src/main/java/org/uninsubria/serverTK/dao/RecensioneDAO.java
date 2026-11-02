@@ -28,7 +28,7 @@ public class RecensioneDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idCliente);
             stmt.setInt(2, idRistorante);
-            stmt.setInt(3, r.valutazione());
+            stmt.setDouble(3, r.valutazione());
             stmt.setString(4, r.testo());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -61,7 +61,7 @@ public class RecensioneDAO {
 
                     lista.add(new RecensioneDTO(
                             rs.getInt("id_recensione"),
-                            rs.getInt("valutazione"),
+                            rs.getDouble("valutazione"),
                             rs.getString("testo"),
                             rs.getString("nome_autore"),
                             dataCreazione,
@@ -95,7 +95,7 @@ public class RecensioneDAO {
                     LocalDateTime dataCreazione = timestamp != null ? timestamp.toLocalDateTime() : null;
                     lista.add(new RecensioneDTO(
                             rs.getInt("id_recensione"),
-                            rs.getInt("valutazione"),
+                            rs.getDouble("valutazione"),
                             rs.getString("testo"),
                             rs.getString("nome_autore"),
                             dataCreazione,
@@ -109,14 +109,15 @@ public class RecensioneDAO {
         return lista;
     }
 
-    public boolean modificaRecensione(int idRecensione, int idCliente, String nuovoTesto, int nuoveStelle)
+    public boolean modificaRecensione(
+            int idRecensione, int idCliente, String nuovoTesto, double nuoveStelle)
             throws SQLException {
         String sql = "UPDATE Recensioni SET valutazione = ?, testo = ?, data_modifica = CURRENT_TIMESTAMP " +
                 "WHERE id_recensione = ? AND id_utente = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, nuoveStelle);
+            stmt.setDouble(1, nuoveStelle);
             stmt.setString(2, nuovoTesto);
             stmt.setInt(3, idRecensione);
             stmt.setInt(4, idCliente);

@@ -134,7 +134,7 @@ public class ScriviRecensioneController {
         }
 
         String testo = txtRecensione.getText();
-        int stelle = (int) Math.round(ratingRecensione.getRating());
+        double stelle = ratingRecensione.getRating();
         if (testo == null || testo.isBlank() || stelle < 1 || stelle > 5) {
             mostraMessaggio(Alert.AlertType.WARNING, "Dati incompleti",
                     "Inserisci il testo e assegna da 1 a 5 stelle.");

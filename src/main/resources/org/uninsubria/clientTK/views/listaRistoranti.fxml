@@ -6,6 +6,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -25,7 +27,21 @@
                 <Insets top="24" right="32" bottom="16" left="32"/>
             </padding>
 
-            <Label text="Trova il tuo ristorante" styleClass="page-title"/>
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="title-bar">
+                <Label text="Trova il tuo ristorante" styleClass="page-title" HBox.hgrow="ALWAYS"/>
+                <Button mnemonicParsing="false"
+                        onAction="#onHomeClick"
+                        styleClass="home-button"
+                        accessibleText="Torna alla home">
+                    <graphic>
+                        <ImageView fitHeight="32" fitWidth="32" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../../images/home.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
 
             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="search-bar">
                 <TextField fx:id="searchField"

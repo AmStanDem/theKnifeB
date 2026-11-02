@@ -69,7 +69,7 @@ public class RecensioneService {
 
         if (recensione == null ||
                 recensione.testo() == null || recensione.testo().trim().isEmpty() ||
-                recensione.valutazione() == null || recensione.valutazione() < 1 || recensione.valutazione() > 5 ||
+                !valutazioneValida(recensione.valutazione()) ||
                 idRistorante == null || idUtente == null) {
             throw new DatiMancantiException("Ristorante, utente, testo e valutazione da 1 a 5 sono obbligatori.");
         }
@@ -94,15 +94,16 @@ public class RecensioneService {
         }
     }
 
-    public void modifica(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle)
+    public void modifica(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
             throws DatiMancantiException, RecensioneNonTrovataException,
             OperazioneNonConsentitaException, SistemaIndisponibileException {
 
         if (nuovoTesto == null || nuovoTesto.trim().isEmpty()) {
             throw new DatiMancantiException("Il testo della recensione non può essere vuoto.");
         }
-        if (nuoveStelle == null || nuoveStelle < 1 || nuoveStelle > 5) {
-            throw new OperazioneNonConsentitaException("La valutazione deve essere compresa tra 1 e 5.");
+        if (!valutazioneValida(nuoveStelle)) {
+            throw new OperazioneNonConsentitaException(
+                    "La valutazione deve essere compresa tra 1 e 5, anche con mezze stelle.");
         }
 
         try {
@@ -115,6 +116,14 @@ public class RecensioneService {
             System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
         }
+    }
+
+    private boolean valutazioneValida(Double valutazione) {
+        return valutazione != null
+                && Double.isFinite(valutazione)
+                && valutazione >= 1
+                && valutazione <= 5
+                && Math.abs(valutazione * 2 - Math.rint(valutazione * 2)) < 1e-9;
     }
 
     public void elimina(Integer idRecensione, Integer idUtente)

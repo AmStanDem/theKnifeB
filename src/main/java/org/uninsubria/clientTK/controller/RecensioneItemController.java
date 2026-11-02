@@ -127,7 +127,7 @@ public class RecensioneItemController {
             String nomeAutore,
             boolean isLocalGuide,
             String data,
-            int valutazione,
+            double valutazione,
             String testoRecensione,
             String testoRisposta) {
 
@@ -160,7 +160,7 @@ public class RecensioneItemController {
         timeLabel.setText(data != null ? data : "");
     }
 
-    public void setValutazione(int stelle) {
+    public void setValutazione(double stelle) {
         stelle = Math.max(0, Math.min(5, stelle));
         ratingControl.setRating(stelle);
     }

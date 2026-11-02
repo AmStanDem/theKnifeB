@@ -88,7 +88,7 @@ public class TheKnifeServerImpl implements ITheKnifeServer {
     }
 
     @Override
-    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle)
+    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
             throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
         recensioneService.modifica(idRecensione, idUtente, nuovoTesto, nuoveStelle);
     }

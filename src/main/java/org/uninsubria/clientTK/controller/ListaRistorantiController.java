@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -13,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.RicercaSessione;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.RicercaIniziale;
@@ -327,6 +329,11 @@ public class ListaRistorantiController {
     @FXML
     private void onLoadMore() {
         caricaPagina(false);
+    }
+
+    @FXML
+    private void onHomeClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     private void aggiornaLista(boolean nuovaRicerca, int offset) {

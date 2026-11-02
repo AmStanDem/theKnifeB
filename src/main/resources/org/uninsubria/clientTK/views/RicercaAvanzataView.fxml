@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -16,6 +15,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 <?import org.controlsfx.control.RangeSlider?>
+<?import org.uninsubria.clientTK.util.LuogoInput?>
 <?import org.uninsubria.clientTK.util.stars.RatingContainer?>
 
 <!--
@@ -71,9 +71,10 @@
                             <!-- Località (obbligatorio) -->
                             <VBox spacing="6" styleClass="field-group">
                                 <Label text="Località *" styleClass="field-label"/>
-                                <TextField fx:id="txtLocalita"
-                                           promptText="Es. Milano, Via Roma 12, oppure CAP"
-                                           styleClass="field-input"/>
+                                <LuogoInput fx:id="txtLocalita"
+                                            prefHeight="40"
+                                            promptText="Es. Milano, Via Roma 12, oppure CAP"
+                                            styleClass="field-input"/>
                                 <Label text="Campo obbligatorio" styleClass="field-hint"/>
                             </VBox>
 
