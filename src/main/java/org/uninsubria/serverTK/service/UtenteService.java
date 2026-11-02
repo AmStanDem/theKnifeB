@@ -9,6 +9,8 @@ import org.uninsubria.common.exceptions.UtenteGiaEsistenteException;
 import org.uninsubria.serverTK.dao.UtenteDAO;
 import org.uninsubria.serverTK.dao.UtenteDAO.UtenteConHash;
 
+import java.sql.SQLException;
+
 public class UtenteService {
 
     private final UtenteDAO utenteDAO = new UtenteDAO();
@@ -23,7 +25,13 @@ public class UtenteService {
             throw new CredenzialiErrateException();
         }
 
-        UtenteConHash authData = utenteDAO.trovaPerEmail(email);
+        UtenteConHash authData;
+        try {
+            authData = utenteDAO.trovaPerEmail(email);
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore durante la ricerca dell'utente per email: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
 
         if (authData == null) {
             throw new CredenzialiErrateException();
@@ -52,19 +60,30 @@ public class UtenteService {
             throw new DatiMancantiException("Tutti i campi (incluso il domicilio) sono obbligatori per la registrazione.");
         }
 
-        if (utenteDAO.trovaPerEmail(nuovoUtente.email()) != null) {
-            throw new UtenteGiaEsistenteException("Esiste già un account associato a questa email.");
-        }
-
         // Generazione dell'hash sicuro con BCrypt
         String hashSicuro = BCrypt.hashpw(passwordInChiaro, BCrypt.gensalt(BCRYPT_WORK_FACTOR));
 
-        boolean successo = utenteDAO.inserisciUtente(nuovoUtente, hashSicuro);
-
-        if (!successo) {
-            throw new SistemaIndisponibileException();
+        boolean successo;
+        try {
+            successo = utenteDAO.inserisciUtente(nuovoUtente, hashSicuro);
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore durante l'inserimento dell'utente: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
 
-        return utenteDAO.trovaPerEmail(nuovoUtente.email()).utente();
+        if (!successo) {
+            throw new UtenteGiaEsistenteException("Esiste già un account associato a questa email.");
+        }
+
+        try {
+            UtenteConHash registrato = utenteDAO.trovaPerEmail(nuovoUtente.email());
+            if (registrato == null) {
+                throw new SistemaIndisponibileException();
+            }
+            return registrato.utente();
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore durante il recupero dell'utente registrato: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
     }
 }

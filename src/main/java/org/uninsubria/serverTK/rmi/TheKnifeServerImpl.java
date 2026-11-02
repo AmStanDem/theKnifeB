@@ -6,19 +6,14 @@ import org.uninsubria.common.exceptions.*;
 import org.uninsubria.serverTK.service.*;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnifeServer {
+public class TheKnifeServerImpl implements ITheKnifeServer {
 
     private final UtenteService utenteService = new UtenteService();
     private final RistoranteService ristoranteService = new RistoranteService();
     private final RecensioneService recensioneService = new RecensioneService();
     private final PreferitiService preferitiService = new PreferitiService();
-
-    public TheKnifeServerImpl() throws RemoteException {
-        super();
-    }
 
     @Override
     public UtenteDTO eseguiLogin(String email, String password)
@@ -34,12 +29,19 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
 
     @Override
     public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
-            throws RemoteException {
+            throws RemoteException, SistemaIndisponibileException {
         return ristoranteService.cercaRistoranti(filtri);
     }
 
     @Override
-    public List<String> ottieniTutteTipologieCucina() throws RemoteException {
+    public PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+            throws RemoteException, SistemaIndisponibileException {
+        return ristoranteService.cercaRistorantiPagina(richiesta);
+    }
+
+    @Override
+    public List<String> ottieniTutteTipologieCucina()
+            throws RemoteException, SistemaIndisponibileException {
         return ristoranteService.ottieniTutteTipologieCucina();
     }
 

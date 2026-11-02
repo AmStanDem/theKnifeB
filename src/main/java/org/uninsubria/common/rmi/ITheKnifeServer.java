@@ -23,7 +23,11 @@ public interface ITheKnifeServer extends Remote {
     List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
             throws RemoteException, SistemaIndisponibileException;
 
-    List<String> ottieniTutteTipologieCucina() throws RemoteException;
+    PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+            throws RemoteException, SistemaIndisponibileException;
+
+    List<String> ottieniTutteTipologieCucina()
+            throws RemoteException, SistemaIndisponibileException;
 
     RistoranteDTO getDettaglioRistorante(Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException;

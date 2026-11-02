@@ -1,6 +1,8 @@
 package org.uninsubria.serverTK.dao;
 
 import org.uninsubria.common.dto.FiltriRicercaDTO;
+import org.uninsubria.common.dto.PaginaRistorantiDTO;
+import org.uninsubria.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.serverTK.config.DatabaseConfig;
 
@@ -11,7 +13,7 @@ import java.util.List;
 
 public class RistoranteDAO {
 
-    public boolean inserisciRistorante(RistoranteDTO r, int idGestore) {
+    public boolean inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlTipologiaCheck = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO NOTHING";
@@ -85,18 +87,17 @@ public class RistoranteDAO {
                 return true;
 
             } catch (SQLException ex) {
-                conn.rollback();
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    ex.addSuppressed(rollbackError);
+                }
                 throw ex;
-            } finally {
-                conn.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore inserimento ristorante: " + e.getMessage());
-            return false;
         }
     }
 
-    public RistoranteDTO trovaPerId(int idRistorante) {
+    public RistoranteDTO trovaPerId(int idRistorante) throws SQLException {
         String sql = costruisciQueryBase() + " WHERE r.id_ristorante = ? GROUP BY r.id_ristorante";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -104,13 +105,11 @@ public class RistoranteDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return mappaResultSetRistorante(rs);
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore ricerca ristorante per ID: " + e.getMessage());
         }
         return null;
     }
 
-    public List<RistoranteDTO> trovaPerGestore(int idGestore) {
+    public List<RistoranteDTO> trovaPerGestore(int idGestore) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
         String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? GROUP BY r.id_ristorante ORDER BY r.nome ASC";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -119,13 +118,11 @@ public class RistoranteDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) lista.add(mappaResultSetRistorante(rs));
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore ricerca ristoranti del gestore: " + e.getMessage());
         }
         return lista;
     }
 
-    public List<RistoranteDTO> cercaConFiltri(FiltriRicercaDTO filtri) {
+    public List<RistoranteDTO> cercaConFiltri(FiltriRicercaDTO filtri) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
         StringBuilder sql = new StringBuilder(costruisciQueryBase() + " WHERE 1=1");
         List<Object> parametri = new ArrayList<>();
@@ -217,10 +214,75 @@ public class RistoranteDAO {
                     lista.add(mappaResultSetRistorante(rs));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore ricerca filtrata: " + e.getMessage());
         }
         return lista;
+    }
+
+    public PaginaRistorantiDTO cercaPagina(RicercaRistorantiPaginaDTO richiesta) throws SQLException {
+        List<Object> parametri = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(costruisciQueryBase()).append(" WHERE 1=1");
+
+        if (richiesta.testo() != null && !richiesta.testo().isBlank()) {
+            String testo = "%" + richiesta.testo().trim().toLowerCase() + "%";
+            sql.append(" AND (LOWER(r.nome) LIKE ? OR LOWER(r.indirizzo) LIKE ? OR LOWER(r.citta) LIKE ?")
+                    .append(" OR EXISTS (SELECT 1 FROM Ristoranti_Tipologie rt_q ")
+                    .append("JOIN Tipologia_Cucina tc_q ON tc_q.id_tipologia = rt_q.id_tipologia ")
+                    .append("WHERE rt_q.id_ristorante = r.id_ristorante AND LOWER(tc_q.nome) LIKE ?))");
+            parametri.add(testo);
+            parametri.add(testo);
+            parametri.add(testo);
+            parametri.add(testo);
+        }
+
+        if (!richiesta.tipologieCucina().isEmpty()) {
+            String placeholders = String.join(", ", java.util.Collections.nCopies(
+                    richiesta.tipologieCucina().size(), "LOWER(?)"));
+            sql.append(" AND EXISTS (SELECT 1 FROM Ristoranti_Tipologie rt_f ")
+                    .append("JOIN Tipologia_Cucina tc_f ON tc_f.id_tipologia = rt_f.id_tipologia ")
+                    .append("WHERE rt_f.id_ristorante = r.id_ristorante ")
+                    .append("AND LOWER(tc_f.nome) IN (").append(placeholders).append("))");
+            richiesta.tipologieCucina().stream()
+                    .map(String::trim)
+                    .map(String::toLowerCase)
+                    .forEach(parametri::add);
+        }
+
+        if (richiesta.prezzoMin() != null) {
+            sql.append(" AND r.prezzo_medio >= ?");
+            parametri.add(richiesta.prezzoMin());
+        }
+        if (richiesta.prezzoMax() != null) {
+            sql.append(" AND r.prezzo_medio <= ?");
+            parametri.add(richiesta.prezzoMax());
+        }
+
+        sql.append(" GROUP BY r.id_ristorante");
+        if (richiesta.mediaStelleMinima() != null) {
+            sql.append(" HAVING COALESCE(AVG(rec_stat.valutazione), 0.0) >= ?");
+            parametri.add(richiesta.mediaStelleMinima());
+        }
+        sql.append(" ORDER BY r.nome ASC LIMIT ? OFFSET ?");
+        parametri.add(richiesta.limite() + 1);
+        parametri.add(richiesta.offset());
+
+        List<RistoranteDTO> risultati = new ArrayList<>(richiesta.limite() + 1);
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < parametri.size(); i++) {
+                stmt.setObject(i + 1, parametri.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    risultati.add(mappaResultSetRistorante(rs));
+                }
+            }
+        }
+
+        boolean hasMore = risultati.size() > richiesta.limite();
+        if (hasMore) {
+            risultati.remove(risultati.size() - 1);
+        }
+        return new PaginaRistorantiDTO(risultati, hasMore);
     }
 
     private String costruisciQueryBase() {
@@ -235,7 +297,7 @@ public class RistoranteDAO {
                 "LEFT JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia";
     }
 
-    public List<String> ottieniTutteTipologieCucina() {
+    public List<String> ottieniTutteTipologieCucina() throws SQLException {
         List<String> tipologie = new ArrayList<>();
         String sql = "SELECT DISTINCT nome FROM Tipologia_Cucina ORDER BY nome";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -244,8 +306,6 @@ public class RistoranteDAO {
             while (rs.next()) {
                 tipologie.add(rs.getString("nome"));
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore caricamento tipologie cucina: " + e.getMessage());
         }
         return tipologie;
     }

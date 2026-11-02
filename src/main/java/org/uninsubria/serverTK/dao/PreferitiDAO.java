@@ -10,7 +10,7 @@ import java.util.List;
 
 public class PreferitiDAO {
 
-    public boolean aggiungiPreferito(int idUtente, int idRistorante) {
+    public boolean aggiungiPreferito(int idUtente, int idRistorante) throws SQLException {
         String sql = "INSERT INTO Preferiti (id_utente, id_ristorante) VALUES (?, ?) ON CONFLICT DO NOTHING";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -18,13 +18,10 @@ public class PreferitiDAO {
             stmt.setInt(1, idUtente);
             stmt.setInt(2, idRistorante);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore aggiunta preferito: " + e.getMessage());
-            return false;
         }
     }
 
-    public boolean rimuoviPreferito(int idUtente, int idRistorante) {
+    public boolean rimuoviPreferito(int idUtente, int idRistorante) throws SQLException {
         String sql = "DELETE FROM Preferiti WHERE id_utente = ? AND id_ristorante = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -32,13 +29,10 @@ public class PreferitiDAO {
             stmt.setInt(1, idUtente);
             stmt.setInt(2, idRistorante);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore rimozione preferito: " + e.getMessage());
-            return false;
         }
     }
 
-    public List<RistoranteDTO> ottieniPreferitiUtente(int idUtente) {
+    public List<RistoranteDTO> ottieniPreferitiUtente(int idUtente) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
 
         String sql = "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, " +
@@ -81,8 +75,6 @@ public class PreferitiDAO {
                     ));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore recupero lista preferiti: " + e.getMessage());
         }
         return lista;
     }

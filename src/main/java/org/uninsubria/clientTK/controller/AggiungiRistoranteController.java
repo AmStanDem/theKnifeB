@@ -74,6 +74,7 @@ public class AggiungiRistoranteController {
     @FXML
     public void onSalvaClick(ActionEvent event) {
 
+
         // 1. Verifica che tutti i campi obbligatori siano compilati.
         if (txtNome.getText().trim().isEmpty()
                 || txtIndirizzo.getText().trim().isEmpty()

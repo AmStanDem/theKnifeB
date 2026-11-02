@@ -21,7 +21,7 @@ public class RecensioneDAO {
         }
     }
 
-    public boolean inserisciRecensione(int idCliente, int idRistorante, RecensioneDTO r) {
+    public boolean inserisciRecensione(int idCliente, int idRistorante, RecensioneDTO r) throws SQLException {
         String sql = "INSERT INTO Recensioni (id_utente, id_ristorante, valutazione, testo) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -32,12 +32,14 @@ public class RecensioneDAO {
             stmt.setString(4, r.testo());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore inserimento recensione: " + e.getMessage());
-            return false;
+            if ("23505".equals(e.getSQLState())) {
+                return false;
+            }
+            throw e;
         }
     }
 
-    public List<RecensioneDTO> trovaPerRistorante(int idRistorante) {
+    public List<RecensioneDTO> trovaPerRistorante(int idRistorante) throws SQLException {
         List<RecensioneDTO> lista = new ArrayList<>();
         String sql = "SELECT rec.*, u.nome as nome_autore, resp.testo as risposta_gestore, r.nome AS nome_ristorante " +
                 "FROM Recensioni rec " +
@@ -69,8 +71,6 @@ public class RecensioneDAO {
                     ));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore recupero recensioni: " + e.getMessage());
         }
         return lista;
     }
@@ -109,7 +109,8 @@ public class RecensioneDAO {
         return lista;
     }
 
-    public boolean modificaRecensione(int idRecensione, int idCliente, String nuovoTesto, int nuoveStelle) {
+    public boolean modificaRecensione(int idRecensione, int idCliente, String nuovoTesto, int nuoveStelle)
+            throws SQLException {
         String sql = "UPDATE Recensioni SET valutazione = ?, testo = ?, data_modifica = CURRENT_TIMESTAMP " +
                 "WHERE id_recensione = ? AND id_utente = ?";
 
@@ -120,13 +121,10 @@ public class RecensioneDAO {
             stmt.setInt(3, idRecensione);
             stmt.setInt(4, idCliente);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
-            return false;
         }
     }
 
-    public boolean eliminaRecensione(int idRecensione, int idCliente) {
+    public boolean eliminaRecensione(int idRecensione, int idCliente) throws SQLException {
         String sql = "DELETE FROM Recensioni WHERE id_recensione = ? AND id_utente = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -134,9 +132,6 @@ public class RecensioneDAO {
             stmt.setInt(1, idRecensione);
             stmt.setInt(2, idCliente);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore eliminazione recensione: " + e.getMessage());
-            return false;
         }
     }
 

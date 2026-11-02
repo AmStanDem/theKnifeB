@@ -85,6 +85,12 @@
                           styleClass="restaurant-container"/>
                 </content>
             </ScrollPane>
+            <Button fx:id="loadMoreButton"
+                    text="Carica altri ristoranti"
+                    styleClass="secondary-button"
+                    onAction="#onLoadMore"
+                    visible="false"
+                    managed="false"/>
         </VBox>
     </center>
 

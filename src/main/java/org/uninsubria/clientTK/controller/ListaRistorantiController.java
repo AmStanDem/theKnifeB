@@ -1,6 +1,7 @@
 package org.uninsubria.clientTK.controller;
 
 import javafx.application.Platform;
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,13 +13,16 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import org.uninsubria.common.dto.FiltriRicercaDTO;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.common.dto.PaginaRistorantiDTO;
+import org.uninsubria.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.common.rmi.ITheKnifeServer;
 
 import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.*;
 
 public class ListaRistorantiController {
@@ -34,36 +38,30 @@ public class ListaRistorantiController {
     @FXML private Label resultsCountLabel;
     @FXML private ScrollPane restaurantScrollPane;
     @FXML private VBox restaurantContainer;
+    @FXML private Button loadMoreButton;
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
     private final Set<String> selectedCuisines = new HashSet<>();
     private final List<CheckBox> cuisineCheckBoxes = new ArrayList<>();
-
-    private ITheKnifeServer serverRMI;
+    private static final int PAGE_SIZE = 20;
 
     private static final String TUTTI_PREZZI = "Tutti i prezzi";
     private static final String TUTTI_RATING = "Tutti i rating";
+    private PauseTransition searchDebounce;
+    private long requestGeneration;
+    private boolean hasMore;
+    private boolean caricamentoInCorso;
+    private boolean tipologieCaricate;
 
     @FXML
     public void initialize() {
         System.out.println("[DEBUG] Inizializzazione ListaRistorantiController...");
         configuraFiltriFissi();
-        connettiAlServer();
+        searchDebounce = new PauseTransition(javafx.util.Duration.millis(350));
+        searchDebounce.setOnFinished(event -> caricaPagina(true));
         caricaDatiDalServer();
 
-        // Filtro real-time mentre si scrive nella casella principale
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> applicaFiltri());
-    }
-
-    private void connettiAlServer() {
-        try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            serverRMI = (ITheKnifeServer) registry.lookup("TheKnifeServer");
-            System.out.println("[DEBUG] Connessione RMI stabilita con successo.");
-        } catch (Exception e) {
-            System.err.println("[DEBUG_ERROR] Connessione fallita: " + e.getMessage());
-            mostraErrore("Connessione fallita", "Impossibile collegarsi al server.");
-        }
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> searchDebounce.playFromStart());
     }
 
     private void configuraFiltriFissi() {
@@ -87,65 +85,105 @@ public class ListaRistorantiController {
     }
 
     private void caricaDatiDalServer() {
-        if (serverRMI == null) return;
+        caricaPagina(true);
+    }
 
-        new Thread(() -> {
-            List<RistoranteDTO> datiScaricati = null;
+    private void caricaPagina(boolean nuovaRicerca) {
+        if (caricamentoInCorso && !nuovaRicerca) {
+            return;
+        }
 
-            // 1. Recupero dei ristoranti con fallback di sicurezza
+        if (nuovaRicerca) {
+            requestGeneration++;
+        }
+
+        long generation = requestGeneration;
+        int offset = nuovaRicerca ? 0 : ristorantiCompleti.size();
+        RicercaRistorantiPaginaDTO richiesta = creaRichiesta(offset);
+        boolean caricaTipologie = !tipologieCaricate;
+        caricamentoInCorso = true;
+        loadMoreButton.setDisable(true);
+        resultsCountLabel.setText("Caricamento ristoranti...");
+
+        Thread.startVirtualThread(() -> {
             try {
-                System.out.println("[DEBUG] Tentativo recupero ristoranti con filtri null...");
-                datiScaricati = serverRMI.cercaRistoranti(null);
-            } catch (Exception e) {
-                System.err.println("[DEBUG_WARN] cercaRistoranti(null) ha fallito: " + e.getMessage());
-            }
-
-            // Se il server richiede un DTO non nullo o una città
-            if (datiScaricati == null || datiScaricati.isEmpty()) {
-                try {
-                    System.out.println("[DEBUG] Fallback: richiesta ristoranti per città 'Modena'...");
-                    FiltriRicercaDTO filtriModena = new FiltriRicercaDTO(
-                            "Modena", null, null, null, null, null, null, null, null, null
-                    );
-                    datiScaricati = serverRMI.cercaRistoranti(filtriModena);
-                } catch (Exception ex) {
-                    System.err.println("[DEBUG_ERROR] Errore anche nel fallback con 'Modena': " + ex.getMessage());
-                }
-            }
-
-            final List<RistoranteDTO> elencoFinale = datiScaricati != null ? datiScaricati : Collections.emptyList();
-            System.out.println("[DEBUG] Ristoranti scaricati dal server: " + elencoFinale.size());
-
-            // 2. Recupero cucine dal DB o per estrazione diretta dai dati
-            List<String> tipologie = new ArrayList<>();
-            try {
-                tipologie = serverRMI.ottieniTutteTipologieCucina();
-                System.out.println("[DEBUG] Cucine lette via RMI: " + (tipologie != null ? tipologie.size() : 0));
-            } catch (Throwable t) {
-                System.out.println("[DEBUG] Metodo RMI cucine non pronto sul server, estrazione automatica dai ristoranti.");
-            }
-
-            // Fallback estrazione: legge le tipologie direttamente dai ristoranti caricati
-            if (tipologie == null || tipologie.isEmpty()) {
-                Set<String> setUnico = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                for (RistoranteDTO r : elencoFinale) {
-                    if (r.tipologieCucina() != null) {
-                        for (String c : r.tipologieCucina()) {
-                            if (c != null && !c.isBlank()) setUnico.add(c.trim());
-                        }
+                ITheKnifeServer server = ServerConnection.getServer();
+                PaginaRistorantiDTO pagina = server.cercaRistorantiPagina(richiesta);
+                List<String> tipologie = null;
+                if (caricaTipologie) {
+                    try {
+                        tipologie = server.ottieniTutteTipologieCucina();
+                    } catch (SistemaIndisponibileException e) {
+                        System.err.println("[SEARCH_WARN] Impossibile caricare le tipologie: " + e.getMessage());
                     }
                 }
-                tipologie = new ArrayList<>(setUnico);
+                List<String> tipologieRisultanti = tipologie;
+
+                Platform.runLater(() -> {
+                    if (generation != requestGeneration) {
+                        return;
+                    }
+                    caricamentoInCorso = false;
+                    if (tipologieRisultanti != null) {
+                        popolaMenuCucine(tipologieRisultanti);
+                        tipologieCaricate = true;
+                    }
+                    if (nuovaRicerca) {
+                        ristorantiCompleti.clear();
+                    }
+                    ristorantiCompleti.addAll(pagina.ristoranti());
+                    hasMore = pagina.hasMore();
+                    aggiornaLista(nuovaRicerca, offset);
+                });
+            } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+                System.err.println("[SEARCH_ERROR] Ricerca paginata non riuscita: " + e.getMessage());
+                Platform.runLater(() -> {
+                    if (generation == requestGeneration) {
+                        caricamentoInCorso = false;
+                        resultsCountLabel.setText(ristorantiCompleti.size() + " ristoranti caricati");
+                        loadMoreButton.setVisible(hasMore);
+                        loadMoreButton.setManaged(hasMore);
+                        loadMoreButton.setDisable(false);
+                        mostraErrore("Ricerca non riuscita", "Impossibile caricare i ristoranti dal server.");
+                    }
+                });
             }
+        });
+    }
 
-            final List<String> cucineFinali = tipologie;
+    private RicercaRistorantiPaginaDTO creaRichiesta(int offset) {
+        Double prezzoMin = null;
+        Double prezzoMax = null;
+        String prezzo = priceFilterCombo.getValue();
+        if (prezzo != null) {
+            if (prezzo.startsWith("€ (Economico")) {
+                prezzoMax = 25.0;
+            } else if (prezzo.startsWith("€€ (Medio")) {
+                prezzoMin = 25.0;
+                prezzoMax = 50.0;
+            } else if (prezzo.startsWith("€€€ (Medio-Alto")) {
+                prezzoMin = 50.01;
+                prezzoMax = 80.0;
+            } else if (prezzo.startsWith("€€€€ (Lusso")) {
+                prezzoMin = 80.01;
+            }
+        }
 
-            Platform.runLater(() -> {
-                popolaMenuCucine(cucineFinali);
-                ristorantiCompleti.setAll(elencoFinale);
-                applicaFiltri();
-            });
-        }).start();
+        Double valutazioneMinima = null;
+        String valutazione = ratingFilterCombo.getValue();
+        if (valutazione != null && !valutazione.equals(TUTTI_RATING)) {
+            valutazioneMinima = Double.parseDouble(valutazione.substring(0, 3));
+        }
+
+        return new RicercaRistorantiPaginaDTO(
+                searchField.getText(),
+                new ArrayList<>(selectedCuisines),
+                prezzoMin,
+                prezzoMax,
+                valutazioneMinima,
+                offset,
+                PAGE_SIZE
+        );
     }
 
     private void popolaMenuCucine(List<String> tipologie) {
@@ -182,7 +220,7 @@ public class ListaRistorantiController {
                     selectedCuisines.remove(cb.getText());
                 }
                 aggiornaEtichettaMenuCucine();
-                applicaFiltri();
+                caricaPagina(true);
             });
 
             cuisineCheckBoxes.add(cb);
@@ -212,7 +250,7 @@ public class ListaRistorantiController {
             for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
             selectedCuisines.clear();
             aggiornaEtichettaMenuCucine();
-            applicaFiltri();
+            caricaPagina(true);
         });
 
         menuContent.getChildren().addAll(searchCuisineInput, scroll, clearBtn);
@@ -237,17 +275,20 @@ public class ListaRistorantiController {
 
     @FXML
     private void onSearch() {
-        applicaFiltri();
+        searchDebounce.stop();
+        caricaPagina(true);
     }
 
     @FXML
     private void onFilterChanged() {
-        applicaFiltri();
+        caricaPagina(true);
     }
 
     @FXML
     private void onResetFilters() {
+        searchDebounce.stop();
         searchField.clear();
+        searchDebounce.stop();
         priceFilterCombo.setValue(TUTTI_PREZZI);
         ratingFilterCombo.setValue(TUTTI_RATING);
 
@@ -255,76 +296,33 @@ public class ListaRistorantiController {
         selectedCuisines.clear();
         aggiornaEtichettaMenuCucine();
 
-        applicaFiltri();
+        caricaPagina(true);
     }
 
-    private void applicaFiltri() {
-        String query = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
-        String prezzoSel = priceFilterCombo.getValue();
-        String ratingSel = ratingFilterCombo.getValue();
+    @FXML
+    private void onLoadMore() {
+        caricaPagina(false);
+    }
 
-        List<RistoranteDTO> filtrati = new ArrayList<>();
-
-        for (RistoranteDTO r : ristorantiCompleti) {
-            // Testo
-            boolean matchTesto = query.isEmpty()
-                    || (r.nome() != null && r.nome().toLowerCase().contains(query))
-                    || (r.indirizzo() != null && r.indirizzo().toLowerCase().contains(query))
-                    || (r.citta() != null && r.citta().toLowerCase().contains(query))
-                    || (r.tipologieCucina() != null && r.tipologieCucina().stream()
-                    .anyMatch(c -> c != null && c.toLowerCase().contains(query)));
-
-            // Prezzo
-            boolean matchPrezzo = true;
-            if (prezzoSel != null && !prezzoSel.equals(TUTTI_PREZZI)) {
-                double p = (r.prezzoMedio() != null) ? r.prezzoMedio() : 0.0;
-                if (prezzoSel.startsWith("€ (Economico")) matchPrezzo = p < 25.0;
-                else if (prezzoSel.startsWith("€€ (Medio")) matchPrezzo = p >= 25.0 && p <= 50.0;
-                else if (prezzoSel.startsWith("€€€ (Medio-Alto")) matchPrezzo = p > 50.0 && p <= 80.0;
-                else if (prezzoSel.startsWith("€€€€ (Lusso")) matchPrezzo = p > 80.0;
-            }
-
-            // Rating
-            boolean matchRating = true;
-            if (ratingSel != null && !ratingSel.equals(TUTTI_RATING)) {
-                try {
-                    double soglia = Double.parseDouble(ratingSel.substring(0, 3));
-                    matchRating = (r.mediaStelle() != null && r.mediaStelle() >= soglia);
-                } catch (Exception ignored) {
-                    matchRating = true;
-                }
-            }
-
-            // Cucine
-            boolean matchCucine = true;
-            if (!selectedCuisines.isEmpty()) {
-                matchCucine = r.tipologieCucina() != null && r.tipologieCucina().stream()
-                        .filter(Objects::nonNull)
-                        .map(String::trim)
-                        .anyMatch(c -> selectedCuisines.stream().anyMatch(s -> s.equalsIgnoreCase(c)));
-            }
-
-            if (matchTesto && matchPrezzo && matchRating && matchCucine) {
-                filtrati.add(r);
-            }
+    private void aggiornaLista(boolean nuovaRicerca, int offset) {
+        if (nuovaRicerca) {
+            restaurantContainer.getChildren().clear();
         }
-
-        System.out.println("[DEBUG] Ristoranti visualizzati dopo i filtri: " + filtrati.size());
-        aggiornaLista(filtrati);
-    }
-
-    private void aggiornaLista(List<RistoranteDTO> lista) {
-        restaurantContainer.getChildren().clear();
-
-        for (RistoranteDTO r : lista) {
+        for (int i = offset; i < ristorantiCompleti.size(); i++) {
+            RistoranteDTO r = ristorantiCompleti.get(i);
             Node card = creaCardRistorante(r);
             if (card != null) {
                 restaurantContainer.getChildren().add(card);
             }
         }
 
-        resultsCountLabel.setText(lista.size() + " ristoranti trovati");
-        restaurantScrollPane.setVvalue(0);
+        resultsCountLabel.setText(ristorantiCompleti.size() + " ristoranti caricati");
+        loadMoreButton.setVisible(hasMore);
+        loadMoreButton.setManaged(hasMore);
+        loadMoreButton.setDisable(false);
+        if (nuovaRicerca) {
+            restaurantScrollPane.setVvalue(0);
+        }
     }
 
     private Node creaCardRistorante(RistoranteDTO r) {

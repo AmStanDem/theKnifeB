@@ -2,7 +2,9 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.application.Platform;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -30,6 +32,9 @@ public class LoginController {
     private Label labelErrore;
 
     @FXML
+    private Button signInButton;
+
+    @FXML
     private void handleSignIn(ActionEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
@@ -54,18 +59,28 @@ public class LoginController {
             return;
         }
 
-        try {
-            UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
-            SessioneUtente.login(utente);
-            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        signInButton.setDisable(true);
 
-        } catch (CredenzialiErrateException e) {
-            labelErrore.setText("Email o password non corretti.");
-        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
-            e.printStackTrace();
-            labelErrore.setText("Errore server: " + e.getClass().getSimpleName()
-                    + " - " + e.getMessage());
-        }
+        Thread.startVirtualThread(() -> {
+            try {
+                UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
+                Platform.runLater(() -> {
+                    SessioneUtente.login(utente);
+                    SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/MainLayout.fxml");
+                });
+            } catch (CredenzialiErrateException e) {
+                Platform.runLater(() -> mostraErroreLogin("Email o password non corretti."));
+            } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+                Platform.runLater(() -> mostraErroreLogin(
+                        "Errore server: " + e.getClass().getSimpleName() + " - " + e.getMessage()));
+            }
+        });
+    }
+
+    private void mostraErroreLogin(String messaggio) {
+        labelErrore.setText(messaggio);
+        signInButton.setDisable(false);
     }
 
     /**
