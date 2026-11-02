@@ -222,6 +222,12 @@ public class RistoranteDAO {
         List<Object> parametri = new ArrayList<>();
         StringBuilder sql = new StringBuilder(costruisciQueryBase()).append(" WHERE 1=1");
 
+        // Filtro per località
+        if (richiesta.localita() != null && !richiesta.localita().isBlank()) {
+            sql.append(" AND LOWER(r.citta) LIKE ?");
+            parametri.add("%" + richiesta.localita().trim().toLowerCase() + "%");
+        }
+
         if (richiesta.testo() != null && !richiesta.testo().isBlank()) {
             String testo = "%" + richiesta.testo().trim().toLowerCase() + "%";
             sql.append(" AND (LOWER(r.nome) LIKE ? OR LOWER(r.indirizzo) LIKE ? OR LOWER(r.citta) LIKE ?")

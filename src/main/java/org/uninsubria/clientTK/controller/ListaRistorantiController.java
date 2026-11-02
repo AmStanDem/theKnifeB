@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.uninsubria.clientTK.util.RicercaSessione;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.common.dto.RicercaRistorantiPaginaDTO;
@@ -59,10 +60,21 @@ public class ListaRistorantiController {
         configuraFiltriFissi();
         searchDebounce = new PauseTransition(javafx.util.Duration.millis(350));
         searchDebounce.setOnFinished(event -> caricaPagina(true));
-        caricaDatiDalServer();
+
+
+
+        String nomeRistorante = RicercaSessione.getNomeRistorante();
+
+
+        if (nomeRistorante != null && !nomeRistorante.isBlank()) {
+            searchField.setText(nomeRistorante);
+        }
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> searchDebounce.playFromStart());
+        caricaDatiDalServer();
     }
+
+
 
     private void configuraFiltriFissi() {
         priceFilterCombo.getItems().setAll(
@@ -176,6 +188,7 @@ public class ListaRistorantiController {
         }
 
         return new RicercaRistorantiPaginaDTO(
+                RicercaSessione.getLocalita(),
                 searchField.getText(),
                 new ArrayList<>(selectedCuisines),
                 prezzoMin,

@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import org.uninsubria.clientTK.util.RicercaSessione;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.SessioneUtente;
 
@@ -177,6 +178,10 @@ public class MainLayoutController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
+        String localita = txtLocalita.getText().trim();
+        String nomeRistorante = txtRicerca.getText().trim();
+        RicercaSessione.impostaRicerca(localita, nomeRistorante);
+
         SceneManager.switchScene(
                 event,
                 "/org/uninsubria/clientTK/views/listaRistoranti.fxml"

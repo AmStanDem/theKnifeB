@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public record RicercaRistorantiPaginaDTO(
+        String localita,
         String testo,
         List<String> tipologieCucina,
         Double prezzoMin,
@@ -17,6 +18,8 @@ public record RicercaRistorantiPaginaDTO(
     private static final long serialVersionUID = 1L;
 
     public RicercaRistorantiPaginaDTO {
+
+        localita = localita == null ? "" : localita.trim();
         tipologieCucina = tipologieCucina == null ? List.of() : List.copyOf(tipologieCucina);
         if (prezzoMin != null && prezzoMax != null && prezzoMin > prezzoMax) {
             throw new IllegalArgumentException("Il prezzo minimo non può superare il prezzo massimo.");
