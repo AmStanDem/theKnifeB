@@ -11,13 +11,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.controlsfx.control.Rating;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.RecensioneSelezionata;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.clientTK.util.stars.BaseRatingView;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
@@ -80,7 +81,9 @@ public class AreaRistoranteController {
     private Label averageRatingLabel;
 
     @FXML
-    private Rating averageRating;
+    private HBox averageRatingContainer;
+
+    private BaseRatingView averageRating;
 
     @FXML
     private Button recensisci;
@@ -121,6 +124,11 @@ public class AreaRistoranteController {
     public void initialize() {
 
         System.out.println("AreaRistoranteController inizializzato");
+        averageRating = new BaseRatingView(5, 0);
+        averageRating.setSpacing(2);
+        averageRating.setScaleX(0.75);
+        averageRating.setScaleY(0.75);
+        averageRatingContainer.getChildren().add(averageRating);
 
         // Recupera il ristorante selezionato nella pagina precedente
         ristorante = RistoranteSelezionato.getRistorante();

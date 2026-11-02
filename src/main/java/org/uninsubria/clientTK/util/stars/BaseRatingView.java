@@ -54,22 +54,27 @@ public class BaseRatingView extends HBox {
             SVGPath star = stars.get(i - 1);
             if (i <= targetRating) {
                 star.setFill(filledColor);
-            } else if (i - 0.5 == targetRating) {
-                star.setFill(createHalfGradient());
+            } else if (i - 1 < targetRating) {
+                star.setFill(createPartialGradient(targetRating - (i - 1)));
             } else {
                 star.setFill(emptyColor);
             }
         }
     }
 
-    protected LinearGradient createHalfGradient() {
+    protected LinearGradient createPartialGradient(double filledFraction) {
         return new LinearGradient(
                 0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0.0, filledColor),
-                new Stop(0.5, filledColor),
-                new Stop(0.501, emptyColor),
+                new Stop(filledFraction, filledColor),
+                new Stop(Math.min(1.0, filledFraction + 0.001), emptyColor),
                 new Stop(1.0, emptyColor)
         );
+    }
+
+    public void setRating(double rating) {
+        this.rating = Math.max(0.0, Math.min(maxStars, rating));
+        paintStars(this.rating);
     }
 
     public void setColors(Color filled, Color empty) {

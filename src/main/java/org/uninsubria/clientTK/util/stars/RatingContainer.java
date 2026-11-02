@@ -54,4 +54,8 @@ public class RatingContainer extends HBox {
     public void setInteractive(boolean interactive) {
         ratingView.setInteractive(interactive);
     }
+
+    public void setOnRatingChanged(Runnable onRatingChanged) {
+        ratingView.setOnRatingChanged(onRatingChanged);
+    }
 }

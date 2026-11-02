@@ -119,43 +119,7 @@
     -fx-font-size: 11px;
 }
 
-/* ===== STELLE CONTROLSFX VERDI (della dimensione del testo) ===== */
-
-/* 1. Nasconde le immagini bitmap di default di ControlsFX */
-.review-rating-small .left-button .graphic,
-.review-rating-small .right-button .graphic {
-    -fx-image: null;
-}
-
-/* 2. Rende ogni metà della stella proporzionata al testo (13px di altezza, 6.5px di larghezza ciascuna) */
-.review-rating-small .left-button,
-.review-rating-small .right-button {
-    -fx-shape: "M 12 2 L 15 9 L 22 9 L 16 14 L 18 21 L 12 17 L 6 21 L 8 14 L 2 9 L 9 9 Z";
-    -fx-scale-shape: true;
-    -fx-background-color: #4CAF50; /* Verde per stelle piene */
-    -fx-min-width: 6.5px;
-    -fx-max-width: 6.5px;
-    -fx-pref-width: 6.5px;
-    -fx-min-height: 13px;
-    -fx-max-height: 13px;
-    -fx-pref-height: 13px;
-    -fx-padding: 2px;
-}
-
-/* Stelle non selezionate (Grigio) */
-.review-rating-small .left-button.unselected,
-.review-rating-small .right-button.unselected {
-    -fx-background-color: #dadce0;
-}
-
-/* Evita opacità quando disabilitato */
-.review-rating-small:disabled .left-button,
-.review-rating-small:disabled .right-button {
-    -fx-opacity: 1.0;
-}
-
-/* Compatta il contenitore delle stelle */
-.review-rating-small .container {
+.review-rating-small {
     -fx-padding: 0;
     -fx-spacing: 1px;
 }
@@ -196,5 +160,4 @@
 .reply-button:hover {
     -fx-background-color: #e8f0fe;
 }
-
 

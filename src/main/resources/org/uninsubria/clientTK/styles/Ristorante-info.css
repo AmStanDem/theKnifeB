@@ -352,9 +352,6 @@
 
 .average-rating {
     -fx-pref-width: 130px;
-}
-
-.average-rating .container {
     -fx-spacing: 2px;
 }
 

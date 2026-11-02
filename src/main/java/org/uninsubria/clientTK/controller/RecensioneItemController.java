@@ -4,11 +4,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import org.controlsfx.control.Rating;
+import javafx.scene.paint.Color;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.RecensioneDaRispondere;
 import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.clientTK.util.stars.BaseRatingView;
 import org.uninsubria.common.dto.RecensioneDTO;
 
 import java.time.format.DateTimeFormatter;
@@ -33,7 +35,9 @@ public class RecensioneItemController {
     private Label localGuideLabel;
 
     @FXML
-    private Rating ratingControl;
+    private HBox ratingStarsContainer;
+
+    private BaseRatingView ratingControl;
 
     @FXML
     private Label timeLabel;
@@ -64,6 +68,16 @@ public class RecensioneItemController {
 
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ITALIAN);
+
+    @FXML
+    private void initialize() {
+        ratingControl = new BaseRatingView(5, 0);
+        ratingControl.setSpacing(1);
+        ratingControl.setScaleX(0.5);
+        ratingControl.setScaleY(0.5);
+        ratingControl.setColors(Color.web("#4CAF50"), Color.web("#dadce0"));
+        ratingStarsContainer.getChildren().add(ratingControl);
+    }
 
     public void setRecensione(RecensioneDTO recensione) {
         if (recensione == null) {
