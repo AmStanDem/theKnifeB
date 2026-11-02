@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.CheckComboBox?>
+<?import org.uninsubria.clientTK.util.LuogoInput?>
 
 <StackPane prefHeight="768.0" prefWidth="1024.0" styleClass="root-pane" stylesheets="@../styles/registraRistorante.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.AggiungiRistoranteController">
 
@@ -39,19 +40,19 @@
                     <HBox spacing="15.0">
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                             <Label styleClass="input-label" text="Indirizzo *" />
-                            <TextField fx:id="txtIndirizzo" promptText="Via Roma 12" styleClass="custom-text-field" />
+                            <LuogoInput fx:id="txtIndirizzo" prefHeight="40.0" promptText="Digita e seleziona l'indirizzo" />
                         </VBox>
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="input-label" text="Città *" />
-                            <TextField fx:id="txtCitta" promptText="Milano" styleClass="custom-text-field" />
+                            <Label styleClass="input-label" text="Città * (dal luogo selezionato)" />
+                            <TextField fx:id="txtCitta" promptText="Si compila selezionando l'indirizzo" styleClass="custom-text-field" />
                         </VBox>
                     </HBox>
 
                     <!-- Nazione e Prezzo Medio -->
                     <HBox spacing="15.0">
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="input-label" text="Nazione *" />
-                            <TextField fx:id="txtNazione" promptText="Italia" styleClass="custom-text-field" />
+                            <Label styleClass="input-label" text="Nazione * (dal luogo selezionato)" />
+                            <TextField fx:id="txtNazione" promptText="Si compila selezionando l'indirizzo" styleClass="custom-text-field" />
                         </VBox>
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                             <Label styleClass="input-label" text="Prezzo Medio (€) *" />

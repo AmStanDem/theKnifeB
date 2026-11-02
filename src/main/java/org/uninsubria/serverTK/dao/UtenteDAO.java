@@ -11,7 +11,7 @@ public class UtenteDAO {
 
     public record UtenteConHash(UtenteDTO utente, String passwordHash) {}
 
-    public boolean inserisciUtente(UtenteDTO utente, String passwordHash) {
+    public boolean inserisciUtente(UtenteDTO utente, String passwordHash) throws SQLException {
         String sql = "INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -34,12 +34,14 @@ public class UtenteDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore durante l'inserimento dell'utente: " + e.getMessage());
-            return false;
+            if ("23505".equals(e.getSQLState())) {
+                return false;
+            }
+            throw e;
         }
     }
 
-    public UtenteConHash trovaPerEmail(String email) {
+    public UtenteConHash trovaPerEmail(String email) throws SQLException {
         String sql = "SELECT id_utente, email, password, nome, cognome, data_nascita, domicilio, ruolo FROM Utenti WHERE email = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -66,8 +68,6 @@ public class UtenteDAO {
                     return new UtenteConHash(dto, rs.getString("password"));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("[DAO_ERROR] Errore durante la ricerca dell'utente per email: " + e.getMessage());
         }
         return null;
     }

@@ -11,23 +11,30 @@ public class RecensioneService {
 
     private final RecensioneDAO recensioneDAO = new RecensioneDAO();
 
-    public List<RecensioneDTO> ottieniPerRistorante(Integer idRistorante) {
+    public List<RecensioneDTO> ottieniPerRistorante(Integer idRistorante)
+            throws SistemaIndisponibileException {
         if (idRistorante == null) {
             return List.of();
         }
-        return recensioneDAO.trovaPerRistorante(idRistorante);
+        try {
+            return recensioneDAO.trovaPerRistorante(idRistorante);
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore recupero recensioni: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
     }
 
     /**
      * Recupera le recensioni di un ristorante oscurando l'identità dell'autore.
      * Utilizzato per la visualizzazione da parte degli utenti non loggati (Guest).
      */
-    public List<RecensioneDTO> ottieniPerRistoranteAnonimo(Integer idRistorante) {
+    public List<RecensioneDTO> ottieniPerRistoranteAnonimo(Integer idRistorante)
+            throws SistemaIndisponibileException {
         if (idRistorante == null) {
             return List.of();
         }
 
-        List<RecensioneDTO> recensioniReali = recensioneDAO.trovaPerRistorante(idRistorante);
+        List<RecensioneDTO> recensioniReali = ottieniPerRistorante(idRistorante);
 
         // Trasforma la lista oscurando il campo del nome autore
         return recensioniReali.stream()
@@ -76,14 +83,20 @@ public class RecensioneService {
             throw new SistemaIndisponibileException(e);
         }
 
-        boolean successo = recensioneDAO.inserisciRecensione(idUtente, idRistorante, recensione);
-        if (!successo) {
-            throw new AzioneDuplicataException("Hai già recensito questo ristorante o si è verificato un errore.");
+        try {
+            boolean successo = recensioneDAO.inserisciRecensione(idUtente, idRistorante, recensione);
+            if (!successo) {
+                throw new AzioneDuplicataException("Hai già recensito questo ristorante.");
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore inserimento recensione: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
     }
 
     public void modifica(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle)
-            throws DatiMancantiException, RecensioneNonTrovataException, OperazioneNonConsentitaException {
+            throws DatiMancantiException, RecensioneNonTrovataException,
+            OperazioneNonConsentitaException, SistemaIndisponibileException {
 
         if (nuovoTesto == null || nuovoTesto.trim().isEmpty()) {
             throw new DatiMancantiException("Il testo della recensione non può essere vuoto.");
@@ -92,16 +105,29 @@ public class RecensioneService {
             throw new OperazioneNonConsentitaException("La valutazione deve essere compresa tra 1 e 5.");
         }
 
-        boolean successo = recensioneDAO.modificaRecensione(idRecensione, idUtente, nuovoTesto, nuoveStelle);
-        if (!successo) {
-            throw new RecensioneNonTrovataException("Impossibile modificare: recensione inesistente o non di tua proprietà.");
+        try {
+            boolean successo = recensioneDAO.modificaRecensione(idRecensione, idUtente, nuovoTesto, nuoveStelle);
+            if (!successo) {
+                throw new RecensioneNonTrovataException(
+                        "Impossibile modificare: recensione inesistente o non di tua proprietà.");
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
     }
 
-    public void elimina(Integer idRecensione, Integer idUtente) throws RecensioneNonTrovataException {
-        boolean successo = recensioneDAO.eliminaRecensione(idRecensione, idUtente);
-        if (!successo) {
-            throw new RecensioneNonTrovataException("Impossibile eliminare: recensione inesistente o non di tua proprietà.");
+    public void elimina(Integer idRecensione, Integer idUtente)
+            throws RecensioneNonTrovataException, SistemaIndisponibileException {
+        try {
+            boolean successo = recensioneDAO.eliminaRecensione(idRecensione, idUtente);
+            if (!successo) {
+                throw new RecensioneNonTrovataException(
+                        "Impossibile eliminare: recensione inesistente o non di tua proprietà.");
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore eliminazione recensione: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
     }
 

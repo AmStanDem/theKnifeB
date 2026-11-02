@@ -10,8 +10,7 @@
 
     <properties>
         <!-- Java -->
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Versions -->
@@ -19,6 +18,7 @@
         <controlsfx.version>11.2.1</controlsfx.version>
         <postgresql.version>42.7.13</postgresql.version>
         <flyway.version>12.11.0</flyway.version>
+        <hikaricp.version>5.1.0</hikaricp.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <atlantafx.version>2.1.0</atlantafx.version>
         <db.host.port>5432</db.host.port>
@@ -119,6 +119,13 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+        </dependency>
+
+        <!-- JDBC connection pool (bounded database concurrency) -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikaricp.version}</version>
         </dependency>
 
         <!-- JavaFX Controls -->

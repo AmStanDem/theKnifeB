@@ -1,12 +1,16 @@
 package org.uninsubria.serverTK.service;
 
 import org.uninsubria.common.dto.FiltriRicercaDTO;
+import org.uninsubria.common.dto.PaginaRistorantiDTO;
+import org.uninsubria.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.exceptions.DatiMancantiException;
 import org.uninsubria.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.common.exceptions.RistoranteNonTrovatoException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.serverTK.dao.RistoranteDAO;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class RistoranteService {
@@ -14,9 +18,9 @@ public class RistoranteService {
     private final RistoranteDAO ristoranteDAO = new RistoranteDAO();
 
     public void aggiungiRistorante(RistoranteDTO ristorante, Integer idGestore)
-            throws DatiMancantiException, OperazioneNonConsentitaException {
+            throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
 
-        if (idGestore == null) {
+        if (ristorante == null || idGestore == null) {
             throw new OperazioneNonConsentitaException("Accesso negato: identificativo gestore mancante.");
         }
 
@@ -24,8 +28,16 @@ public class RistoranteService {
                 ristorante.indirizzo() == null || ristorante.indirizzo().trim().isEmpty() ||
                 ristorante.citta() == null || ristorante.citta().trim().isEmpty() ||
                 ristorante.nazione() == null || ristorante.nazione().trim().isEmpty() ||
-                ristorante.prezzoMedio() == null || ristorante.prezzoMedio() < 0.0) {
+                ristorante.prezzoMedio() == null || !Double.isFinite(ristorante.prezzoMedio())
+                || ristorante.prezzoMedio() < 0.0) {
             throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
+        }
+
+        if (ristorante.latitudine() == null || !Double.isFinite(ristorante.latitudine())
+                || ristorante.latitudine() < -90 || ristorante.latitudine() > 90
+                || ristorante.longitudine() == null || !Double.isFinite(ristorante.longitudine())
+                || ristorante.longitudine() < -180 || ristorante.longitudine() > 180) {
+            throw new DatiMancantiException("Seleziona un luogo valido con coordinate geografiche corrette.");
         }
 
         // Validazione della relazione Molti-a-Molti introdotta
@@ -33,36 +45,74 @@ public class RistoranteService {
             throw new DatiMancantiException("È necessario specificare almeno una tipologia di cucina.");
         }
 
-        boolean successo = ristoranteDAO.inserisciRistorante(ristorante, idGestore);
-        if (!successo) {
-            throw new RuntimeException("Impossibile registrare il ristorante nel database.");
+        try {
+            boolean successo = ristoranteDAO.inserisciRistorante(ristorante, idGestore);
+            if (!successo) {
+                throw new SistemaIndisponibileException();
+            }
+        } catch (SQLException e) {
+            throw databaseError("inserimento ristorante", e);
         }
     }
 
-    public RistoranteDTO ottieniDettaglio(Integer idRistorante) throws RistoranteNonTrovatoException {
+    public RistoranteDTO ottieniDettaglio(Integer idRistorante)
+            throws RistoranteNonTrovatoException, SistemaIndisponibileException {
         if (idRistorante == null) {
             throw new RistoranteNonTrovatoException(idRistorante);
         }
 
-        RistoranteDTO ristorante = ristoranteDAO.trovaPerId(idRistorante);
-        if (ristorante == null) {
-            throw new RistoranteNonTrovatoException(idRistorante);
+        try {
+            RistoranteDTO ristorante = ristoranteDAO.trovaPerId(idRistorante);
+            if (ristorante == null) {
+                throw new RistoranteNonTrovatoException(idRistorante);
+            }
+            return ristorante;
+        } catch (SQLException e) {
+            throw databaseError("ricerca ristorante per ID", e);
         }
-        return ristorante;
     }
 
-    public List<String> ottieniTutteTipologieCucina() {
-        return ristoranteDAO.ottieniTutteTipologieCucina();
+    public List<String> ottieniTutteTipologieCucina() throws SistemaIndisponibileException {
+        try {
+            return ristoranteDAO.ottieniTutteTipologieCucina();
+        } catch (SQLException e) {
+            throw databaseError("caricamento tipologie cucina", e);
+        }
     }
 
-    public List<RistoranteDTO> ottieniRistorantiGestore(Integer idGestore) {
-        return ristoranteDAO.trovaPerGestore(idGestore);
-    }
-
-    public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) {
-        if (filtri == null) {
+    public List<RistoranteDTO> ottieniRistorantiGestore(Integer idGestore) throws SistemaIndisponibileException {
+        if (idGestore == null) {
             return List.of();
         }
-        return ristoranteDAO.cercaConFiltri(filtri);
+        try {
+            return ristoranteDAO.trovaPerGestore(idGestore);
+        } catch (SQLException e) {
+            throw databaseError("ricerca ristoranti del gestore", e);
+        }
+    }
+
+    public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws SistemaIndisponibileException {
+        try {
+            return ristoranteDAO.cercaConFiltri(filtri);
+        } catch (SQLException e) {
+            throw databaseError("ricerca ristoranti", e);
+        }
+    }
+
+    public PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+            throws SistemaIndisponibileException {
+        if (richiesta == null) {
+            throw new IllegalArgumentException("La richiesta di ricerca è obbligatoria.");
+        }
+        try {
+            return ristoranteDAO.cercaPagina(richiesta);
+        } catch (SQLException e) {
+            throw databaseError("ricerca paginata ristoranti", e);
+        }
+    }
+
+    private SistemaIndisponibileException databaseError(String operation, SQLException cause) {
+        System.err.println("[DAO_ERROR] Errore durante " + operation + ": " + cause.getMessage());
+        return new SistemaIndisponibileException(cause);
     }
 }

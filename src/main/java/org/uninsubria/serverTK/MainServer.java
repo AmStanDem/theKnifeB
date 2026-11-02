@@ -2,15 +2,19 @@ package org.uninsubria.serverTK;
 
 import org.uninsubria.serverTK.config.DatabaseConfig;
 import org.uninsubria.serverTK.rmi.TheKnifeServerImpl;
+import org.uninsubria.common.rmi.ITheKnifeServer;
 
 import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Punto di ingresso principale (Entry Point) per l'infrastruttura di backend.
@@ -79,7 +83,17 @@ public class MainServer {
         } catch (Exception e) {
             System.err.println("[FATAL ERROR] Inizializzazione database fallita: " + e.getMessage());
             System.exit(1);
+            return;
         }
+
+        AtomicReference<Registry> registryRef = new AtomicReference<>();
+        AtomicReference<TheKnifeServerImpl> serverRef = new AtomicReference<>();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("\n[SYSTEM] Chiusura del server e del pool database...");
+            unexport(registryRef.get());
+            unexport(serverRef.get());
+            DatabaseConfig.close();
+        }, "theknife-server-shutdown"));
 
         org.uninsubria.serverTK.utils.CsvImporter.importaSeNecessario();
 
@@ -87,18 +101,28 @@ public class MainServer {
         try {
             TheKnifeServerImpl serverService = new TheKnifeServerImpl();
             Registry registry = LocateRegistry.createRegistry(rmiPort);
-            registry.rebind("TheKnifeServer", serverService);
+            registryRef.set(registry);
+            ITheKnifeServer stub = (ITheKnifeServer) UnicastRemoteObject.exportObject(serverService, 0);
+            serverRef.set(serverService);
+            registry.rebind("TheKnifeServer", stub);
 
             System.out.println("[RMI] Registro creato e in ascolto sulla porta " + rmiPort);
             System.out.println("[SYSTEM] Server THE KNIFE operativo e pronto a ricevere connessioni.\n");
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                System.out.println("\n[SYSTEM] Segnale di arresto ricevuto. Chiusura sicura del server...");
-            }));
-
         } catch (Exception e) {
             System.err.println("[FATAL ERROR] Impossibile avviare il registro RMI: " + e.getMessage());
             System.exit(1);
+        }
+    }
+
+    private static void unexport(Remote remote) {
+        if (remote == null) {
+            return;
+        }
+        try {
+            UnicastRemoteObject.unexportObject(remote, true);
+        } catch (java.rmi.NoSuchObjectException ignored) {
+            // The object may not have been exported if startup failed partway through.
         }
     }
 
