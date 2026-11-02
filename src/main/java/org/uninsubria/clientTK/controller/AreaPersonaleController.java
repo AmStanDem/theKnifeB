@@ -2,18 +2,14 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.UtenteDTO;
 import org.uninsubria.common.enums.RuoloUtente;
-
-import java.io.IOException;
 
 public class AreaPersonaleController {
 
@@ -156,8 +152,7 @@ public class AreaPersonaleController {
 
     @FXML
     private void onPreferitiClick(ActionEvent event) {
-
-        cambiaPagina(
+        SceneManager.switchScene(
                 event,
                 "/org/uninsubria/clientTK/views/Preferiti.fxml"
         );
@@ -166,8 +161,7 @@ public class AreaPersonaleController {
 
     @FXML
     private void onRecensioniClick(ActionEvent event) {
-
-        cambiaPagina(
+        SceneManager.switchScene(
                 event,
                 "/org/uninsubria/clientTK/views/MieRecensioni.fxml"
         );
@@ -176,8 +170,7 @@ public class AreaPersonaleController {
 
     @FXML
     private void onAggiungiClick(ActionEvent event) {
-
-        cambiaPagina(
+        SceneManager.switchScene(
                 event,
                 "/org/uninsubria/clientTK/views/AggiungiRistorante.fxml"
         );
@@ -186,8 +179,7 @@ public class AreaPersonaleController {
 
     @FXML
     private void onRistorantiClick(ActionEvent event) {
-
-        cambiaPagina(
+        SceneManager.switchScene(
                 event,
                 "/org/uninsubria/clientTK/views/ListaRistoranti.fxml"
         );
@@ -197,44 +189,21 @@ public class AreaPersonaleController {
     @FXML
     private void onLogOutClick(ActionEvent event) {
         SessioneUtente.logout();
-        cambiaPagina(
-                event,
-                "/org/uninsubria/clientTK/views/MainLayout.fxml"
-        );
+
+        // Ricaviamo lo Stage in modo sicuro da un componente grafico esistente (es. lblNome)
+        if (lblNome != null && lblNome.getScene() != null) {
+            Stage stage = (Stage) lblNome.getScene().getWindow();
+            SceneManager.clearHistory(stage);
+            SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/MainLayout.fxml");
+        }
     }
 
 
     @FXML
     private void handleLogoClick(MouseEvent event) {
-
-        cambiaPagina(
+        SceneManager.switchScene(
                 event,
                 "/org/uninsubria/clientTK/views/MainLayout.fxml"
         );
-    }
-
-
-    private void cambiaPagina(
-            javafx.event.Event event,
-            String percorso) {
-
-        try {
-
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(
-                    new Scene(
-                            FXMLLoader.load(
-                                    getClass().getResource(percorso)
-                            )
-                    )
-            );
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }
     }
 }

@@ -1,0 +1,70 @@
+package org.uninsubria.clientTK.util.stars;
+
+import javafx.geometry.Insets;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.SVGPath;
+
+/**
+ * Superclasse base per il rendering statico delle stelle di valutazione.
+ */
+public class BaseRatingView extends HBox {
+
+    protected static final String STAR_SVG = "M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.399 8.168-7.333-3.854-7.333 3.854 1.399-8.168-5.934-5.787 8.2-1.192z";
+
+    protected final int maxStars = 5;
+    protected double rating = 0.0;
+
+    protected Color filledColor = Color.web("#66CC33");
+    protected Color emptyColor = Color.web("#334d40");
+
+    public BaseRatingView(int maxStarsIgnored, double initialRating) {
+        this.rating = initialRating;
+        setSpacing(6);
+        setPadding(new Insets(5));
+        setStyle("-fx-background-color: transparent;");
+        drawStars(rating);
+    }
+
+    protected void drawStars(double targetRating) {
+        getChildren().clear();
+        for (int i = 1; i <= maxStars; i++) {
+            SVGPath star = new SVGPath();
+            star.setContent(STAR_SVG);
+            star.setScaleX(1.2);
+            star.setScaleY(1.2);
+
+            if (i <= targetRating) {
+                star.setFill(filledColor);
+            } else if (i - 0.5 == targetRating) {
+                star.setFill(createHalfGradient());
+            } else {
+                star.setFill(emptyColor);
+            }
+            getChildren().add(star);
+        }
+    }
+
+    protected LinearGradient createHalfGradient() {
+        return new LinearGradient(
+                0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                new Stop(0.0, filledColor),
+                new Stop(0.5, filledColor),
+                new Stop(0.501, emptyColor),
+                new Stop(1.0, emptyColor)
+        );
+    }
+
+    public void setColors(Color filled, Color empty) {
+        this.filledColor = filled;
+        this.emptyColor = empty;
+        drawStars(rating);
+    }
+
+    public double getRating() {
+        return rating;
+    }
+}

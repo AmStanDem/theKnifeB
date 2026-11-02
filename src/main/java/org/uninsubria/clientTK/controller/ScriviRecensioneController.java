@@ -8,12 +8,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import org.controlsfx.control.Rating;
+
+
 import org.uninsubria.clientTK.util.RecensioneSelezionata;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.clientTK.util.stars.RatingContainer;
 import org.uninsubria.common.dto.RecensioneDTO;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
@@ -42,8 +44,9 @@ public class ScriviRecensioneController {
     @FXML
     private TextArea txtRecensione;
 
+    // Cambia il tipo in RatingContainer
     @FXML
-    private Rating ratingRecensione;
+    private RatingContainer ratingRecensione;
 
     @FXML
     private Button btnInviaRecensione;
