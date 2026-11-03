@@ -4,12 +4,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.StackPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.beans.property.StringProperty;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -38,16 +37,16 @@ public final class LuogoInput extends HBox {
         mappa.setMnemonicParsing(false);
         mappa.setAccessibleText("Seleziona un luogo sulla mappa");
         mappa.setTooltip(new Tooltip("Cerca un luogo o selezionalo sulla mappa"));
-        SVGPath iconaPuntina = new SVGPath();
-        iconaPuntina.setContent("M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z");
-        iconaPuntina.setFill(Color.WHITE);
-        iconaPuntina.setScaleX(1.15);
-        iconaPuntina.setScaleY(1.15);
-        StackPane graphic = new StackPane(iconaPuntina);
-        graphic.setMinSize(24, 24);
-        graphic.setPrefSize(24, 24);
-        graphic.setMaxSize(24, 24);
-        mappa.setGraphic(graphic);
+        var pinResource = LuogoInput.class.getResource("/images/pin-geolocalizzazione-rosso.png");
+        if (pinResource == null) {
+            throw new IllegalStateException("Immagine del pin di geolocalizzazione non trovata.");
+        }
+        ImageView pin = new ImageView(new Image(pinResource.toExternalForm()));
+        pin.setFitWidth(28);
+        pin.setFitHeight(28);
+        pin.setPreserveRatio(true);
+        pin.setMouseTransparent(true);
+        mappa.setGraphic(pin);
         mappa.getStyleClass().add("location-input-map-button");
         mappa.setOnAction(event -> SelettoreLuogoDialog
                 .mostra(getScene() == null ? null : getScene().getWindow(), getLuogoSelezionato())
