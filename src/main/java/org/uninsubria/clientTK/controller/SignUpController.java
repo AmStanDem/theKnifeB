@@ -51,6 +51,15 @@ public class SignUpController {
     @FXML
     private void initialize() {
         indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
+
+
+        passwordField.textProperty().addListener((obs, oldValue, newValue) ->
+                controllaConfermaPassword()
+        );
+
+        confermaPasswordField.textProperty().addListener((obs, oldValue, newValue) ->
+                controllaConfermaPassword()
+        );
     }
 
     @FXML
@@ -128,5 +137,22 @@ public class SignUpController {
     @FXML
     public void handleLogoClick(MouseEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
+    }
+
+    private void controllaConfermaPassword() {
+        String password = passwordField.getText();
+        String confermaPassword = confermaPasswordField.getText();
+
+        if (confermaPassword.isEmpty()) {
+            confermaPasswordField.setStyle("");
+        } else if (!password.equals(confermaPassword)) {
+            confermaPasswordField.setStyle(
+                    "-fx-border-color: red; " +
+                            "-fx-border-width: 2px; " +
+                            "-fx-border-radius: 5px;"
+            );
+        } else {
+            confermaPasswordField.setStyle("");
+        }
     }
 }
