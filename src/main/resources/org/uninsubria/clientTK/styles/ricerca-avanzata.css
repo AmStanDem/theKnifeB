@@ -19,15 +19,19 @@
     -fx-background-color: #1c1c1e;
 }
 
+.footer-bar {
+    -fx-background-color: #1c1c1e;
+}
+
 .logo-text-white {
     -fx-fill: #ffffff;
-    -fx-font-size: 22px;
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
 }
 
 .logo-text-green {
     -fx-fill: #4CAF50;
-    -fx-font-size: 22px;
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
 }
 
@@ -47,7 +51,7 @@
 }
 
 .page-title {
-    -fx-font-size: 20px;
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-text-fill: #1c1c1e;
     -fx-padding: 0 0 6 0;
@@ -65,7 +69,7 @@
 /* ---------------- CAMPI DI INPUT ---------------- */
 
 .field-label {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: #1c1c1e;
 }

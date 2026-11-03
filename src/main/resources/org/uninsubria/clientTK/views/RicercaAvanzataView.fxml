@@ -30,9 +30,10 @@
 
     <!-- ===================== HEADER ===================== -->
     <top>
-        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="10">
+        <HBox styleClass="header-bar" alignment="CENTER_LEFT" spacing="10"
+              minHeight="112" prefHeight="112" maxHeight="112">
             <padding>
-                <Insets top="16" right="24" bottom="16" left="24"/>
+                <Insets top="24" right="36" bottom="24" left="36"/>
             </padding>
             <TextFlow onMouseClicked="#handleLogoClick"
                       styleClass="clickable-logo">
@@ -43,31 +44,35 @@
         </HBox>
     </top>
 
+    <bottom>
+        <HBox styleClass="footer-bar" minHeight="88" prefHeight="88" maxHeight="88"/>
+    </bottom>
+
     <!-- ===================== CONTENUTO ===================== -->
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-container">
-            <VBox alignment="TOP_CENTER" spacing="20" styleClass="form-container">
+            <VBox alignment="CENTER" spacing="24" styleClass="form-container">
                 <padding>
-                    <Insets top="24" right="32" bottom="32" left="32"/>
+                    <Insets top="28" right="36" bottom="36" left="36"/>
                 </padding>
 
                 <Label text="Trova il ristorante perfetto per te" styleClass="page-title"/>
 
                 <!-- Card contenitore del form (Layout Orizzontale) -->
-                <VBox spacing="20" styleClass="form-card" maxWidth="920">
+                <VBox spacing="24" styleClass="form-card" maxWidth="1040">
                     <padding>
-                        <Insets top="24" right="28" bottom="24" left="28"/>
+                        <Insets top="30" right="36" bottom="30" left="36"/>
                     </padding>
 
                     <!-- Layout a griglia su 2 colonne -->
-                    <GridPane hgap="30" vgap="18">
+                    <GridPane hgap="36" vgap="22">
                         <columnConstraints>
                             <ColumnConstraints percentWidth="50" />
                             <ColumnConstraints percentWidth="50" />
                         </columnConstraints>
 
                         <!-- COLONNA SINISTRA -->
-                        <VBox spacing="16" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <VBox spacing="20" GridPane.columnIndex="0" GridPane.rowIndex="0">
                             <!-- Località (obbligatorio) -->
                             <VBox spacing="6" styleClass="field-group">
                                 <Label text="Località *" styleClass="field-label"/>
@@ -90,7 +95,7 @@
                         </VBox>
 
                         <!-- COLONNA DESTRA -->
-                        <VBox spacing="16" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <VBox spacing="20" GridPane.columnIndex="1" GridPane.rowIndex="0">
                             <!-- Fascia di prezzo -->
                             <VBox spacing="6" styleClass="field-group">
                                 <Label text="Fascia di prezzo" styleClass="field-label"/>
@@ -124,11 +129,11 @@
                     <Separator/>
 
                     <!-- SEZIONE INFERIORE: Servizi + Pulsanti affiancati -->
-                    <HBox alignment="CENTER_LEFT" spacing="20">
+                    <HBox alignment="CENTER_LEFT" spacing="28">
                         <!-- Servizi disponibili -->
                         <VBox spacing="8" styleClass="field-group" HBox.hgrow="ALWAYS">
                             <Label text="Servizi disponibili" styleClass="field-label"/>
-                            <HBox spacing="20" alignment="CENTER_LEFT">
+                            <HBox spacing="28" alignment="CENTER_LEFT">
                                 <CheckBox fx:id="chkDelivery" text="Servizio di delivery" styleClass="field-checkbox"/>
                                 <CheckBox fx:id="chkPrenotazione" text="Prenotazione online" styleClass="field-checkbox"/>
                             </HBox>
