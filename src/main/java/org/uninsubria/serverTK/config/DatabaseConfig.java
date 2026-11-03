@@ -48,6 +48,7 @@ public class DatabaseConfig {
         config.setJdbcUrl(url);
         config.setUsername(username);
         config.setPassword(password);
+        config.addDataSourceProperty("reWriteBatchedInserts", "true");
         config.setPoolName("TheKnife-PostgreSQL");
         config.setMaximumPoolSize(MAXIMUM_POOL_SIZE);
         config.setMinimumIdle(MINIMUM_IDLE);

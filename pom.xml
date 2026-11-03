@@ -121,6 +121,13 @@
             <version>${postgresql.version}</version>
         </dependency>
 
+        <!-- CSV parser that correctly handles quoted delimiters and multiline fields -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.14.1</version>
+        </dependency>
+
         <!-- JDBC connection pool (bounded database concurrency) -->
         <dependency>
             <groupId>com.zaxxer</groupId>

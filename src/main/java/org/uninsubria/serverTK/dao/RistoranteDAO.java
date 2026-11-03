@@ -13,6 +13,12 @@ import java.util.List;
 
 public class RistoranteDAO {
 
+    private static final String POSIZIONE_RISTORANTE =
+            "ST_SetSRID(ST_MakePoint(r.longitudine::double precision, " +
+                    "r.latitudine::double precision), 4326)::geography";
+    private static final String POSIZIONE_RIFERIMENTO =
+            "ST_SetSRID(ST_MakePoint(?::double precision, ?::double precision), 4326)::geography";
+
     public boolean inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -136,22 +142,17 @@ public class RistoranteDAO {
                 parametri.add(locPattern);
             }
 
-            // Formula di Haversine per distanza
+            // Ricerca geografica su geography per sfruttare l'indice GiST PostGIS.
             boolean usaCoordinate = filtri.latitudineRiferimento() != null &&
                     filtri.longitudineRiferimento() != null &&
                     filtri.raggioKm() != null;
 
             if (usaCoordinate) {
-                String haversineFormula = "(6371.0 * acos(LEAST(1.0::double precision, " +
-                        "cos(radians(?)) * cos(radians(r.latitudine)) * " +
-                        "cos(radians(r.longitudine) - radians(?)) + " +
-                        "sin(radians(?)) * sin(radians(r.latitudine)))))";
-
-                sql.append(" AND ").append(haversineFormula).append(" <= ?");
-                parametri.add(filtri.latitudineRiferimento());
+                sql.append(" AND ST_DWithin(").append(POSIZIONE_RISTORANTE)
+                        .append(", ").append(POSIZIONE_RIFERIMENTO).append(", ?)");
                 parametri.add(filtri.longitudineRiferimento());
                 parametri.add(filtri.latitudineRiferimento());
-                parametri.add(filtri.raggioKm());
+                parametri.add(filtri.raggioKm() * 1000.0);
             }
 
             // Filtro tipologia cucina
@@ -187,12 +188,9 @@ public class RistoranteDAO {
 
             // Ordinamento
             if (usaCoordinate) {
-                String haversineOrder = "(6371.0 * acos(LEAST(1.0::double precision, " +
-                        "cos(radians(?)) * cos(radians(r.latitudine)) * " +
-                        "cos(radians(r.longitudine) - radians(?)) + " +
-                        "sin(radians(?)) * sin(radians(r.latitudine)))))";
-                sql.append(" ORDER BY ").append(haversineOrder).append(" ASC");
-                parametri.add(filtri.latitudineRiferimento());
+                sql.append(" ORDER BY ST_Distance(")
+                        .append(POSIZIONE_RISTORANTE).append(", ")
+                        .append(POSIZIONE_RIFERIMENTO).append(") ASC");
                 parametri.add(filtri.longitudineRiferimento());
                 parametri.add(filtri.latitudineRiferimento());
             } else {
@@ -241,14 +239,11 @@ public class RistoranteDAO {
         }
 
         if (richiesta.latitudineRiferimento() != null) {
-            sql.append(" AND (6371.0 * acos(GREATEST(-1.0::double precision, LEAST(1.0::double precision, ")
-                    .append("cos(radians(?)) * cos(radians(r.latitudine)) * ")
-                    .append("cos(radians(r.longitudine) - radians(?)) + ")
-                    .append("sin(radians(?)) * sin(radians(r.latitudine)))))) <= ?");
-            parametri.add(richiesta.latitudineRiferimento());
+            sql.append(" AND ST_DWithin(").append(POSIZIONE_RISTORANTE)
+                    .append(", ").append(POSIZIONE_RIFERIMENTO).append(", ?)");
             parametri.add(richiesta.longitudineRiferimento());
             parametri.add(richiesta.latitudineRiferimento());
-            parametri.add(richiesta.raggioKm());
+            parametri.add(richiesta.raggioKm() * 1000.0);
         }
 
         if (!richiesta.tipologieCucina().isEmpty()) {
@@ -285,11 +280,9 @@ public class RistoranteDAO {
             parametri.add(richiesta.mediaStelleMinima());
         }
         if (richiesta.latitudineRiferimento() != null) {
-            sql.append(" ORDER BY (6371.0 * acos(GREATEST(-1.0::double precision, LEAST(1.0::double precision, ")
-                    .append("cos(radians(?)) * cos(radians(r.latitudine)) * ")
-                    .append("cos(radians(r.longitudine) - radians(?)) + ")
-                    .append("sin(radians(?)) * sin(radians(r.latitudine)))))) ASC, r.nome ASC");
-            parametri.add(richiesta.latitudineRiferimento());
+            sql.append(" ORDER BY ST_Distance(")
+                    .append(POSIZIONE_RISTORANTE).append(", ")
+                    .append(POSIZIONE_RIFERIMENTO).append(") ASC, r.nome ASC");
             parametri.add(richiesta.longitudineRiferimento());
             parametri.add(richiesta.latitudineRiferimento());
         } else {
