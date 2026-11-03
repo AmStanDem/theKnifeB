@@ -1,6 +1,7 @@
 package org.uninsubria.clientTK.util;
 
 import javafx.application.Platform;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -34,6 +35,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,6 +69,8 @@ public final class SelettoreLuogoDialog {
         ricerca.setPromptText("Cerca una via, città o indirizzo");
         Label stato = new Label("Cerca un luogo oppure trascina la mappa sotto il segnaposto.");
         Label statoMappa = new Label("Caricamento mappa OpenStreetMap...");
+        statoMappa.setWrapText(true);
+        statoMappa.setStyle("-fx-background-color: rgba(255,255,255,0.9); -fx-padding: 6;");
         AtomicReference<GeocodingService.Luogo> selezionato = new AtomicReference<>();
         Button conferma = (Button) dialog.getDialogPane().lookupButton(CONFERMA);
         conferma.setDisable(true);
@@ -103,13 +107,17 @@ public final class SelettoreLuogoDialog {
 
         Button zoomOut = new Button("−");
         Button zoomIn = new Button("+");
+        Button ricentra = new Button("Torna al luogo");
+        ricentra.setAccessibleText("Torna alla posizione iniziale della mappa");
+        ricentra.setTooltip(new javafx.scene.control.Tooltip(
+                "Torna alla posizione iniziale della mappa"));
         Button selezionaCentro = new Button("Usa il punto al centro");
         selezionaCentro.setDefaultButton(false);
         zoomOut.setOnAction(event -> mappa.cambiaZoom(-1));
         zoomIn.setOnAction(event -> mappa.cambiaZoom(1));
+        ricentra.setOnAction(event -> mappa.ricentra());
         selezionaCentro.setOnAction(event -> mappa.selezionaCentro());
-        Label attribution = new Label("© OpenStreetMap contributors");
-        HBox controls = new HBox(8, zoomOut, zoomIn, selezionaCentro);
+        HBox controls = new HBox(8, zoomOut, zoomIn, ricentra, selezionaCentro);
         controls.setPadding(new Insets(8));
         controls.setAlignment(Pos.CENTER);
         controls.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
@@ -129,8 +137,8 @@ public final class SelettoreLuogoDialog {
         VBox content = new VBox(10, new Label("Località"), ricerca, stato, statoMappa, mapPane);
         content.setPadding(new Insets(8));
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-        content.setPrefSize(Math.min(1080, screen.getWidth() - 80),
-                Math.min(760, screen.getHeight() - 160));
+        content.setPrefSize(Math.min(1200, screen.getWidth() * 0.9),
+                Math.min(850, screen.getHeight() * 0.88));
         dialog.getDialogPane().setContent(content);
         dialog.setResultConverter(button -> button == CONFERMA ? selezionato.get() : null);
         dialog.setResizable(true);
@@ -156,7 +164,9 @@ public final class SelettoreLuogoDialog {
         private final Consumer<String> statoMappa;
         private final Map<String, ImageView> visteTile = new HashMap<>();
         private final Set<String> tileInFlight = ConcurrentHashMap.newKeySet();
-        private final Circle marker = new Circle(8, javafx.scene.paint.Color.web("#d92d20"));
+        private final StackPane marker = new StackPane();
+        private final PauseTransition caricamentoTileDopoPan =
+                new PauseTransition(javafx.util.Duration.millis(120));
         private final AtomicLong generazioneSelezione = new AtomicLong();
         private final java.util.concurrent.atomic.AtomicBoolean tileCaricato =
                 new java.util.concurrent.atomic.AtomicBoolean();
@@ -173,6 +183,9 @@ public final class SelettoreLuogoDialog {
         private double dragStartY;
         private boolean dragging;
         private int zoom;
+        private final double latitudineIniziale;
+        private final double longitudineIniziale;
+        private final int zoomIniziale;
 
         private MappaLuoghi(
                 GeocodingService.Luogo iniziale,
@@ -187,17 +200,29 @@ public final class SelettoreLuogoDialog {
             this.centroSpostato = centroSpostato;
             this.erroreSelezione = erroreSelezione;
             this.statoMappa = statoMappa;
-            zoom = iniziale == null ? 6 : 14;
-            centroLatitudine = iniziale == null ? 42.5 : iniziale.latitudine();
-            centroLongitudine = iniziale == null ? 12.5 : iniziale.longitudine();
+            zoomIniziale = iniziale == null ? 6 : 14;
+            latitudineIniziale = iniziale == null ? 42.5 : iniziale.latitudine();
+            longitudineIniziale = iniziale == null ? 12.5 : iniziale.longitudine();
+            zoom = zoomIniziale;
+            centroLatitudine = latitudineIniziale;
+            centroLongitudine = longitudineIniziale;
             setClip(areaVisibile);
-            marker.setStroke(javafx.scene.paint.Color.WHITE);
-            marker.setStrokeWidth(2);
+            Circle bordoMarker = new Circle(13, javafx.scene.paint.Color.web("#d92d20"));
+            bordoMarker.setStroke(javafx.scene.paint.Color.WHITE);
+            bordoMarker.setStrokeWidth(3);
+            Circle centroMarker = new Circle(4, javafx.scene.paint.Color.WHITE);
+            marker.getChildren().addAll(bordoMarker, centroMarker);
+            marker.setMinSize(30, 30);
+            marker.setPrefSize(30, 30);
+            marker.setMaxSize(30, 30);
+            marker.setEffect(new javafx.scene.effect.DropShadow(
+                    8, javafx.scene.paint.Color.rgb(0, 0, 0, 0.55)));
             marker.setMouseTransparent(true);
             getChildren().add(marker);
             setMinSize(400, 300);
             setPrefSize(760, 420);
             setStyle("-fx-background-color: #e8edf0;");
+            caricamentoTileDopoPan.setOnFinished(event -> aggiornaMappa());
             widthProperty().addListener((observable, oldValue, newValue) -> {
                 areaVisibile.setWidth(newValue.doubleValue());
                 aggiornaMappa();
@@ -224,10 +249,12 @@ public final class SelettoreLuogoDialog {
                     centroY = dragStartY - (event.getY() - dragY);
                     aggiornaCentroCoordinate();
                     aggiornaMappa(false);
+                    caricamentoTileDopoPan.playFromStart();
                 }
             });
             setOnMouseReleased(event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
+                    caricamentoTileDopoPan.stop();
                     aggiornaCentroCoordinate();
                     aggiornaMappa();
                     if (dragging) {
@@ -254,6 +281,14 @@ public final class SelettoreLuogoDialog {
             aggiornaMappa();
         }
 
+        private void ricentra() {
+            generazioneSelezione.incrementAndGet();
+            zoom = zoomIniziale;
+            centroLatitudine = latitudineIniziale;
+            centroLongitudine = longitudineIniziale;
+            aggiornaMappa();
+        }
+
         private void cambiaZoom(int delta) {
             zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom + delta));
             aggiornaMappa();
@@ -276,6 +311,7 @@ public final class SelettoreLuogoDialog {
             int minTileY = (int) Math.floor(top / TILE_SIZE);
             int maxTileY = (int) Math.floor((top + getHeight()) / TILE_SIZE);
             int tileCount = 1 << zoom;
+            Set<ImageView> tileVisibili = new HashSet<>();
             for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
                 for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
                     if (tileY < 0 || tileY >= tileCount) {
@@ -295,6 +331,7 @@ public final class SelettoreLuogoDialog {
                     if (tile == null) {
                         continue;
                     }
+                    tileVisibili.add(tile);
                     tile.setLayoutX(tileX * TILE_SIZE - left);
                     tile.setLayoutY(tileY * TILE_SIZE - top);
                     if (caricaNuoviTile && tile.getImage() == null) {
@@ -305,14 +342,11 @@ public final class SelettoreLuogoDialog {
             }
             visteTile.entrySet().removeIf(entry -> {
                 ImageView view = entry.getValue();
-                boolean fuoriMappa = view.getLayoutX() < -TILE_SIZE
-                        || view.getLayoutY() < -TILE_SIZE
-                        || view.getLayoutX() > getWidth()
-                        || view.getLayoutY() > getHeight();
-                if (fuoriMappa) {
+                if (!tileVisibili.contains(view)) {
                     getChildren().remove(view);
+                    return true;
                 }
-                return fuoriMappa;
+                return false;
             });
             aggiornaMarker();
         }
@@ -357,9 +391,9 @@ public final class SelettoreLuogoDialog {
                         TILE_CACHE.keySet().stream().findAny().ifPresent(TILE_CACHE::remove);
                     }
                     Platform.runLater(() -> {
-                        if (tile.getParent() == this
-                                && tile.getImage() != image) {
-                            tile.setImage(image);
+                        ImageView tileAttuale = visteTile.get(key);
+                        if (tileAttuale != null && tileAttuale.getImage() != image) {
+                            tileAttuale.setImage(image);
                         }
                         segnalaMappaPronta();
                     });
@@ -428,8 +462,9 @@ public final class SelettoreLuogoDialog {
         }
 
         private void aggiornaMarker() {
-            marker.setCenterX(getWidth() / 2);
-            marker.setCenterY(getHeight() / 2);
+            marker.resize(30, 30);
+            marker.setLayoutX((getWidth() - 30) / 2);
+            marker.setLayoutY((getHeight() - 30) / 2);
             marker.setVisible(true);
             marker.toFront();
         }
