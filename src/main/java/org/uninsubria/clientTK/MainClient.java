@@ -18,7 +18,7 @@ public class MainClient extends Application {
         stage.getIcons().add(icona);
         stage.setTitle("TheKnife");
 
-        // Usa una finestra borderless a schermo intero, senza la modalita fullscreen esclusiva.
+        // Usa una finestra borderless a schermo intero.
         SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/MainLayout.fxml");
         var bounds = Screen.getPrimary().getBounds();
         stage.setX(bounds.getMinX());

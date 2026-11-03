@@ -2,6 +2,7 @@ package org.uninsubria.clientTK.util;
 
 import javafx.event.Event;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,13 +10,17 @@ import javafx.scene.control.Button;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Modality;
+import javafx.scene.input.KeyCombination;
+import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import java.io.IOException;
@@ -26,6 +31,8 @@ public class SceneManager {
 
     private static final Map<Stage, Stack<String>> historyMap = new HashMap<>();
     private static final Map<Stage, String> currentFxmlMap = new HashMap<>();
+    private static final Map<Stage, Set<Window>> popupWindows = new HashMap<>();
+    private static boolean popupListenerInstalled;
 
     private static final String GLOBAL_CSS = "/org/uninsubria/clientTK/styles/style.css";
 
@@ -45,10 +52,7 @@ public class SceneManager {
     }
 
     /**
-     * Cambia la scena, applica il CSS globale e mantiene la finestra principale
-     * a schermo intero.
-     *
-     * DA ELIMINARE DOPO LA PULIZIA
+     * Cambia la scena mantenendo la finestra principale a schermo intero.
      */
     public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath) {
         return switchSceneAndGetController(stage, fxmlPath, true);
@@ -79,14 +83,7 @@ public class SceneManager {
                 stage.sizeToScene();
             }
 
-            stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-            stage.setFullScreenExitHint("");
-            Platform.runLater(() -> {
-                if (stage.isShowing()) {
-                    stage.setFullScreen(true);
-                }
-            });
-
+            mantieneFullscreen(stage);
             return loader.getController();
 
         } catch (IOException e) {
@@ -95,6 +92,88 @@ public class SceneManager {
                     e
             );
         }
+    }
+
+    private static void mantieneFullscreen(Stage stage) {
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        stage.setFullScreenExitHint("");
+        if (!popupWindows.containsKey(stage)) {
+            popupWindows.put(stage, new HashSet<>());
+            stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> popupWindows.remove(stage));
+        }
+
+        if (!popupListenerInstalled) {
+            Window.getWindows().addListener((ListChangeListener<Window>) change -> {
+                while (change.next()) {
+                    if (change.wasAdded()) {
+                        for (Window window : change.getAddedSubList()) {
+                            monitoraPopup(window);
+                        }
+                    }
+                }
+            });
+            popupListenerInstalled = true;
+        }
+
+        for (Window window : Window.getWindows()) {
+            monitoraPopup(stage, window);
+        }
+
+        Platform.runLater(() -> {
+            if (stage.isShowing()) {
+                stage.setFullScreen(true);
+            }
+        });
+    }
+
+    private static void monitoraPopup(Window window) {
+        for (Stage stage : Set.copyOf(popupWindows.keySet())) {
+            monitoraPopup(stage, window);
+        }
+    }
+
+    private static void monitoraPopup(Stage stage, Window window) {
+        if (window == stage || !appartieneA(window, stage)) {
+            return;
+        }
+        Set<Window> monitorate = popupWindows.get(stage);
+        if (monitorate == null || !monitorate.add(window)) {
+            return;
+        }
+
+        window.showingProperty().addListener((observable, precedente, visibile) -> {
+            if (!visibile) {
+                Platform.runLater(() -> {
+                    if (stage.isShowing()
+                            && !stage.isFullScreen()
+                            && popupWindows.getOrDefault(stage, Set.of()).stream()
+                                    .noneMatch(Window::isShowing)) {
+                        stage.setFullScreen(true);
+                    }
+                });
+            }
+        });
+    }
+
+    private static boolean appartieneA(Window window, Stage stage) {
+        Window owner = proprietario(window);
+        while (owner != null) {
+            if (owner == stage) {
+                return true;
+            }
+            owner = proprietario(owner);
+        }
+        return false;
+    }
+
+    private static Window proprietario(Window window) {
+        if (window instanceof PopupWindow popup) {
+            return popup.getOwnerWindow();
+        }
+        if (window instanceof Stage stage) {
+            return stage.getOwner();
+        }
+        return null;
     }
 
     private static StackPane creaRootApplicativa(Stage stage, Parent contenuto) {
