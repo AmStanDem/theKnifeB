@@ -1,7 +1,7 @@
 package org.uninsubria.clientTK.controller;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -9,12 +9,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.CheckComboBox;
+import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.SessioneUtente;
-import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -54,21 +56,12 @@ public class AggiungiRistoranteController {
     @FXML
     private Button btnAnnulla;
 
+    private boolean tipologieCaricate;
+
     @FXML
     public void initialize() {
-        ObservableList<String> tipologieCucina =
-                FXCollections.observableArrayList(
-                        "Italiana",
-                        "Pizzeria",
-                        "Giapponese",
-                        "Cinese",
-                        "Messicana",
-                        "Indiana",
-                        "Vegetariana",
-                        "Vegan"
-                );
-
-        comboCucine.getItems().setAll(tipologieCucina);
+        comboCucine.setDisable(true);
+        btnSalva.setDisable(true);
         txtIndirizzo.addTextFieldStyleClass("custom-text-field");
         txtCitta.setEditable(false);
         txtNazione.setEditable(false);
@@ -76,11 +69,42 @@ public class AggiungiRistoranteController {
             txtCitta.setText(luogo.localita());
             txtNazione.setText(luogo.nazione());
         });
+        caricaTipologieCucina();
+    }
+
+    private void caricaTipologieCucina() {
+        Thread.startVirtualThread(() -> {
+            try {
+                List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
+                Platform.runLater(() -> {
+                    comboCucine.getItems().setAll(FXCollections.observableArrayList(tipologie));
+                    comboCucine.setDisable(false);
+                    btnSalva.setDisable(false);
+                    tipologieCaricate = true;
+                });
+            } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+                System.err.println("[RESTAURANT_FORM_ERROR] Impossibile caricare le tipologie cucina: "
+                        + e.getMessage());
+                Platform.runLater(() -> mostraMessaggio(
+                        Alert.AlertType.ERROR,
+                        "Catalogo cucine non disponibile",
+                        "Non è stato possibile caricare le tipologie di cucina dal server. "
+                                + "Riapri il modulo quando il server è disponibile."
+                ));
+            }
+        });
     }
 
     @FXML
     public void onSalvaClick(ActionEvent event) {
-
+        if (!tipologieCaricate) {
+            mostraMessaggio(
+                    Alert.AlertType.WARNING,
+                    "Catalogo cucine non disponibile",
+                    "Attendi il caricamento delle tipologie di cucina prima di salvare."
+            );
+            return;
+        }
 
         // 1. Verifica che tutti i campi obbligatori siano compilati.
         if (txtNome.getText().trim().isEmpty()

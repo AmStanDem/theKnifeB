@@ -66,6 +66,7 @@
                     <VBox spacing="5.0">
                         <Label styleClass="input-label" text="Tipologie di Cucina *" />
                         <CheckComboBox fx:id="comboCucine" maxWidth="Infinity" styleClass="custom-check-combo" />
+                        <Label styleClass="form-subtitle" text="Seleziona una o più tipologie dal catalogo completo." />
                     </VBox>
 
                     <!-- Servizi Offerti -->
