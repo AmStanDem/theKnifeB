@@ -8,7 +8,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.control.Button?>
-<VBox spacing="10" stylesheets="@../styles/recensione-item.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
+<VBox spacing="10"
+      maxWidth="Infinity"
+      stylesheets="@../styles/recensione-item.css"
+      styleClass="recensione-item"
+      xmlns="http://javafx.com/javafx/21.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.uninsubria.clientTK.controller.RecensioneItemController">
 
     <!-- Header: Avatar + Nome + Menu Opzioni (Tre Punti) -->
     <HBox alignment="CENTER_LEFT" spacing="12">
@@ -40,7 +46,11 @@
     </HBox>
 
     <!-- Testo recensione -->
-    <Label fx:id="reviewTextField" maxWidth="350" prefWidth="350" style="-fx-font-size: 14px; -fx-text-fill: #3c4043; -fx-line-spacing: 2px;" styleClass="review-text-field" text="credo sia il gioco migliore a cui abbia mai giocato: ha ambientazioni, personaggi, dialoghi e storia impeccabili. prima di giocarci non mi sarei mai aspettato una mappa così vasta e tante missioni e personaggi, non manca nulla è davvero un bellissimo open word e lo consiglio. ha piccolissimi lati negativi come le poche ricompense ma quasi impercettibili durante il gioco perché diventa continuativo ma per niente stancante." wrapText="true" />
+    <Label fx:id="reviewTextField"
+           maxWidth="Infinity"
+           styleClass="review-text-field"
+           text="credo sia il gioco migliore a cui abbia mai giocato: ha ambientazioni, personaggi, dialoghi e storia impeccabili. prima di giocarci non mi sarei mai aspettato una mappa così vasta e tante missioni e personaggi, non manca nulla è davvero un bellissimo open word e lo consiglio. ha piccolissimi lati negativi come le poche ricompense ma quasi impercettibili durante il gioco perché diventa continuativo ma per niente stancante."
+           wrapText="true" />
 
     <!-- Sezione Risposta -->
     <VBox spacing="4" style="-fx-padding: 8px 0 0 0;">
@@ -78,8 +88,7 @@
         </HBox>
 
         <Label fx:id="responseTextField"
-               maxWidth="350"
-               prefWidth="350"
+               maxWidth="Infinity"
                style="-fx-font-size: 13px; -fx-text-fill: #5f6368;"
                styleClass="response-text-field"
                text="Nam vestibulum neque a maximus scelerisque."
@@ -88,6 +97,6 @@
     </VBox>
 
     <padding>
-        <Insets bottom="16" left="16" right="16" top="16" />
+        <Insets bottom="18" left="22" right="22" top="18" />
     </padding>
 </VBox>

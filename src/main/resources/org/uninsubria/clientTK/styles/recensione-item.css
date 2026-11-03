@@ -78,10 +78,13 @@
 
 .recensione-item {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 8;
-    -fx-border-color: #e0e0e0;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);
+}
+
+.recensione-item:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 14, 0, 0, 5);
+    -fx-translate-y: -2;
 }
 
 /* ===== Avatar ===== */
