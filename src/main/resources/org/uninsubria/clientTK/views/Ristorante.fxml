@@ -9,6 +9,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
@@ -204,11 +205,10 @@
                   </HBox>
 
                      <!-- TIPO DI CUCINA -->
-                  <HBox alignment="CENTER_LEFT" spacing="10.0">
-                      <Label styleClass="profile-label" text="Tipo di cucina:" />
-
-                         <Label fx:id="lblTipoCucina" styleClass="profile-value"  />
-                  </HBox>
+                  <VBox spacing="8.0">
+                      <Label styleClass="profile-label" text="Tipologie di cucina:" />
+                      <FlowPane fx:id="cuisineTags" hgap="6.0" vgap="6.0" styleClass="cuisine-tags" />
+                  </VBox>
 
                  </VBox>
                   <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onRecensioniClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />

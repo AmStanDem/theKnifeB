@@ -12,7 +12,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import org.uninsubria.clientTK.util.CuisineTags;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.RecensioneSelezionata;
@@ -60,7 +62,7 @@ public class AreaRistoranteController {
     private Label lblPrenotazione;
 
     @FXML
-    private Label lblTipoCucina;
+    private FlowPane cuisineTags;
 
 
 
@@ -212,11 +214,7 @@ public class AreaRistoranteController {
                 Boolean.TRUE.equals(ristorante.bookingOnline()) ? "Sì" : "No"
         );
 
-        lblTipoCucina.setText(
-                ristorante.tipologieCucina() != null
-                        ? String.valueOf(ristorante.tipologieCucina())
-                        : "Non specificata"
-        );
+        CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
     }
 
     private void caricaRecensioni() {

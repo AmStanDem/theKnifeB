@@ -189,6 +189,26 @@
     -fx-font-size: 17px;
 }
 
+.cuisine-tags {
+    -fx-hgap: 6;
+    -fx-vgap: 6;
+}
+
+.cuisine-chip {
+    -fx-background-color: #E8F3E7;
+    -fx-text-fill: #276B2D;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 14;
+    -fx-padding: 6 12 6 12;
+}
+
+.cuisine-chip-empty {
+    -fx-background-color: #ECEFF1;
+    -fx-text-fill: #626B73;
+    -fx-font-weight: normal;
+}
+
 
 /* =========================
    PULSANTI PROFILO

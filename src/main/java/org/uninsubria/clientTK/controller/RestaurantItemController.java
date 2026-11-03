@@ -4,8 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
 import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.CuisineTags;
 import org.uninsubria.common.dto.RistoranteDTO;
 
 import java.util.function.Consumer;
@@ -31,6 +33,7 @@ public class RestaurantItemController {
     @FXML private Label ratingValueLabel;
     @FXML private Label addressLabel;
     @FXML private Label metaLabel;
+    @FXML private FlowPane cuisineTags;
     @FXML private Label deliveryTag;
     @FXML private Label bookingTag;
     @FXML private Button detailsButton;
@@ -54,7 +57,8 @@ public class RestaurantItemController {
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
-        metaLabel.setText(formattaMeta(String.valueOf(ristorante.tipologieCucina()), ristorante.prezzoMedio()));
+        CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
+        metaLabel.setText(formattaMeta(ristorante.prezzoMedio()));
 
         aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.delivery()));
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));
@@ -129,13 +133,11 @@ public class RestaurantItemController {
      * viene utilizzato un valore indicativo.
      * </p>
      *
-     * @param tipoCucina tipologia di cucina del ristorante
      * @param prezzoMedio prezzo medio del ristorante
      * @return stringa contenente tipologia di cucina e prezzo medio
      */
-    private String formattaMeta(String tipoCucina, Double prezzoMedio) {
-        String cucina = (tipoCucina != null && !tipoCucina.isBlank()) ? tipoCucina : "Cucina non specificata";
+    private String formattaMeta(Double prezzoMedio) {
         String prezzo = (prezzoMedio != null) ? String.format("%.0f €", prezzoMedio) : "n.d.";
-        return cucina + " • Prezzo medio " + prezzo;
+        return "Prezzo medio " + prezzo;
     }
 }

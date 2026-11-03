@@ -40,6 +40,26 @@
     -fx-text-fill: #374151;
 }
 
+.cuisine-tags {
+    -fx-hgap: 6;
+    -fx-vgap: 6;
+}
+
+.cuisine-chip {
+    -fx-background-color: #E8F3E7;
+    -fx-text-fill: #276B2D;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-padding: 5 10 5 10;
+}
+
+.cuisine-chip-empty {
+    -fx-background-color: #F1F2F4;
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: normal;
+}
+
 /* ---------- TAG ---------- */
 .tag-delivery {
     -fx-background-color: #EAFBF1;
