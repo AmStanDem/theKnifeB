@@ -56,14 +56,18 @@
 
             <Button fx:id="editButton"
                     text="Modifica"
+                    styleClass="edit-button"
                     onAction="#onModificaClicked"
                     visible="false"
                     managed="false" />
+
             <Button fx:id="deleteButton"
                     text="Elimina"
+                    styleClass="delete-button"
                     onAction="#onEliminaClicked"
                     visible="false"
                     managed="false" />
+
             <Button fx:id="replyButton"
                     text="Rispondi"
                     styleClass="reply-button"

@@ -10,7 +10,7 @@
 /* ===================== LISTA RECENSIONI (colonna destra) ===================== */
 
 .lista-recensioni-root {
-    -fx-background-color: transparent;
+    -fx-background-color: #FFFFFF;
 }
 
 .lista-recensioni-title {
@@ -59,17 +59,19 @@
 }
 
 /* Scroll list */
+
+
 .lista-recensioni-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
+    -fx-background-color: #FFFFFF;
+    -fx-background: #FFFFFF;
 }
 
 .lista-recensioni-scroll > .viewport {
-    -fx-background-color: transparent;
+    -fx-background-color: #FFFFFF;
 }
 
 .recensioni-container {
-    -fx-background-color: transparent;
+    -fx-background-color: #FFFFFF;
 }
 
 /* ===================== SINGOLA RECENSIONE ===================== */
@@ -161,3 +163,53 @@
     -fx-background-color: #e8f0fe;
 }
 
+
+/* ===== PULSANTE MODIFICA ===== */
+.edit-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4CAF50;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+}
+
+.edit-button:hover {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(76,175,80,0.35), 8, 0, 0, 2);
+}
+
+.edit-button:pressed {
+    -fx-background-color: #388E3C;
+    -fx-border-color: #388E3C;
+}
+
+/* ===== PULSANTE ELIMINA ===== */
+.delete-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #E53935;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-border-color: #E53935;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 20 8 20;
+    -fx-cursor: hand;
+}
+
+.delete-button:hover {
+    -fx-background-color: #E53935;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(229,57,53,0.35), 8, 0, 0, 2);
+}
+
+.delete-button:pressed {
+    -fx-background-color: #C62828;
+    -fx-border-color: #C62828;
+}
