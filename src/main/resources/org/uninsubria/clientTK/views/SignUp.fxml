@@ -21,7 +21,6 @@
 
 <BorderPane styleClass="root" stylesheets="@../styles/signUp-style.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.clientTK.controller.SignUpController">
 
-    <!-- CONTENUTO PRINCIPALE CON SCROLLPANE PER SCHERMI DA 14" -->
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="main-scroll" BorderPane.alignment="CENTER">
             <content>
@@ -30,7 +29,7 @@
                         <Insets bottom="20.0" top="20.0" />
                     </padding>
 
-                    <VBox alignment="TOP_CENTER" maxWidth="500.0" spacing="15.0" styleClass="signup-card">
+                    <VBox alignment="TOP_CENTER" maxWidth="750.0" spacing="15.0" styleClass="signup-card">
                         <padding>
                             <Insets bottom="30.0" left="40.0" right="40.0" top="25.0" />
                         </padding>
