@@ -148,7 +148,7 @@
                     <!-- I MIEI RISTORANTI  -->
                     <Button fx:id="btnRistoranti"
                             mnemonicParsing="false"
-                            onAction="#onRistorantiClick"
+                            onAction="#ListaRistorantiRistoratore"
                             prefHeight="55.0"
                             prefWidth="500.0"
                             styleClass="profile-button"

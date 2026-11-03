@@ -6,19 +6,14 @@ import org.uninsubria.common.exceptions.*;
 import org.uninsubria.serverTK.service.*;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnifeServer {
+public class TheKnifeServerImpl implements ITheKnifeServer {
 
     private final UtenteService utenteService = new UtenteService();
     private final RistoranteService ristoranteService = new RistoranteService();
     private final RecensioneService recensioneService = new RecensioneService();
     private final PreferitiService preferitiService = new PreferitiService();
-
-    public TheKnifeServerImpl() throws RemoteException {
-        super();
-    }
 
     @Override
     public UtenteDTO eseguiLogin(String email, String password)
@@ -34,8 +29,20 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
 
     @Override
     public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
-            throws RemoteException {
+            throws RemoteException, SistemaIndisponibileException {
         return ristoranteService.cercaRistoranti(filtri);
+    }
+
+    @Override
+    public PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+            throws RemoteException, SistemaIndisponibileException {
+        return ristoranteService.cercaRistorantiPagina(richiesta);
+    }
+
+    @Override
+    public List<String> ottieniTutteTipologieCucina()
+            throws RemoteException, SistemaIndisponibileException {
+        return ristoranteService.ottieniTutteTipologieCucina();
     }
 
     @Override
@@ -63,13 +70,25 @@ public class TheKnifeServerImpl extends UnicastRemoteObject implements ITheKnife
     }
 
     @Override
+    public List<RecensioneDTO> getRecensioniRistoranteAnonimo(Integer idRistorante)
+            throws RemoteException, SistemaIndisponibileException {
+        return recensioneService.ottieniPerRistoranteAnonimo(idRistorante);
+    }
+
+    @Override
+    public List<RecensioneDTO> getRecensioniUtente(Integer idUtente)
+            throws RemoteException, SistemaIndisponibileException {
+        return recensioneService.ottieniPerUtente(idUtente);
+    }
+
+    @Override
     public void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException {
         recensioneService.aggiungiRecensione(recensione, idRistorante, idUtente);
     }
 
     @Override
-    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle)
+    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
             throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
         recensioneService.modifica(idRecensione, idUtente, nuovoTesto, nuoveStelle);
     }

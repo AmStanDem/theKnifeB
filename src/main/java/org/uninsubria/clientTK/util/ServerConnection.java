@@ -21,10 +21,9 @@ public final class ServerConnection {
     /** Nome con cui il serverTK espone il servizio remoto nel registry. */
     private static final String SERVICE_NAME = "TheKnifeServer";
 
-    private static String host = "localhost";
-    private static int port = 1099;
+    private record Endpoint(String host, int port, ITheKnifeServer server) {}
 
-    private static ITheKnifeServer server;
+    private static volatile Endpoint endpoint = new Endpoint("localhost", 1099, null);
 
     private ServerConnection() {
         // classe di utilità, non istanziabile
@@ -39,9 +38,10 @@ public final class ServerConnection {
      * @param nuovaPorta porta del server RMI
      */
     public static void configura(String nuovoHost, int nuovaPorta) {
-        host = nuovoHost;
-        port = nuovaPorta;
-        server = null; // forza una nuova connessione con i nuovi parametri
+        if (nuovoHost == null || nuovoHost.isBlank() || nuovaPorta < 1 || nuovaPorta > 65535) {
+            throw new IllegalArgumentException("Host e porta RMI non validi.");
+        }
+        endpoint = new Endpoint(nuovoHost.trim(), nuovaPorta, null);
     }
 
     /**
@@ -53,10 +53,18 @@ public final class ServerConnection {
      * @throws NotBoundException se il servizio non è registrato sul registry indicato
      */
     public static ITheKnifeServer getServer() throws RemoteException, NotBoundException {
-        if (server == null) {
-            Registry registry = LocateRegistry.getRegistry(host, port);
-            server = (ITheKnifeServer) registry.lookup(SERVICE_NAME);
+        while (true) {
+            Endpoint current = endpoint;
+            if (current.server() != null) {
+                return current.server();
+            }
+
+            Registry registry = LocateRegistry.getRegistry(current.host(), current.port());
+            ITheKnifeServer stub = (ITheKnifeServer) registry.lookup(SERVICE_NAME);
+            if (endpoint == current) {
+                endpoint = new Endpoint(current.host(), current.port(), stub);
+                return stub;
+            }
         }
-        return server;
     }
 }

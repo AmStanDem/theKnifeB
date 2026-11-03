@@ -149,25 +149,11 @@
     -fx-text-fill: #9a9a9a;
 }
 
-/* ---------------- VALUTAZIONE (Rating ControlsFX) ---------------- */
+/* ---------------- VALUTAZIONE ---------------- */
 
 .star-rating {
-    -fx-skin: "org.controlsfx.control.skin.RatingSkin";
-}
-
-/* Stelle non selezionate */
-.star-rating > .container > .button {
-    -fx-background-color: transparent;
-    -fx-shape: "M50,0 L61,35 L98,35 L68,57 L79,91 L50,70 L21,91 L32,57 L2,35 L39,35 Z";
-    -fx-scale-shape: true;
-    -fx-background-insets: 0;
-    -fx-padding: 8px;
-    -fx-background-color: #dcdcdc;
-}
-
-/* Stelle selezionate / evidenziate */
-.star-rating > .container > .button.strong {
-    -fx-background-color: #f5a623;
+    -fx-alignment: center-left;
+    -fx-spacing: 4px;
 }
 
 /* ---------------- BOTTONIERA ---------------- */

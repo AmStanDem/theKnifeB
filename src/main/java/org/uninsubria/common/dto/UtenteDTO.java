@@ -1,5 +1,7 @@
 package org.uninsubria.common.dto;
 import org.uninsubria.common.enums.RuoloUtente;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -11,4 +13,7 @@ public record UtenteDTO(
         LocalDate dataNascita,
         String domicilio,
         RuoloUtente ruolo
-) implements Serializable {}
+) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+}

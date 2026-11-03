@@ -2,15 +2,13 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
-
-import java.io.IOException;
+import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.enums.RuoloUtente;
 
 /**
  * Controller JavaFX dell'interfaccia principale dell'area cliente.
@@ -30,10 +28,57 @@ import java.io.IOException;
 public class AreaClienteController {
 
     @FXML
-    private TextField txtLocalita;
+    private Label lblNome;
 
     @FXML
-    private Button btnGeolocalizzazione;
+    private Label lblCognome;
+
+    @FXML
+    private Label lblData;
+
+    @FXML
+    private Label lblDomicilio;
+
+    @FXML
+    private Label lblRuolo;
+
+    @FXML
+    private Label lblEmail;
+
+
+    @FXML
+    private void initialize() {
+
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+
+        // Controllo di sicurezza
+        if (utente == null) {
+            return;
+        }
+
+        lblNome.setText(utente.nome());
+        lblCognome.setText(utente.cognome());
+        lblEmail.setText(utente.email());
+        lblDomicilio.setText(utente.domicilio());
+
+        // Data di nascita
+        if (utente.dataNascita() != null) {
+            lblData.setText(utente.dataNascita().toString());
+        } else {
+            lblData.setText("-");
+        }
+
+        // Ruolo
+        if (utente.ruolo() != null) {
+            if (utente.ruolo() == RuoloUtente.CLIENTE) {
+                lblRuolo.setText("Cliente");
+            } else if (utente.ruolo() == RuoloUtente.GESTORE) {
+                lblRuolo.setText("Ristoratore");
+            }
+        } else {
+            lblRuolo.setText("-");
+        }
+    }
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
@@ -51,20 +96,7 @@ public class AreaClienteController {
      * @param event evento generato dal click sul pulsante
      */
     private void onAreaPersonaleClick(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/SignUp.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/SignUp.fxml");
     }
 
     @FXML
@@ -88,20 +120,8 @@ public class AreaClienteController {
      * @param actionEvent evento generato dal click dell'utente
      */
     public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(actionEvent,
+                "/org/uninsubria/clientTK/views/RicercaAvanzataView.fxml");
     }
 
     /**
@@ -111,6 +131,7 @@ public class AreaClienteController {
      * </p>
      */
     public void onPreferitiClick(ActionEvent actionEvent) {
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Preferiti.fxml");
     }
 
     /**
@@ -123,20 +144,7 @@ public class AreaClienteController {
      * @param actionEvent evento generato dal click dell'utente
      */
     public void onRecensioniClick(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/RecensioneItem.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MieRecensioni.fxml");
     }
 
     /**
@@ -150,21 +158,8 @@ public class AreaClienteController {
      * @param actionEvent evento generato dal click dell'utente
      */
     public void onLogOutClick(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        SessioneUtente.logout();
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     /**
@@ -178,19 +173,6 @@ public class AreaClienteController {
      * @param mouseEvent evento generato dal click sul logo
      */
     public void handleLogoClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneManager.switchScene(mouseEvent, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 }

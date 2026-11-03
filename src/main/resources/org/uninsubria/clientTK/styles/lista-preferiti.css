@@ -1,0 +1,155 @@
+/* ==========================================================
+   PALETTE — stile TheFork
+   ========================================================== */
+.root-pane {
+    -fx-background-color: #F7F8F9;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- HEADER ---------- */
+.header-box {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: transparent transparent #E5E7EB transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.page-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1F2937;
+}
+
+/* ---------- SEARCH BAR ---------- */
+.search-bar {
+    -fx-background-color: #FFFFFF;
+}
+
+.search-field {
+    -fx-background-color: #F3F4F6;
+    -fx-background-radius: 24;
+    -fx-padding: 10 18 10 18;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: transparent;
+}
+
+.search-field:focused {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #2ECC71;
+    -fx-border-radius: 24;
+    -fx-border-width: 1.5;
+}
+
+.primary-button {
+    -fx-background-color: #2ECC71;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 24;
+    -fx-padding: 10 26 10 26;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(46,204,113,0.35), 8, 0, 0, 2);
+}
+
+.primary-button:hover {
+    -fx-background-color: #27AE60;
+    -fx-effect: dropshadow(gaussian, rgba(46,204,113,0.5), 10, 0, 0, 3);
+}
+
+.primary-button:pressed {
+    -fx-background-color: #1E8449;
+}
+
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #6B7280;
+    -fx-font-size: 13px;
+    -fx-border-color: #D1D5DB;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 18 8 18;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-border-color: #2ECC71;
+    -fx-text-fill: #2ECC71;
+}
+
+/* ---------- FILTRI ---------- */
+.filters-bar {
+    -fx-padding: 4 0 0 0;
+}
+
+.filters-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6B7280;
+    -fx-font-weight: bold;
+}
+
+.filter-combo {
+    -fx-background-color: #F3F4F6;
+    -fx-background-radius: 18;
+    -fx-padding: 2 8 2 8;
+    -fx-font-size: 13px;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: #1F2937;
+    -fx-padding: 4 8 4 8;
+}
+
+.filter-combo:hover {
+    -fx-background-color: #E5E7EB;
+}
+
+/* ---------- CONTENUTO / RISULTATI ---------- */
+.content-box {
+    -fx-background-color: #F7F8F9;
+}
+
+.results-count {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6B7280;
+    -fx-padding: 12 0 8 4;
+}
+
+/* ---------- SCROLLPANE + CONTAINER LISTA ---------- */
+.restaurant-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.restaurant-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.restaurant-container {
+    -fx-background-color: transparent;
+    -fx-padding: 4 4 20 4;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #D1D5DB;
+    -fx-background-radius: 8;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #9CA3AF;
+}
+
+.restaurant-scroll-pane .scroll-bar:vertical .increment-button,
+.restaurant-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.restaurant-scroll-pane .corner {
+    -fx-background-color: transparent;
+}

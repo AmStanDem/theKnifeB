@@ -89,6 +89,11 @@
     -fx-border-radius: 10px;
 }
 
+.location-container:hover {
+    -fx-border-color: #3E9330;
+    -fx-border-width: 2px;
+}
+
 
 /* Campo "Dove?" */
 

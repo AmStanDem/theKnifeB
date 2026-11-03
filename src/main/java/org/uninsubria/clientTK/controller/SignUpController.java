@@ -2,32 +2,23 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import java.io.IOException;
+import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.ServerConnection;
+import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.clientTK.util.LuogoInput;
+import org.uninsubria.clientTK.util.GeocodingService;
+import org.uninsubria.common.dto.UtenteDTO;
+import org.uninsubria.common.enums.RuoloUtente;
+import org.uninsubria.common.exceptions.DatiMancantiException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.common.exceptions.UtenteGiaEsistenteException;
 
-/**
- * Controller JavaFX dell'interfaccia dedicata alla registrazione
- * di un nuovo utente.
- * <p>
- * Gestisce la raccolta e la validazione dei dati inseriti dall'utente,
- * verificando la correttezza dei campi anagrafici, del ruolo selezionato
- * e dei requisiti di sicurezza della password.
- * </p>
- *
- * <p>
- * Il controller gestisce inoltre la navigazione verso la schermata
- * principale dell'applicazione dopo la registrazione e verso la schermata
- * di accesso o quella principale tramite le relative azioni dell'interfaccia.
- * </p>
- */
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.time.LocalDate;
+
 public class SignUpController {
 
     @FXML
@@ -40,185 +31,102 @@ public class SignUpController {
     private ComboBox<String> ruoloComboBox;
 
     @FXML
+    private DatePicker dataNascitaPicker;
+
+    @FXML
+    private LuogoInput indirizzo;
+
+    @FXML
     private TextField emailField;
 
     @FXML
     private PasswordField passwordField;
 
-    /**
-     * Gestisce la registrazione di un nuovo utente.
-     * <p>
-     * Recupera i dati inseriti nei campi della schermata e verifica
-     * che siano stati compilati correttamente. Controlla inoltre che
-     * il ruolo selezionato sia valido e che la password rispetti
-     * i requisiti minimi di lunghezza e complessità.
-     * </p>
-     *
-     * <p>
-     * Se uno dei controlli non viene superato, viene mostrato un messaggio
-     * nella console e il campo interessato riceve nuovamente il focus.
-     * In caso di validazione positiva, viene caricata la schermata
-     * {@code MainLayoutLoggato.fxml}.
-     * </p>
-     *
-     * @param event evento generato dal click sul pulsante di registrazione
-     */
+    @FXML
+    private PasswordField confermaPasswordField;
+
+    @FXML
+    private Label labelErrore;
+
+    @FXML
+    private void initialize() {
+        indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
+    }
+
     @FXML
     private void handleRegistrati(ActionEvent event) {
-
+        labelErrore.setText("");
         String nome = nomeField.getText();
         String cognome = cognomeField.getText();
         String ruolo = ruoloComboBox.getValue();
+        LocalDate dataNascita = dataNascitaPicker.getValue();
+        String domicilio = indirizzo.getText().trim();
         String email = emailField.getText();
         String password = passwordField.getText();
+        String confermaPassword = confermaPasswordField.getText();
 
-        if (nome.isEmpty() ||
-                cognome.isEmpty() ||
-                ruolo == null ||
-                email.isEmpty() ||
-                password.isEmpty()) {
-
-            System.out.println("Compila tutti i campi!");
+        if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
+                || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
+            labelErrore.setText("Compila tutti i campi obbligatori!");
             return;
         }
 
-        if (!ruolo.equals("Cliente") &&
-                !ruolo.equals("Ristoratore")) {
+        GeocodingService.Luogo luogo = indirizzo.getLuogoSelezionato();
+        if (luogo == null || !luogo.etichetta().equals(domicilio.trim())) {
+            labelErrore.setText("Seleziona un domicilio valido dai suggerimenti.");
+            indirizzo.requestFocus();
+            return;
+        }
 
-            System.out.println("Il ruolo selezionato non è valido.");
+        if (!password.equals(confermaPassword)) {
+            labelErrore.setText("Le password non coincidono.");
+            confermaPasswordField.requestFocus();
+            return;
+        }
+
+        if (!ruolo.equals("Cliente") && !ruolo.equals("Ristoratore")) {
+            labelErrore.setText("Il ruolo selezionato non è valido.");
             ruoloComboBox.requestFocus();
             return;
         }
 
-        if (password.length() < 8) {
-            System.out.println(
-                    "La password deve contenere almeno 8 caratteri."
-            );
+        if (password.length() < 8 || password.length() > 64 || password.contains(" ") ||
+                !password.matches(".*[a-z].*") || !password.matches(".*[A-Z].*") ||
+                !password.matches(".*\\d.*") || !password.matches(".*[^A-Za-z0-9].*")) {
+            labelErrore.setText("La password non soddisfa i requisiti di sicurezza.");
             passwordField.requestFocus();
             return;
         }
-
-        if (password.length() > 64) {
-            System.out.println(
-                    "La password non può superare 64 caratteri."
-            );
-            passwordField.requestFocus();
-            return;
-        }
-
-        if (password.contains(" ")) {
-            System.out.println(
-                    "La password non può contenere spazi."
-            );
-            passwordField.requestFocus();
-            return;
-        }
-
-        if (!password.matches(".*[a-z].*")) {
-            System.out.println(
-                    "La password deve contenere almeno una lettera minuscola."
-            );
-            passwordField.requestFocus();
-            return;
-        }
-
-        if (!password.matches(".*[A-Z].*")) {
-            System.out.println(
-                    "La password deve contenere almeno una lettera maiuscola."
-            );
-            passwordField.requestFocus();
-            return;
-        }
-
-        if (!password.matches(".*\\d.*")) {
-            System.out.println(
-                    "La password deve contenere almeno un numero."
-            );
-            passwordField.requestFocus();
-            return;
-        }
-
-        if (!password.matches(".*[^A-Za-z0-9].*")) {
-            System.out.println(
-                    "La password deve contenere almeno un carattere speciale."
-            );
-            passwordField.requestFocus();
-            return;
-        }
-
-
-        System.out.println("Registrazione:");
-        System.out.println("Nome: " + nome);
-        System.out.println("Cognome: " + cognome);
-        System.out.println("Ruolo: " + ruolo);
-        System.out.println("Email: " + email);
-
 
         try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
+            RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
+            UtenteDTO utente = new UtenteDTO(null, nome, cognome, email, dataNascita, domicilio, ruoloEnum);
 
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayoutLoggato.fxml")
-                    )
-            ));
+            // Chiamata remota al server
+            utente = ServerConnection.getServer().registraCliente(utente, password);
+            SessioneUtente.login(utente);
 
-        } catch (IOException e) {
+            // Cambio scena pulito tramite SceneManager centralizzato
+            SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
+
+        } catch (UtenteGiaEsistenteException e) {
+            labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");
+            emailField.requestFocus();
+        } catch (DatiMancantiException e) {
+            labelErrore.setText("Errore nei dati: " + e.getMessage());
+        } catch (SistemaIndisponibileException | RemoteException | NotBoundException e) {
+            labelErrore.setText("Errore di connessione al server.");
             e.printStackTrace();
         }
     }
 
-    /**
-     * Gestisce l'accesso alla schermata di login.
-     * <p>
-     * Recupera la finestra attualmente visualizzata e sostituisce
-     * la scena corrente caricando la vista {@code LoginView.fxml}.
-     * </p>
-     *
-     * @param mouseEvent evento generato dal click dell'utente
-     */
-    public void handleAccedi(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/LoginView.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @FXML
+    public void handleAccedi(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/LoginView.fxml");
     }
 
-    /**
-     * Gestisce il click sul logo dell'applicazione.
-     * <p>
-     * Riporta l'utente alla schermata principale caricando
-     * la vista {@code MainLayout.fxml}.
-     * </p>
-     *
-     * @param mouseEvent evento generato dal click sul logo
-     */
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        try {
-            Stage stage = (Stage) ((Node) mouseEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/MainLayout.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @FXML
+    public void handleLogoClick(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 }

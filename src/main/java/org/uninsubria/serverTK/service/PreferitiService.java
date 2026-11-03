@@ -3,40 +3,59 @@ package org.uninsubria.serverTK.service;
 import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.common.exceptions.RistoranteNonTrovatoException;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.serverTK.dao.PreferitiDAO;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class PreferitiService {
 
     private final PreferitiDAO preferitiDAO = new PreferitiDAO();
 
-    public List<RistoranteDTO> getPreferiti(Integer idUtente) {
+    public List<RistoranteDTO> getPreferiti(Integer idUtente) throws SistemaIndisponibileException {
         if (idUtente == null) {
-            return List.of();
+            throw new SistemaIndisponibileException();
         }
-        return preferitiDAO.ottieniPreferitiUtente(idUtente);
+        try {
+            return preferitiDAO.ottieniPreferitiUtente(idUtente);
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore recupero lista preferiti: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
     }
 
-    public void aggiungi(Integer idUtente, Integer idRistorante) throws AzioneDuplicataException {
+    public void aggiungi(Integer idUtente, Integer idRistorante)
+            throws AzioneDuplicataException, SistemaIndisponibileException {
         if (idUtente == null || idRistorante == null) {
             throw new AzioneDuplicataException("Parametri non validi per l'aggiunta ai preferiti.");
         }
 
-        boolean successo = preferitiDAO.aggiungiPreferito(idUtente, idRistorante);
-        if (!successo) {
-            throw new AzioneDuplicataException("Il ristorante è già presente nei tuoi preferiti o non esiste.");
+        try {
+            boolean successo = preferitiDAO.aggiungiPreferito(idUtente, idRistorante);
+            if (!successo) {
+                throw new AzioneDuplicataException("Il ristorante è già presente nei tuoi preferiti o non esiste.");
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore aggiunta preferito: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
     }
 
-    public void rimuovi(Integer idUtente, Integer idRistorante) throws RistoranteNonTrovatoException {
+    public void rimuovi(Integer idUtente, Integer idRistorante)
+            throws RistoranteNonTrovatoException, SistemaIndisponibileException {
         if (idUtente == null || idRistorante == null) {
             throw new RistoranteNonTrovatoException();
         }
 
-        boolean successo = preferitiDAO.rimuoviPreferito(idUtente, idRistorante);
-        if (!successo) {
-            throw new RistoranteNonTrovatoException(idRistorante);
+        try {
+            boolean successo = preferitiDAO.rimuoviPreferito(idUtente, idRistorante);
+            if (!successo) {
+                throw new RistoranteNonTrovatoException(idRistorante);
+            }
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore rimozione preferito: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
         }
     }
 }

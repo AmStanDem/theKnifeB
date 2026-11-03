@@ -52,6 +52,14 @@ Metodo 2. Avvio tramite interfaccia grafica
   2.	Fai click destro sul file 
   3.	Seleziona Apri con -> Java (oppure Java(TM) Platform SE binary)
 
+### Database e avvio del serverTK
+
+PostgreSQL nel container ascolta sulla porta interna `5432`, la sua porta predefinita. Compose la pubblica sull'host usando `DB_HOST_PORT`, anch'essa predefinita a `5432`. Se la porta host è già occupata da un PostgreSQL locale, imposta per esempio `DB_HOST_PORT=5433` in `.env`; copia `.env.example` in `.env` e avvia il database con `docker compose up -d db`. Non modificare la porta interna `5432`.
+
+Avvia la classe `org.uninsubria.serverTK.MainServer` separatamente dal client. Il prompt propone la porta `DB_HOST_PORT` letta da `.env` e richiede host, nome database e credenziali; premi Invio per accettare i valori predefiniti. Se scegli una porta diversa nel prompt, configura la stessa `DB_HOST_PORT` in `.env` e riavvia Compose prima di connettere il server.
+
+Flyway usa la stessa porta predefinita `5432`; per una porta host diversa avvia Maven indicando `-Ddb.host.port=<DB_HOST_PORT>`. Quando il server è avviato da un terminale, la password non viene mostrata. In un IDE senza terminale associato può risultare visibile durante la digitazione.
+
 ---
 
 ## 🖥️ **Utilizzo**

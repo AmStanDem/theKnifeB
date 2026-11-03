@@ -23,6 +23,12 @@ public interface ITheKnifeServer extends Remote {
     List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
             throws RemoteException, SistemaIndisponibileException;
 
+    PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+            throws RemoteException, SistemaIndisponibileException;
+
+    List<String> ottieniTutteTipologieCucina()
+            throws RemoteException, SistemaIndisponibileException;
+
     RistoranteDTO getDettaglioRistorante(Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException;
 
@@ -37,11 +43,17 @@ public interface ITheKnifeServer extends Remote {
     List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException;
 
+    List<RecensioneDTO> getRecensioniRistoranteAnonimo(Integer idRistorante)
+            throws RemoteException, SistemaIndisponibileException;
+
+    List<RecensioneDTO> getRecensioniUtente(Integer idUtente)
+            throws RemoteException, SistemaIndisponibileException;
+
     void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException;
 
     // Metodo AGGIUNTO per Area Cliente
-    void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Integer nuoveStelle)
+    void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
             throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
 
     // Metodo AGGIUNTO per Area Cliente
@@ -62,4 +74,5 @@ public interface ITheKnifeServer extends Remote {
     // Metodo AGGIUNTO per Area Cliente
     void rimuoviPreferito(Integer idUtente, Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException;
+
 }

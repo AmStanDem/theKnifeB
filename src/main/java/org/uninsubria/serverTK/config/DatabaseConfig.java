@@ -2,22 +2,24 @@ package org.uninsubria.serverTK.config;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
  * Gestore centralizzato per la configurazione e l'accesso al database PostgreSQL.
- * Implementa un pattern Singleton Thread-Safe per l'erogazione delle connessioni JDBC.
+ * Pubblica un pool bounded, thread-safe, per le connessioni JDBC.
  * Gestisce l'allineamento automatico dello schema tramite Flyway.
  */
 public class DatabaseConfig {
 
-    private static String jdbcUrl;
-    private static String dbUser;
-    private static String dbPassword;
-    private static boolean isInitialized = false;
+    private static final int MAXIMUM_POOL_SIZE = 10;
+    private static final int MINIMUM_IDLE = 2;
+    private static final long CONNECTION_TIMEOUT_MS = 30_000;
+    private static final long VALIDATION_TIMEOUT_MS = 5_000;
+
+    private static volatile HikariDataSource dataSource;
 
     // Costruttore privato per prevenire l'instanziazione multipla (Singleton)
     private DatabaseConfig() {
@@ -27,27 +29,44 @@ public class DatabaseConfig {
      * Inizializza l'infrastruttura di persistenza.
      * Viene chiamato dal MainServer durante la fase di bootstrapping.
      *
-     * @param url      L'URL JDBC completo (es. jdbc:postgresql://localhost:5433/theknife)
+     * @param url      L'URL JDBC completo, con la porta pubblicata del database (es. localhost:5432)
      * @param username L'utente del database
      * @param password La password del database
      */
     public static synchronized void init(String url, String username, String password) {
-        if (isInitialized) {
+        if (dataSource != null) {
             return;
         }
 
-        jdbcUrl = url;
-        dbUser = username;
-        dbPassword = password;
+        if (url == null || url.isBlank() || username == null || username.isBlank() || password == null) {
+            throw new IllegalArgumentException("URL, utente e password del database sono obbligatori.");
+        }
 
-        // 1. Fail-Fast: Verifichiamo subito se il database è raggiungibile
-        testConnessione();
+        eseguiMigrazioniFlyway(url, username, password);
 
-        // 2. Automazione: Allineiamo lo schema relazionale al codice
-        eseguiMigrazioniFlyway();
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setPoolName("TheKnife-PostgreSQL");
+        config.setMaximumPoolSize(MAXIMUM_POOL_SIZE);
+        config.setMinimumIdle(MINIMUM_IDLE);
+        config.setConnectionTimeout(CONNECTION_TIMEOUT_MS);
+        config.setValidationTimeout(VALIDATION_TIMEOUT_MS);
+        config.setInitializationFailTimeout(CONNECTION_TIMEOUT_MS);
 
-        isInitialized = true;
-        System.out.println("[DB_INFO] DatabaseConfig inizializzato e bloccato con successo.");
+        HikariDataSource pool = new HikariDataSource(config);
+        try (Connection connection = pool.getConnection()) {
+            if (!connection.isValid((int) (VALIDATION_TIMEOUT_MS / 1_000))) {
+                throw new SQLException("Il database non ha superato la verifica di validità.");
+            }
+        } catch (SQLException e) {
+            pool.close();
+            throw new IllegalStateException("Bootstrapping del pool database fallito.", e);
+        }
+        dataSource = pool;
+        System.out.printf("[DB_INFO] HikariCP pronto (pool massimo: %d connessioni).%n",
+                MAXIMUM_POOL_SIZE);
     }
 
     /**
@@ -58,26 +77,21 @@ public class DatabaseConfig {
      * @throws SQLException Se l'erogazione della connessione fallisce
      */
     public static Connection getConnection() throws SQLException {
-        if (!isInitialized) {
+        HikariDataSource pool = dataSource;
+        if (pool == null || pool.isClosed()) {
             throw new IllegalStateException("ERRORE DI SISTEMA: Tentativo di accesso al DB prima dell'inizializzazione.");
         }
-        // Nelle architetture avanzate, qui si potrebbe restituire una connessione presa da un pool (es. HikariCP).
-        // Per mantenere il sistema leggero e nativo, deleghiamo al DriverManager.
-        return DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
+        return pool.getConnection();
     }
 
     /**
-     * Tenta di aprire e chiudere una connessione. Se fallisce, fa crashare volontariamente
-     * il processo d'avvio per non lasciare il server in uno stato inconsistente.
+     * Chiude il pool durante lo shutdown del server.
      */
-    private static void testConnessione() {
-        System.out.println("[DB_INFO] Ping di verifica verso PostgreSQL in corso su: " + jdbcUrl);
-        try (Connection conn = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword)) {
-            System.out.println("[DB_INFO] Handshake con PostgreSQL completato. Rete e credenziali valide.");
-        } catch (SQLException e) {
-            System.err.println("[DB_FATAL] Impossibile stabilire il contatto con PostgreSQL.");
-            System.err.println("[DB_FATAL] Dettaglio: " + e.getMessage());
-            throw new RuntimeException("Bootstrapping del database fallito", e);
+    public static synchronized void close() {
+        HikariDataSource pool = dataSource;
+        dataSource = null;
+        if (pool != null) {
+            pool.close();
         }
     }
 
@@ -85,11 +99,11 @@ public class DatabaseConfig {
      * Avvia il motore Flyway per scansionare la cartella resources/db/migration
      * ed eseguire eventuali script SQL mancanti (es. V1__schema_iniziale.sql).
      */
-    private static void eseguiMigrazioniFlyway() {
+    private static void eseguiMigrazioniFlyway(String url, String username, String password) {
         System.out.println("[DB_INFO] Avvio motore di migrazione Flyway...");
         try {
             Flyway flyway = Flyway.configure()
-                    .dataSource(jdbcUrl, dbUser, dbPassword)
+                    .dataSource(url, username, password)
                     // Assicurati che i tuoi script .sql siano in src/main/resources/db/migration
                     .locations("classpath:db/migration")
                     .baselineOnMigrate(true) // Crea la tabella di storico se il DB è già pre-esistente

@@ -1,60 +1,160 @@
 package org.uninsubria.clientTK.util;
 
+import javafx.event.Event;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 import java.io.IOException;
 
-/**
- * Gestisce la navigazione tra le schermate dell'applicazione client, riusando
- * un unico {@link Stage} principale e sostituendone la {@link Scene}.
- * <p>
- * Evita di aprire una nuova finestra per ogni schermata: tutte le viste FXML
- * vengono caricate dal classpath a partire dal package
- * {@code org.uninsubria.clientTK.view}.
- *
- * @author TheKnife Team
- */
-public final class SceneManager {
 
-    private static Stage stagePrincipale;
 
-    private SceneManager() {
-        // classe di utilità, non istanziabile
+public class SceneManager {
+
+    private static final Map<Stage, Stack<String>> historyMap = new HashMap<>();
+    private static final Map<Stage, String> currentFxmlMap = new HashMap<>();
+
+    private static final String GLOBAL_CSS = "/org/uninsubria/clientTK/styles/style.css";
+
+    /**
+     * Cambia vista ricavando lo Stage dall'evento (ActionEvent, MouseEvent, ecc.)
+     */
+    public static void switchScene(Event event, String fxmlPath) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        switchScene(stage, fxmlPath);
     }
 
     /**
-     * Deve essere chiamato una sola volta, da {@code ClientApp.start()},
-     * per registrare lo Stage principale dell'applicazione.
-     *
-     * @param stage lo stage primario fornito da JavaFX
+     * Cambia la root della scena corrente sullo Stage specificato.
      */
-    public static void init(Stage stage) {
-        stagePrincipale = stage;
+    public static void switchScene(Stage stage, String fxmlPath) {
+        switchSceneAndGetController(stage, fxmlPath, true);
     }
 
     /**
-     * Carica una vista FXML e la mostra sullo stage principale.
+     * Cambia la scena, applica il CSS globale e mantiene la finestra principale
+     * a schermo intero.
      *
-     * @param nomeFxml nome del file FXML (senza path), es. {@code "login.fxml"}
-     * @param titolo   titolo da mostrare sulla finestra
-     * @throws IOException se il file FXML non viene trovato o non è valido
+     * DA ELIMINARE DOPO LA PULIZIA
      */
-    public static void mostraSchermata(String nomeFxml, String titolo) throws IOException {
-        FXMLLoader loader = new FXMLLoader(
-                SceneManager.class.getResource("/org/uninsubria/clientTK/view/" + nomeFxml));
-        Parent root = loader.load();
+    public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath) {
+        return switchSceneAndGetController(stage, fxmlPath, true);
+    }
 
-        Scene scena = stagePrincipale.getScene();
-        if (scena == null) {
-            scena = new Scene(root, 900, 600);
-            stagePrincipale.setScene(scena);
-        } else {
-            scena.setRoot(root);
+    /**
+     * Metodo interno sovraccarico per gestire il salvataggio nello storico.
+     * @param saveToHistory Se true, salva la pagina precedente nello stack. Se false (es. durante il "Back"), evita i loop.
+     */
+    public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath, boolean saveToHistory) {
+        try {
+            String currentFxml = currentFxmlMap.get(stage);
+
+            if (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)) {
+                historyMap.computeIfAbsent(stage, k -> new Stack<>()).push(currentFxml);
+            }
+
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
+            Parent root = loader.load();
+            StackPane applicationRoot = creaRootApplicativa(stage, root);
+
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(applicationRoot);
+            } else {
+                Scene scene = new Scene(applicationRoot);
+                applyCssIfAvailable(scene);
+                stage.setScene(scene);
+                stage.sizeToScene();
+            }
+
+            stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+            stage.setFullScreenExitHint("");
+            Platform.runLater(() -> {
+                if (stage.isShowing()) {
+                    stage.setFullScreen(true);
+                }
+            });
+
+            return loader.getController();
+
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Impossibile caricare la schermata FXML: " + fxmlPath,
+                    e
+            );
         }
-        stagePrincipale.setTitle("TheKnife - " + titolo);
-        stagePrincipale.show();
+    }
+
+    private static StackPane creaRootApplicativa(Stage stage, Parent contenuto) {
+        StackPane root = new StackPane(contenuto);
+        root.setPickOnBounds(false);
+
+        Button esci = new Button("×");
+        esci.getStyleClass().add("app-exit-button");
+        esci.setAccessibleText("Esci dall'applicazione");
+        esci.setTooltip(new javafx.scene.control.Tooltip("Esci dall'applicazione"));
+        esci.setOnAction(event -> {
+            stage.close();
+            Platform.exit();
+        });
+
+        root.getChildren().add(esci);
+        StackPane.setAlignment(esci, Pos.TOP_RIGHT);
+        StackPane.setMargin(esci, new Insets(10, 12, 0, 0));
+        return root;
+    }
+
+    /**
+     * Torna alla schermata precedente usando lo Stage ricavato dall'evento.
+     */
+    public static void goBack(Event event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        goBack(stage);
+    }
+
+    /**
+     * Torna alla schermata precedente sullo Stage specificato.
+     */
+    public static void goBack(Stage stage) {
+        Stack<String> history = historyMap.get(stage);
+
+        if (history != null && !history.isEmpty()) {
+            String previousFxml = history.pop();
+            // Carichiamo la pagina precedente impostando saveToHistory a false per non sporcare la pila
+            switchSceneAndGetController(stage, previousFxml, false);
+        } else {
+            System.out.println("Nessuna pagina precedente nello storico per questo stage.");
+        }
+    }
+
+    /**
+     * Pulisce lo storico (utile ad esempio quando si fa il Logout o si torna al Menu Principale).
+     */
+    public static void clearHistory(Stage stage) {
+        if (historyMap.containsKey(stage)) {
+            historyMap.get(stage).clear();
+        }
+        currentFxmlMap.remove(stage);
+    }
+
+    /**
+     * Helper privato per applicare il CSS globale se presente.
+     */
+    private static void applyCssIfAvailable(Scene scene) {
+        if (SceneManager.class.getResource(GLOBAL_CSS) != null) {
+            scene.getStylesheets().add(SceneManager.class.getResource(GLOBAL_CSS).toExternalForm());
+        }
     }
 }

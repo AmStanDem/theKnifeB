@@ -2,58 +2,40 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import org.uninsubria.clientTK.util.LuogoInput;
+import org.uninsubria.clientTK.util.GeocodingService;
+import org.uninsubria.clientTK.util.RicercaIniziale;
+import org.uninsubria.clientTK.util.SceneManager;
 
-import java.io.IOException;
-
-/**
- * Controller JavaFX dell'interfaccia dedicata alla ricerca avanzata
- * dei ristoranti.
- * <p>
- * Gestisce le interazioni dell'utente con la schermata di ricerca
- * avanzata e la navigazione verso la lista dei ristoranti.
- * </p>
- */
 public class RicercaAvanzataController {
 
     @FXML
-    /**
-     * Gestisce la ricerca di un ristorante.
-     * <p>
-     * Recupera la finestra attualmente visualizzata e sostituisce
-     * la scena corrente caricando la vista {@code listaRistoranti.fxml},
-     * nella quale vengono visualizzati i risultati della ricerca.
-     * </p>
-     *
-     * @param event evento generato dal click dell'utente
-     */
+    private LuogoInput txtLocalita;
+
+    @FXML
+    private void initialize() {
+        txtLocalita.addTextFieldStyleClass("field-input");
+        txtLocalita.setOnLuogoSelezionato(luogo -> { });
+    }
+
+    @FXML
     private void cercaRistorante(ActionEvent event) {
-        try {
-            Stage stage = (Stage) ((Node) event.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/listaRistoranti.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        GeocodingService.Luogo luogo = txtLocalita.getLuogoSelezionato();
+        if (luogo == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Località da selezionare");
+            alert.setHeaderText(null);
+            alert.setContentText("Seleziona una località dai suggerimenti prima di cercare.");
+            alert.showAndWait();
+            return;
         }
+        RicercaIniziale.imposta("", luogo);
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/listaRistoranti.fxml");
     }
 
     @FXML
     private void reimpostaFiltri() {
+        // Logica per reimpostare i campi dei filtri
     }
-
-
-
 }

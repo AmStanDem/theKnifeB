@@ -1,5 +1,6 @@
 package org.uninsubria.common.dto;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,4 +17,7 @@ public record RistoranteDTO(
         Boolean delivery,
         Boolean bookingOnline,
         Double mediaStelle
-) implements Serializable {}
+) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+}

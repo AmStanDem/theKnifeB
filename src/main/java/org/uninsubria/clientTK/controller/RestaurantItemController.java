@@ -1,16 +1,13 @@
 package org.uninsubria.clientTK.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
+import org.uninsubria.clientTK.util.RistoranteSelezionato;
+import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.common.dto.RistoranteDTO;
 
-import javafx.event.ActionEvent;
-import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -53,11 +50,11 @@ public class RestaurantItemController {
      */
     public void setRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
-
+        System.out.println(ristorante.toString());
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
-        metaLabel.setText(formattaMeta(ristorante.tipoCucina(), ristorante.prezzoMedio()));
+        metaLabel.setText(formattaMeta(String.valueOf(ristorante.tipologieCucina()), ristorante.prezzoMedio()));
 
         aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.delivery()));
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));
@@ -89,20 +86,8 @@ public class RestaurantItemController {
      * @param actionEvent evento generato dal click dell'utente
      */
     private void onDetailsClicked(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) ((Node) actionEvent.getSource())
-                    .getScene()
-                    .getWindow();
-
-            stage.setScene(new Scene(
-                    FXMLLoader.load(
-                            getClass().getResource("/org/uninsubria/clientTK/views/Ristorante.fxml")
-                    )
-            ));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        RistoranteSelezionato.setRistorante(ristorante);
+        SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
     }
 
     /**
