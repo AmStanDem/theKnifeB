@@ -31,9 +31,8 @@
     -fx-font-weight: bold;
 }
 
-.header-subtitle {
-    -fx-text-fill: #cfcfcf;
-    -fx-font-size: 13px;
+.clickable-logo {
+    -fx-cursor: hand;
 }
 
 /* ---------------- CONTENITORE ---------------- */

@@ -34,12 +34,12 @@
             <padding>
                 <Insets top="16" right="24" bottom="16" left="24"/>
             </padding>
-            <TextFlow>
+            <TextFlow onMouseClicked="#handleLogoClick"
+                      styleClass="clickable-logo">
                 <Text text="The" styleClass="logo-text-white"/>
                 <Text text="Knife" styleClass="logo-text-green"/>
             </TextFlow>
             <HBox HBox.hgrow="ALWAYS"/>
-            <Label text="Ricerca Avanzata" styleClass="header-subtitle"/>
         </HBox>
     </top>
 

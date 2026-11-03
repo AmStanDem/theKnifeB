@@ -89,14 +89,26 @@
                     <HBox alignment="CENTER" spacing="10.0">
 
                         <!-- LOCALITÀ / GEOLOCALIZZAZIONE -->
-                        <LuogoInput fx:id="txtLocalita" prefHeight="65.0" prefWidth="375.0"
+                        <LuogoInput fx:id="txtLocalita"
+                                    minHeight="65.0" prefHeight="65.0" maxHeight="65.0"
+                                    prefWidth="375.0"
                                     promptText="Dove? Cerca una città o un indirizzo" />
 
                         <!-- RICERCA RISTORANTE -->
-                        <TextField fx:id="txtRicerca" prefHeight="65.0" prefWidth="375.0" promptText="Cerca un ristorante..." styleClass="search-field" />
+                        <TextField fx:id="txtRicerca"
+                                   minHeight="65.0" prefHeight="65.0" maxHeight="65.0"
+                                   prefWidth="375.0"
+                                   promptText="Cerca un ristorante..."
+                                   styleClass="search-field" />
 
                         <!-- PULSANTE CERCA -->
-                        <Button fx:id="btnCerca" mnemonicParsing="false" onAction="#onRicercaClick" prefHeight="65.0" prefWidth="150.0" styleClass="flat" text="Cerca" />
+                        <Button fx:id="btnCerca"
+                                mnemonicParsing="false"
+                                onAction="#onRicercaClick"
+                                minHeight="65.0" prefHeight="65.0" maxHeight="65.0"
+                                prefWidth="150.0"
+                                styleClass="flat"
+                                text="Cerca" />
 
                     </HBox>
 

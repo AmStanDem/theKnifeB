@@ -3,6 +3,7 @@ package org.uninsubria.clientTK.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 import org.uninsubria.clientTK.util.LuogoInput;
 import org.uninsubria.clientTK.util.GeocodingService;
 import org.uninsubria.clientTK.util.RicercaIniziale;
@@ -17,6 +18,11 @@ public class RicercaAvanzataController {
     private void initialize() {
         txtLocalita.addTextFieldStyleClass("field-input");
         txtLocalita.setOnLuogoSelezionato(luogo -> { });
+    }
+
+    @FXML
+    private void handleLogoClick(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
     }
 
     @FXML
