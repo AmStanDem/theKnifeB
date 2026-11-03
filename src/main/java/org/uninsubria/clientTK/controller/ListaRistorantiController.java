@@ -36,6 +36,8 @@ public class ListaRistorantiController {
 
     @FXML private ComboBox<String> priceFilterCombo;
     @FXML private ComboBox<String> ratingFilterCombo;
+    @FXML private CheckBox deliveryFilterCheckBox;
+    @FXML private CheckBox bookingOnlineFilterCheckBox;
     @FXML private MenuButton cuisineMenuButton;
     @FXML private Button resetFiltersButton;
 
@@ -209,7 +211,9 @@ public class ListaRistorantiController {
                 PAGE_SIZE,
                 latitudineRicerca,
                 longitudineRicerca,
-                latitudineRicerca == null ? null : RicercaIniziale.RAGGIO_RICERCA_KM
+                latitudineRicerca == null ? null : RicercaIniziale.RAGGIO_RICERCA_KM,
+                deliveryFilterCheckBox.isSelected(),
+                bookingOnlineFilterCheckBox.isSelected()
         );
     }
 
@@ -318,6 +322,8 @@ public class ListaRistorantiController {
         searchDebounce.stop();
         priceFilterCombo.setValue(TUTTI_PREZZI);
         ratingFilterCombo.setValue(TUTTI_RATING);
+        deliveryFilterCheckBox.setSelected(false);
+        bookingOnlineFilterCheckBox.setSelected(false);
 
         for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
         selectedCuisines.clear();

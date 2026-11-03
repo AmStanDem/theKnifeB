@@ -15,7 +15,9 @@ public record RicercaRistorantiPaginaDTO(
         int limite,
         Double latitudineRiferimento,
         Double longitudineRiferimento,
-        Double raggioKm
+        Double raggioKm,
+        boolean delivery,
+        boolean bookingOnline
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
