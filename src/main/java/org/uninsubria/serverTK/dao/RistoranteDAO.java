@@ -272,6 +272,12 @@ public class RistoranteDAO {
             sql.append(" AND r.prezzo_medio <= ?");
             parametri.add(richiesta.prezzoMax());
         }
+        if (richiesta.delivery()) {
+            sql.append(" AND r.delivery = TRUE");
+        }
+        if (richiesta.bookingOnline()) {
+            sql.append(" AND r.booking_online = TRUE");
+        }
 
         sql.append(" GROUP BY r.id_ristorante");
         if (richiesta.mediaStelleMinima() != null) {

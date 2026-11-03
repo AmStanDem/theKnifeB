@@ -118,6 +118,12 @@
     -fx-background-color: #E5E7EB;
 }
 
+.service-filter-checkbox {
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
 /* ---------- CONTENUTO / RISULTATI ---------- */
 .content-box {
     -fx-background-color: #F7F8F9;
