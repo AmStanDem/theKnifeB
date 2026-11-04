@@ -16,6 +16,7 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import org.uninsubria.clientTK.controller.BaseLayoutController;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ public class SceneManager {
     private static boolean popupListenerInstalled;
 
     private static final String GLOBAL_CSS = "/org/uninsubria/clientTK/styles/style.css";
+    private static final String BASE_LAYOUT_FXML = "/org/uninsubria/clientTK/views/BaseLayout.fxml";
 
     /**
      * Cambia vista ricavando lo Stage dall'evento (ActionEvent, MouseEvent, ecc.)
@@ -71,8 +73,14 @@ public class SceneManager {
             }
 
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
-            Parent root = loader.load();
-            StackPane applicationRoot = creaRootApplicativa(stage, root);
+            Parent page = loader.load();
+
+            FXMLLoader baseLayoutLoader = new FXMLLoader(SceneManager.class.getResource(BASE_LAYOUT_FXML));
+            Parent baseLayout = baseLayoutLoader.load();
+            BaseLayoutController baseLayoutController = baseLayoutLoader.getController();
+            baseLayoutController.setContent(page);
+
+            StackPane applicationRoot = creaRootApplicativa(stage, baseLayout);
 
             if (stage.getScene() != null) {
                 stage.getScene().setRoot(applicationRoot);
