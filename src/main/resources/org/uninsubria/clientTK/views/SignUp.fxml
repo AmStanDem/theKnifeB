@@ -98,7 +98,7 @@
                         <VBox spacing="4.0">
                             <Label styleClass="field-label" text="Password" />
                             <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Inserisci la password" />
-                            <Label styleClass="hint-label" text="ⓘ La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola" wrapText="true" />
+                            <Label styleClass="hint-label" text="ⓘ La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola e un carattere speciale " wrapText="true" />
                         </VBox>
 
                         <!-- CONFERMA PASSWORD -->
