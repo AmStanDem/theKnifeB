@@ -75,7 +75,7 @@
 
 
                 <!-- DISTRIBUZIONE STELLE -->
-                <VBox prefWidth="600.0" spacing="9.0" styleClass="rating-distribution">
+                <VBox prefWidth="600.0" spacing="4.0" styleClass="rating-distribution">
 
                     <!-- 5 STELLE -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -86,6 +86,14 @@
 
                     </HBox>
 
+                    <!-- 4,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="4,5" />
+
+                        <ProgressBar fx:id="bar4_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
 
                     <!-- 4 STELLE -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -96,6 +104,14 @@
 
                     </HBox>
 
+                    <!-- 3,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="3,5" />
+
+                        <ProgressBar fx:id="bar3_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
 
                     <!-- 3 STELLE -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -106,6 +122,14 @@
 
                     </HBox>
 
+                    <!-- 2,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="2,5" />
+
+                        <ProgressBar fx:id="bar2_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
 
                     <!-- 2 STELLE -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -116,6 +140,14 @@
 
                     </HBox>
 
+                    <!-- 1,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="1,5" />
+
+                        <ProgressBar fx:id="bar1_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
 
                     <!-- 1 STELLA -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
