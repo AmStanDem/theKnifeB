@@ -237,7 +237,7 @@ public class CsvImporter {
                         (id_ristorante, id_gestore, nome, indirizzo, citta, nazione,
                          latitudine, longitudine, prezzo_medio, delivery, booking_online)
                     SELECT r.id_ristorante, u.id_utente, r.nome, r.indirizzo, r.citta, r.nazione,
-                           r.latitudine, r.longitudine, 100.00, FALSE, FALSE
+                           r.latitudine, r.longitudine, NULL, FALSE, FALSE
                     FROM tmp_dataset_restaurants r
                     JOIN Utenti u ON u.email =
                         'dataset.manager.' || MD5(LOWER(r.nazione) || '|' || LOWER(r.citta))

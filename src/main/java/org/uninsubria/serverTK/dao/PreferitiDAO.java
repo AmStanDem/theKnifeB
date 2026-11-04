@@ -4,6 +4,7 @@ import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.serverTK.config.DatabaseConfig;
 
 import java.sql.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,6 +59,7 @@ public class PreferitiDAO {
                     String tipiCucinaRaw = rs.getString("tipi_cucina");
                     List<String> tipologie = tipiCucinaRaw != null && !tipiCucinaRaw.isEmpty()
                             ? Arrays.asList(tipiCucinaRaw.split(",")) : new ArrayList<>();
+                    BigDecimal prezzoMedio = rs.getBigDecimal("prezzo_medio");
 
                     lista.add(new RistoranteDTO(
                             rs.getInt("id_ristorante"),
@@ -68,7 +70,7 @@ public class PreferitiDAO {
                             rs.getDouble("latitudine"),
                             rs.getDouble("longitudine"),
                             tipologie,
-                            rs.getDouble("prezzo_medio"),
+                            prezzoMedio == null ? null : prezzoMedio.doubleValue(),
                             rs.getBoolean("delivery"),
                             rs.getBoolean("booking_online"),
                             rs.getDouble("media_stelle")

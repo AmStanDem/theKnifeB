@@ -7,6 +7,7 @@ import org.uninsubria.common.dto.RistoranteDTO;
 import org.uninsubria.serverTK.config.DatabaseConfig;
 
 import java.sql.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -342,6 +343,7 @@ public class RistoranteDAO {
         List<String> tipologie = (stringaCucine != null && !stringaCucine.isBlank())
                 ? Arrays.asList(stringaCucine.split(","))
                 : new ArrayList<>();
+        BigDecimal prezzoMedio = rs.getBigDecimal("prezzo_medio");
 
         return new RistoranteDTO(
                 rs.getInt("id_ristorante"),
@@ -352,7 +354,7 @@ public class RistoranteDAO {
                 rs.getDouble("latitudine"),
                 rs.getDouble("longitudine"),
                 tipologie,
-                rs.getDouble("prezzo_medio"),
+                prezzoMedio == null ? null : prezzoMedio.doubleValue(),
                 rs.getBoolean("delivery"),
                 rs.getBoolean("booking_online"),
                 rs.getDouble("media_stelle")
