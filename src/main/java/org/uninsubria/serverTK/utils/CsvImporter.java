@@ -27,9 +27,10 @@ public class CsvImporter {
 
         System.out.println("[ETL_INFO] Inizio importazione massiva del dataset Michelin con normalizzazione 3NF...");
 
-        try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps.csv")) {
+        try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps_clean.csv")) {
             if (is == null) {
-                throw new IllegalStateException("File CSV non trovato nel classpath: /dataset/michelin_my_maps.csv");
+                throw new IllegalStateException(
+                        "File CSV non trovato nel classpath: /dataset/michelin_my_maps_clean.csv");
             }
 
             long startTime = System.nanoTime();
