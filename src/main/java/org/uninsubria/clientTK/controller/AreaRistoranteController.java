@@ -107,13 +107,25 @@ public class AreaRistoranteController {
     private ProgressBar bar5;
 
     @FXML
+    private ProgressBar bar4_5;
+
+    @FXML
     private ProgressBar bar4;
+
+    @FXML
+    private ProgressBar bar3_5;
 
     @FXML
     private ProgressBar bar3;
 
     @FXML
+    private ProgressBar bar2_5;
+
+    @FXML
     private ProgressBar bar2;
+
+    @FXML
+    private ProgressBar bar1_5;
 
     @FXML
     private ProgressBar bar1;
@@ -310,36 +322,26 @@ public class AreaRistoranteController {
 
     private void aggiornaDistribuzioneRecensioni(List<RecensioneDTO> recensioni) {
 
-        double[] conteggi = new double[6];
+        double[] conteggi = new double[11];
 
         for (RecensioneDTO recensione : recensioni) {
             double valutazione = recensione.valutazione();
             if (valutazione >= 1 && valutazione <= 5) {
-                int stellaInferiore = (int) Math.floor(valutazione);
-                double frazione = valutazione - stellaInferiore;
-                conteggi[stellaInferiore] += 1 - frazione;
-                if (frazione > 0 && stellaInferiore < 5) {
-                    conteggi[stellaInferiore + 1] += frazione;
-                }
+                int indice = (int) Math.round(valutazione * 2);
+                conteggi[indice]++;
             }
         }
 
+        ProgressBar[] barre = {
+                bar1, bar1_5, bar2, bar2_5, bar3,
+                bar3_5, bar4, bar4_5, bar5
+        };
         int totale = recensioni.size();
 
-        if (totale == 0) {
-            bar5.setProgress(0);
-            bar4.setProgress(0);
-            bar3.setProgress(0);
-            bar2.setProgress(0);
-            bar1.setProgress(0);
-            return;
+        for (int i = 0; i < barre.length; i++) {
+            double conteggio = conteggi[i + 2];
+            barre[i].setProgress(totale == 0 ? 0 : conteggio / totale);
         }
-
-        bar5.setProgress((double) conteggi[5] / totale);
-        bar4.setProgress((double) conteggi[4] / totale);
-        bar3.setProgress((double) conteggi[3] / totale);
-        bar2.setProgress((double) conteggi[2] / totale);
-        bar1.setProgress((double) conteggi[1] / totale);
     }
 
     // =========================================================
