@@ -58,7 +58,7 @@ public class AreaRistoratoreController {
 
     @FXML
     public void ListaRistorantiRistoratore(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/ListaRistoranti.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/ListaRistorantiGestore.fxml");
     }
 
     @FXML

@@ -181,7 +181,7 @@ public class AreaPersonaleController {
     private void onRistorantiClick(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/clientTK/views/ListaRistoranti.fxml"
+                "/org/uninsubria/clientTK/views/ListaRistorantiGestore.fxml"
         );
     }
 
