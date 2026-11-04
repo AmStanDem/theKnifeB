@@ -55,6 +55,8 @@
                         onAction="#onSearch"/>
             </HBox>
 
+            <Label fx:id="locationFilterLabel" text="Posizione: ovunque" styleClass="filters-label"/>
+
             <!-- FILTRI -->
             <HBox spacing="16" alignment="CENTER_LEFT" styleClass="filters-bar">
                 <Label text="Filtri:" styleClass="filters-label"/>

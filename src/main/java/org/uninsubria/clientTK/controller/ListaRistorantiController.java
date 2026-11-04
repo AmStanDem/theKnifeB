@@ -41,6 +41,7 @@ public class ListaRistorantiController {
     @FXML private MenuButton cuisineMenuButton;
     @FXML private Button resetFiltersButton;
 
+    @FXML private Label locationFilterLabel;
     @FXML private Label resultsCountLabel;
     @FXML private ScrollPane restaurantScrollPane;
     @FXML private VBox restaurantContainer;
@@ -60,6 +61,10 @@ public class ListaRistorantiController {
     private boolean tipologieCaricate;
     private Double latitudineRicerca;
     private Double longitudineRicerca;
+    private String localitaRicerca;
+    private Double prezzoMinPersonalizzato;
+    private Double prezzoMaxPersonalizzato;
+    private String etichettaPrezzoPersonalizzata;
 
     @FXML
     public void initialize() {
@@ -69,8 +74,17 @@ public class ListaRistorantiController {
             searchField.setText(criteri.testo() == null ? "" : criteri.testo());
             latitudineRicerca = criteri.latitudine();
             longitudineRicerca = criteri.longitudine();
+            localitaRicerca = criteri.localita();
+            selectedCuisines.addAll(criteri.tipologieCucina());
+            prezzoMinPersonalizzato = criteri.prezzoMin();
+            prezzoMaxPersonalizzato = criteri.prezzoMax();
+            if (prezzoMinPersonalizzato != null || prezzoMaxPersonalizzato != null) {
+                etichettaPrezzoPersonalizzata = formattaEtichettaPrezzo(
+                        prezzoMinPersonalizzato, prezzoMaxPersonalizzato);
+            }
         }
         configuraFiltriFissi();
+        applicaCriteriIniziali(criteri);
         searchDebounce = new PauseTransition(javafx.util.Duration.millis(350));
         searchDebounce.setOnFinished(event -> caricaPagina(true));
 
@@ -79,12 +93,36 @@ public class ListaRistorantiController {
         String nomeRistorante = RicercaSessione.getNomeRistorante();
 
 
-        if (nomeRistorante != null && !nomeRistorante.isBlank()) {
+        if (criteri == null && nomeRistorante != null && !nomeRistorante.isBlank()) {
             searchField.setText(nomeRistorante);
         }
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> searchDebounce.playFromStart());
         caricaDatiDalServer();
+    }
+
+    private void applicaCriteriIniziali(RicercaIniziale.Criteri criteri) {
+        locationFilterLabel.setText(localitaRicerca == null || localitaRicerca.isBlank()
+                ? "Posizione: ovunque"
+                : "Posizione: " + localitaRicerca + " (raggio "
+                + (int) RicercaIniziale.RAGGIO_RICERCA_KM + " km)");
+        if (criteri == null) {
+            return;
+        }
+        if (etichettaPrezzoPersonalizzata != null) {
+            priceFilterCombo.getItems().add(etichettaPrezzoPersonalizzata);
+            priceFilterCombo.setValue(etichettaPrezzoPersonalizzata);
+        }
+        if (criteri.mediaStelleMinima() != null) {
+            String etichettaRating = String.format(Locale.ROOT, "%.1f+ ★", criteri.mediaStelleMinima());
+            if (!ratingFilterCombo.getItems().contains(etichettaRating)) {
+                ratingFilterCombo.getItems().add(etichettaRating);
+            }
+            ratingFilterCombo.setValue(etichettaRating);
+        }
+        deliveryFilterCheckBox.setSelected(criteri.delivery());
+        bookingOnlineFilterCheckBox.setSelected(criteri.bookingOnline());
+        aggiornaEtichettaMenuCucine();
     }
 
 
@@ -180,7 +218,10 @@ public class ListaRistorantiController {
         Double prezzoMin = null;
         Double prezzoMax = null;
         String prezzo = priceFilterCombo.getValue();
-        if (prezzo != null) {
+        if (prezzo != null && prezzo.equals(etichettaPrezzoPersonalizzata)) {
+            prezzoMin = prezzoMinPersonalizzato;
+            prezzoMax = prezzoMaxPersonalizzato;
+        } else if (prezzo != null) {
             if (prezzo.startsWith("€ (Economico")) {
                 prezzoMax = 25.0;
             } else if (prezzo.startsWith("€€ (Medio")) {
@@ -197,11 +238,11 @@ public class ListaRistorantiController {
         Double valutazioneMinima = null;
         String valutazione = ratingFilterCombo.getValue();
         if (valutazione != null && !valutazione.equals(TUTTI_RATING)) {
-            valutazioneMinima = Double.parseDouble(valutazione.substring(0, 3));
+            valutazioneMinima = Double.parseDouble(valutazione.substring(0, valutazione.indexOf('+')));
         }
 
         return new RicercaRistorantiPaginaDTO(
-                RicercaSessione.getLocalita(),
+                latitudineRicerca == null ? RicercaSessione.getLocalita() : "",
                 searchField.getText(),
                 new ArrayList<>(selectedCuisines),
                 prezzoMin,
@@ -243,6 +284,7 @@ public class ListaRistorantiController {
 
             CheckBox cb = new CheckBox(tipo.trim());
             cb.setStyle("-fx-text-fill: #1e293b;"); // Garanzia inline contro override di Modena
+            cb.setSelected(selectedCuisines.contains(cb.getText()));
 
             cb.setOnAction(e -> {
                 if (cb.isSelected()) {
@@ -257,6 +299,7 @@ public class ListaRistorantiController {
             cuisineCheckBoxes.add(cb);
             checkBoxesBox.getChildren().add(cb);
         }
+        aggiornaEtichettaMenuCucine();
 
         // Filtro in tempo reale sui CheckBox
         searchCuisineInput.textProperty().addListener((obs, oldVal, newVal) -> {
@@ -321,9 +364,19 @@ public class ListaRistorantiController {
         searchField.clear();
         searchDebounce.stop();
         priceFilterCombo.setValue(TUTTI_PREZZI);
+        if (etichettaPrezzoPersonalizzata != null) {
+            priceFilterCombo.getItems().remove(etichettaPrezzoPersonalizzata);
+            etichettaPrezzoPersonalizzata = null;
+        }
+        prezzoMinPersonalizzato = null;
+        prezzoMaxPersonalizzato = null;
         ratingFilterCombo.setValue(TUTTI_RATING);
         deliveryFilterCheckBox.setSelected(false);
         bookingOnlineFilterCheckBox.setSelected(false);
+        latitudineRicerca = null;
+        longitudineRicerca = null;
+        localitaRicerca = null;
+        locationFilterLabel.setText("Posizione: ovunque");
 
         for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
         selectedCuisines.clear();
@@ -389,5 +442,15 @@ public class ListaRistorantiController {
         alert.setHeaderText(null);
         alert.setContentText(messaggio);
         alert.showAndWait();
+    }
+
+    private String formattaEtichettaPrezzo(Double prezzoMin, Double prezzoMax) {
+        String minimo = prezzoMin == null ? "qualsiasi" : "da " + formatoEuro(prezzoMin);
+        String massimo = prezzoMax == null ? "350+ €" : "fino a " + formatoEuro(prezzoMax);
+        return "Personalizzato: " + minimo + ", " + massimo;
+    }
+
+    private String formatoEuro(double valore) {
+        return String.format(Locale.ROOT, "%.0f €", valore);
     }
 }

@@ -2,14 +2,24 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.RangeSlider;
 import org.uninsubria.clientTK.util.LuogoInput;
 import org.uninsubria.clientTK.util.GeocodingService;
 import org.uninsubria.clientTK.util.RicercaIniziale;
+import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.common.exceptions.SistemaIndisponibileException;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.List;
 
 public class RicercaAvanzataController {
 
@@ -29,9 +39,26 @@ public class RicercaAvanzataController {
     private TextField txtPrezzoMax;
 
     @FXML
+    private ComboBox<String> cmbTipologiaCucina;
+
+    @FXML
+    private CheckBox chkDelivery;
+
+    @FXML
+    private CheckBox chkPrenotazione;
+
+    @FXML
+    private org.uninsubria.clientTK.util.stars.RatingContainer ratingStelleMinime;
+
+    @FXML
+    private Label lblRatingValore;
+
+    @FXML
     private void initialize() {
         txtLocalita.addTextFieldStyleClass("field-input");
-        txtLocalita.setOnLuogoSelezionato(luogo -> { });
+        ratingStelleMinime.setOnRatingChanged(this::aggiornaEtichettaRating);
+        cmbTipologiaCucina.setDisable(true);
+        caricaTipologieCucina();
 
         configuraCampoPrezzo(txtPrezzoMin, false);
         configuraCampoPrezzo(txtPrezzoMax, true);
@@ -67,6 +94,35 @@ public class RicercaAvanzataController {
         });
         aggiornaPrezzoMin();
         aggiornaPrezzoMax();
+        aggiornaEtichettaRating();
+    }
+
+    private void caricaTipologieCucina() {
+        Thread.startVirtualThread(() -> {
+            try {
+                List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
+                Platform.runLater(() -> {
+                    cmbTipologiaCucina.getItems().setAll(tipologie);
+                    cmbTipologiaCucina.setDisable(false);
+                });
+            } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+                System.err.println("[SEARCH_WARN] Impossibile caricare le tipologie di cucina: " + e.getMessage());
+                Platform.runLater(() -> {
+                    cmbTipologiaCucina.setDisable(false);
+                    mostraErrore(
+                            "Tipologie non disponibili",
+                            "Impossibile caricare le tipologie di cucina dal server."
+                    );
+                });
+            }
+        });
+    }
+
+    private void aggiornaEtichettaRating() {
+        double rating = ratingStelleMinime.getRating();
+        lblRatingValore.setText(rating == 0
+                ? "Nessun minimo"
+                : String.format(java.util.Locale.ITALY, "%.1f+ stelle", rating));
     }
 
     private void configuraCampoPrezzo(TextField campo, boolean accettaPiu) {
@@ -135,13 +191,38 @@ public class RicercaAvanzataController {
             alert.showAndWait();
             return;
         }
-        RicercaIniziale.imposta("", luogo);
+        double prezzoMinimo = rangeSliderPrezzo.getLowValue();
+        double prezzoMassimo = rangeSliderPrezzo.getHighValue();
+        RicercaIniziale.imposta(
+                "",
+                luogo,
+                cmbTipologiaCucina.getValue() == null ? List.of() : List.of(cmbTipologiaCucina.getValue()),
+                prezzoMinimo,
+                prezzoMassimo < PREZZO_MASSIMO ? prezzoMassimo : null,
+                ratingStelleMinime.getRating() > 0 ? ratingStelleMinime.getRating() : null,
+                chkDelivery.isSelected(),
+                chkPrenotazione.isSelected()
+        );
         SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/listaRistoranti.fxml");
     }
 
     @FXML
     private void reimpostaFiltri() {
+        txtLocalita.setText("");
+        cmbTipologiaCucina.setValue(null);
         rangeSliderPrezzo.setLowValue(PREZZO_MINIMO);
         rangeSliderPrezzo.setHighValue(PREZZO_MASSIMO);
+        ratingStelleMinime.setRating(0);
+        aggiornaEtichettaRating();
+        chkDelivery.setSelected(false);
+        chkPrenotazione.setSelected(false);
+    }
+
+    private void mostraErrore(String titolo, String messaggio) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(titolo);
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.show();
     }
 }

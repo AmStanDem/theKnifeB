@@ -93,6 +93,8 @@ public class SignUpController {
             return;
         }
 
+
+
         if (!ruolo.equals("Cliente") && !ruolo.equals("Ristoratore")) {
             labelErrore.setText("Il ruolo selezionato non è valido.");
             ruoloComboBox.requestFocus();
