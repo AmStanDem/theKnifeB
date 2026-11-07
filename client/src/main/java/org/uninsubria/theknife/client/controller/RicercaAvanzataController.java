@@ -7,11 +7,7 @@ package org.uninsubria.theknife.client.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.RangeSlider;
 import org.uninsubria.theknife.client.util.LuogoInput;
@@ -23,7 +19,15 @@ import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import javafx.geometry.Insets;
+import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 
 public class RicercaAvanzataController {
 
@@ -43,7 +47,11 @@ public class RicercaAvanzataController {
     private TextField txtPrezzoMax;
 
     @FXML
-    private ComboBox<String> cmbTipologiaCucina;
+    private MenuButton cuisineMenuButton;
+
+
+    private final Set<String> selectedCuisines = new HashSet<>();
+    private final List<CheckBox> cuisineCheckBoxes = new ArrayList<>();
 
     @FXML
     private CheckBox chkDelivery;
@@ -61,7 +69,7 @@ public class RicercaAvanzataController {
     private void initialize() {
         txtLocalita.addTextFieldStyleClass("field-input");
         ratingStelleMinime.setOnRatingChanged(this::aggiornaEtichettaRating);
-        cmbTipologiaCucina.setDisable(true);
+
         caricaTipologieCucina();
 
         configuraCampoPrezzo(txtPrezzoMin, false);
@@ -104,23 +112,149 @@ public class RicercaAvanzataController {
     private void caricaTipologieCucina() {
         Thread.startVirtualThread(() -> {
             try {
-                List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
-                Platform.runLater(() -> {
-                    cmbTipologiaCucina.getItems().setAll(tipologie);
-                    cmbTipologiaCucina.setDisable(false);
-                });
+                List<String> tipologie =
+                        ServerConnection.getServer().ottieniTutteTipologieCucina();
+
+                Platform.runLater(() -> popolaMenuCucine(tipologie));
+
             } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
-                System.err.println("[SEARCH_WARN] Impossibile caricare le tipologie di cucina: " + e.getMessage());
-                Platform.runLater(() -> {
-                    cmbTipologiaCucina.setDisable(false);
-                    mostraErrore(
-                            "Tipologie non disponibili",
-                            "Impossibile caricare le tipologie di cucina dal server."
-                    );
-                });
+
+                System.err.println("[SEARCH_WARN] Impossibile caricare le tipologie di cucina: "
+                        + e.getMessage());
+
+                Platform.runLater(() -> mostraErrore(
+                        "Tipologie non disponibili",
+                        "Impossibile caricare le tipologie di cucina dal server."
+                ));
             }
         });
     }
+
+    private void popolaMenuCucine(List<String> tipologie) {
+
+        VBox menuContent = new VBox(8);
+        menuContent.setPadding(new Insets(8));
+        menuContent.setPrefWidth(260);
+
+        TextField searchCuisineInput = new TextField();
+        searchCuisineInput.setPromptText("Filtra cucine...");
+
+        searchCuisineInput.getStyleClass().add("search-cuisine-input");
+
+        searchCuisineInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                searchCuisineInput.insertText(
+                        searchCuisineInput.getCaretPosition(), " ");
+                event.consume();
+            }
+        });
+
+        VBox checkBoxesBox = new VBox(6);
+        cuisineCheckBoxes.clear();
+
+        for (String tipo : tipologie) {
+
+            if (tipo == null || tipo.isBlank()) {
+                continue;
+            }
+
+            CheckBox cb = new CheckBox(tipo.trim());
+            cb.setStyle("-fx-text-fill: #1e293b;");
+
+            cb.setSelected(selectedCuisines.contains(cb.getText()));
+
+            cb.setOnAction(e -> {
+
+                if (cb.isSelected()) {
+                    selectedCuisines.add(cb.getText());
+                } else {
+                    selectedCuisines.remove(cb.getText());
+                }
+
+                aggiornaEtichettaMenuCucine();
+            });
+
+            cuisineCheckBoxes.add(cb);
+            checkBoxesBox.getChildren().add(cb);
+        }
+
+        searchCuisineInput.textProperty().addListener((obs, oldVal, newVal) -> {
+
+            String q = newVal == null ? "" : newVal.trim().toLowerCase();
+
+            for (CheckBox cb : cuisineCheckBoxes) {
+
+                boolean visibile = q.isEmpty()
+                        || cb.getText().toLowerCase().contains(q);
+
+                cb.setVisible(visibile);
+                cb.setManaged(visibile);
+            }
+        });
+
+        ScrollPane scroll = new ScrollPane(checkBoxesBox);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(180);
+        scroll.setMaxHeight(220);
+
+        scroll.setStyle(
+                "-fx-background-color: transparent; -fx-background: transparent;"
+        );
+
+        Button clearBtn = new Button("Deseleziona tutte");
+        clearBtn.setMaxWidth(Double.MAX_VALUE);
+
+        clearBtn.setStyle(
+                "-fx-background-color: #f1f5f9; " +
+                        "-fx-text-fill: #475569; -fx-cursor: hand;"
+        );
+
+        clearBtn.setOnAction(e -> {
+
+            for (CheckBox cb : cuisineCheckBoxes) {
+                cb.setSelected(false);
+            }
+
+            selectedCuisines.clear();
+            aggiornaEtichettaMenuCucine();
+        });
+
+        menuContent.getChildren().addAll(
+                searchCuisineInput,
+                scroll,
+                clearBtn
+        );
+
+        CustomMenuItem item = new CustomMenuItem(menuContent, false);
+        item.setHideOnClick(false);
+
+        cuisineMenuButton.getItems().setAll(item);
+
+        cuisineMenuButton.setOnShowing(
+                e -> Platform.runLater(searchCuisineInput::requestFocus)
+        );
+
+        aggiornaEtichettaMenuCucine();
+    }
+
+    private void aggiornaEtichettaMenuCucine() {
+
+        if (selectedCuisines.isEmpty()) {
+
+            cuisineMenuButton.setText("Tipo di cucina");
+
+        } else if (selectedCuisines.size() == 1) {
+
+            cuisineMenuButton.setText(selectedCuisines.iterator().next());
+
+        } else {
+
+            cuisineMenuButton.setText(
+                    "Cucine (" + selectedCuisines.size() + ")"
+            );
+        }
+    }
+
 
     private void aggiornaEtichettaRating() {
         double rating = ratingStelleMinime.getRating();
@@ -200,7 +334,7 @@ public class RicercaAvanzataController {
         RicercaIniziale.imposta(
                 "",
                 luogo,
-                cmbTipologiaCucina.getValue() == null ? List.of() : List.of(cmbTipologiaCucina.getValue()),
+                new ArrayList<>(selectedCuisines),
                 prezzoMinimo,
                 prezzoMassimo < PREZZO_MASSIMO ? prezzoMassimo : null,
                 ratingStelleMinime.getRating() > 0 ? ratingStelleMinime.getRating() : null,
@@ -213,7 +347,12 @@ public class RicercaAvanzataController {
     @FXML
     private void reimpostaFiltri() {
         txtLocalita.setText("");
-        cmbTipologiaCucina.setValue(null);
+        for (CheckBox cb : cuisineCheckBoxes) {
+            cb.setSelected(false);
+        }
+
+        selectedCuisines.clear();
+        aggiornaEtichettaMenuCucine();
         rangeSliderPrezzo.setLowValue(PREZZO_MINIMO);
         rangeSliderPrezzo.setHighValue(PREZZO_MASSIMO);
         ratingStelleMinime.setRating(0);

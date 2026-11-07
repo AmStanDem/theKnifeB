@@ -212,3 +212,47 @@
 .btn-secondary:hover {
     -fx-background-color: #d8d8d8;
 }
+
+/* Menu a comparsa personalizzato per Cucine */
+.menu-button .context-menu {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+}
+
+/* Sfondo pulito per il menu a tendina */
+.context-menu {
+    -fx-background-color: #ffffff !important;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.12), 12, 0, 0, 4);
+}
+
+/* Disabilita il blu (-fx-selection-bar) di JavaFX su hover e focus del menu */
+.context-menu .menu-item,
+.context-menu .menu-item:focused,
+.context-menu .menu-item:hover,
+.context-menu .custom-menu-item,
+.context-menu .custom-menu-item:focused,
+.context-menu .custom-menu-item:hover {
+    -fx-background-color: transparent !important;
+    -fx-background: transparent !important;
+}
+
+/* Forza il testo delle checkbox a rimanere SEMPRE scuro */
+.context-menu .check-box {
+    -fx-text-fill: #1e293b !important;
+}
+
+.context-menu .check-box .text {
+    -fx-fill: #1e293b !important;
+}
+
+.context-menu .check-box:focused .text,
+.context-menu .check-box:hover .text {
+    -fx-fill: #1e293b !important;
+}

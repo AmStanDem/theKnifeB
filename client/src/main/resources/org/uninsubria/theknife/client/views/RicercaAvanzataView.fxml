@@ -24,6 +24,7 @@
     Pagina di Ricerca Avanzata - TheKnife (Formato Orizzontale)
     Controller di riferimento: RicercaAvanzataController
 -->
+<?import javafx.scene.control.MenuButton?>
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.theknife.client.controller.RicercaAvanzataController"
@@ -87,11 +88,12 @@
                             <!-- Tipologia di cucina -->
                             <VBox spacing="6" styleClass="field-group">
                                 <Label text="Tipologia di cucina" styleClass="field-label"/>
-                                <ComboBox fx:id="cmbTipologiaCucina"
-                                          promptText="Tutte le tipologie"
-                                          editable="false"
-                                          maxWidth="Infinity"
-                                          styleClass="field-input"/>
+                                <MenuButton
+                                        fx:id="cuisineMenuButton"
+                                        text="Tipo di cucina"
+                                        maxWidth="Infinity"
+                                        styleClass="field-input"
+                                />
                             </VBox>
                         </VBox>
 
