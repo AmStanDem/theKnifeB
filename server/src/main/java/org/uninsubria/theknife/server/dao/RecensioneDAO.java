@@ -85,7 +85,8 @@ public class RecensioneDAO {
                             dataCreazione,
                             rs.getString("risposta_gestore"),
                             rs.getInt("id_ristorante"),
-                            rs.getString("nome_ristorante")
+                            rs.getString("nome_ristorante"),
+                            rs.getInt("versione")
                     ));
                 }
             }
@@ -119,7 +120,8 @@ public class RecensioneDAO {
                             dataCreazione,
                             rs.getString("risposta_gestore"),
                             rs.getInt("id_ristorante"),
-                            rs.getString("nome_ristorante")
+                            rs.getString("nome_ristorante"),
+                            rs.getInt("versione")
                     ));
                 }
             }
@@ -127,11 +129,18 @@ public class RecensioneDAO {
         return lista;
     }
 
-    public boolean modificaRecensione(
-            int idRecensione, int idCliente, String nuovoTesto, double nuoveStelle)
+    public record EsitoModifica(boolean aggiornata, boolean esiste, Integer restaurantId) {}
+
+    public EsitoModifica modificaRecensione(
+            int idRecensione, int idCliente, String nuovoTesto, double nuoveStelle, int versioneAttesa)
             throws SQLException {
-        String sql = "UPDATE Recensioni SET valutazione = ?, testo = ?, data_modifica = CURRENT_TIMESTAMP " +
-                "WHERE id_recensione = ? AND id_utente = ?";
+        String sql = """
+                UPDATE Recensioni
+                SET valutazione = ?, testo = ?, data_modifica = CURRENT_TIMESTAMP,
+                    versione = versione + 1
+                WHERE id_recensione = ? AND id_utente = ? AND versione = ?
+                RETURNING id_ristorante
+                """;
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -139,7 +148,22 @@ public class RecensioneDAO {
             stmt.setString(2, nuovoTesto);
             stmt.setInt(3, idRecensione);
             stmt.setInt(4, idCliente);
-            return stmt.executeUpdate() > 0;
+            stmt.setInt(5, versioneAttesa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new EsitoModifica(true, true, rs.getInt("id_ristorante"));
+                }
+            }
+        }
+
+        String existsSql = "SELECT EXISTS (SELECT 1 FROM Recensioni WHERE id_recensione = ? AND id_utente = ?)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(existsSql)) {
+            stmt.setInt(1, idRecensione);
+            stmt.setInt(2, idCliente);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return new EsitoModifica(false, rs.next() && rs.getBoolean(1), null);
+            }
         }
     }
 

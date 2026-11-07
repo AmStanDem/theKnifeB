@@ -49,3 +49,14 @@ Su Windows usare invece:
 
 Il database PostgreSQL usa la porta host DB_HOST_PORT (5432 per default).
 Il server usa RMI sulla porta 1099 per default.
+
+Test concorrenti RMI (solo su un database dedicato già migrato):
+    export THEKNIFE_TEST_JDBC_URL='jdbc:postgresql://localhost:5432/theknife_test'
+    export THEKNIFE_TEST_DB_USER='admin'
+    export THEKNIFE_TEST_DB_PASSWORD='...'
+Avviare prima il server su questo database, poi:
+    mvn -pl server -am -Pconcurrency-tests integration-test
+
+Il test sincronizza due chiamate RMI per verificare duplicati di preferiti e
+recensioni e conflitti di modifica. Elimina le fixture create; non dimostra da
+solo tutte le proprietà ACID del sistema.

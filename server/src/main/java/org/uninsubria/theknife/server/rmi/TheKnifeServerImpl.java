@@ -123,9 +123,11 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
-    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
-            throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
-        recensioneService.modifica(idRecensione, idUtente, nuovoTesto, nuoveStelle);
+    public void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto,
+                                   Double nuoveStelle, Integer versioneAttesa)
+            throws RemoteException, RecensioneNonTrovataException, ModificaObsoletaException,
+            OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
+        recensioneService.modifica(idRecensione, idUtente, nuovoTesto, nuoveStelle, versioneAttesa);
     }
 
     @Override

@@ -111,7 +111,7 @@ SELECT
         LOWER(BTRIM(t.nuova_nazione)) || '|' || LOWER(BTRIM(t.nuova_citta))
     ) || '@example.invalid' AS email
 FROM migrazione_target t
-GROUP BY 1, 2;
+GROUP BY 1, 2, t.nuova_nazione;
 
 INSERT INTO Utenti (email, password, nome, cognome, domicilio, ruolo)
 SELECT

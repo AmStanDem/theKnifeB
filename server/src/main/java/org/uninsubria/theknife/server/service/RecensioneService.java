@@ -57,7 +57,8 @@ public class RecensioneService {
                         r.dataCreazione(),
                         r.rispostaGestore(),
                         r.idRistorante(),
-                        r.nomeRistorante()
+                        r.nomeRistorante(),
+                        r.versione()
                 ))
                 .toList();
     }
@@ -106,8 +107,9 @@ public class RecensioneService {
         }
     }
 
-    public void modifica(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
-            throws DatiMancantiException, RecensioneNonTrovataException,
+    public void modifica(Integer idRecensione, Integer idUtente, String nuovoTesto,
+                         Double nuoveStelle, Integer versioneAttesa)
+            throws DatiMancantiException, RecensioneNonTrovataException, ModificaObsoletaException,
             OperazioneNonConsentitaException, SistemaIndisponibileException {
 
         if (nuovoTesto == null || nuovoTesto.trim().isEmpty()) {
@@ -119,13 +121,20 @@ public class RecensioneService {
         }
 
         try {
-            RecensioneDAO.RecensioneTarget target = recensioneDAO.trovaTargetRecensione(idRecensione);
-            boolean successo = recensioneDAO.modificaRecensione(idRecensione, idUtente, nuovoTesto, nuoveStelle);
-            if (!successo) {
+            if (idRecensione == null || idUtente == null || versioneAttesa == null || versioneAttesa < 0) {
+                throw new DatiMancantiException("Identificativo e versione della recensione sono obbligatori.");
+            }
+            RecensioneDAO.EsitoModifica esito = recensioneDAO.modificaRecensione(
+                    idRecensione, idUtente, nuovoTesto, nuoveStelle, versioneAttesa);
+            if (!esito.aggiornata() && !esito.esiste()) {
                 throw new RecensioneNonTrovataException(
                         "Impossibile modificare: recensione inesistente o non di tua proprietà.");
             }
-            subscriptions.publish(target.restaurantId(), idUtente, DataChangedEvent.ChangeType.REVIEW_UPDATED);
+            if (!esito.aggiornata()) {
+                throw new ModificaObsoletaException(
+                        "La recensione è stata modificata da un altro client. Ricarica i dati e riprova.");
+            }
+            subscriptions.publish(esito.restaurantId(), idUtente, DataChangedEvent.ChangeType.REVIEW_UPDATED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);

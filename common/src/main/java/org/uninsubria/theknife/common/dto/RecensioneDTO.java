@@ -15,7 +15,8 @@ public record RecensioneDTO(
         LocalDateTime dataCreazione,
         String rispostaGestore,    // Null se il gestore non ha ancora risposto
         Integer idRistorante,
-        String nomeRistorante
+        String nomeRistorante,
+        Integer versione
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -30,5 +31,19 @@ public record RecensioneDTO(
     ) {
         this(idRecensione, valutazione, testo, nomeAutore, dataCreazione,
                 rispostaGestore, null, null);
+    }
+
+    public RecensioneDTO(
+            Integer idRecensione,
+            Double valutazione,
+            String testo,
+            String nomeAutore,
+            LocalDateTime dataCreazione,
+            String rispostaGestore,
+            Integer idRistorante,
+            String nomeRistorante
+    ) {
+        this(idRecensione, valutazione, testo, nomeAutore, dataCreazione,
+                rispostaGestore, idRistorante, nomeRistorante, 0);
     }
 }

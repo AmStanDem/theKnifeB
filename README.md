@@ -91,6 +91,25 @@ poi il client Linux o Windows corrispondente. Premi Invio per accettare i valori
 predefiniti. Se scegli una porta diversa nel prompt, configura la stessa
 `DB_HOST_PORT` in `.env` e riavvia Compose prima di connettere il server.
 
+### Test concorrenti RMI
+
+Il profilo opzionale `concurrency-tests` esegue un harness che crea fixture temporanee e verifica
+via due chiamate RMI sincronizzate con barriera: aggiunta duplicata ai preferiti, recensione
+duplicata e conflitto tra due aggiornamenti della stessa recensione. Il test elimina le fixture
+al termine e deve essere eseguito solo contro un database dedicato già migrato (mai contro il DB
+di sviluppo o produzione). Avvia prima il server connesso a quel database, poi esegui:
+
+```sh
+export THEKNIFE_TEST_JDBC_URL='jdbc:postgresql://localhost:5432/theknife_test'
+export THEKNIFE_TEST_DB_USER='admin'
+export THEKNIFE_TEST_DB_PASSWORD='...'
+mvn -pl server -am -Pconcurrency-tests integration-test
+```
+
+Il registry RMI predefinito è `localhost:1099`; si può configurare con `THEKNIFE_RMI_HOST` e
+`THEKNIFE_RMI_PORT`. Le corse verificano invarianti e conflitti per queste operazioni specifiche,
+non costituiscono una dimostrazione generale di tutte le proprietà ACID del sistema.
+
 Flyway usa la stessa porta predefinita `5432`; per una porta host diversa avvia Maven indicando `-Ddb.host.port=<DB_HOST_PORT>`. Quando il server è avviato da un terminale, la password non viene mostrata. In un IDE senza terminale associato può risultare visibile durante la digitazione.
 
 ---

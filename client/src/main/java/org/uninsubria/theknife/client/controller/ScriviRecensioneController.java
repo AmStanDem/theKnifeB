@@ -25,6 +25,7 @@ import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
+import org.uninsubria.theknife.common.exceptions.ModificaObsoletaException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.RecensioneNonTrovataException;
 import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
@@ -151,7 +152,8 @@ public class ScriviRecensioneController {
                         recensioneDaModificare.idRecensione(),
                         utente.idUtente(),
                         testo.trim(),
-                        stelle
+                        stelle,
+                        recensioneDaModificare.versione()
                 );
                 RecensioneSelezionata.pulisci();
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione aggiornata",
@@ -185,6 +187,11 @@ public class ScriviRecensioneController {
         } catch (RecensioneNonTrovataException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione non disponibile",
                     "La recensione è stata eliminata o non è più modificabile.");
+            RecensioneSelezionata.pulisci();
+            tornaAlRistoranteRecensito(actionEvent);
+        } catch (ModificaObsoletaException e) {
+            mostraMessaggio(Alert.AlertType.WARNING, "Recensione modificata altrove",
+                    "Un altro dispositivo ha aggiornato questa recensione. Ricarica i dati prima di riprovare.");
             RecensioneSelezionata.pulisci();
             tornaAlRistoranteRecensito(actionEvent);
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {

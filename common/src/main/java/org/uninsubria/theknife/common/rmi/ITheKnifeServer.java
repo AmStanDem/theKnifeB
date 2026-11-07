@@ -66,8 +66,10 @@ public interface ITheKnifeServer extends Remote {
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException;
 
     // Metodo AGGIUNTO per Area Cliente
-    void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto, Double nuoveStelle)
-            throws RemoteException, RecensioneNonTrovataException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
+    void modificaRecensione(Integer idRecensione, Integer idUtente, String nuovoTesto,
+                            Double nuoveStelle, Integer versioneAttesa)
+            throws RemoteException, RecensioneNonTrovataException, ModificaObsoletaException,
+            OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
 
     // Metodo AGGIUNTO per Area Cliente
     void eliminaRecensione(Integer idRecensione, Integer idUtente)
