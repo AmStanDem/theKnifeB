@@ -39,6 +39,9 @@ public interface ITheKnifeServer extends Remote {
     void registraNuovoRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
 
+    void modificaRistorante(RistoranteDTO ristorante, Integer idGestore)
+            throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
+
     // --- RECENSIONI E RISPOSTE ---
     List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException;

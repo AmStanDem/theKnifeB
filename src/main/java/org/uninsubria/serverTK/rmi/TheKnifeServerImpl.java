@@ -64,6 +64,12 @@ public class TheKnifeServerImpl implements ITheKnifeServer {
     }
 
     @Override
+    public void modificaRistorante(RistoranteDTO ristorante, Integer idGestore)
+            throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
+        ristoranteService.modificaRistorante(ristorante, idGestore);
+    }
+
+    @Override
     public List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException {
         return recensioneService.ottieniPerRistorante(idRistorante);

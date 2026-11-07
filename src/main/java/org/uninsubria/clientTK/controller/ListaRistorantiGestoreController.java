@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import org.uninsubria.clientTK.util.SceneManager;
+import org.uninsubria.clientTK.util.RistoranteSelezionato;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
 import org.uninsubria.common.dto.RistoranteDTO;
@@ -68,6 +69,7 @@ public class ListaRistorantiGestoreController {
                 Node card = loader.load();
                 RestaurantItemController controller = loader.getController();
                 controller.setRistorante(ristorante);
+                controller.setOnModificaAction(this::apriModificaRistorante);
                 restaurantContainer.getChildren().add(card);
             }
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
@@ -89,6 +91,14 @@ public class ListaRistorantiGestoreController {
     @FXML
     private void onAggiungiClick(ActionEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/AggiungiRistorante.fxml");
+    }
+
+    private void apriModificaRistorante(RistoranteDTO ristorante) {
+        RistoranteSelezionato.setRistorante(ristorante);
+        SceneManager.switchScene(
+                (javafx.stage.Stage) restaurantContainer.getScene().getWindow(),
+                "/org/uninsubria/clientTK/views/ModificaRistorante.fxml"
+        );
     }
 
     private void showError(String titolo, String messaggio) {

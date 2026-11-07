@@ -37,9 +37,11 @@ public class RestaurantItemController {
     @FXML private Label deliveryTag;
     @FXML private Label bookingTag;
     @FXML private Button detailsButton;
+    @FXML private Button editButton;
 
     private RistoranteDTO ristorante;
     private Consumer<RistoranteDTO> onDettagliAction;
+    private Consumer<RistoranteDTO> onModificaAction;
 
     /**
      * Popola la card con i dati del ristorante passato.
@@ -79,6 +81,12 @@ public class RestaurantItemController {
         this.onDettagliAction = onDettagliAction;
     }
 
+    public void setOnModificaAction(Consumer<RistoranteDTO> onModificaAction) {
+        this.onModificaAction = onModificaAction;
+        editButton.setVisible(onModificaAction != null);
+        editButton.setManaged(onModificaAction != null);
+    }
+
     @FXML
     /**
      * Gestisce il click sul pulsante "Dettagli".
@@ -92,6 +100,13 @@ public class RestaurantItemController {
     private void onDetailsClicked(ActionEvent actionEvent) {
         RistoranteSelezionato.setRistorante(ristorante);
         SceneManager.switchScene(actionEvent, "/org/uninsubria/clientTK/views/Ristorante.fxml");
+    }
+
+    @FXML
+    private void onEditClicked() {
+        if (ristorante != null && onModificaAction != null) {
+            onModificaAction.accept(ristorante);
+        }
     }
 
     /**
