@@ -108,6 +108,64 @@ public class RistoranteDAO {
         }
     }
 
+    public boolean modificaRistorante(RistoranteDTO r, int idGestore) throws SQLException {
+        String sqlRistorante = "UPDATE RistorantiTheKnife SET nome = ?, indirizzo = ?, citta = ?, " +
+                "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, delivery = ?, " +
+                "booking_online = ? WHERE id_ristorante = ? AND id_gestore = ?";
+        String sqlEliminaTipologie = "DELETE FROM Ristoranti_Tipologie WHERE id_ristorante = ?";
+        String sqlAggiungiTipologia = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) " +
+                "SELECT ?, id_tipologia FROM Tipologia_Cucina WHERE LOWER(nome) = LOWER(?) " +
+                "ON CONFLICT DO NOTHING";
+
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                int aggiornati;
+                try (PreparedStatement stmt = conn.prepareStatement(sqlRistorante)) {
+                    stmt.setString(1, r.nome().trim());
+                    stmt.setString(2, r.indirizzo().trim());
+                    stmt.setString(3, r.citta().trim());
+                    stmt.setString(4, r.nazione().trim());
+                    stmt.setDouble(5, r.latitudine());
+                    stmt.setDouble(6, r.longitudine());
+                    stmt.setDouble(7, r.prezzoMedio());
+                    stmt.setBoolean(8, Boolean.TRUE.equals(r.delivery()));
+                    stmt.setBoolean(9, Boolean.TRUE.equals(r.bookingOnline()));
+                    stmt.setInt(10, r.idRistorante());
+                    stmt.setInt(11, idGestore);
+                    aggiornati = stmt.executeUpdate();
+                }
+                if (aggiornati == 0) {
+                    conn.rollback();
+                    return false;
+                }
+
+                try (PreparedStatement stmt = conn.prepareStatement(sqlEliminaTipologie)) {
+                    stmt.setInt(1, r.idRistorante());
+                    stmt.executeUpdate();
+                }
+                try (PreparedStatement stmt = conn.prepareStatement(sqlAggiungiTipologia)) {
+                    for (String tipo : r.tipologieCucina()) {
+                        stmt.setInt(1, r.idRistorante());
+                        stmt.setString(2, tipo.trim());
+                        if (stmt.executeUpdate() == 0) {
+                            throw new SQLException("Tipologia cucina non presente nel catalogo: " + tipo);
+                        }
+                    }
+                }
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    e.addSuppressed(rollbackError);
+                }
+                throw e;
+            }
+        }
+    }
+
     public RistoranteDTO trovaPerId(int idRistorante) throws SQLException {
         String sql = costruisciQueryBase() + " WHERE r.id_ristorante = ? GROUP BY r.id_ristorante";
         try (Connection conn = DatabaseConfig.getConnection();

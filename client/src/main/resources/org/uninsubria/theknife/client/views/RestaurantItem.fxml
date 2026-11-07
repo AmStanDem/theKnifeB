@@ -52,6 +52,12 @@
     <!-- AZIONE -->
     <HBox alignment="CENTER_LEFT">
         <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="editButton"
+                text="Modifica"
+                styleClass="details-button"
+                onAction="#onEditClicked"
+                visible="false"
+                managed="false"/>
         <Button fx:id="detailsButton"
                 text="Dettagli"
                 styleClass="details-button"

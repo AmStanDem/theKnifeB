@@ -59,6 +59,47 @@ public class RistoranteService {
         }
     }
 
+    public void modificaRistorante(RistoranteDTO ristorante, Integer idGestore)
+            throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
+        if (ristorante == null || idGestore == null || ristorante.idRistorante() == null) {
+            throw new OperazioneNonConsentitaException("Accesso negato: ristorante o gestore non valido.");
+        }
+        validaDatiModifica(ristorante);
+
+        try {
+            List<String> tipologieDisponibili = ristoranteDAO.ottieniTutteTipologieCucina();
+            if (ristorante.tipologieCucina().stream()
+                    .anyMatch(tipo -> tipo == null || tipologieDisponibili.stream()
+                            .noneMatch(disponibile -> disponibile.equalsIgnoreCase(tipo.trim())))) {
+                throw new DatiMancantiException("Seleziona tipologie di cucina presenti nel catalogo.");
+            }
+            if (!ristoranteDAO.modificaRistorante(ristorante, idGestore)) {
+                throw new OperazioneNonConsentitaException(
+                        "Il ristorante non esiste o non appartiene al gestore corrente.");
+            }
+        } catch (SQLException e) {
+            throw databaseError("modifica ristorante", e);
+        }
+    }
+
+    private void validaDatiModifica(RistoranteDTO ristorante) throws DatiMancantiException {
+        if (ristorante.nome() == null || ristorante.nome().isBlank()
+                || ristorante.indirizzo() == null || ristorante.indirizzo().isBlank()
+                || ristorante.citta() == null || ristorante.citta().isBlank()
+                || ristorante.nazione() == null || ristorante.nazione().isBlank()
+                || ristorante.prezzoMedio() == null || !Double.isFinite(ristorante.prezzoMedio())
+                || ristorante.prezzoMedio() < 0
+                || ristorante.latitudine() == null || !Double.isFinite(ristorante.latitudine())
+                || ristorante.latitudine() < -90 || ristorante.latitudine() > 90
+                || ristorante.longitudine() == null || !Double.isFinite(ristorante.longitudine())
+                || ristorante.longitudine() < -180 || ristorante.longitudine() > 180) {
+            throw new DatiMancantiException("Dati del ristorante mancanti o non validi.");
+        }
+        if (ristorante.tipologieCucina() == null || ristorante.tipologieCucina().isEmpty()) {
+            throw new DatiMancantiException("È necessario specificare almeno una tipologia di cucina.");
+        }
+    }
+
     public RistoranteDTO ottieniDettaglio(Integer idRistorante)
             throws RistoranteNonTrovatoException, SistemaIndisponibileException {
         if (idRistorante == null) {
