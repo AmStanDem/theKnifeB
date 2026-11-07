@@ -37,6 +37,7 @@ public class SceneManager {
 
     private static final String GLOBAL_CSS = "/org/uninsubria/clientTK/styles/style.css";
     private static final String BASE_LAYOUT_FXML = "/org/uninsubria/clientTK/views/BaseLayout.fxml";
+    private static final String LOGIN_VIEW_FXML = "/org/uninsubria/clientTK/views/LoginView.fxml";
 
     /**
      * Cambia vista ricavando lo Stage dall'evento (ActionEvent, MouseEvent, ecc.)
@@ -68,10 +69,6 @@ public class SceneManager {
         try {
             String currentFxml = currentFxmlMap.get(stage);
 
-            if (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)) {
-                historyMap.computeIfAbsent(stage, k -> new Stack<>()).push(currentFxml);
-            }
-
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent page = loader.load();
 
@@ -79,6 +76,14 @@ public class SceneManager {
             Parent baseLayout = baseLayoutLoader.load();
             BaseLayoutController baseLayoutController = baseLayoutLoader.getController();
             baseLayoutController.setContent(page);
+            baseLayoutController.setLoginPage(LOGIN_VIEW_FXML.equals(fxmlPath));
+            baseLayoutController.setCanGoBack(hasPreviousPage(stage)
+                    || (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)));
+
+            if (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)) {
+                historyMap.computeIfAbsent(stage, k -> new Stack<>()).push(currentFxml);
+            }
+            currentFxmlMap.put(stage, fxmlPath);
 
             StackPane applicationRoot = creaRootApplicativa(stage, baseLayout);
 
@@ -224,6 +229,11 @@ public class SceneManager {
         } else {
             System.out.println("Nessuna pagina precedente nello storico per questo stage.");
         }
+    }
+
+    public static boolean hasPreviousPage(Stage stage) {
+        Stack<String> history = historyMap.get(stage);
+        return history != null && !history.isEmpty();
     }
 
     /**

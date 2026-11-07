@@ -67,6 +67,7 @@ public class LoginController {
                 UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
                 Platform.runLater(() -> {
                     SessioneUtente.login(utente);
+                    SceneManager.clearHistory(stage);
                     SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/MainLayout.fxml");
                 });
             } catch (CredenzialiErrateException e) {

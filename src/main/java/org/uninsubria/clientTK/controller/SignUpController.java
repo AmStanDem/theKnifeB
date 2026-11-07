@@ -2,8 +2,10 @@ package org.uninsubria.clientTK.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import org.uninsubria.clientTK.util.SceneManager;
 import org.uninsubria.clientTK.util.ServerConnection;
 import org.uninsubria.clientTK.util.SessioneUtente;
@@ -118,6 +120,8 @@ public class SignUpController {
             SessioneUtente.login(utente);
 
             // Cambio scena pulito tramite SceneManager centralizzato
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            SceneManager.clearHistory(stage);
             SceneManager.switchScene(event, "/org/uninsubria/clientTK/views/MainLayout.fxml");
 
         } catch (UtenteGiaEsistenteException e) {

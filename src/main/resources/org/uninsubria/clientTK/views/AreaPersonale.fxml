@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -18,60 +15,6 @@
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.clientTK.controller.AreaPersonaleController">
-
-    <!-- HEADER -->
-    <top>
-
-        <HBox alignment="CENTER_LEFT"
-              spacing="20.0"
-              styleClass="header"
-              BorderPane.alignment="CENTER">
-
-            <padding>
-
-                <Insets bottom="15.0"
-                        left="25.0"
-                        right="25.0"
-                        top="15.0" />
-
-            </padding>
-
-            <children>
-
-                <!-- LOGO -->
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true"
-                           onMouseClicked="#handleLogoClick">
-
-                    <image>
-
-                        <Image url="@../../../../images/img_1.png" />
-
-                    </image>
-
-                </ImageView>
-
-
-                <!-- SPAZIO -->
-                <Region HBox.hgrow="ALWAYS" />
-
-
-                <!-- LOGOUT -->
-                <Button fx:id="btnLogOut"
-                        mnemonicParsing="false"
-                        onAction="#onLogOutClick"
-                        prefHeight="63.0"
-                        prefWidth="285.0"
-                        styleClass="accent"
-                        text="Log out" />
-
-            </children>
-
-        </HBox>
-
-    </top>
-
 
     <!-- CONTENUTO CENTRALE -->
     <center>
@@ -227,6 +170,15 @@
                             prefWidth="500.0"
                             styleClass="profile-button"
                             text="Aggiungi ristorante" />
+
+                    <!-- LOGOUT -->
+                    <Button fx:id="btnLogOut"
+                            mnemonicParsing="false"
+                            onAction="#onLogOutClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="accent"
+                            text="Log out" />
 
                 </VBox>
 
