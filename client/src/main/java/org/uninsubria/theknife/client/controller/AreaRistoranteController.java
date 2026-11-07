@@ -22,8 +22,10 @@ import org.uninsubria.theknife.client.util.CuisineTags;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.client.util.stars.BaseRatingView;
 import org.uninsubria.theknife.common.dto.RecensioneDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
@@ -32,6 +34,7 @@ import org.uninsubria.theknife.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.RecensioneNonTrovataException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -155,12 +158,47 @@ public class AreaRistoranteController {
             System.out.println("Ristorante selezionato: " + ristorante.nome());
             mostraDatiRistorante();
             aggiornaStatoPreferito();
+            RemoteRefreshManager.subscribe(
+                    this, SubscriptionTopic.RESTAURANT, ristorante.idRistorante(), event -> {
+                        if (event.type() == DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+                            return;
+                        }
+                        if (event.type() == DataChangedEvent.ChangeType.RESTAURANT_CHANGED) {
+                            aggiornaDettaglioRistorante();
+                        }
+                        aggiornaAzioniRecensione(SessioneUtente.isCliente());
+                        caricaRecensioni();
+                    }, () -> {
+                        aggiornaDettaglioRistorante();
+                        aggiornaAzioniRecensione(SessioneUtente.isCliente());
+                        caricaRecensioni();
+                    });
+            UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+            if (utente != null) {
+                RemoteRefreshManager.subscribe(
+                        this, SubscriptionTopic.USER, utente.idUtente(), event -> {
+                            if (event.type() == DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+                                aggiornaStatoPreferito();
+                            }
+                        }, this::aggiornaStatoPreferito);
+            }
         } else {
             System.out.println("Nessun ristorante selezionato");
         }
         boolean clienteLoggato = SessioneUtente.isCliente();
         aggiornaAzioniRecensione(clienteLoggato);
         caricaRecensioni();
+    }
+
+    private void aggiornaDettaglioRistorante() {
+        try {
+            ristorante = ServerConnection.getServer().getDettaglioRistorante(ristorante.idRistorante());
+            mostraDatiRistorante();
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException
+                 | org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Errore di aggiornamento",
+                    "Impossibile aggiornare i dati del ristorante.");
+        }
     }
 
     private void aggiornaAzioniRecensione(boolean clienteLoggato) {

@@ -13,6 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecensioneDAO {
+    public record RecensioneTarget(int restaurantId, int userId) {}
+
+    public RecensioneTarget trovaTargetRecensione(int idRecensione) throws SQLException {
+        String sql = "SELECT id_ristorante, id_utente FROM Recensioni WHERE id_recensione = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idRecensione);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next()
+                        ? new RecensioneTarget(rs.getInt("id_ristorante"), rs.getInt("id_utente"))
+                        : null;
+            }
+        }
+    }
 
     public boolean utenteCliente(int idUtente) throws SQLException {
         String sql = "SELECT EXISTS (SELECT 1 FROM Utenti WHERE id_utente = ? AND ruolo = 'cliente')";

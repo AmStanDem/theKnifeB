@@ -4,11 +4,13 @@
  */
 package org.uninsubria.theknife.server.service;
 
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.theknife.server.dao.PreferitiDAO;
+import org.uninsubria.theknife.server.rmi.RemoteSubscriptionManager;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -16,6 +18,11 @@ import java.util.List;
 public class PreferitiService {
 
     private final PreferitiDAO preferitiDAO = new PreferitiDAO();
+    private final RemoteSubscriptionManager subscriptions;
+
+    public PreferitiService(RemoteSubscriptionManager subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public List<RistoranteDTO> getPreferiti(Integer idUtente) throws SistemaIndisponibileException {
         if (idUtente == null) {
@@ -40,6 +47,8 @@ public class PreferitiService {
             if (!successo) {
                 throw new AzioneDuplicataException("Il ristorante è già presente nei tuoi preferiti o non esiste.");
             }
+            subscriptions.publish(
+                    idRistorante, idUtente, DataChangedEvent.ChangeType.FAVORITES_CHANGED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore aggiunta preferito: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -57,6 +66,8 @@ public class PreferitiService {
             if (!successo) {
                 throw new RistoranteNonTrovatoException(idRistorante);
             }
+            subscriptions.publish(
+                    idRistorante, idUtente, DataChangedEvent.ChangeType.FAVORITES_CHANGED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore rimozione preferito: " + e.getMessage());
             throw new SistemaIndisponibileException(e);

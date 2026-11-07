@@ -35,6 +35,7 @@ public class SceneManager {
 
     private static final Map<Stage, Stack<String>> historyMap = new HashMap<>();
     private static final Map<Stage, String> currentFxmlMap = new HashMap<>();
+    private static final Map<Stage, Object> currentControllers = new HashMap<>();
     private static final Map<Stage, Set<Window>> popupWindows = new HashMap<>();
     private static boolean popupListenerInstalled;
 
@@ -77,6 +78,10 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
             StackPane applicationRoot = creaRootApplicativa(stage, root);
+            Object previousController = currentControllers.get(stage);
+            if (previousController != null) {
+                RemoteRefreshManager.unsubscribeOwner(previousController);
+            }
 
             if (stage.getScene() != null) {
                 stage.getScene().setRoot(applicationRoot);
@@ -87,6 +92,8 @@ public class SceneManager {
                 stage.sizeToScene();
             }
 
+            currentControllers.put(stage, loader.getController());
+            currentFxmlMap.put(stage, fxmlPath);
             mantieneFullscreen(stage);
             return loader.getController();
 
@@ -103,7 +110,15 @@ public class SceneManager {
         stage.setFullScreenExitHint("");
         if (!popupWindows.containsKey(stage)) {
             popupWindows.put(stage, new HashSet<>());
-            stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> popupWindows.remove(stage));
+            stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
+                Object controller = currentControllers.remove(stage);
+                if (controller != null) {
+                    RemoteRefreshManager.unsubscribeOwner(controller);
+                }
+                popupWindows.remove(stage);
+                historyMap.remove(stage);
+                currentFxmlMap.remove(stage);
+            });
         }
 
         if (!popupListenerInstalled) {

@@ -5,8 +5,10 @@
 package org.uninsubria.theknife.server.service;
 
 import org.uninsubria.theknife.common.dto.RecensioneDTO;
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.exceptions.*;
 import org.uninsubria.theknife.server.dao.RecensioneDAO;
+import org.uninsubria.theknife.server.rmi.RemoteSubscriptionManager;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,6 +16,11 @@ import java.util.List;
 public class RecensioneService {
 
     private final RecensioneDAO recensioneDAO = new RecensioneDAO();
+    private final RemoteSubscriptionManager subscriptions;
+
+    public RecensioneService(RemoteSubscriptionManager subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public List<RecensioneDTO> ottieniPerRistorante(Integer idRistorante)
             throws SistemaIndisponibileException {
@@ -92,6 +99,7 @@ public class RecensioneService {
             if (!successo) {
                 throw new AzioneDuplicataException("Hai già recensito questo ristorante.");
             }
+            subscriptions.publish(idRistorante, idUtente, DataChangedEvent.ChangeType.REVIEW_CREATED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore inserimento recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -111,11 +119,13 @@ public class RecensioneService {
         }
 
         try {
+            RecensioneDAO.RecensioneTarget target = recensioneDAO.trovaTargetRecensione(idRecensione);
             boolean successo = recensioneDAO.modificaRecensione(idRecensione, idUtente, nuovoTesto, nuoveStelle);
             if (!successo) {
                 throw new RecensioneNonTrovataException(
                         "Impossibile modificare: recensione inesistente o non di tua proprietà.");
             }
+            subscriptions.publish(target.restaurantId(), idUtente, DataChangedEvent.ChangeType.REVIEW_UPDATED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -133,11 +143,13 @@ public class RecensioneService {
     public void elimina(Integer idRecensione, Integer idUtente)
             throws RecensioneNonTrovataException, SistemaIndisponibileException {
         try {
+            RecensioneDAO.RecensioneTarget target = recensioneDAO.trovaTargetRecensione(idRecensione);
             boolean successo = recensioneDAO.eliminaRecensione(idRecensione, idUtente);
             if (!successo) {
                 throw new RecensioneNonTrovataException(
                         "Impossibile eliminare: recensione inesistente o non di tua proprietà.");
             }
+            subscriptions.publish(target.restaurantId(), idUtente, DataChangedEvent.ChangeType.REVIEW_DELETED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore eliminazione recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -153,12 +165,15 @@ public class RecensioneService {
         }
 
         try {
+            RecensioneDAO.RecensioneTarget target = recensioneDAO.trovaTargetRecensione(idRecensione);
             boolean successo = recensioneDAO.aggiungiRispostaGestore(
                     idRecensione, idGestore, testoRisposta.trim());
             if (!successo) {
                 throw new OperazioneNonConsentitaException(
                         "solo il gestore del ristorante può rispondere e ogni recensione può avere una sola risposta.");
             }
+            subscriptions.publish(
+                    target.restaurantId(), target.userId(), DataChangedEvent.ChangeType.REVIEW_REPLY_CHANGED);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore inserimento risposta recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);

@@ -80,7 +80,11 @@ public class MainServer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\n[SYSTEM] Chiusura del server e del pool database...");
             unexport(registryRef.get());
-            unexport(serverRef.get());
+            TheKnifeServerImpl server = serverRef.get();
+            unexport(server);
+            if (server != null) {
+                server.close();
+            }
             DatabaseConfig.close();
         }, "theknife-server-shutdown"));
 
@@ -117,8 +121,8 @@ public class MainServer {
         // Esposizione dei servizi tramite RMI.
         try {
             TheKnifeServerImpl serverService = new TheKnifeServerImpl();
-            ITheKnifeServer stub = (ITheKnifeServer) UnicastRemoteObject.exportObject(serverService, 0);
             serverRef.set(serverService);
+            ITheKnifeServer stub = (ITheKnifeServer) UnicastRemoteObject.exportObject(serverService, 0);
             registry.rebind("TheKnifeServer", stub);
 
             System.out.println("[RMI] Registro in ascolto sulla porta " + rmiPort);

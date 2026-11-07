@@ -19,14 +19,17 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.common.dto.RecensioneDTO;
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.RecensioneNonTrovataException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -80,6 +83,18 @@ public class MieRecensioniController {
     public void initialize() {
         caricaRecensioni();
         aggiornaLista(recensioniComplete);
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente != null) {
+            RemoteRefreshManager.subscribe(this, SubscriptionTopic.USER, utente.idUtente(), event -> {
+                if (event.type() != DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+                    caricaRecensioni();
+                    aggiornaLista(recensioniComplete);
+                }
+            }, () -> {
+                caricaRecensioni();
+                aggiornaLista(recensioniComplete);
+            });
+        }
     }
 
     private void caricaRecensioni() {

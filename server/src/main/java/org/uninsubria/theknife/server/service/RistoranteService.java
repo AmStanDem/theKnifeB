@@ -5,6 +5,7 @@
 package org.uninsubria.theknife.server.service;
 
 import org.uninsubria.theknife.common.dto.FiltriRicercaDTO;
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
@@ -13,6 +14,7 @@ import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaExceptio
 import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.theknife.server.dao.RistoranteDAO;
+import org.uninsubria.theknife.server.rmi.RemoteSubscriptionManager;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,6 +22,11 @@ import java.util.List;
 public class RistoranteService {
 
     private final RistoranteDAO ristoranteDAO = new RistoranteDAO();
+    private final RemoteSubscriptionManager subscriptions;
+
+    public RistoranteService(RemoteSubscriptionManager subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public void aggiungiRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
@@ -50,10 +57,11 @@ public class RistoranteService {
         }
 
         try {
-            boolean successo = ristoranteDAO.inserisciRistorante(ristorante, idGestore);
-            if (!successo) {
+            Integer restaurantId = ristoranteDAO.inserisciRistorante(ristorante, idGestore);
+            if (restaurantId == null) {
                 throw new SistemaIndisponibileException();
             }
+            subscriptions.publish(restaurantId, idGestore, DataChangedEvent.ChangeType.RESTAURANT_CHANGED);
         } catch (SQLException e) {
             throw databaseError("inserimento ristorante", e);
         }
@@ -77,6 +85,8 @@ public class RistoranteService {
                 throw new OperazioneNonConsentitaException(
                         "Il ristorante non esiste o non appartiene al gestore corrente.");
             }
+            subscriptions.publish(
+                    ristorante.idRistorante(), idGestore, DataChangedEvent.ChangeType.RESTAURANT_CHANGED);
         } catch (SQLException e) {
             throw databaseError("modifica ristorante", e);
         }

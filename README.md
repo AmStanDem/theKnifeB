@@ -61,6 +61,14 @@ e macOS (`bin/theknife-client-linux.jar`, `bin/theknife-client-windows.jar` e
 rispettiva piattaforma: distribuisci a ogni compagno il file corrispondente al suo
 sistema operativo.
 
+### Aggiornamento tra client
+
+Le viste di dettaglio ristorante, ricerca, ristoranti del gestore, preferiti e
+recensioni personali usano callback RMI per ricevere notifiche di invalidazione
+dopo modifiche a recensioni, risposte, ristoranti o preferiti. Ogni vista ricarica
+i dati dal server; le sottoscrizioni vengono rimosse quando la vista viene chiusa.
+Non viene eseguito polling periodico.
+
 ### Database e avvio del serverTK
 
 PostgreSQL nel container ascolta sulla porta interna `5432`, la sua porta predefinita. Compose la pubblica sull'host usando `DB_HOST_PORT`, anch'essa predefinita a `5432`. Se la porta host è già occupata da un PostgreSQL locale, imposta per esempio `DB_HOST_PORT=5433` in `.env`; copia `.env.example` in `.env` e avvia il database con `docker compose up -d db`. Non modificare la porta interna `5432`.

@@ -12,11 +12,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import org.uninsubria.theknife.client.util.SceneManager;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -47,6 +49,9 @@ public class ListaRistorantiGestoreController {
         }
 
         caricaRistoranti(gestore);
+        RemoteRefreshManager.subscribe(
+                this, SubscriptionTopic.CATALOG, null, event -> caricaRistoranti(gestore),
+                () -> caricaRistoranti(gestore));
     }
 
     private void caricaRistoranti(UtenteDTO gestore) {

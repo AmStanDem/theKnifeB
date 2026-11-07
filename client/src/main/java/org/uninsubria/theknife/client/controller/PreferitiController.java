@@ -19,12 +19,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.uninsubria.theknife.client.util.SceneManager;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -70,6 +73,16 @@ public class PreferitiController {
     @FXML
     public void initialize() {
         caricaPreferiti();
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        if (utente != null) {
+            RemoteRefreshManager.subscribe(this, SubscriptionTopic.USER, utente.idUtente(), event -> {
+                if (event.type() == DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+                    caricaPreferiti();
+                }
+            }, this::caricaPreferiti);
+            RemoteRefreshManager.subscribe(
+                    this, SubscriptionTopic.CATALOG, null, event -> caricaPreferiti(), this::caricaPreferiti);
+        }
     }
 
     private void caricaPreferiti() {

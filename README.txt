@@ -23,6 +23,11 @@ e i client JavaFX con le librerie native specifiche della piattaforma:
 
 Distribuire a ogni compagno il JAR corrispondente al suo sistema operativo.
 
+Le viste di dettaglio, ricerca, ristoranti del gestore, preferiti e recensioni
+personali ricevono aggiornamenti tramite callback RMI. Le notifiche invalidano i
+dati locali, che vengono ricaricati dal server; le sottoscrizioni terminano quando
+si chiude la vista. Non viene eseguito polling periodico.
+
 Configurare .env copiando .env.example e avviare il database:
     docker compose up -d db
 

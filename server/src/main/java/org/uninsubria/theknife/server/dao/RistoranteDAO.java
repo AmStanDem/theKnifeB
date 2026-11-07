@@ -24,7 +24,7 @@ public class RistoranteDAO {
     private static final String POSIZIONE_RIFERIMENTO =
             "ST_SetSRID(ST_MakePoint(?::double precision, ?::double precision), 4326)::geography";
 
-    public boolean inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
+    public Integer inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlTipologiaCheck = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO NOTHING";
@@ -48,7 +48,7 @@ public class RistoranteDAO {
 
                 if (stmt.executeUpdate() == 0) {
                     conn.rollback();
-                    return false;
+                    return null;
                 }
 
                 int idRistorante = -1;
@@ -60,7 +60,7 @@ public class RistoranteDAO {
 
                 if (idRistorante == -1) {
                     conn.rollback();
-                    return false;
+                    return null;
                 }
 
                 // Inserimento cucine e associazioni
@@ -95,7 +95,7 @@ public class RistoranteDAO {
                 }
 
                 conn.commit();
-                return true;
+                return idRistorante;
 
             } catch (SQLException ex) {
                 try {

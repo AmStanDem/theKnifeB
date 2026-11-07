@@ -10,11 +10,17 @@ import org.uninsubria.theknife.common.exceptions.*;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Contratto RMI principale (Facade) che espone tutti i casi d'uso del sistema The Knife.
  */
 public interface ITheKnifeServer extends Remote {
+
+    UUID subscribe(SubscriptionTopic topic, Integer targetId, RemoteObserver observer)
+            throws RemoteException, DatiMancantiException;
+
+    void unsubscribe(UUID subscriptionId) throws RemoteException;
 
     // --- IDENTITÀ ---
     UtenteDTO eseguiLogin(String email, String password)

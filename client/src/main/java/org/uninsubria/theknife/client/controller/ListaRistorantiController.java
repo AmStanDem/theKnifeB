@@ -19,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.uninsubria.theknife.client.util.SceneManager;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.RicercaSessione;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.RicercaIniziale;
@@ -27,6 +28,7 @@ import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.theknife.common.rmi.ITheKnifeServer;
+import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -103,6 +105,9 @@ public class ListaRistorantiController {
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> searchDebounce.playFromStart());
         caricaDatiDalServer();
+        RemoteRefreshManager.subscribe(
+                this, SubscriptionTopic.CATALOG, null, event -> caricaPagina(true),
+                () -> caricaPagina(true));
     }
 
     private void applicaCriteriIniziali(RicercaIniziale.Criteri criteri) {

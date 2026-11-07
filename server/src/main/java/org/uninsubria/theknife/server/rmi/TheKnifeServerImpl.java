@@ -7,17 +7,42 @@ package org.uninsubria.theknife.server.rmi;
 import org.uninsubria.theknife.common.rmi.ITheKnifeServer;
 import org.uninsubria.theknife.common.dto.*;
 import org.uninsubria.theknife.common.exceptions.*;
+import org.uninsubria.theknife.common.rmi.RemoteObserver;
+import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 import org.uninsubria.theknife.server.service.*;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.UUID;
 
-public class TheKnifeServerImpl implements ITheKnifeServer {
+public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
 
+    private final RemoteSubscriptionManager subscriptions = new RemoteSubscriptionManager();
     private final UtenteService utenteService = new UtenteService();
-    private final RistoranteService ristoranteService = new RistoranteService();
-    private final RecensioneService recensioneService = new RecensioneService();
-    private final PreferitiService preferitiService = new PreferitiService();
+    private final RistoranteService ristoranteService = new RistoranteService(subscriptions);
+    private final RecensioneService recensioneService = new RecensioneService(subscriptions);
+    private final PreferitiService preferitiService = new PreferitiService(subscriptions);
+
+    @Override
+    public UUID subscribe(SubscriptionTopic topic, Integer targetId, RemoteObserver observer)
+            throws RemoteException, DatiMancantiException {
+        if (topic == null || observer == null
+                || (topic == SubscriptionTopic.CATALOG && targetId != null)
+                || (topic != SubscriptionTopic.CATALOG && (targetId == null || targetId <= 0))) {
+            throw new DatiMancantiException("Argomenti di sottoscrizione non validi.");
+        }
+        return subscriptions.subscribe(topic, targetId, observer);
+    }
+
+    @Override
+    public void unsubscribe(UUID subscriptionId) {
+        subscriptions.unsubscribe(subscriptionId);
+    }
+
+    @Override
+    public void close() {
+        subscriptions.close();
+    }
 
     @Override
     public UtenteDTO eseguiLogin(String email, String password)
