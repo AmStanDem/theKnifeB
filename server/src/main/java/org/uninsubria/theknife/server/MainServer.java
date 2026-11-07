@@ -18,6 +18,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -74,6 +75,27 @@ public class MainServer {
         String dbPassword = promptPassword(scanner, console);
         String dbUrl = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
 
+        AtomicReference<Registry> registryRef = new AtomicReference<>();
+        AtomicReference<TheKnifeServerImpl> serverRef = new AtomicReference<>();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("\n[SYSTEM] Chiusura del server e del pool database...");
+            unexport(registryRef.get());
+            unexport(serverRef.get());
+            DatabaseConfig.close();
+        }, "theknife-server-shutdown"));
+
+        Registry registry;
+        try {
+            registry = LocateRegistry.createRegistry(rmiPort);
+            registryRef.set(registry);
+        } catch (Exception e) {
+            System.err.println("[FATAL ERROR] Porta RMI " + rmiPort
+                    + " non disponibile: " + e.getMessage());
+            System.err.println("[SUGGERIMENTO] Arresta l'altra istanza del server oppure libera la porta.");
+            System.exit(1);
+            return;
+        }
+
         if (dbHost.isBlank() || dbName.isBlank() || dbUser.isBlank()) {
             System.err.println("[FATAL ERROR] Host, nome database e utente PostgreSQL non possono essere vuoti.");
             System.exit(1);
@@ -90,32 +112,27 @@ public class MainServer {
             return;
         }
 
-        AtomicReference<Registry> registryRef = new AtomicReference<>();
-        AtomicReference<TheKnifeServerImpl> serverRef = new AtomicReference<>();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("\n[SYSTEM] Chiusura del server e del pool database...");
-            unexport(registryRef.get());
-            unexport(serverRef.get());
-            DatabaseConfig.close();
-        }, "theknife-server-shutdown"));
-
         org.uninsubria.theknife.server.utils.CsvImporter.importaSeNecessario();
 
         // Esposizione dei servizi tramite RMI.
         try {
             TheKnifeServerImpl serverService = new TheKnifeServerImpl();
-            Registry registry = LocateRegistry.createRegistry(rmiPort);
-            registryRef.set(registry);
             ITheKnifeServer stub = (ITheKnifeServer) UnicastRemoteObject.exportObject(serverService, 0);
             serverRef.set(serverService);
             registry.rebind("TheKnifeServer", stub);
 
-            System.out.println("[RMI] Registro creato e in ascolto sulla porta " + rmiPort);
+            System.out.println("[RMI] Registro in ascolto sulla porta " + rmiPort);
             System.out.println("[SYSTEM] Server THE KNIFE operativo e pronto a ricevere connessioni.\n");
 
         } catch (Exception e) {
             System.err.println("[FATAL ERROR] Impossibile avviare il registro RMI: " + e.getMessage());
             System.exit(1);
+        }
+
+        try {
+            new CountDownLatch(1).await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

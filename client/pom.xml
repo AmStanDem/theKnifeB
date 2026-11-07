@@ -14,6 +14,212 @@
     <artifactId>theknife-client</artifactId>
     <packaging>jar</packaging>
 
+    <profiles>
+        <profile>
+            <id>run-client</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openjfx</groupId>
+                        <artifactId>javafx-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start-client</id>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>client-linux</id>
+            <activation>
+                <os>
+                    <name>Linux</name>
+                </os>
+            </activation>
+            <properties>
+                <javafx.platform>linux</javafx.platform>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>client-windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <javafx.platform>win</javafx.platform>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>mac</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>client-macos</id>
+            <activation>
+                <os>
+                    <name>Mac OS X</name>
+                </os>
+            </activation>
+            <properties>
+                <javafx.platform>mac</javafx.platform>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>linux</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-graphics</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                    <classifier>win</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.uninsubria.theknife</groupId>
@@ -62,12 +268,85 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>shade-linux-client</id>
                         <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <goals><goal>shade</goal></goals>
                         <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>linux</shadedClassifierName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.openjfx:javafx-*:jar:win</exclude>
+                                    <exclude>org.openjfx:javafx-*:jar:mac</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.uninsubria.theknife.client.AppLauncher</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>shade-windows-client</id>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>windows</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.openjfx:javafx-*:jar:linux</exclude>
+                                    <exclude>org.openjfx:javafx-*:jar:mac</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.uninsubria.theknife.client.AppLauncher</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>shade-macos-client</id>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>macos</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.openjfx:javafx-*:jar:linux</exclude>
+                                    <exclude>org.openjfx:javafx-*:jar:win</exclude>
+                                </excludes>
+                            </artifactSet>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.uninsubria.theknife.client.AppLauncher</mainClass>
@@ -91,24 +370,24 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>copy-client-executable</id>
+                        <id>copy-client-executables</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${maven.multiModuleProjectDirectory}/bin</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>${project.build.finalName}.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
+                            <target>
+                                <copy file="${project.build.directory}/${project.build.finalName}-${project.version}-linux.jar"
+                                      tofile="${maven.multiModuleProjectDirectory}/bin/theknife-client-linux.jar"/>
+                                <copy file="${project.build.directory}/${project.build.finalName}-${project.version}-windows.jar"
+                                      tofile="${maven.multiModuleProjectDirectory}/bin/theknife-client-windows.jar"/>
+                                <copy file="${project.build.directory}/${project.build.finalName}-${project.version}-macos.jar"
+                                      tofile="${maven.multiModuleProjectDirectory}/bin/theknife-client-macos.jar"/>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>

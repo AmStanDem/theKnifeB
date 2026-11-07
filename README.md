@@ -55,13 +55,33 @@ Dalla directory radice:
 mvn clean package
 ```
 
-Il build crea i due JAR eseguibili `bin/theknife-client.jar` e `bin/theknife-server.jar`.
+Una singola build genera `bin/theknife-server.jar` e i JAR client per Linux, Windows
+e macOS (`bin/theknife-client-linux.jar`, `bin/theknife-client-windows.jar` e
+`bin/theknife-client-macos.jar`). Ogni JAR JavaFX include le librerie native della
+rispettiva piattaforma: distribuisci a ogni compagno il file corrispondente al suo
+sistema operativo.
 
 ### Database e avvio del serverTK
 
 PostgreSQL nel container ascolta sulla porta interna `5432`, la sua porta predefinita. Compose la pubblica sull'host usando `DB_HOST_PORT`, anch'essa predefinita a `5432`. Se la porta host è già occupata da un PostgreSQL locale, imposta per esempio `DB_HOST_PORT=5433` in `.env`; copia `.env.example` in `.env` e avvia il database con `docker compose up -d db`. Non modificare la porta interna `5432`.
 
-Avvia prima il server con `java -jar bin/theknife-server.jar`; il prompt propone la porta `DB_HOST_PORT` letta da `.env` e richiede host, nome database e credenziali. Avvia il client separatamente con `java -jar bin/theknife-client.jar`. Premi Invio per accettare i valori predefiniti. Se scegli una porta diversa nel prompt, configura la stessa `DB_HOST_PORT` in `.env` e riavvia Compose prima di connettere il server.
+Per avviare i processi da Maven, usa due terminali dalla directory radice. Nel primo:
+
+```sh
+mvn -pl server -am -Prun-server integration-test
+```
+
+Il server applica le migrazioni, chiede i parametri del database e resta in ascolto.
+Rimane attivo finché non interrompi Maven con `Ctrl+C`. Nel secondo avvia il client:
+
+```sh
+mvn -pl client -am -Prun-client integration-test
+```
+
+In alternativa, dopo la build puoi avviare i JAR con `java -jar`: prima il server e
+poi il client Linux o Windows corrispondente. Premi Invio per accettare i valori
+predefiniti. Se scegli una porta diversa nel prompt, configura la stessa
+`DB_HOST_PORT` in `.env` e riavvia Compose prima di connettere il server.
 
 Flyway usa la stessa porta predefinita `5432`; per una porta host diversa avvia Maven indicando `-Ddb.host.port=<DB_HOST_PORT>`. Quando il server è avviato da un terminale, la password non viene mostrata. In un IDE senza terminale associato può risultare visibile durante la digitazione.
 
