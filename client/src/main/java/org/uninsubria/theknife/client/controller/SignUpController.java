@@ -1,0 +1,164 @@
+/**
+ * Autori: Thomas Riotto (matr. 760981, sede VA), Alessandro Tullo (matr. 760760, sede VA),
+ * Giovanni Albé (matr. 760117, sede VA), Antonio Pesavento (matr. 759933, sede VA).
+ */
+package org.uninsubria.theknife.client.controller;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import org.uninsubria.theknife.client.util.SceneManager;
+import org.uninsubria.theknife.client.util.ServerConnection;
+import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.LuogoInput;
+import org.uninsubria.theknife.client.util.GeocodingService;
+import org.uninsubria.theknife.common.dto.UtenteDTO;
+import org.uninsubria.theknife.common.dto.UtenteDTO.RuoloUtente;
+import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
+import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.exceptions.UtenteGiaEsistenteException;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.time.LocalDate;
+
+public class SignUpController {
+
+    @FXML
+    private TextField nomeField;
+
+    @FXML
+    private TextField cognomeField;
+
+    @FXML
+    private ComboBox<String> ruoloComboBox;
+
+    @FXML
+    private DatePicker dataNascitaPicker;
+
+    @FXML
+    private LuogoInput indirizzo;
+
+    @FXML
+    private TextField emailField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private PasswordField confermaPasswordField;
+
+    @FXML
+    private Label labelErrore;
+
+    @FXML
+    private void initialize() {
+        indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
+
+
+        passwordField.textProperty().addListener((obs, oldValue, newValue) ->
+                controllaConfermaPassword()
+        );
+
+        confermaPasswordField.textProperty().addListener((obs, oldValue, newValue) ->
+                controllaConfermaPassword()
+        );
+    }
+
+    @FXML
+    private void handleRegistrati(ActionEvent event) {
+        labelErrore.setText("");
+        String nome = nomeField.getText();
+        String cognome = cognomeField.getText();
+        String ruolo = ruoloComboBox.getValue();
+        LocalDate dataNascita = dataNascitaPicker.getValue();
+        String domicilio = indirizzo.getText().trim();
+        String email = emailField.getText();
+        String password = passwordField.getText();
+        String confermaPassword = confermaPasswordField.getText();
+
+        if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
+                || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
+            labelErrore.setText("Compila tutti i campi obbligatori!");
+            return;
+        }
+
+        GeocodingService.Luogo luogo = indirizzo.getLuogoSelezionato();
+        if (luogo == null || !luogo.etichetta().equals(domicilio.trim())) {
+            labelErrore.setText("Seleziona un domicilio valido dai suggerimenti.");
+            indirizzo.requestFocus();
+            return;
+        }
+
+        if (!password.equals(confermaPassword)) {
+            labelErrore.setText("Le password non coincidono.");
+            confermaPasswordField.requestFocus();
+            return;
+        }
+
+
+
+        if (!ruolo.equals("Cliente") && !ruolo.equals("Ristoratore")) {
+            labelErrore.setText("Il ruolo selezionato non è valido.");
+            ruoloComboBox.requestFocus();
+            return;
+        }
+
+        if (password.length() < 8 || password.length() > 64 || password.contains(" ") ||
+                !password.matches(".*[a-z].*") || !password.matches(".*[A-Z].*") ||
+                !password.matches(".*\\d.*") || !password.matches(".*[^A-Za-z0-9].*")) {
+            labelErrore.setText("La password non soddisfa i requisiti di sicurezza.");
+            passwordField.requestFocus();
+            return;
+        }
+
+        try {
+            RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
+            UtenteDTO utente = new UtenteDTO(null, nome, cognome, email, dataNascita, domicilio, ruoloEnum);
+
+            // Chiamata remota al server
+            utente = ServerConnection.getServer().registraCliente(utente, password);
+            SessioneUtente.login(utente);
+
+            // Cambio scena pulito tramite SceneManager centralizzato
+            SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+
+        } catch (UtenteGiaEsistenteException e) {
+            labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");
+            emailField.requestFocus();
+        } catch (DatiMancantiException e) {
+            labelErrore.setText("Errore nei dati: " + e.getMessage());
+        } catch (SistemaIndisponibileException | RemoteException | NotBoundException e) {
+            labelErrore.setText("Errore di connessione al server.");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void handleAccedi(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/LoginView.fxml");
+    }
+
+    @FXML
+    public void handleLogoClick(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+    }
+
+    private void controllaConfermaPassword() {
+        String password = passwordField.getText();
+        String confermaPassword = confermaPasswordField.getText();
+
+        if (confermaPassword.isEmpty()) {
+            confermaPasswordField.setStyle("");
+        } else if (!password.equals(confermaPassword)) {
+            confermaPasswordField.setStyle(
+                    "-fx-border-color: red; " +
+                            "-fx-border-width: 2px; " +
+                            "-fx-border-radius: 5px;"
+            );
+        } else {
+            confermaPasswordField.setStyle("");
+        }
+    }
+}

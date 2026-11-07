@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.AreaRistoranteController">
+
+    <!-- HEADER -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="header" BorderPane.alignment="CENTER">
+
+            <padding>
+                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
+            </padding>
+
+            <children>
+
+                <!-- LOGO A SINISTRA -->
+                <ImageView fitHeight="133.0" fitWidth="441.0" preserveRatio="true" onMouseClicked="#handleLogoClick">
+
+                    <Image url="@../images/img_1.png"/>
+                </ImageView>
+
+                <!-- SPAZIO -->
+                <Region HBox.hgrow="ALWAYS" />
+
+                <!-- LOGOUT -->
+                <!--
+                <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Log out" />
+                -->
+
+            </children>
+
+        </HBox>
+    </top>
+
+
+    <!-- CONTENUTO CENTRALE -->
+    <!-- CONTENUTO CENTRALE -->
+    <center>
+
+        <VBox spacing="12.0" styleClass="reviews-box" BorderPane.alignment="CENTER">
+
+            <padding>
+                <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+            </padding>
+
+            <!-- TITOLO -->
+            <Label styleClass="profile-title" text="Recensioni" /><!-- RIEPILOGO RECENSIONI -->
+            <HBox alignment="CENTER_LEFT" spacing="45.0" styleClass="rating-summary">
+
+                <!-- MEDIA A SINISTRA -->
+                <VBox alignment="CENTER" prefWidth="190.0" spacing="5.0" styleClass="rating-average-box">
+
+                    <!-- NUMERO MEDIA -->
+                    <Label fx:id="averageRatingLabel" styleClass="rating-average-number" text="0,0" />
+
+                    <!-- STELLE -->
+                    <HBox fx:id="averageRatingContainer" alignment="CENTER" styleClass="average-rating" />
+
+                    <!-- NUMERO RECENSIONI -->
+                    <Label fx:id="resultsCountLabel" styleClass="rating-total-reviews" text="0 recensioni" />
+
+                </VBox>
+
+
+                <!-- DISTRIBUZIONE STELLE -->
+                <VBox prefWidth="600.0" spacing="4.0" styleClass="rating-distribution">
+
+                    <!-- 5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="5" />
+
+                        <ProgressBar fx:id="bar5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 4,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="4,5" />
+
+                        <ProgressBar fx:id="bar4_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 4 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="4" />
+
+                        <ProgressBar fx:id="bar4" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 3,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="3,5" />
+
+                        <ProgressBar fx:id="bar3_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 3 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="3" />
+
+                        <ProgressBar fx:id="bar3" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 2,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="2,5" />
+
+                        <ProgressBar fx:id="bar2_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 2 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="2" />
+
+                        <ProgressBar fx:id="bar2" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 1,5 STELLE -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="1,5" />
+
+                        <ProgressBar fx:id="bar1_5" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                    <!-- 1 STELLA -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+
+                        <Label styleClass="rating-star-number" text="1" />
+
+                        <ProgressBar fx:id="bar1" maxWidth="Infinity" prefWidth="500.0" progress="0" styleClass="rating-progress" />
+
+                    </HBox>
+
+                </VBox>
+
+            </HBox>
+
+            <!-- LISTA RECENSIONI -->
+            <ScrollPane fx:id="reviewScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="restaurant-scroll-pane" VBox.vgrow="ALWAYS">
+
+                <content>
+
+                    <VBox fx:id="reviewContainer" spacing="14.0" styleClass="restaurant-container" />
+
+                </content>
+
+            </ScrollPane>
+
+        </VBox>
+
+    </center>
+   <left>
+
+          <VBox alignment="CENTER" maxWidth="579.0" prefHeight="603.0" prefWidth="512.0" spacing="15.0" BorderPane.alignment="CENTER">
+
+              <!-- TITOLO -->
+              <Label styleClass="profile-title" text="Informazioni ristorante" />
+
+                 <!-- INFORMAZIONI RISTORANTE -->
+              <VBox alignment="CENTER_LEFT" spacing="10.0" styleClass="profile-container">
+
+                     <!-- NOME RISTORANTE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Nome:" />
+
+                         <Label fx:id="lblNomeRistorante" styleClass="profile-value" />
+                  </HBox>
+
+                     <!-- NAZIONE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Nazione:" />
+
+                         <Label fx:id="lblNazione" styleClass="profile-value" />
+                  </HBox>
+
+                     <!-- CITTÀ -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Città:" />
+
+                         <Label fx:id="lblCitta" styleClass="profile-value" />
+                  </HBox>
+
+                     <!-- INDIRIZZO -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Indirizzo:" />
+
+                         <Label fx:id="lblIndirizzo" styleClass="profile-value"  />
+                  </HBox>
+
+
+                     <!-- FASCIA DI PREZZO -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Prezzo medio:" />
+
+                         <Label fx:id="lblFasciaPrezzo" styleClass="profile-value"  />
+                  </HBox>
+
+                     <!-- DELIVERY -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Delivery:" />
+
+                         <Label fx:id="lblDelivery" styleClass="profile-value"  />
+                  </HBox>
+
+                     <!-- PRENOTAZIONE ONLINE -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Prenotazione:" />
+
+                         <Label fx:id="lblPrenotazione" styleClass="profile-value"  />
+                  </HBox>
+
+                     <!-- TIPO DI CUCINA -->
+                  <VBox spacing="8.0">
+                      <Label styleClass="profile-label" text="Tipologie di cucina:" />
+                      <FlowPane fx:id="cuisineTags" hgap="6.0" vgap="6.0" styleClass="cuisine-tags" />
+                  </VBox>
+
+                 </VBox>
+                  <Button fx:id="recensisci" mnemonicParsing="false" onAction="#onRecensioniClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Recensisci" />
+                  <Button fx:id="modificaRecensione" mnemonicParsing="false" onAction="#onModificaRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Modifica recensione" visible="false" managed="false" />
+                  <Button fx:id="rimuoviRecensione" mnemonicParsing="false" onAction="#onRimuoviRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Rimuovi recensione" visible="false" managed="false" />
+                  <Button fx:id="aggiungiPreferito" mnemonicParsing="false" onAction="#onPreferitiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Aggiungi ai preferiti" />
+          </VBox>
+
+
+   </left>
+
+</BorderPane>

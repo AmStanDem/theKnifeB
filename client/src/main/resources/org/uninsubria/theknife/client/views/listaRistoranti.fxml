@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.MenuButton?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.uninsubria.theknife.client.controller.ListaRistorantiController"
+            stylesheets="@../styles/lista-ristoranti.css"
+            styleClass="root-pane"
+            prefWidth="1100" prefHeight="750">
+
+    <!-- HEADER: titolo + barra di ricerca -->
+    <top>
+        <VBox spacing="16" styleClass="header-box">
+            <padding>
+                <Insets top="24" right="32" bottom="16" left="32"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="title-bar">
+                <Label text="Trova il tuo ristorante" styleClass="page-title" HBox.hgrow="ALWAYS"/>
+                <Button mnemonicParsing="false"
+                        onAction="#onHomeClick"
+                        styleClass="home-button"
+                        accessibleText="Torna alla home">
+                    <graphic>
+                        <ImageView fitHeight="32" fitWidth="32" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/home.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="search-bar">
+                <TextField fx:id="searchField"
+                           promptText="Cerca per nome, indirizzo o cucina..."
+                           styleClass="search-field"
+                           HBox.hgrow="ALWAYS"/>
+                <Button fx:id="searchButton"
+                        text="Cerca"
+                        styleClass="primary-button"
+                        onAction="#onSearch"/>
+            </HBox>
+
+            <Label fx:id="locationFilterLabel" text="Posizione: ovunque" styleClass="filters-label"/>
+
+            <!-- FILTRI -->
+            <HBox spacing="16" alignment="CENTER_LEFT" styleClass="filters-bar">
+                <Label text="Filtri:" styleClass="filters-label"/>
+
+                <ComboBox fx:id="priceFilterCombo"
+                          styleClass="filter-combo"
+                          onAction="#onFilterChanged"/>
+
+                <ComboBox fx:id="ratingFilterCombo"
+                          styleClass="filter-combo"
+                          onAction="#onFilterChanged"/>
+
+                <CheckBox fx:id="deliveryFilterCheckBox"
+                          text="Delivery"
+                          styleClass="service-filter-checkbox"
+                          onAction="#onFilterChanged"/>
+
+                <CheckBox fx:id="bookingOnlineFilterCheckBox"
+                          text="Prenotazione online"
+                          styleClass="service-filter-checkbox"
+                          onAction="#onFilterChanged"/>
+
+                <!-- MenuButton per selezione multipla cucine -->
+                <MenuButton fx:id="cuisineMenuButton"
+                            text="Tipo di cucina"
+                            styleClass="filter-combo">
+                </MenuButton>
+
+                <Button fx:id="resetFiltersButton"
+                        text="Azzera filtri"
+                        styleClass="secondary-button"
+                        onAction="#onResetFilters"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- CENTRO: lista ristoranti (ScrollPane + VBox) -->
+    <center>
+        <VBox styleClass="content-box">
+            <padding>
+                <Insets top="8" right="32" bottom="24" left="32"/>
+            </padding>
+
+            <Label fx:id="resultsCountLabel"
+                   text="0 ristoranti trovati"
+                   styleClass="results-count"/>
+
+            <ScrollPane fx:id="restaurantScrollPane"
+                        styleClass="restaurant-scroll-pane"
+                        fitToWidth="true"
+                        VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="restaurantContainer"
+                          spacing="14"
+                          styleClass="restaurant-container"/>
+                </content>
+            </ScrollPane>
+            <Button fx:id="loadMoreButton"
+                    text="Carica altri ristoranti"
+                    styleClass="secondary-button"
+                    onAction="#onLoadMore"
+                    visible="false"
+                    managed="false"/>
+        </VBox>
+    </center>
+
+</BorderPane>

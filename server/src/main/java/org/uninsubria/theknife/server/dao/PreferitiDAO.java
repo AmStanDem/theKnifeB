@@ -1,0 +1,87 @@
+/**
+ * Autori: Thomas Riotto (matr. 760981, sede VA), Alessandro Tullo (matr. 760760, sede VA),
+ * Giovanni Albé (matr. 760117, sede VA), Antonio Pesavento (matr. 759933, sede VA).
+ */
+package org.uninsubria.theknife.server.dao;
+
+import org.uninsubria.theknife.common.dto.RistoranteDTO;
+import org.uninsubria.theknife.server.config.DatabaseConfig;
+
+import java.sql.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class PreferitiDAO {
+
+    public boolean aggiungiPreferito(int idUtente, int idRistorante) throws SQLException {
+        String sql = "INSERT INTO Preferiti (id_utente, id_ristorante) VALUES (?, ?) ON CONFLICT DO NOTHING";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUtente);
+            stmt.setInt(2, idRistorante);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public boolean rimuoviPreferito(int idUtente, int idRistorante) throws SQLException {
+        String sql = "DELETE FROM Preferiti WHERE id_utente = ? AND id_ristorante = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUtente);
+            stmt.setInt(2, idRistorante);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    public List<RistoranteDTO> ottieniPreferitiUtente(int idUtente) throws SQLException {
+        List<RistoranteDTO> lista = new ArrayList<>();
+
+        String sql = "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, " +
+                "r.latitudine, r.longitudine, r.prezzo_medio, r.delivery, r.booking_online, " +
+                "COALESCE(rec.media_stelle, 0.0) AS media_stelle, cucine.tipi_cucina " +
+                "FROM RistorantiTheKnife r " +
+                "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
+                "LEFT JOIN (SELECT id_ristorante, AVG(valutazione) AS media_stelle " +
+                "FROM Recensioni GROUP BY id_ristorante) rec ON r.id_ristorante = rec.id_ristorante " +
+                "LEFT JOIN (SELECT rt.id_ristorante, STRING_AGG(tc.nome, ',') AS tipi_cucina " +
+                "FROM Ristoranti_Tipologie rt JOIN Tipologia_Cucina tc " +
+                "ON rt.id_tipologia = tc.id_tipologia GROUP BY rt.id_ristorante) cucine " +
+                "ON r.id_ristorante = cucine.id_ristorante " +
+                "WHERE p.id_utente = ? ORDER BY r.nome";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idUtente);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String tipiCucinaRaw = rs.getString("tipi_cucina");
+                    List<String> tipologie = tipiCucinaRaw != null && !tipiCucinaRaw.isEmpty()
+                            ? Arrays.asList(tipiCucinaRaw.split(",")) : new ArrayList<>();
+                    BigDecimal prezzoMedio = rs.getBigDecimal("prezzo_medio");
+
+                    lista.add(new RistoranteDTO(
+                            rs.getInt("id_ristorante"),
+                            rs.getString("nome"),
+                            rs.getString("indirizzo"),
+                            rs.getString("citta"),
+                            rs.getString("nazione"),
+                            rs.getDouble("latitudine"),
+                            rs.getDouble("longitudine"),
+                            tipologie,
+                            prezzoMedio == null ? null : prezzoMedio.doubleValue(),
+                            rs.getBoolean("delivery"),
+                            rs.getBoolean("booking_online"),
+                            rs.getDouble("media_stelle")
+                    ));
+                }
+            }
+        }
+        return lista;
+    }
+}
