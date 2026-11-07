@@ -55,8 +55,8 @@ public class LoginController {
     @FXML
     private void onAccedi(ActionEvent event) {
         labelErrore.setText("");
-        String email = campoEmail.getText();
-        String password = campoPassword.getText();
+        String email = campoEmail.getText().trim();
+        String password = campoPassword.getText().trim();
 
         if (email.isBlank() || password.isBlank()) {
             labelErrore.setText("Inserisci email e password.");

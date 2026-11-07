@@ -69,14 +69,14 @@ public class SignUpController {
     @FXML
     private void handleRegistrati(ActionEvent event) {
         labelErrore.setText("");
-        String nome = nomeField.getText();
-        String cognome = cognomeField.getText();
-        String ruolo = ruoloComboBox.getValue();
+        String nome = nomeField.getText().trim();
+        String cognome = cognomeField.getText().trim();
+        String ruolo = ruoloComboBox.getValue().trim();
         LocalDate dataNascita = dataNascitaPicker.getValue();
         String domicilio = indirizzo.getText().trim();
-        String email = emailField.getText();
-        String password = passwordField.getText();
-        String confermaPassword = confermaPasswordField.getText();
+        String email = emailField.getText().trim();
+        String password = passwordField.getText().trim();
+        String confermaPassword = confermaPasswordField.getText().trim();
 
         if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
                 || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
