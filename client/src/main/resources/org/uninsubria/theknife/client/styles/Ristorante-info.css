@@ -308,9 +308,10 @@
 }
 
 .rating-average-number {
-    -fx-font-size: 64px;
+    -fx-font-size: 36px;
     -fx-font-weight: 400;
     -fx-text-fill: #202124;
+    -fx-alignment: CENTER;
 }
 
 .rating-total-reviews {
@@ -335,79 +336,27 @@
 
 .rating-distribution {
     -fx-padding: 5 0 5 0;
+    -fx-pref-width: 600px;
+    -fx-min-width: 0;
 }
 
-.rating-star-number {
-    -fx-pref-width: 30px;
-    -fx-min-width: 30px;
-
-    -fx-font-size: 16px;
-    -fx-text-fill: #5A5A5D;
-    -fx-alignment: CENTER;
+.rating-histogram {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
-
-/* =========================
-   BARRE
-   ========================= */
-
-.rating-progress {
-    -fx-pref-height: 15px;
-    -fx-min-height: 15px;
-    -fx-max-height: 15px;
+.rating-histogram .chart-plot-background {
+    -fx-background-color: #F1F3F4;
 }
 
-.rating-progress > .track {
-    -fx-background-color: #E8EAED;
-    -fx-background-radius: 10px;
-    -fx-background-insets: 0;
+.rating-histogram .chart-horizontal-grid-lines {
+    -fx-stroke: #DADCE0;
 }
 
-.rating-progress > .bar {
-    -fx-background-color: #2B885F;
-    -fx-background-radius: 10px;
-    -fx-background-insets: 0;
-}
-/* STELLE */
-
-.average-rating {
-    -fx-pref-width: 130px;
-    -fx-spacing: 2px;
+.rating-histogram .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
 }
 
-
-/* DISTRIBUZIONE */
-
-.rating-distribution {
-    -fx-padding: 5 0 5 0;
+.rating-histogram .chart-bar {
+    -fx-bar-fill: #2B885F;
 }
-
-.rating-star-number {
-    -fx-pref-width: 30px;
-    -fx-min-width: 30px;
-    -fx-font-size: 16px;
-    -fx-text-fill: #5f6368;
-    -fx-alignment: CENTER;
-}
-
-
-/* BARRE */
-
-.rating-progress {
-    -fx-pref-height: 15px;
-    -fx-min-height: 15px;
-    -fx-max-height: 15px;
-}
-
-.rating-progress > .track {
-    -fx-background-color: #e5e7eb;
-    -fx-background-radius: 10px;
-}
-
-.rating-progress > .bar {
-    -fx-background-color: #2d8a63;
-    -fx-background-radius: 10px;
-    -fx-background-insets: 0;
-}
-
-TODO lavorare all istogramma della media delle stelle

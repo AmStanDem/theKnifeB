@@ -9,15 +9,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 import org.uninsubria.theknife.client.util.CuisineTags;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RistoranteSelezionato;
@@ -39,6 +43,7 @@ import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static org.uninsubria.theknife.client.util.ServerConnection.getServer;
@@ -111,31 +116,7 @@ public class AreaRistoranteController {
 
 
     @FXML
-    private ProgressBar bar5;
-
-    @FXML
-    private ProgressBar bar4_5;
-
-    @FXML
-    private ProgressBar bar4;
-
-    @FXML
-    private ProgressBar bar3_5;
-
-    @FXML
-    private ProgressBar bar3;
-
-    @FXML
-    private ProgressBar bar2_5;
-
-    @FXML
-    private ProgressBar bar2;
-
-    @FXML
-    private ProgressBar bar1_5;
-
-    @FXML
-    private ProgressBar bar1;
+    private HBox ratingDistributionContainer;
 
     // =========================================================
     // INIZIALIZZAZIONE
@@ -150,6 +131,12 @@ public class AreaRistoranteController {
         averageRating.setScaleX(0.75);
         averageRating.setScaleY(0.75);
         averageRatingContainer.getChildren().add(averageRating);
+        averageRatingLabel.setAlignment(javafx.geometry.Pos.CENTER);
+        averageRatingLabel.setTextOverrun(javafx.scene.control.OverrunStyle.CLIP);
+        HBox.setHgrow(ratingDistributionContainer, Priority.ALWAYS);
+        ratingDistributionContainer.setMinWidth(0);
+        ratingDistributionContainer.setMaxWidth(Double.MAX_VALUE);
+        aggiornaDistribuzioneRecensioni(List.of());
 
         // Recupera il ristorante selezionato nella pagina precedente
         ristorante = RistoranteSelezionato.getRistorante();
@@ -342,7 +329,7 @@ public class AreaRistoranteController {
     private void aggiornaMediaRecensioni(List<RecensioneDTO> recensioni) {
 
         if (recensioni == null || recensioni.isEmpty()) {
-            averageRatingLabel.setText("0,0");
+            averageRatingLabel.setText("0.0 / 10");
             averageRating.setRating(0);
             return;
         }
@@ -356,7 +343,7 @@ public class AreaRistoranteController {
         double media = somma / recensioni.size();
 
         averageRatingLabel.setText(
-                String.format(java.util.Locale.ITALY, "%.1f", media)
+                String.format(Locale.ROOT, "%.1f / 10", media * 2)
         );
 
         averageRating.setRating(media);
@@ -364,26 +351,62 @@ public class AreaRistoranteController {
 
     private void aggiornaDistribuzioneRecensioni(List<RecensioneDTO> recensioni) {
 
-        double[] conteggi = new double[11];
-
-        for (RecensioneDTO recensione : recensioni) {
-            double valutazione = recensione.valutazione();
-            if (valutazione >= 1 && valutazione <= 5) {
-                int indice = (int) Math.round(valutazione * 2);
-                conteggi[indice]++;
+        int[] conteggi = new int[11];
+        int totale = 0;
+        if (recensioni != null) {
+            for (RecensioneDTO recensione : recensioni) {
+                if (recensione == null || recensione.valutazione() == null) {
+                    continue;
+                }
+                double voto = recensione.valutazione();
+                int indice = (int) Math.round(voto * 2);
+                if (voto >= 1 && voto <= 5 && Math.abs(voto * 2 - indice) < 0.000001) {
+                    conteggi[indice]++;
+                    totale++;
+                }
             }
         }
 
-        ProgressBar[] barre = {
-                bar1, bar1_5, bar2, bar2_5, bar3,
-                bar3_5, bar4, bar4_5, bar5
-        };
-        int totale = recensioni.size();
+        CategoryAxis asseValutazioni = new CategoryAxis();
+        asseValutazioni.setLabel("Valutazione");
 
-        for (int i = 0; i < barre.length; i++) {
-            double conteggio = conteggi[i + 2];
-            barre[i].setProgress(totale == 0 ? 0 : conteggio / totale);
+        NumberAxis assePercentuali = new NumberAxis();
+        assePercentuali.setAutoRanging(false);
+        assePercentuali.setLowerBound(0);
+        assePercentuali.setUpperBound(100);
+        assePercentuali.setTickUnit(25);
+        assePercentuali.setMinorTickVisible(false);
+        assePercentuali.setTickLabelFormatter(new StringConverter<>() {
+            @Override
+            public String toString(Number valore) {
+                return String.format(Locale.ROOT, "%.0f%%", valore.doubleValue());
+            }
+
+            @Override
+            public Number fromString(String testo) {
+                return Double.parseDouble(testo.replace("%", ""));
+            }
+        });
+
+        BarChart<String, Number> istogramma = new BarChart<>(asseValutazioni, assePercentuali);
+        istogramma.getStyleClass().add("rating-histogram");
+        istogramma.setLegendVisible(false);
+        istogramma.setAnimated(false);
+        istogramma.setCategoryGap(8);
+        istogramma.setBarGap(0);
+        istogramma.setMinHeight(190);
+        istogramma.setPrefHeight(210);
+        istogramma.setMaxWidth(Double.MAX_VALUE);
+
+        BarChart.Series<String, Number> serie = new BarChart.Series<>();
+        for (int indice = 0; indice < conteggi.length; indice++) {
+            String voto = String.format(Locale.ROOT, "%.1f", indice / 2.0)
+                    .replace(".0", "");
+            double percentuale = totale == 0 ? 0 : conteggi[indice] * 100.0 / totale;
+            serie.getData().add(new BarChart.Data<>(voto, percentuale));
         }
+        istogramma.getData().add(serie);
+        ratingDistributionContainer.getChildren().setAll(istogramma);
     }
 
     // =========================================================
