@@ -133,6 +133,7 @@ public class ScriviRispostaController {
 
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(messaggio);

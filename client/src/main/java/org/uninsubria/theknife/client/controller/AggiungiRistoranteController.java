@@ -306,6 +306,7 @@ public class AggiungiRistoranteController {
             String contenuto
     ) {
         Alert alert = new Alert(alertType);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(contenuto);

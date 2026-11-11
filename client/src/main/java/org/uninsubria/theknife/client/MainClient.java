@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.SceneManager;
 
 public class MainClient extends Application {
@@ -30,6 +31,11 @@ public class MainClient extends Application {
         stage.setWidth(bounds.getWidth());
         stage.setHeight(bounds.getHeight());
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        RemoteRefreshManager.shutdown();
     }
 
     public static void main(String[] args) {

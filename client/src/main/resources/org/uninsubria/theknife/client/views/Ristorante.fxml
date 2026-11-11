@@ -78,6 +78,12 @@
 
             </HBox>
 
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label fx:id="reviewFilterLabel" managed="false" styleClass="rating-filter-label" visible="false" />
+                <Button fx:id="clearReviewFilterButton" managed="false" onAction="#azzeraFiltriRecensioni"
+                        styleClass="rating-filter-button" text="Azzera filtri" visible="false" />
+            </HBox>
+
             <!-- LISTA RECENSIONI -->
             <ScrollPane fx:id="reviewScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="restaurant-scroll-pane" VBox.vgrow="ALWAYS">
 

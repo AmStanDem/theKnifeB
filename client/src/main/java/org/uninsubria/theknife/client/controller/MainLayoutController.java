@@ -108,6 +108,7 @@ public class MainLayoutController {
 
     private void mostraErrore(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(messaggio);

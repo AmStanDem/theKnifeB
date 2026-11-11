@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -37,6 +38,7 @@ public class SceneManager {
     private static final Map<Stage, String> currentFxmlMap = new HashMap<>();
     private static final Map<Stage, Object> currentControllers = new HashMap<>();
     private static final Map<Stage, Set<Window>> popupWindows = new HashMap<>();
+    private static Stage applicationStage;
     private static boolean popupListenerInstalled;
 
     private static final String GLOBAL_CSS = "/org/uninsubria/theknife/client/styles/style.css";
@@ -68,6 +70,7 @@ public class SceneManager {
      * @param saveToHistory Se true, salva la pagina precedente nello stack. Se false (es. durante il "Back"), evita i loop.
      */
     public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath, boolean saveToHistory) {
+        setApplicationStage(stage);
         try {
             String currentFxml = currentFxmlMap.get(stage);
 
@@ -103,6 +106,16 @@ public class SceneManager {
                     e
             );
         }
+    }
+
+    public static void initOwner(Dialog<?> dialog) {
+        if (applicationStage != null) {
+            dialog.initOwner(applicationStage);
+        }
+    }
+
+    public static void setApplicationStage(Stage stage) {
+        applicationStage = stage;
     }
 
     private static void mantieneFullscreen(Stage stage) {

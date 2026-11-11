@@ -179,6 +179,7 @@ public class MieRecensioniController {
 
     private void confermaEliminazione(RecensioneDTO recensione) {
         Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
+        SceneManager.initOwner(conferma);
         conferma.setTitle("Elimina recensione");
         conferma.setHeaderText("Vuoi eliminare la recensione per " + recensione.nomeRistorante() + "?");
         conferma.setContentText("Questa operazione non può essere annullata.");
@@ -212,6 +213,7 @@ public class MieRecensioniController {
 
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(messaggio);

@@ -102,6 +102,7 @@ public class ListaRistorantiGestoreController {
 
     private void showError(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(messaggio);

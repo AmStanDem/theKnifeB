@@ -66,6 +66,8 @@ public final class SelettoreLuogoDialog {
         dialog.initModality(Modality.APPLICATION_MODAL);
         if (owner != null) {
             dialog.initOwner(owner);
+        } else {
+            SceneManager.initOwner(dialog);
         }
         dialog.getDialogPane().getButtonTypes().addAll(CONFERMA, ButtonType.CANCEL);
 

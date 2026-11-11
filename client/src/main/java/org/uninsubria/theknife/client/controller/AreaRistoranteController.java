@@ -15,11 +15,12 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.uninsubria.theknife.client.util.CuisineTags;
@@ -88,7 +89,16 @@ public class AreaRistoranteController {
     @FXML
     private Label resultsCountLabel;
 
+    @FXML
+    private Label reviewFilterLabel;
+
+    @FXML
+    private Button clearReviewFilterButton;
+
     private RistoranteDTO ristorante;
+    private List<RecensioneDTO> recensioniCaricate = List.of();
+    private Double valutazioneSelezionata;
+    private boolean gestoreProprietario;
 
 
     @FXML
@@ -269,7 +279,7 @@ public class AreaRistoranteController {
             List<RecensioneDTO> recensioni = SessioneUtente.isLoggato()
                     ? ServerConnection.getServer().getRecensioniRistorante(ristorante.idRistorante())
                     : ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
-            boolean gestoreProprietario = false;
+            gestoreProprietario = false;
             if (SessioneUtente.isGestore()) {
                 UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
                 gestoreProprietario = gestore != null
@@ -281,48 +291,59 @@ public class AreaRistoranteController {
 
             aggiornaMediaRecensioni(recensioni);
             aggiornaDistribuzioneRecensioni(recensioni);
-
-            if (reviewContainer == null) {
-                System.out.println("ERRORE: reviewContainer è NULL");
-                return;
-            }
-
-            System.out.println("reviewContainer trovato!");
-            reviewContainer.getChildren().clear();
-
-
-
-            System.out.println("Numero recensioni: " + recensioni.size());
-            resultsCountLabel.setText(recensioni.size() + " recensioni trovate");
-
-            for (RecensioneDTO recensione : recensioni) {
-                try {
-                    System.out.println("Carico recensione di: " + recensione.nomeAutore());
-
-                    FXMLLoader loader = new FXMLLoader(
-                            getClass().getResource("/org/uninsubria/theknife/client/views/RecensioneItem.fxml")
-                    );
-
-                    Node item = loader.load();
-                    RecensioneItemController controller = loader.getController();
-
-                    controller.setRecensione(recensione);
-                    controller.setRispostaAbilitata(gestoreProprietario);
-
-                    reviewContainer.getChildren().add(item);
-                    System.out.println("Recensione aggiunta!");
-
-                } catch (Exception e) {
-                    System.out.println("ERRORE caricando la recensione:");
-                    e.printStackTrace();
-                }
-            }
-
+            recensioniCaricate = recensioni;
+            mostraRecensioniFiltrate(gestoreProprietario);
 
         } catch (RemoteException | SistemaIndisponibileException | NotBoundException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
                     "Impossibile caricare le recensioni o verificare la proprietà del ristorante.");
         }
+    }
+
+    private void mostraRecensioniFiltrate(boolean gestoreProprietario) {
+        if (reviewContainer == null) {
+            System.out.println("ERRORE: reviewContainer è NULL");
+            return;
+        }
+
+        List<RecensioneDTO> recensioniVisibili = recensioniCaricate.stream()
+                .filter(recensione -> valutazioneSelezionata == null
+                        || recensione.valutazione() != null
+                        && Math.abs(recensione.valutazione() - valutazioneSelezionata) < 0.000001)
+                .toList();
+
+        reviewContainer.getChildren().clear();
+        resultsCountLabel.setText(recensioniVisibili.size() + " recensioni trovate");
+        boolean filtroAttivo = valutazioneSelezionata != null;
+        reviewFilterLabel.setText(filtroAttivo
+                ? "Filtro valutazione: " + formattaValutazione(valutazioneSelezionata)
+                : "");
+        reviewFilterLabel.setVisible(filtroAttivo);
+        reviewFilterLabel.setManaged(filtroAttivo);
+        clearReviewFilterButton.setVisible(filtroAttivo);
+        clearReviewFilterButton.setManaged(filtroAttivo);
+
+        for (RecensioneDTO recensione : recensioniVisibili) {
+            try {
+                FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/org/uninsubria/theknife/client/views/RecensioneItem.fxml")
+                );
+                Node item = loader.load();
+                RecensioneItemController controller = loader.getController();
+                controller.setRecensione(recensione);
+                controller.setRispostaAbilitata(gestoreProprietario);
+                reviewContainer.getChildren().add(item);
+            } catch (Exception e) {
+                System.out.println("ERRORE caricando la recensione:");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    private void azzeraFiltriRecensioni() {
+        valutazioneSelezionata = null;
+        mostraRecensioniFiltrate(gestoreProprietario);
     }
 
 
@@ -400,13 +421,35 @@ public class AreaRistoranteController {
 
         BarChart.Series<String, Number> serie = new BarChart.Series<>();
         for (int indice = 0; indice < conteggi.length; indice++) {
-            String voto = String.format(Locale.ROOT, "%.1f", indice / 2.0)
-                    .replace(".0", "");
+            double valutazione = indice / 2.0;
+            String voto = formattaValutazione(valutazione);
             double percentuale = totale == 0 ? 0 : conteggi[indice] * 100.0 / totale;
-            serie.getData().add(new BarChart.Data<>(voto, percentuale));
+            BarChart.Data<String, Number> barraData = new BarChart.Data<>(voto, percentuale);
+            StackPane barra = new StackPane();
+            barra.getStyleClass().add("rating-histogram-node");
+            Region riempimento = new Region();
+            riempimento.getStyleClass().add("rating-histogram-bar");
+            Label percentualeLabel = new Label(String.format(Locale.ROOT, "%.1f%%", percentuale));
+            percentualeLabel.getStyleClass().add("rating-histogram-percentage");
+            percentualeLabel.setVisible(false);
+            percentualeLabel.setMouseTransparent(true);
+            barra.getChildren().setAll(riempimento, percentualeLabel);
+            barra.setOnMouseEntered(event -> percentualeLabel.setVisible(true));
+            barra.setOnMouseExited(event -> percentualeLabel.setVisible(false));
+            barra.setOnMouseClicked(event -> {
+                valutazioneSelezionata = valutazione;
+                mostraRecensioniFiltrate(gestoreProprietario);
+                event.consume();
+            });
+            barraData.setNode(barra);
+            serie.getData().add(barraData);
         }
         istogramma.getData().add(serie);
         ratingDistributionContainer.getChildren().setAll(istogramma);
+    }
+
+    private String formattaValutazione(double valutazione) {
+        return String.format(Locale.ROOT, "%.1f", valutazione).replace(".0", "");
     }
 
     // =========================================================
@@ -504,6 +547,7 @@ public class AreaRistoranteController {
 
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(messaggio);
@@ -536,6 +580,7 @@ public class AreaRistoranteController {
         }
 
         Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
+        SceneManager.initOwner(conferma);
         conferma.setTitle("Rimuovi recensione");
         conferma.setHeaderText("Vuoi rimuovere la tua recensione?");
         conferma.setContentText("Questa operazione non può essere annullata.");

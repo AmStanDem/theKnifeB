@@ -323,6 +323,7 @@ public class RicercaAvanzataController {
         GeocodingService.Luogo luogo = txtLocalita.getLuogoSelezionato();
         if (luogo == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            SceneManager.initOwner(alert);
             alert.setTitle("Località da selezionare");
             alert.setHeaderText(null);
             alert.setContentText("Seleziona una località dai suggerimenti prima di cercare.");
@@ -363,6 +364,7 @@ public class RicercaAvanzataController {
 
     private void mostraErrore(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        SceneManager.initOwner(alert);
         alert.setTitle(titolo);
         alert.setHeaderText(null);
         alert.setContentText(messaggio);

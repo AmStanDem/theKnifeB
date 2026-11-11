@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public final class RemoteRefreshManager {
 
-    private static final RemoteRefreshManager INSTANCE = new RemoteRefreshManager();
+    private static volatile RemoteRefreshManager instance;
 
     private static final class Subscription {
         private final UUID localId = UUID.randomUUID();
@@ -56,7 +56,7 @@ public final class RemoteRefreshManager {
 
         @Override
         public void onDataChanged(DataChangedEvent event) throws RemoteException {
-            INSTANCE.dispatch(event);
+            getInstance().dispatch(event);
         }
     }
 
@@ -81,7 +81,7 @@ public final class RemoteRefreshManager {
             Consumer<DataChangedEvent> listener,
             Runnable onSubscribed
     ) {
-        return INSTANCE.addSubscription(owner, topic, targetId, listener, onSubscribed);
+        return getInstance().addSubscription(owner, topic, targetId, listener, onSubscribed);
     }
 
     private UUID addSubscription(
@@ -128,7 +128,17 @@ public final class RemoteRefreshManager {
     }
 
     public static void unsubscribeOwner(Object owner) {
-        INSTANCE.removeSubscriptions(owner);
+        RemoteRefreshManager manager = instance;
+        if (manager != null) {
+            manager.removeSubscriptions(owner);
+        }
+    }
+
+    private static synchronized RemoteRefreshManager getInstance() {
+        if (instance == null) {
+            instance = new RemoteRefreshManager();
+        }
+        return instance;
     }
 
     private void removeSubscriptions(Object owner) {
@@ -174,6 +184,13 @@ public final class RemoteRefreshManager {
             });
         } catch (IllegalStateException e) {
             throw new RemoteException("JavaFX non è più attivo per ricevere notifiche.", e);
+        }
+    }
+
+    public static void shutdown() {
+        RemoteRefreshManager manager = instance;
+        if (manager != null) {
+            manager.close();
         }
     }
 

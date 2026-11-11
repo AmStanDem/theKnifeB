@@ -9,6 +9,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.uninsubria.theknife.client.util.RemoteRefreshManager;
+import org.uninsubria.theknife.client.util.SceneManager;
 
 public class Main extends Application {
 
@@ -25,7 +27,13 @@ public class Main extends Application {
 
         stage.setTitle("The Knife");
         stage.setScene(scene);
+        SceneManager.setApplicationStage(stage);
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        RemoteRefreshManager.shutdown();
     }
 
     public static void main(String[] args) {

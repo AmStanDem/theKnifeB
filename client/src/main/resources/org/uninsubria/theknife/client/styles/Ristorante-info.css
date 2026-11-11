@@ -360,3 +360,35 @@
 .rating-histogram .chart-bar {
     -fx-bar-fill: #2B885F;
 }
+
+.rating-filter-label {
+    -fx-text-fill: #5A5A5D;
+    -fx-font-size: 14px;
+}
+
+.rating-filter-button {
+    -fx-background-color: #E8E8E8;
+    -fx-text-fill: #1A1A1E;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.rating-filter-button:hover {
+    -fx-background-color: #D5D5D5;
+}
+
+.rating-histogram-bar {
+    -fx-background-color: #2B885F;
+}
+
+.rating-histogram-node {
+    -fx-cursor: hand;
+}
+
+.rating-histogram-percentage {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}

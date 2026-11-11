@@ -268,6 +268,7 @@ public class ListaMieRecensioniController {
     private void eliminaRecensione(RecensioneDTO recensione) {
         javafx.scene.control.Alert conferma = new javafx.scene.control.Alert(
                 javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        SceneManager.initOwner(conferma);
         conferma.setTitle("Elimina recensione");
         conferma.setHeaderText("Vuoi eliminare la recensione?");
         conferma.setContentText("Questa operazione non può essere annullata.");
@@ -298,6 +299,7 @@ public class ListaMieRecensioniController {
     private void mostraErrore(String messaggio) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
                 javafx.scene.control.Alert.AlertType.ERROR);
+        SceneManager.initOwner(alert);
         alert.setTitle("Recensioni");
         alert.setHeaderText(null);
         alert.setContentText(messaggio);
