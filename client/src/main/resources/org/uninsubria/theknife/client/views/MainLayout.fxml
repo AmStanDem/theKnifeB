@@ -49,8 +49,8 @@
                 <Button fx:id="btnAccediRegistrati"
                         mnemonicParsing="false"
                         onAction="#onAreaPersonaleClick"
-                        prefHeight="52.0"
-                        prefWidth="180.0"
+                        prefHeight="63.0"
+                        prefWidth="285.0"
                         styleClass="accent"
                         text="Accedi" />
 
