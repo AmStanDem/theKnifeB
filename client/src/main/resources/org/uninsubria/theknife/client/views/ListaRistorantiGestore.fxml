@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.uninsubria.theknife.client.controller.ListaRistorantiGestoreController"
+            stylesheets="@../styles/lista-ristoranti.css"
+            styleClass="root-pane"
+            prefWidth="1100"
+            prefHeight="750">
+    <top>
+        <VBox styleClass="header-box">
+            <padding>
+                <Insets top="24" right="32" bottom="16" left="32"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="title-bar">
+                <Label text="I miei ristoranti" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Aggiungi ristorante"
+                        styleClass="primary-button"
+                        onAction="#onAggiungiClick"/>
+                <Button text="Profilo"
+                        styleClass="secondary-button"
+                        onAction="#onProfiloClick"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox styleClass="content-box">
+            <padding>
+                <Insets top="16" right="32" bottom="24" left="32"/>
+            </padding>
+            <Label fx:id="resultsCountLabel"
+                   text="Caricamento ristoranti..."
+                   styleClass="results-count"/>
+            <Label fx:id="emptyStateLabel"
+                   text="Non hai ancora aggiunto ristoranti."
+                   visible="false"
+                   managed="false"
+                   styleClass="results-count"/>
+            <ScrollPane fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        styleClass="restaurant-scroll-pane"
+                        VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox fx:id="restaurantContainer"
+                          spacing="14"
+                          styleClass="restaurant-container"/>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

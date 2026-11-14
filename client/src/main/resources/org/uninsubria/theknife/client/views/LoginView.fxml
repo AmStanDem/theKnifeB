@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox prefHeight="750" prefWidth="1200" stylesheets="@../styles/login-style.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.LoginController">
+
+    <!-- ================= LEFT PANEL – FORM ================= -->
+    <VBox alignment="TOP_LEFT" spacing="0" styleClass="left-panel" HBox.hgrow="ALWAYS">
+        <padding>
+            <Insets bottom="40" left="90" right="90" top="40" />
+        </padding>
+
+        <!-- Logo -->
+        <HBox alignment="CENTER_LEFT" spacing="10" />
+
+        <Region maxHeight="142.0" prefHeight="61.0" prefWidth="460.0" VBox.vgrow="ALWAYS" />
+
+        <!-- Title -->
+        <Label styleClass="title-label" text="Welcome back" />
+        <Label styleClass="subtitle-label" text="Please enter your details">
+            <VBox.margin>
+                <Insets bottom="30" top="8" />
+            </VBox.margin>
+        </Label>
+
+        <!-- Email -->
+        <Label styleClass="field-label" text="Email address" />
+        <TextField fx:id="campoEmail" promptText="" styleClass="text-input">
+            <VBox.margin>
+                <Insets bottom="22" top="6" />
+            </VBox.margin>
+        </TextField>
+
+        <!-- Password -->
+        <Label styleClass="field-label" text="Password" />
+        <PasswordField fx:id="campoPassword" promptText="" styleClass="text-input">
+            <VBox.margin>
+                <Insets bottom="18" top="6" />
+            </VBox.margin>
+        </PasswordField>
+
+
+        <!-- Messaggio di errore -->
+        <Label fx:id="labelErrore" styleClass="error-label" />
+
+
+        <!-- Sign in button -->
+        <Button fx:id="signInButton" maxWidth="Infinity" onAction="#onAccedi" styleClass="sign-in-button" text="Sign in">
+            <VBox.margin>
+                <Insets bottom="14" />
+            </VBox.margin>
+        </Button>
+
+
+
+        <!-- Sign up -->
+        <HBox alignment="CENTER" spacing="6">
+            <Label styleClass="signup-label" text="Don't have an account?" />
+            <Hyperlink styleClass="signup-link" text="Sign up" onAction="#onVaiRegistrazione" />
+        </HBox>
+
+        <Region VBox.vgrow="ALWAYS" />
+    </VBox>
+
+    <!-- ================= RIGHT PANEL – ILLUSTRATION ================= -->
+    <StackPane prefWidth="560" styleClass="right-panel" HBox.hgrow="NEVER">
+        <VBox alignment="CENTER" spacing="24">
+            <StackPane prefHeight="240" prefWidth="240" styleClass="illustration-circle">
+            <children>
+                  <ImageView fitHeight="249.0" fitWidth="416.0" onMouseClicked="#handleLogoClick" preserveRatio="true">
+                      <Image url="@../images/img_1.png" />
+                  </ImageView>
+            </children>
+            </StackPane>
+            <Label maxWidth="320" styleClass="illustration-text" text="Fresh ingredients, honest recipes" textAlignment="CENTER" wrapText="true" />
+        </VBox>
+    </StackPane>
+
+</HBox>
