@@ -77,7 +77,7 @@ public class LoginController {
                 Platform.runLater(() -> mostraErroreLogin("Email o password non corretti."));
             } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
                 Platform.runLater(() -> mostraErroreLogin(
-                        "Errore server: " + e.getClass().getSimpleName() + " - " + e.getMessage()));
+                        "Impossibile contattare il server. Verifica la connessione e riprova."));
             }
         });
     }

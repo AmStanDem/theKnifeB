@@ -36,7 +36,7 @@
 
                 <!-- LOGOUT -->
                 <!--
-                <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Log out" />
+                <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Esci" />
                 -->
 
             </children>
@@ -159,7 +159,7 @@
 
                      <!-- DELIVERY -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
-                      <Label styleClass="profile-label" text="Delivery:" />
+                      <Label styleClass="profile-label" text="Consegna a domicilio:" />
 
                          <Label fx:id="lblDelivery" styleClass="profile-value"  />
                   </HBox>

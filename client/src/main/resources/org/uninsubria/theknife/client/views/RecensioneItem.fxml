@@ -30,7 +30,7 @@
                managed="false" />
         <Label fx:id="localGuideLabel"
                style="-fx-font-size: 12px; -fx-text-fill: #5f6368;"
-               text="Local Guide"
+               text="Recensore locale"
                visible="false"
                managed="false" />
         <Region HBox.hgrow="ALWAYS" />
@@ -91,7 +91,7 @@
                maxWidth="Infinity"
                style="-fx-font-size: 13px; -fx-text-fill: #5f6368;"
                styleClass="response-text-field"
-               text="Nam vestibulum neque a maximus scelerisque."
+               text="Risposta del ristoratore"
                wrapText="true" />
 
     </VBox>
