@@ -64,7 +64,7 @@
                         prefHeight="63.0"
                         prefWidth="285.0"
                         styleClass="accent"
-                        text="Log out" />
+                        text="Esci" />
 
             </children>
 
@@ -169,7 +169,7 @@
                         <HBox alignment="CENTER_LEFT"
                               spacing="10.0">
 
-                            <Label text="Email:"
+                            <Label text="E-mail:"
                                    styleClass="profile-label" />
 
                             <Label fx:id="lblEmail"

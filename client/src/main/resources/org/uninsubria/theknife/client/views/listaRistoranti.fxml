@@ -70,7 +70,7 @@
                           onAction="#onFilterChanged"/>
 
                 <CheckBox fx:id="deliveryFilterCheckBox"
-                          text="Delivery"
+                          text="Consegna a domicilio"
                           styleClass="service-filter-checkbox"
                           onAction="#onFilterChanged"/>
 

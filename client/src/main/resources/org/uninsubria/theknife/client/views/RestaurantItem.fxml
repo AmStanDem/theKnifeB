@@ -43,7 +43,7 @@
 
     <!-- TAG: delivery / prenotazione online -->
     <HBox spacing="8" alignment="CENTER_LEFT">
-        <Label fx:id="deliveryTag" text="Delivery disponibile" styleClass="tag-delivery"
+        <Label fx:id="deliveryTag" text="Consegna a domicilio disponibile" styleClass="tag-delivery"
                visible="false" managed="false"/>
         <Label fx:id="bookingTag" text="Prenotazione online" styleClass="tag-booking"
                visible="false" managed="false"/>

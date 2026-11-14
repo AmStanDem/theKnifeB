@@ -171,7 +171,7 @@
                         <VBox spacing="8" styleClass="field-group" HBox.hgrow="ALWAYS">
                             <Label text="Servizi disponibili" styleClass="field-label"/>
                             <HBox spacing="28" alignment="CENTER_LEFT">
-                                <CheckBox fx:id="chkDelivery" text="Servizio di delivery" styleClass="field-checkbox"/>
+                                <CheckBox fx:id="chkDelivery" text="Consegna a domicilio" styleClass="field-checkbox"/>
                                 <CheckBox fx:id="chkPrenotazione" text="Prenotazione online" styleClass="field-checkbox"/>
                             </HBox>
                         </VBox>

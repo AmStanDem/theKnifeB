@@ -47,7 +47,7 @@
                           onAction="#onFilterChanged"/>
 
                 <ComboBox fx:id="ratingFilterCombo"
-                          promptText="Rating minimo"
+                          promptText="Valutazione minima"
                           styleClass="filter-combo"
                           onAction="#onFilterChanged"/>
 

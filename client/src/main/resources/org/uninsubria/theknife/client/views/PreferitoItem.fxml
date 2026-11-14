@@ -63,7 +63,7 @@
           alignment="CENTER_LEFT">
 
         <Label fx:id="deliveryTag"
-               text="Delivery disponibile"
+               text="Consegna a domicilio disponibile"
                styleClass="tag-delivery"
                visible="false"
                managed="false"/>

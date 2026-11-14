@@ -59,7 +59,7 @@ public class ListaRistorantiController {
     private static final int PAGE_SIZE = 20;
 
     private static final String TUTTI_PREZZI = "Tutti i prezzi";
-    private static final String TUTTI_RATING = "Tutti i rating";
+    private static final String TUTTI_RATING = "Tutte le valutazioni";
     private PauseTransition searchDebounce;
     private long requestGeneration;
     private boolean hasMore;

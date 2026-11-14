@@ -65,7 +65,7 @@
                         <VBox spacing="4.0">
                             <Label styleClass="field-label" text="Data di nascita" />
                             <HBox spacing="8.0">
-                                <TextField fx:id="dataNascitaField" HBox.hgrow="ALWAYS" prefHeight="40.0" promptText="dd/mm/yyyy" />
+                                <TextField fx:id="dataNascitaField" HBox.hgrow="ALWAYS" prefHeight="40.0" promptText="gg/mm/aaaa" />
                                 <Button mnemonicParsing="false" onAction="#handleScegliDataNascita" prefHeight="40.0" styleClass="date-picker-button" text="Scegli" />
                             </HBox>
                         </VBox>

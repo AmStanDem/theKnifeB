@@ -61,7 +61,7 @@
                         prefHeight="63.0"
                         prefWidth="285.0"
                         styleClass="accent"
-                        text="Log out" />
+                        text="Esci" />
 
 
             </children>

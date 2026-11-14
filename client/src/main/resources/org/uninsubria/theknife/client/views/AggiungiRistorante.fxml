@@ -73,8 +73,8 @@
                     <VBox spacing="8.0">
                         <Label styleClass="input-label" text="Servizi Offerti" />
                         <HBox spacing="20.0">
-                            <CheckBox fx:id="chkDelivery" mnemonicParsing="false" styleClass="custom-checkbox" text="Servizio Delivery" />
-                            <CheckBox fx:id="chkBookingOnline" mnemonicParsing="false" styleClass="custom-checkbox" text="Prenotazione Online" />
+                            <CheckBox fx:id="chkDelivery" mnemonicParsing="false" styleClass="custom-checkbox" text="Consegna a domicilio" />
+                            <CheckBox fx:id="chkBookingOnline" mnemonicParsing="false" styleClass="custom-checkbox" text="Prenotazione online" />
                         </HBox>
                     </VBox>
 
