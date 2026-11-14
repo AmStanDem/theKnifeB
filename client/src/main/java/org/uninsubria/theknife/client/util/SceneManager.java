@@ -4,32 +4,31 @@
  */
 package org.uninsubria.theknife.client.util;
 
-import javafx.event.Event;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.StackPane;
 import javafx.stage.PopupWindow;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
-import java.io.IOException;
-
 
 
 public class SceneManager {
@@ -38,6 +37,7 @@ public class SceneManager {
     private static final Map<Stage, String> currentFxmlMap = new HashMap<>();
     private static final Map<Stage, Object> currentControllers = new HashMap<>();
     private static final Map<Stage, Set<Window>> popupWindows = new HashMap<>();
+    private static final Set<Stage> configuredStages = new HashSet<>();
     private static Stage applicationStage;
     private static boolean popupListenerInstalled;
 
@@ -67,6 +67,7 @@ public class SceneManager {
 
     /**
      * Metodo interno sovraccarico per gestire il salvataggio nello storico.
+     *
      * @param saveToHistory Se true, salva la pagina precedente nello stack. Se false (es. durante il "Back"), evita i loop.
      */
     public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath, boolean saveToHistory) {
@@ -116,19 +117,22 @@ public class SceneManager {
 
     public static void setApplicationStage(Stage stage) {
         applicationStage = stage;
+        configuraStagePrincipale(stage);
     }
 
     private static void mantieneFullscreen(Stage stage) {
-        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-        stage.setFullScreenExitHint("");
+        configuraStagePrincipale(stage);
         if (!popupWindows.containsKey(stage)) {
             popupWindows.put(stage, new HashSet<>());
+            stage.addEventHandler(WindowEvent.WINDOW_SHOWN, event ->
+                    ripristinaFullscreen(stage));
             stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
                 Object controller = currentControllers.remove(stage);
                 if (controller != null) {
                     RemoteRefreshManager.unsubscribeOwner(controller);
                 }
                 popupWindows.remove(stage);
+                configuredStages.remove(stage);
                 historyMap.remove(stage);
                 currentFxmlMap.remove(stage);
             });
@@ -148,14 +152,12 @@ public class SceneManager {
         }
 
         for (Window window : Window.getWindows()) {
-            monitoraPopup(stage, window);
+            if (window != stage) {
+                monitoraPopup(stage, window);
+            }
         }
 
-        Platform.runLater(() -> {
-            if (stage.isShowing()) {
-                stage.setFullScreen(true);
-            }
-        });
+        ripristinaFullscreen(stage);
     }
 
     private static void monitoraPopup(Window window) {
@@ -175,16 +177,52 @@ public class SceneManager {
 
         window.showingProperty().addListener((observable, precedente, visibile) -> {
             if (!visibile) {
-                Platform.runLater(() -> {
-                    if (stage.isShowing()
-                            && !stage.isFullScreen()
-                            && popupWindows.getOrDefault(stage, Set.of()).stream()
-                                    .noneMatch(Window::isShowing)) {
-                        stage.setFullScreen(true);
-                    }
-                });
+                Platform.runLater(() -> ripristinaFullscreen(stage));
+            } else {
+                // Windows può uscire dal fullscreen quando un dialog prende il focus.
+                Platform.runLater(() -> ripristinaFullscreen(stage));
             }
         });
+    }
+
+    private static void configuraStagePrincipale(Stage stage) {
+        if (!configuredStages.add(stage)) {
+            return;
+        }
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        stage.setFullScreenExitHint("");
+        stage.setResizable(false);
+        stage.showingProperty().addListener((observable, precedente, visibile) -> {
+            if (visibile) {
+                Platform.runLater(() -> ripristinaFullscreen(stage));
+            }
+        });
+        stage.fullScreenProperty().addListener((observable, precedente, attivo) -> {
+            if (!attivo && stage.isShowing()) {
+                Platform.runLater(() -> ripristinaFullscreen(stage));
+            }
+        });
+        stage.focusedProperty().addListener((observable, precedente, attivo) -> {
+            if (attivo) {
+                Platform.runLater(() -> ripristinaFullscreen(stage));
+            }
+        });
+    }
+
+    private static void ripristinaFullscreen(Stage stage) {
+        if (!stage.isShowing() || stage.isFullScreen()) {
+            return;
+        }
+        stage.setFullScreen(true);
+        if (!stage.isFullScreen()) {
+            // Fallback per alcune configurazioni Windows/JavaFX: dimensiona la
+            // finestra sui bounds visibili senza lasciarla parzialmente fuori schermo.
+            javafx.geometry.Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+            stage.setX(bounds.getMinX());
+            stage.setY(bounds.getMinY());
+            stage.setWidth(bounds.getWidth());
+            stage.setHeight(bounds.getHeight());
+        }
     }
 
     private static boolean appartieneA(Window window, Stage stage) {
