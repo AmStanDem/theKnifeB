@@ -8,8 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import org.uninsubria.clientTK.util.SceneManager;
-import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.SceneManager;
+import org.uninsubria.theknife.client.util.SessioneUtente;
 
 import java.util.Objects;
 
@@ -47,7 +47,7 @@ public class BaseLayoutController {
     private void onAreaPersonaleClick(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/clientTK/views/LoginView.fxml"
+                "/org/uninsubria/theknife/client/views/LoginView.fxml"
         );
     }
 
@@ -55,7 +55,7 @@ public class BaseLayoutController {
     public void handleLogoClick(MouseEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/clientTK/views/MainLayout.fxml"
+                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
         );
     }
 
@@ -63,7 +63,7 @@ public class BaseLayoutController {
     private void onAreaPersonaleLoggatoClick(MouseEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/clientTK/views/AreaPersonale.fxml"
+                "/org/uninsubria/theknife/client/views/AreaPersonale.fxml"
         );
     }
 

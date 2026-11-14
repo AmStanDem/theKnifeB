@@ -42,6 +42,8 @@ public class SceneManager {
     private static Stage applicationStage;
     private static boolean popupListenerInstalled;
 
+    private static final String BASE_LAYOUT_FXML = "/org/uninsubria/theknife/client/views/BaseLayout.fxml";
+    private static final String LOGIN_VIEW_FXML = "/org/uninsubria/theknife/client/views/LoginView.fxml";
     private static final String GLOBAL_CSS = "/org/uninsubria/theknife/client/styles/style.css";
 
     /**

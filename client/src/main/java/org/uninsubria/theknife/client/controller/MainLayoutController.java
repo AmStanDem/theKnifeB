@@ -8,11 +8,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import org.uninsubria.clientTK.util.GeocodingService;
-import org.uninsubria.clientTK.util.LuogoInput;
-import org.uninsubria.clientTK.util.RicercaIniziale;
-import org.uninsubria.clientTK.util.SceneManager;
-import org.uninsubria.clientTK.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.GeocodingService;
+import org.uninsubria.theknife.client.util.LuogoInput;
+import org.uninsubria.theknife.client.util.RicercaIniziale;
+import org.uninsubria.theknife.client.util.SceneManager;
+import org.uninsubria.theknife.client.util.SessioneUtente;
 
 public class MainLayoutController {
 

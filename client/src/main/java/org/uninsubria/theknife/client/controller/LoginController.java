@@ -72,7 +72,7 @@ public class LoginController {
                 Platform.runLater(() -> {
                     SessioneUtente.login(utente);
                     SceneManager.clearHistory(stage);
-                    SceneManager.switchScene(stage, "/org/uninsubria/clientTK/views/MainLayout.fxml");
+                    SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
                 });
             } catch (CredenzialiErrateException e) {
                 Platform.runLater(() -> mostraErroreLogin("Email o password non corretti."));
@@ -102,6 +102,6 @@ public class LoginController {
     @FXML
     private void onContinuaComeGuest(ActionEvent event) {
         SessioneUtente.logout();
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/home.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 }

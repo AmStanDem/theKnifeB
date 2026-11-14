@@ -24,6 +24,7 @@ public class MainClient extends Application {
 
         SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
         stage.show();
+        stage.setFullScreen(true);
     }
 
     @Override

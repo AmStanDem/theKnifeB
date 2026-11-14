@@ -47,7 +47,7 @@
                                preserveRatio="true"
                                onMouseClicked="#handleLogoClick">
                         <image>
-                            <Image url="@../../../../images/img_1.png" />
+                            <Image url="@/org/uninsubria/theknife/client/images/img_1.png" />
                         </image>
                     </ImageView>
 
@@ -72,7 +72,7 @@
                                visible="false"
                                managed="false">
                         <image>
-                            <Image url="@../../../../images/user.png" />
+                            <Image url="@/org/uninsubria/theknife/client/images/user.png" />
                         </image>
                     </ImageView>
 
