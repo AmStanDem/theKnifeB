@@ -46,6 +46,9 @@ public class SignUpController {
             DateTimeFormatter.ofPattern("dd/MM/uuuu", Locale.ITALY)
                     .withResolverStyle(ResolverStyle.STRICT);
 
+    private static final String EMAIL_REGEX =
+            "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
     @FXML
     private TextField nomeField;
 
@@ -113,6 +116,12 @@ public class SignUpController {
                 || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()
                 || dataNascita == null) {
             labelErrore.setText("Compila tutti i campi obbligatori!");
+            return;
+        }
+
+        if (email.length() > 254 || !email.matches(EMAIL_REGEX)) {
+            labelErrore.setText("Inserisci un indirizzo email valido.");
+            emailField.requestFocus();
             return;
         }
 
