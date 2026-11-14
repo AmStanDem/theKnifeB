@@ -91,8 +91,9 @@ public class ListaRistorantiController {
         }
         configuraFiltriFissi();
         applicaCriteriIniziali(criteri);
+        /*
         searchDebounce = new PauseTransition(javafx.util.Duration.millis(350));
-        searchDebounce.setOnFinished(event -> caricaPagina(true));
+        searchDebounce.setOnFinished(event -> caricaPagina(true));*/
 
 
 
@@ -302,7 +303,7 @@ public class ListaRistorantiController {
                     selectedCuisines.remove(cb.getText());
                 }
                 aggiornaEtichettaMenuCucine();
-                caricaPagina(true);
+                //caricaPagina(true);
             });
 
             cuisineCheckBoxes.add(cb);
@@ -333,7 +334,7 @@ public class ListaRistorantiController {
             for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
             selectedCuisines.clear();
             aggiornaEtichettaMenuCucine();
-            caricaPagina(true);
+            //caricaPagina(true);
         });
 
         menuContent.getChildren().addAll(searchCuisineInput, scroll, clearBtn);
@@ -358,13 +359,12 @@ public class ListaRistorantiController {
 
     @FXML
     private void onSearch() {
-        searchDebounce.stop();
         caricaPagina(true);
     }
 
     @FXML
     private void onFilterChanged() {
-        caricaPagina(true);
+        //caricaPagina(true);
     }
 
     @FXML
