@@ -33,8 +33,8 @@
             <children>
 
                 <!-- LOGO -->
-                <ImageView fitHeight="96.0"
-                           fitWidth="300.0"
+                <ImageView fitHeight="133.0"
+                           fitWidth="441.0"
                            preserveRatio="true"
                            onMouseClicked="#handleLogoClick">
                     <image>
@@ -56,8 +56,8 @@
 
                 <!-- IMMAGINE PER UTENTE LOGGATO -->
                 <ImageView fx:id="imgUtente"
-                           fitHeight="70.0"
-                           fitWidth="70.0"
+                           fitHeight="100.0"
+                           fitWidth="350.0"
                            preserveRatio="true"
                            onMouseClicked="#onAreaPersonaleLoggatoClick"
                            visible="false"
