@@ -25,7 +25,12 @@
     Controller di riferimento: RicercaAvanzataController
 -->
 <?import javafx.scene.control.MenuButton?>
-<BorderPane xmlns="http://javafx.com/javafx/21"
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<BorderPane
+            prefHeight="768.0"
+            prefWidth="1024.0"
+            xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.theknife.client.controller.RicercaAvanzataController"
             stylesheets="@../styles/ricerca-avanzata.css"
@@ -33,22 +38,37 @@
 
     <!-- ===================== HEADER ===================== -->
     <top>
-        <StackPane styleClass="header-bar"
-                   minHeight="112" prefHeight="112" maxHeight="112">
+        <HBox alignment="CENTER_LEFT"
+              spacing="20.0"
+              styleClass="header-bar"
+              BorderPane.alignment="CENTER">
+
             <padding>
-                <Insets top="24" right="36" bottom="24" left="36"/>
+                <Insets bottom="15.0"
+                        left="25.0"
+                        right="25.0"
+                        top="15.0" />
             </padding>
-            <TextFlow onMouseClicked="#handleLogoClick"
-                      styleClass="clickable-logo">
-                <Text text="The" styleClass="logo-text-white"/>
-                <Text text="Knife" styleClass="logo-text-green"/>
-            </TextFlow>
-        </StackPane>
+
+            <children>
+
+                <!-- LOGO A SINISTRA -->
+                <ImageView fitHeight="133.0"
+                           fitWidth="441.0"
+                           preserveRatio="true"
+                           onMouseClicked="#handleLogoClick">
+
+                    <image>
+                        <Image url="@../images/img_1.png" />
+                    </image>
+
+                </ImageView>
+            </children>
+
+        </HBox>
     </top>
 
-    <bottom>
-        <HBox styleClass="footer-bar" minHeight="88" prefHeight="88" maxHeight="88"/>
-    </bottom>
+
 
     <!-- ===================== CONTENUTO ===================== -->
     <center>
