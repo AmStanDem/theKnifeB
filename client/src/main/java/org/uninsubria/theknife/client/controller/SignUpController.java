@@ -41,6 +41,7 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 public class SignUpController {
+    private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/uuuu", Locale.ITALY)
                     .withResolverStyle(ResolverStyle.STRICT);
@@ -148,10 +149,24 @@ public class SignUpController {
 
         try {
             RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
+            var server = ServerConnection.getServer();
+            LocalDate dataCorrente = server.ottieniDataCorrente();
+
+            if (dataNascita.isBefore(DATA_NASCITA_MINIMA)) {
+                labelErrore.setText("La data di nascita non può essere precedente al 01/01/1900.");
+                dataNascitaField.requestFocus();
+                return;
+            }
+            if (dataNascita.isAfter(dataCorrente)) {
+                labelErrore.setText("La data di nascita non può essere successiva a oggi.");
+                dataNascitaField.requestFocus();
+                return;
+            }
+
             UtenteDTO utente = new UtenteDTO(null, nome, cognome, email, dataNascita, domicilio, ruoloEnum);
 
             // Chiamata remota al server
-            utente = ServerConnection.getServer().registraCliente(utente, password);
+            utente = server.registraCliente(utente, password);
             SessioneUtente.login(utente);
 
             // Cambio scena pulito tramite SceneManager centralizzato
@@ -163,7 +178,7 @@ public class SignUpController {
         } catch (DatiMancantiException e) {
             labelErrore.setText(e.getMessage());
         } catch (SistemaIndisponibileException | RemoteException | NotBoundException e) {
-            labelErrore.setText("Errore di connessione al server.");
+            labelErrore.setText("Il server non è aggiornato o non è raggiungibile. Riavvialo e riprova.");
             e.printStackTrace();
         }
     }
@@ -180,21 +195,21 @@ public class SignUpController {
 
     @FXML
     private void handleScegliDataNascita() {
-        LocalDate dataCorrente;
+        LocalDate dataCorrenteDispositivo = LocalDate.now();
         try {
-            dataCorrente = ServerConnection.getServer().ottieniDataCorrente();
+            dataCorrenteDispositivo = ServerConnection.getServer().ottieniDataCorrente();
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
-            labelErrore.setText("Non è stato possibile verificare l'intervallo delle date.");
-            e.printStackTrace();
-            return;
+            labelErrore.setText(
+                    "Calendario aperto con la data del dispositivo; il server verificherà la data alla registrazione.");
         }
+        LocalDate dataCorrente = dataCorrenteDispositivo;
 
         LocalDate dataIniziale = dataCorrente;
         String testoData = dataNascitaField.getText().trim();
         if (!testoData.isEmpty()) {
             try {
                 LocalDate dataInserita = LocalDate.parse(testoData, DATE_FORMATTER);
-                if (!dataInserita.isBefore(LocalDate.of(1900, 1, 1))
+                if (!dataInserita.isBefore(DATA_NASCITA_MINIMA)
                         && !dataInserita.isAfter(dataCorrente)) {
                     dataIniziale = dataInserita;
                 }
@@ -256,7 +271,8 @@ public class SignUpController {
                 LocalDate data = primoGiorno.withDayOfMonth(giorno);
                 Button pulsanteGiorno = new Button(Integer.toString(giorno));
                 pulsanteGiorno.setMaxWidth(Double.MAX_VALUE);
-                pulsanteGiorno.setDisable(data.isAfter(dataCorrente));
+                pulsanteGiorno.setDisable(data.isBefore(DATA_NASCITA_MINIMA)
+                        || data.isAfter(dataCorrente));
                 pulsanteGiorno.setOnAction(event -> {
                     dialog.setResult(data);
                     dialog.close();
