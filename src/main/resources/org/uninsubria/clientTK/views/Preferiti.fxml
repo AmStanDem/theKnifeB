@@ -21,56 +21,6 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.uninsubria.clientTK.controller.PreferitiController">
 
-    <!-- HEADER -->
-    <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="20.0"
-              styleClass="header"
-              BorderPane.alignment="CENTER">
-
-            <padding>
-                <Insets bottom="15.0"
-                        left="25.0"
-                        right="25.0"
-                        top="15.0" />
-            </padding>
-
-            <children>
-
-                <!-- LOGO A SINISTRA -->
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true"
-                           onMouseClicked="#handleLogoClick">
-
-                    <image>
-                        <Image url="@../../../../images/img_1.png" />
-                    </image>
-
-                </ImageView>
-
-                <!-- SPAZIO -->
-                <Region HBox.hgrow="ALWAYS" />
-
-                <!-- AREA PERSONALE -->
-                <ImageView fitHeight="100.0"
-                           fitWidth="350.0"
-                           preserveRatio="true"
-                           onMouseClicked="#onAreaPersonaleClick">
-
-                    <image>
-                        <Image url="@../../../../images/user.png" />
-                    </image>
-
-                </ImageView>
-
-
-            </children>
-
-        </HBox>
-    </top>
-
-
     <!-- CONTENUTO CENTRALE -->
     <center>
         <VBox styleClass="content-box">

@@ -30,25 +30,6 @@
             stylesheets="@../styles/ricerca-avanzata.css"
             styleClass="root-pane">
 
-    <!-- ===================== HEADER ===================== -->
-    <top>
-        <StackPane styleClass="header-bar"
-                   minHeight="112" prefHeight="112" maxHeight="112">
-            <padding>
-                <Insets top="24" right="36" bottom="24" left="36"/>
-            </padding>
-            <TextFlow onMouseClicked="#handleLogoClick"
-                      styleClass="clickable-logo">
-                <Text text="The" styleClass="logo-text-white"/>
-                <Text text="Knife" styleClass="logo-text-green"/>
-            </TextFlow>
-        </StackPane>
-    </top>
-
-    <bottom>
-        <HBox styleClass="footer-bar" minHeight="88" prefHeight="88" maxHeight="88"/>
-    </bottom>
-
     <!-- ===================== CONTENUTO ===================== -->
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-container">
