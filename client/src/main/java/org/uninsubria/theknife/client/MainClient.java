@@ -11,13 +11,17 @@ import javafx.stage.StageStyle;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.SceneManager;
 
+import java.io.InputStream;
+
 public class MainClient extends Application {
 
     @Override
     public void start(Stage stage) {
         stage.initStyle(StageStyle.UNDECORATED);
+        InputStream resourceAsStream = getClass().getResourceAsStream("/org/uninsubria/theknife/client/assets/icon.png");
+        assert resourceAsStream != null;
         Image icona = new Image(
-                getClass().getResourceAsStream("/org/uninsubria/theknife/client/assets/icon.png")
+                resourceAsStream
         );
         stage.getIcons().add(icona);
         stage.setTitle("TheKnife");
