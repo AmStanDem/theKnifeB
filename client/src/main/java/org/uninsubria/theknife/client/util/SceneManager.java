@@ -186,42 +186,39 @@ public class SceneManager {
     }
 
     private static void configuraStagePrincipale(Stage stage) {
+
         if (!configuredStages.add(stage)) {
             return;
         }
+
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setFullScreenExitHint("");
         stage.setResizable(false);
+
+        stage.setMaximized(true);
+
         stage.showingProperty().addListener((observable, precedente, visibile) -> {
             if (visibile) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
-            }
-        });
-        stage.fullScreenProperty().addListener((observable, precedente, attivo) -> {
-            if (!attivo && stage.isShowing()) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
-            }
-        });
-        stage.focusedProperty().addListener((observable, precedente, attivo) -> {
-            if (attivo) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
+                Platform.runLater(() -> {
+                    stage.setMaximized(true);
+                    stage.setFullScreen(true);
+                });
             }
         });
     }
 
     private static void ripristinaFullscreen(Stage stage) {
-        if (!stage.isShowing() || stage.isFullScreen()) {
+
+        if (!stage.isShowing()) {
             return;
         }
-        stage.setFullScreen(true);
+
         if (!stage.isFullScreen()) {
-            // Fallback per alcune configurazioni Windows/JavaFX: dimensiona la
-            // finestra sui bounds visibili senza lasciarla parzialmente fuori schermo.
-            javafx.geometry.Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-            stage.setX(bounds.getMinX());
-            stage.setY(bounds.getMinY());
-            stage.setWidth(bounds.getWidth());
-            stage.setHeight(bounds.getHeight());
+            Platform.runLater(() -> {
+                if (stage.isShowing() && !stage.isFullScreen()) {
+                    stage.setFullScreen(true);
+                }
+            });
         }
     }
 
