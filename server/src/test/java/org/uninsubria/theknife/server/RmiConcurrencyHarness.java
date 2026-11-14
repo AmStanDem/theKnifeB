@@ -7,6 +7,7 @@ import org.uninsubria.theknife.common.dto.RecensioneDTO;
 import org.uninsubria.theknife.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.theknife.common.exceptions.ModificaObsoletaException;
 import org.uninsubria.theknife.common.rmi.ITheKnifeServer;
+import org.uninsubria.theknife.server.utils.PrezzoDatasetEstimator;
 
 import java.rmi.registry.LocateRegistry;
 import java.sql.Connection;
@@ -27,6 +28,7 @@ public final class RmiConcurrencyHarness {
     }
 
     public static void main(String[] args) throws Exception {
+        verificaStimePrezzo();
         String databaseName = DB_URL.substring(DB_URL.lastIndexOf('/') + 1).split("\\?", 2)[0];
         if (!databaseName.toLowerCase().contains("test")) {
             throw new IllegalStateException("Il database di test deve avere 'test' nel nome.");
@@ -78,6 +80,22 @@ public final class RmiConcurrencyHarness {
             System.out.println("OK: preferito, recensione duplicata e optimistic locking concorrenti.");
         } finally {
             deleteFixture(fixture);
+        }
+    }
+
+    private static void verificaStimePrezzo() {
+        double economico = PrezzoDatasetEstimator.stimaInEuro("€", "Italy", "Ristorante A", "Via 1");
+        double medio = PrezzoDatasetEstimator.stimaInEuro("€€", "Italy", "Ristorante A", "Via 1");
+        double alto = PrezzoDatasetEstimator.stimaInEuro("€€€", "Italy", "Ristorante A", "Via 1");
+        double lusso = PrezzoDatasetEstimator.stimaInEuro("€€€€", "Italy", "Ristorante A", "Via 1");
+        double lowCost = PrezzoDatasetEstimator.stimaInEuro("€€", "India", "Ristorante A", "Via 1");
+        double highCost = PrezzoDatasetEstimator.stimaInEuro("€€", "Switzerland", "Ristorante A", "Via 1");
+
+        if (!(economico < medio && medio < alto && alto < lusso && lowCost < medio && medio < highCost)
+                || PrezzoDatasetEstimator.stimaInEuro("", "Italy", "Ristorante A", "Via 1") != null
+                || PrezzoDatasetEstimator.stimaInEuro("€$", "Italy", "Ristorante A", "Via 1") != null
+                || medio == PrezzoDatasetEstimator.stimaInEuro("€€", "Italy", "Ristorante B", "Via 2")) {
+            throw new AssertionError("La stima dei prezzi non rispetta fasce, costo locale o variazione.");
         }
     }
 

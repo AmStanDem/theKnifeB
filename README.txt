@@ -60,3 +60,11 @@ Avviare prima il server su questo database, poi:
 Il test sincronizza due chiamate RMI per verificare duplicati di preferiti e
 recensioni e conflitti di modifica. Elimina le fixture create; non dimostra da
 solo tutte le proprietà ACID del sistema.
+
+Stima prezzi dataset:
+L'importatore converte il numero di simboli nel campo Price in quattro fasce
+euro e applica un coefficiente indicativo per il costo della vita del Paese,
+variando deterministicamente il valore all'interno della fascia. Sono stime,
+segnalate nell'interfaccia con ≈, non prezzi verificati. Le righe senza fascia
+valida restano senza prezzo; all'avvio vengono stimati anche i prezzi mancanti
+dei record dataset già importati.

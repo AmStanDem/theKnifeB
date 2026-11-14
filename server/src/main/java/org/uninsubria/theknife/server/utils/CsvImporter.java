@@ -25,7 +25,9 @@ public class CsvImporter {
 
     public static void importaSeNecessario() {
         if (datiGiaPresenti()) {
-            System.out.println("[ETL_INFO] Ristoranti già presenti nel database. Importazione CSV saltata.");
+            int aggiornati = aggiornaPrezziMancanti();
+            System.out.printf("[ETL_INFO] Ristoranti già presenti; stimate le fasce prezzo per %d record.%n",
+                    aggiornati);
             return;
         }
 
@@ -93,7 +95,8 @@ public class CsvImporter {
                         citta TEXT NOT NULL,
                         nazione TEXT NOT NULL,
                         latitudine NUMERIC(10, 7) NOT NULL,
-                        longitudine NUMERIC(10, 7) NOT NULL
+                        longitudine NUMERIC(10, 7) NOT NULL,
+                        prezzo_medio NUMERIC(6, 2)
                     ) ON COMMIT DROP
                     """);
             stmt.execute("""
@@ -109,8 +112,8 @@ public class CsvImporter {
     private static int caricaStaging(CSVParser csv, Connection conn) throws Exception {
         String sqlRestaurant = """
                 INSERT INTO tmp_dataset_restaurants
-                    (row_no, nome, indirizzo, citta, nazione, latitudine, longitudine)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (row_no, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         String sqlCuisine = """
                 INSERT INTO tmp_dataset_cuisines (row_no, nome) VALUES (?, ?)
@@ -138,6 +141,8 @@ public class CsvImporter {
                     String rawCuisines = pulisciStringa(record.get(4));
                     double longitude = Double.parseDouble(pulisciStringa(record.get(5)));
                     double latitude = Double.parseDouble(pulisciStringa(record.get(6)));
+                    Double estimatedPrice = PrezzoDatasetEstimator.stimaInEuro(
+                            record.get(3), country, name, address);
 
                     if (!Double.isFinite(latitude) || !Double.isFinite(longitude)
                             || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
@@ -152,6 +157,7 @@ public class CsvImporter {
                     restaurants.setString(5, country);
                     restaurants.setDouble(6, latitude);
                     restaurants.setDouble(7, longitude);
+                    restaurants.setObject(8, estimatedPrice);
                     restaurants.addBatch();
                     pendingRestaurants++;
 
@@ -239,9 +245,10 @@ public class CsvImporter {
             int insertedRestaurants = stmt.executeUpdate("""
                     INSERT INTO RistorantiTheKnife
                         (id_ristorante, id_gestore, nome, indirizzo, citta, nazione,
-                         latitudine, longitudine, prezzo_medio, delivery, booking_online)
+                         latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato)
                     SELECT r.id_ristorante, u.id_utente, r.nome, r.indirizzo, r.citta, r.nazione,
-                           r.latitudine, r.longitudine, NULL, FALSE, FALSE
+                           r.latitudine, r.longitudine, r.prezzo_medio, FALSE, FALSE,
+                           r.prezzo_medio IS NOT NULL
                     FROM tmp_dataset_restaurants r
                     JOIN Utenti u ON u.email =
                         'dataset.manager.' || MD5(LOWER(r.nazione) || '|' || LOWER(r.citta))
@@ -260,6 +267,82 @@ public class CsvImporter {
                     ON CONFLICT DO NOTHING
                     """);
         }
+    }
+
+    private static int aggiornaPrezziMancanti() {
+        String sql = """
+                UPDATE RistorantiTheKnife r
+                SET prezzo_medio = ?, prezzo_stimato = TRUE
+                FROM Utenti u
+                WHERE r.id_gestore = u.id_utente
+                  AND u.email = 'dataset.manager.' || MD5(LOWER(?) || '|' || LOWER(?))
+                      || '@example.invalid'
+                  AND r.nome = ?
+                  AND r.indirizzo = ?
+                  AND LOWER(r.citta) = LOWER(?)
+                  AND LOWER(r.nazione) = LOWER(?)
+                  AND r.prezzo_medio IS NULL
+                """;
+        int updated = 0;
+        int pending = 0;
+
+        try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps_clean.csv")) {
+            if (is == null) {
+                throw new IllegalStateException("File CSV non trovato: /dataset/michelin_my_maps_clean.csv");
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                 CSVParser csv = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get().parse(reader);
+                 Connection conn = DatabaseConfig.getConnection();
+                 PreparedStatement statement = conn.prepareStatement(sql)) {
+                for (CSVRecord record : csv) {
+                    if (record.size() < 7) {
+                        continue;
+                    }
+                    String name = pulisciStringa(record.get(0));
+                    String address = pulisciStringa(record.get(1));
+                    String[] locationParts = pulisciStringa(record.get(2)).split(",", 2);
+                    String city = locationParts[0].isBlank() ? "Sconosciuta" : locationParts[0].trim();
+                    String country = locationParts.length > 1 && !locationParts[1].isBlank()
+                            ? locationParts[1].trim() : "Non specificata";
+                    Double estimate = PrezzoDatasetEstimator.stimaInEuro(
+                            record.get(3), country, name, address);
+                    if (estimate == null) {
+                        continue;
+                    }
+
+                    statement.setDouble(1, estimate);
+                    statement.setString(2, country);
+                    statement.setString(3, city);
+                    statement.setString(4, name);
+                    statement.setString(5, address);
+                    statement.setString(6, city);
+                    statement.setString(7, country);
+                    statement.addBatch();
+                    if (++pending >= BATCH_SIZE) {
+                        updated += contaAggiornamenti(statement.executeBatch());
+                        pending = 0;
+                    }
+                }
+                if (pending > 0) {
+                    updated += contaAggiornamenti(statement.executeBatch());
+                }
+            }
+            return updated;
+        } catch (Exception e) {
+            throw new IllegalStateException("Aggiornamento delle stime prezzo del dataset fallito.", e);
+        }
+    }
+
+    private static int contaAggiornamenti(int[] risultati) {
+        int count = 0;
+        for (int risultato : risultati) {
+            if (risultato > 0) {
+                count += risultato;
+            } else if (risultato == PreparedStatement.SUCCESS_NO_INFO) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static String pulisciStringa(String input) {

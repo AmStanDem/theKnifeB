@@ -41,7 +41,7 @@ public class PreferitiDAO {
         List<RistoranteDTO> lista = new ArrayList<>();
 
         String sql = "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, " +
-                "r.latitudine, r.longitudine, r.prezzo_medio, r.delivery, r.booking_online, " +
+                "r.latitudine, r.longitudine, r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, " +
                 "COALESCE(rec.media_stelle, 0.0) AS media_stelle, cucine.tipi_cucina " +
                 "FROM RistorantiTheKnife r " +
                 "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
@@ -77,7 +77,8 @@ public class PreferitiDAO {
                             prezzoMedio == null ? null : prezzoMedio.doubleValue(),
                             rs.getBoolean("delivery"),
                             rs.getBoolean("booking_online"),
-                            rs.getDouble("media_stelle")
+                            rs.getDouble("media_stelle"),
+                            rs.getBoolean("prezzo_stimato")
                     ));
                 }
             }

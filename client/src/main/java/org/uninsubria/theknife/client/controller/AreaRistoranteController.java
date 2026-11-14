@@ -253,7 +253,8 @@ public class AreaRistoranteController {
         System.out.println("citta: " + ristorante.nazione());
         lblFasciaPrezzo.setText(
                 ristorante.prezzoMedio() != null
-                        ? String.format("%.2f €", ristorante.prezzoMedio())
+                        ? (ristorante.prezzoStimato() ? "≈ " : "")
+                                + String.format("%.2f €", ristorante.prezzoMedio())
                         : "N/D"
         );
 

@@ -20,8 +20,27 @@ public record RistoranteDTO(
         Double prezzoMedio,
         Boolean delivery,
         Boolean bookingOnline,
-        Double mediaStelle
+        Double mediaStelle,
+        boolean prezzoStimato
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public RistoranteDTO(
+            Integer idRistorante,
+            String nome,
+            String indirizzo,
+            String citta,
+            String nazione,
+            Double latitudine,
+            Double longitudine,
+            List<String> tipologieCucina,
+            Double prezzoMedio,
+            Boolean delivery,
+            Boolean bookingOnline,
+            Double mediaStelle
+    ) {
+        this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
+                tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle, false);
+    }
 }

@@ -110,6 +110,16 @@ Il registry RMI predefinito è `localhost:1099`; si può configurare con `THEKNI
 `THEKNIFE_RMI_PORT`. Le corse verificano invarianti e conflitti per queste operazioni specifiche,
 non costituiscono una dimostrazione generale di tutte le proprietà ACID del sistema.
 
+### Stima dei prezzi del dataset
+
+L'importatore usa la colonna `Price` del CSV Michelin: il numero di simboli valuta determina una
+delle quattro fasce (€ 12–25, € 25–50, € 50–80, oltre € 80). Applica poi un coefficiente
+indicativo per il costo della vita del Paese e una variazione deterministica all'interno della
+fascia, così i ristoranti della stessa categoria non ricevono tutti lo stesso importo.
+Gli importi sono stime in euro, non prezzi verificati; l'interfaccia li contrassegna con `≈`.
+Le righe senza fascia valida restano senza prezzo. All'avvio, il server recupera le stime mancanti
+anche per i record del dataset già presenti, senza modificare i prezzi dei ristoranti gestiti.
+
 Flyway usa la stessa porta predefinita `5432`; per una porta host diversa avvia Maven indicando `-Ddb.host.port=<DB_HOST_PORT>`. Quando il server è avviato da un terminale, la password non viene mostrata. In un IDE senza terminale associato può risultare visibile durante la digitazione.
 
 ---

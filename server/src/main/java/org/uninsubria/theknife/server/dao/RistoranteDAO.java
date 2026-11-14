@@ -25,8 +25,8 @@ public class RistoranteDAO {
             "ST_SetSRID(ST_MakePoint(?::double precision, ?::double precision), 4326)::geography";
 
     public Integer inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
-        String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlTipologiaCheck = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO NOTHING";
         String sqlTipologiaId = "SELECT id_tipologia FROM Tipologia_Cucina WHERE nome = ?";
         String sqlRistoTipo = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES (?, ?) ON CONFLICT DO NOTHING";
@@ -42,9 +42,10 @@ public class RistoranteDAO {
                 stmt.setString(5, r.nazione());
                 stmt.setDouble(6, r.latitudine() != null ? r.latitudine() : 0.0);
                 stmt.setDouble(7, r.longitudine() != null ? r.longitudine() : 0.0);
-                stmt.setDouble(8, r.prezzoMedio() != null ? r.prezzoMedio() : 0.0);
+                stmt.setDouble(8, r.prezzoMedio());
                 stmt.setBoolean(9, r.delivery() != null ? r.delivery() : false);
                 stmt.setBoolean(10, r.bookingOnline() != null && r.bookingOnline());
+                stmt.setBoolean(11, false);
 
                 if (stmt.executeUpdate() == 0) {
                     conn.rollback();
@@ -110,7 +111,7 @@ public class RistoranteDAO {
 
     public boolean modificaRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRistorante = "UPDATE RistorantiTheKnife SET nome = ?, indirizzo = ?, citta = ?, " +
-                "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, delivery = ?, " +
+                "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, prezzo_stimato = FALSE, delivery = ?, " +
                 "booking_online = ? WHERE id_ristorante = ? AND id_gestore = ?";
         String sqlEliminaTipologie = "DELETE FROM Ristoranti_Tipologie WHERE id_ristorante = ?";
         String sqlAggiungiTipologia = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) " +
@@ -378,7 +379,7 @@ public class RistoranteDAO {
     private String costruisciQueryBase() {
         // Separiamo le recensioni per evitare righe duplicate provocate dalle molteplici tipologie cucina
         return "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, r.latitudine, r.longitudine, " +
-                "r.prezzo_medio, r.delivery, r.booking_online, " +
+                "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, " +
                 "COALESCE(AVG(rec_stat.valutazione), 0.0) as media_stelle, " +
                 "STRING_AGG(DISTINCT tc.nome, ',') as tipologie_cucina " +
                 "FROM RistorantiTheKnife r " +
@@ -419,7 +420,8 @@ public class RistoranteDAO {
                 prezzoMedio == null ? null : prezzoMedio.doubleValue(),
                 rs.getBoolean("delivery"),
                 rs.getBoolean("booking_online"),
-                rs.getDouble("media_stelle")
+                rs.getDouble("media_stelle"),
+                rs.getBoolean("prezzo_stimato")
         );
     }
 }

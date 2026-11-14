@@ -64,7 +64,7 @@ public class RestaurantItemController {
         addressLabel.setText(ristorante.indirizzo());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
-        metaLabel.setText(formattaMeta(ristorante.prezzoMedio()));
+        metaLabel.setText(formattaMeta(ristorante.prezzoMedio(), ristorante.prezzoStimato()));
 
         aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.delivery()));
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));
@@ -155,8 +155,10 @@ public class RestaurantItemController {
      * @param prezzoMedio prezzo medio del ristorante
      * @return stringa contenente tipologia di cucina e prezzo medio
      */
-    private String formattaMeta(Double prezzoMedio) {
-        String prezzo = (prezzoMedio != null) ? String.format("%.0f €", prezzoMedio) : "n.d.";
+    private String formattaMeta(Double prezzoMedio, boolean prezzoStimato) {
+        String prezzo = (prezzoMedio != null)
+                ? (prezzoStimato ? "≈ " : "") + String.format("%.0f €", prezzoMedio)
+                : "n.d.";
         return "Prezzo medio " + prezzo;
     }
 }

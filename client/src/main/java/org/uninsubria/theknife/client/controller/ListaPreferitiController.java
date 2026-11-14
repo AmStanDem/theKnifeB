@@ -119,10 +119,10 @@ public class ListaPreferitiController {
      * Soglie indicative, personalizzabili in base ai dati reali.
      */
     static int fasciaPrezzoDaImporto(Double prezzoMedio) {
-        if (prezzoMedio == null) return 1;
-        if (prezzoMedio < 15) return 1;
-        if (prezzoMedio < 30) return 2;
-        if (prezzoMedio < 50) return 3;
+        if (prezzoMedio == null) return 0;
+        if (prezzoMedio < 25) return 1;
+        if (prezzoMedio < 50) return 2;
+        if (prezzoMedio < 80) return 3;
         return 4;
     }
 
