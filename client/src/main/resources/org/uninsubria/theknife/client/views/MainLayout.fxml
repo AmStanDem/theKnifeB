@@ -94,7 +94,7 @@
                                     minHeight="65.0" prefHeight="65.0" maxHeight="65.0"
                                     maxWidth="1.7976931348623157E308"
                                     HBox.hgrow="ALWAYS"
-                                    promptText="Dove? Cerca una città o un indirizzo" />
+                                    promptText="Cerca una città o un indirizzo" />
 
                         <!-- RICERCA RISTORANTE -->
                         <TextField fx:id="txtRicerca"

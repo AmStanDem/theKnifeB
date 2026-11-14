@@ -152,7 +152,7 @@
                             prefHeight="55.0"
                             prefWidth="500.0"
                             styleClass="profile-button"
-                            text="I miei ristoranti" />
+                            text="Gestisci i miei ristoranti" />
 
                     <!-- AGGIUNGI RISTORANTE -->
                     <Button fx:id="btnAggiungi"
@@ -162,6 +162,14 @@
                             prefWidth="500.0"
                             styleClass="profile-button"
                             text="Aggiungi ristorante" />
+
+                    <Button fx:id="btnModificaRistorante"
+                            mnemonicParsing="false"
+                            onAction="#onModificaRistoranteClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="Modifica ristorante" />
 
                     <Button fx:id="btnModificaCredenziali"
                             mnemonicParsing="false"

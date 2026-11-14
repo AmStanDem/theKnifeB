@@ -80,6 +80,11 @@ public class ListaRistorantiGestoreController {
                 controller.setRistorante(ristorante);
                 controller.setOnDettagliAction(ristoranteSelezionato ->
                         RistoranteSelezionato.setRitornoAiMieiRistoranti(true));
+                controller.setOnModificaAction((event, ristoranteSelezionato) -> {
+                    RistoranteSelezionato.setRistorante(ristoranteSelezionato);
+                    SceneManager.switchScene(event,
+                            "/org/uninsubria/theknife/client/views/ModificaRistorante.fxml");
+                });
                 restaurantContainer.getChildren().add(card);
             }
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
