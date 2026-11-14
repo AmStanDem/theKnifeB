@@ -85,7 +85,8 @@
 .text-field,
 .password-field,
 .combo-box,
-.date-picker {
+.date-picker,
+.date-picker-button {
     -fx-background-color: #FAFAFA;
     -fx-border-color: #D5D8D5;
     -fx-border-width: 1;
@@ -102,7 +103,8 @@
 .text-field:focused,
 .password-field:focused,
 .combo-box:focused,
-.date-picker:focused {
+.date-picker:focused,
+.date-picker-button:focused {
     -fx-background-color: white;
     -fx-border-color: #3E9330;
     -fx-border-width: 1.5;
@@ -116,6 +118,15 @@
 .combo-box .arrow-button,
 .date-picker .arrow-button {
     -fx-background-color: transparent;
+}
+
+.date-picker-button {
+    -fx-padding: 0 14 0 14;
+    -fx-cursor: hand;
+}
+
+.date-picker-button:hover {
+    -fx-background-color: #F0F0F0;
 }
 
 
