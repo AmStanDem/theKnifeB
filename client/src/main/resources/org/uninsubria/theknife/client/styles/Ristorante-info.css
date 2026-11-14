@@ -189,6 +189,12 @@
     -fx-font-size: 17px;
 }
 
+.profile-link {
+    -fx-text-fill: #276B2D;
+    -fx-font-size: 17px;
+    -fx-padding: 0;
+}
+
 .cuisine-tags {
     -fx-hgap: 6;
     -fx-vgap: 6;

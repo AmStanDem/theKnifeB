@@ -26,8 +26,9 @@ public class CsvImporter {
     public static void importaSeNecessario() {
         if (datiGiaPresenti()) {
             int aggiornati = aggiornaPrezziMancanti();
-            System.out.printf("[ETL_INFO] Ristoranti già presenti; stimate le fasce prezzo per %d record.%n",
-                    aggiornati);
+            int contattiAggiornati = aggiornaContattiDataset();
+            System.out.printf("[ETL_INFO] Ristoranti già presenti; aggiornati prezzi per %d record e contatti per %d record.%n",
+                    aggiornati, contattiAggiornati);
             return;
         }
 
@@ -96,7 +97,9 @@ public class CsvImporter {
                         nazione TEXT NOT NULL,
                         latitudine NUMERIC(10, 7) NOT NULL,
                         longitudine NUMERIC(10, 7) NOT NULL,
-                        prezzo_medio NUMERIC(6, 2)
+                        prezzo_medio NUMERIC(6, 2),
+                        telefono TEXT,
+                        sito_web TEXT
                     ) ON COMMIT DROP
                     """);
             stmt.execute("""
@@ -112,8 +115,9 @@ public class CsvImporter {
     private static int caricaStaging(CSVParser csv, Connection conn) throws Exception {
         String sqlRestaurant = """
                 INSERT INTO tmp_dataset_restaurants
-                    (row_no, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (row_no, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio,
+                     telefono, sito_web)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         String sqlCuisine = """
                 INSERT INTO tmp_dataset_cuisines (row_no, nome) VALUES (?, ?)
@@ -158,6 +162,8 @@ public class CsvImporter {
                     restaurants.setDouble(6, latitude);
                     restaurants.setDouble(7, longitude);
                     restaurants.setObject(8, estimatedPrice);
+                    restaurants.setString(9, valoreDataset(record, 7));
+                    restaurants.setString(10, valoreDataset(record, 9));
                     restaurants.addBatch();
                     pendingRestaurants++;
 
@@ -245,10 +251,11 @@ public class CsvImporter {
             int insertedRestaurants = stmt.executeUpdate("""
                     INSERT INTO RistorantiTheKnife
                         (id_ristorante, id_gestore, nome, indirizzo, citta, nazione,
-                         latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato)
+                         latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato,
+                         telefono, sito_web)
                     SELECT r.id_ristorante, u.id_utente, r.nome, r.indirizzo, r.citta, r.nazione,
                            r.latitudine, r.longitudine, r.prezzo_medio, FALSE, FALSE,
-                           r.prezzo_medio IS NOT NULL
+                           r.prezzo_medio IS NOT NULL, r.telefono, r.sito_web
                     FROM tmp_dataset_restaurants r
                     JOIN Utenti u ON u.email =
                         'dataset.manager.' || MD5(LOWER(r.nazione) || '|' || LOWER(r.citta))
@@ -267,6 +274,48 @@ public class CsvImporter {
                     ON CONFLICT DO NOTHING
                     """);
         }
+    }
+
+    private static String valoreDataset(CSVRecord record, int indice) {
+        return indice < record.size() ? pulisciStringa(record.get(indice)) : null;
+    }
+
+    private static int aggiornaContattiDataset() {
+        String sql = """
+                UPDATE RistorantiTheKnife r
+                SET telefono = ?, sito_web = ?
+                WHERE r.nome = ? AND r.indirizzo = ?
+                  AND LOWER(r.citta) = LOWER(?) AND LOWER(r.nazione) = LOWER(?)
+                  AND ROUND(r.longitudine, 7) = ROUND(?::numeric, 7)
+                  AND ROUND(r.latitudine, 7) = ROUND(?::numeric, 7)
+                """;
+        int aggiornati = 0;
+        try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps_clean.csv");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+             CSVParser csv = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get().parse(reader);
+             Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (CSVRecord record : csv) {
+                if (record.size() < 10) {
+                    continue;
+                }
+                String[] locationParts = pulisciStringa(record.get(2)).split(",", 2);
+                String city = locationParts[0].trim();
+                String country = locationParts.length > 1 ? locationParts[1].trim() : "Non specificata";
+                stmt.setString(1, valoreDataset(record, 7));
+                stmt.setString(2, valoreDataset(record, 9));
+                stmt.setString(3, pulisciStringa(record.get(0)));
+                stmt.setString(4, pulisciStringa(record.get(1)));
+                stmt.setString(5, city);
+                stmt.setString(6, country);
+                stmt.setString(7, pulisciStringa(record.get(5)));
+                stmt.setString(8, pulisciStringa(record.get(6)));
+                aggiornati += stmt.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Impossibile aggiornare i contatti dal dataset.", e);
+        }
+        return aggiornati;
     }
 
     private static int aggiornaPrezziMancanti() {

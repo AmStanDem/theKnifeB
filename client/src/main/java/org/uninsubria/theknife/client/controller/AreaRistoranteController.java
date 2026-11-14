@@ -14,6 +14,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -63,6 +64,12 @@ public class AreaRistoranteController {
 
     @FXML
     private Label lblIndirizzo;
+
+    @FXML
+    private Hyperlink lblTelefono;
+
+    @FXML
+    private Hyperlink lblSitoWeb;
 
 
     @FXML
@@ -246,6 +253,8 @@ public class AreaRistoranteController {
 
         lblNomeRistorante.setText(ristorante.nome());
         lblIndirizzo.setText(ristorante.indirizzo());
+        impostaLink(lblTelefono, ristorante.telefono());
+        impostaLink(lblSitoWeb, ristorante.sitoWeb());
 
         lblCitta.setText(ristorante.citta());
         System.out.println("citta: " + ristorante.citta());
@@ -267,6 +276,42 @@ public class AreaRistoranteController {
         );
 
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
+    }
+
+    private void impostaLink(Hyperlink link, String valore) {
+        boolean disponibile = valore != null && !valore.isBlank();
+        link.setText(disponibile ? valore : "N/D");
+        link.setDisable(!disponibile);
+        link.setVisited(false);
+    }
+
+    @FXML
+    private void apriSitoWeb() {
+        if (ristorante == null || ristorante.sitoWeb() == null || ristorante.sitoWeb().isBlank()) {
+            return;
+        }
+        String sito = ristorante.sitoWeb().trim();
+        if (!sito.matches("(?i)^[a-z][a-z0-9+.-]*://.*$")) {
+            sito = "https://" + sito;
+        }
+        apriURI(sito);
+    }
+
+    @FXML
+    private void apriTelefono() {
+        if (ristorante == null || ristorante.telefono() == null || ristorante.telefono().isBlank()) {
+            return;
+        }
+        apriURI("tel:" + ristorante.telefono().replaceAll("[^0-9+]", ""));
+    }
+
+    private void apriURI(String valore) {
+        try {
+            org.uninsubria.theknife.client.MainClient.apriCollegamento(valore);
+        } catch (Exception e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Collegamento non disponibile",
+                    "Impossibile aprire il collegamento: " + e.getMessage());
+        }
     }
 
     private void caricaRecensioni() {

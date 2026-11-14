@@ -379,7 +379,7 @@ public class RistoranteDAO {
     private String costruisciQueryBase() {
         // Separiamo le recensioni per evitare righe duplicate provocate dalle molteplici tipologie cucina
         return "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, r.latitudine, r.longitudine, " +
-                "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, " +
+                "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, r.telefono, r.sito_web, " +
                 "COALESCE(AVG(rec_stat.valutazione), 0.0) as media_stelle, " +
                 "STRING_AGG(DISTINCT tc.nome, ',') as tipologie_cucina " +
                 "FROM RistorantiTheKnife r " +
@@ -421,7 +421,9 @@ public class RistoranteDAO {
                 rs.getBoolean("delivery"),
                 rs.getBoolean("booking_online"),
                 rs.getDouble("media_stelle"),
-                rs.getBoolean("prezzo_stimato")
+                rs.getBoolean("prezzo_stimato"),
+                rs.getString("telefono"),
+                rs.getString("sito_web")
         );
     }
 }
