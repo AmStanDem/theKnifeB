@@ -222,6 +222,7 @@ public class SignUpController {
         dialog.setTitle("Data di nascita");
         dialog.initOwner(dataNascitaField.getScene().getWindow());
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+        dialog.setResultConverter(button -> null);
 
         ComboBox<Month> meseComboBox = new ComboBox<>();
         meseComboBox.getItems().setAll(Month.values());
