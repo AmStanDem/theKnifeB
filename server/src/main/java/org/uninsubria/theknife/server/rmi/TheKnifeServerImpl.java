@@ -58,6 +58,13 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
+    public UtenteDTO aggiornaAccount(UtenteDTO utenteAggiornato, String passwordCorrente, String nuovaPassword)
+            throws RemoteException, CredenzialiErrateException, UtenteGiaEsistenteException,
+            DatiMancantiException, SistemaIndisponibileException {
+        return utenteService.aggiornaAccount(utenteAggiornato, passwordCorrente, nuovaPassword);
+    }
+
+    @Override
     public LocalDate ottieniDataCorrente() throws RemoteException, SistemaIndisponibileException {
         return utenteService.ottieniDataCorrente();
     }

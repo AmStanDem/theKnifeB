@@ -103,6 +103,9 @@ public class RestaurantItemController {
      */
     private void onDetailsClicked(ActionEvent actionEvent) {
         RistoranteSelezionato.setRistorante(ristorante);
+        if (onDettagliAction != null) {
+            onDettagliAction.accept(ristorante);
+        }
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
     }
 

@@ -30,6 +30,10 @@ public interface ITheKnifeServer extends Remote {
     UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException;
 
+    UtenteDTO aggiornaAccount(UtenteDTO utenteAggiornato, String passwordCorrente, String nuovaPassword)
+            throws RemoteException, CredenzialiErrateException, UtenteGiaEsistenteException,
+            DatiMancantiException, SistemaIndisponibileException;
+
     LocalDate ottieniDataCorrente()
             throws RemoteException, SistemaIndisponibileException;
 

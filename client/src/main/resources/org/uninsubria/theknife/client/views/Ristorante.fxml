@@ -34,6 +34,14 @@
                 <!-- SPAZIO -->
                 <Region HBox.hgrow="ALWAYS" />
 
+                <Button fx:id="tornaAiMieiRistoranti"
+                        mnemonicParsing="false"
+                        onAction="#onTornaAiMieiRistorantiClick"
+                        styleClass="recensione"
+                        text="Torna ai miei ristoranti"
+                        visible="false"
+                        managed="false" />
+
                 <!-- LOGOUT -->
                 <!--
                 <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Esci" />

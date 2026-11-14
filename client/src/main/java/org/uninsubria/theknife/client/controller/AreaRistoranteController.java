@@ -128,6 +128,9 @@ public class AreaRistoranteController {
     @FXML
     private Button aggiungiPreferito;
 
+    @FXML
+    private Button tornaAiMieiRistoranti;
+
     private boolean ristorantePreferito;
     private RecensioneDTO recensioneUtente;
 
@@ -143,6 +146,10 @@ public class AreaRistoranteController {
     public void initialize() {
 
         System.out.println("AreaRistoranteController inizializzato");
+        boolean mostraRitornoMieiRistoranti =
+                RistoranteSelezionato.consumaRitornoAiMieiRistoranti();
+        tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
+        tornaAiMieiRistoranti.setManaged(mostraRitornoMieiRistoranti);
         averageRating = new BaseRatingView(5, 0);
         averageRating.setSpacing(2);
         averageRating.setScaleX(0.75);
@@ -680,5 +687,13 @@ public class AreaRistoranteController {
     @FXML
     public void handleLogoClick(MouseEvent mouseEvent) {
         SceneManager.switchScene(mouseEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+    }
+
+    @FXML
+    private void onTornaAiMieiRistorantiClick(ActionEvent event) {
+        SceneManager.switchScene(
+                event,
+                "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml"
+        );
     }
 }

@@ -83,8 +83,12 @@ Il server applica le migrazioni, chiede i parametri del database e resta in asco
 Rimane attivo finché non interrompi Maven con `Ctrl+C`. Nel secondo avvia il client:
 
 ```sh
-mvn -pl client -am -Prun-client integration-test
+mvn -pl client -am -Prun-client process-classes
 ```
+
+Il profilo `run-client` usa le librerie JavaFX native della piattaforma corrente
+e avvia il client dai sorgenti; non esegue le fasi di packaging dei JAR.
+La build multipiattaforma dei JAR resta disponibile con `mvn clean package`.
 
 In alternativa, dopo la build puoi avviare i JAR con `java -jar`: prima il server e
 poi il client Linux o Windows corrispondente. Premi Invio per accettare i valori

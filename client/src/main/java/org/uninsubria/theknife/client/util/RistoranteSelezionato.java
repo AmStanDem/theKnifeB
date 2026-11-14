@@ -9,12 +9,24 @@ import org.uninsubria.theknife.common.dto.RistoranteDTO;
 public class RistoranteSelezionato {
 
     private static RistoranteDTO ristorante;
+    private static boolean ritornoAiMieiRistoranti;
 
     public static void setRistorante(RistoranteDTO r) {
         ristorante = r;
+        ritornoAiMieiRistoranti = false;
     }
 
     public static RistoranteDTO getRistorante() {
         return ristorante;
+    }
+
+    public static void setRitornoAiMieiRistoranti(boolean ritorno) {
+        ritornoAiMieiRistoranti = ritorno;
+    }
+
+    public static boolean consumaRitornoAiMieiRistoranti() {
+        boolean ritorno = ritornoAiMieiRistoranti;
+        ritornoAiMieiRistoranti = false;
+        return ritorno;
     }
 }

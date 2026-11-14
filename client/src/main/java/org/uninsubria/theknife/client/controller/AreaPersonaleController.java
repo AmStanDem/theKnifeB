@@ -47,6 +47,9 @@ public class AreaPersonaleController {
     @FXML
     private Button btnAggiungi;
 
+    @FXML
+    private Button btnModificaCredenziali;
+
 
     @FXML
     private void initialize() {
@@ -98,6 +101,8 @@ public class AreaPersonaleController {
 
             btnRecensioni.setVisible(true);
             btnRecensioni.setManaged(true);
+            btnModificaCredenziali.setVisible(true);
+            btnModificaCredenziali.setManaged(true);
 
             // Nasconde pulsanti ristoratore
             btnRistoranti.setVisible(false);
@@ -150,6 +155,9 @@ public class AreaPersonaleController {
 
             btnAggiungi.setVisible(true);
             btnAggiungi.setManaged(true);
+
+            btnModificaCredenziali.setVisible(true);
+            btnModificaCredenziali.setManaged(true);
         }
     }
 
@@ -186,6 +194,14 @@ public class AreaPersonaleController {
         SceneManager.switchScene(
                 event,
                 "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml"
+        );
+    }
+
+    @FXML
+    private void onModificaCredenzialiClick(ActionEvent event) {
+        SceneManager.switchScene(
+                event,
+                "/org/uninsubria/theknife/client/views/ModificaAccount.fxml"
         );
     }
 

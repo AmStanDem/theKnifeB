@@ -259,7 +259,7 @@ public class AggiungiRistoranteController {
                             + "\" è stato registrato con successo."
             );
 
-            tornaAllaHome(event);
+            tornaAiMieiRistoranti(event);
 
         } catch (NumberFormatException e) {
             mostraMessaggio(
@@ -290,13 +290,13 @@ public class AggiungiRistoranteController {
 
     @FXML
     public void onAnnullaClick(ActionEvent event) {
-        tornaAllaHome(event);
+        tornaAiMieiRistoranti(event);
     }
 
-    private void tornaAllaHome(ActionEvent event) {
+    private void tornaAiMieiRistoranti(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
+                "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml"
         );
     }
 

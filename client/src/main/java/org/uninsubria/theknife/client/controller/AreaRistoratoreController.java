@@ -61,6 +61,11 @@ public class AreaRistoratoreController {
     }
 
     @FXML
+    public void onModificaCredenzialiClick(ActionEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/ModificaAccount.fxml");
+    }
+
+    @FXML
     public void ListaRistorantiRistoratore(ActionEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml");
     }
