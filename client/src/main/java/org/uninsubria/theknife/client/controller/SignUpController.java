@@ -161,7 +161,7 @@ public class SignUpController {
             labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");
             emailField.requestFocus();
         } catch (DatiMancantiException e) {
-            labelErrore.setText("Errore nei dati: " + e.getMessage());
+            labelErrore.setText(e.getMessage());
         } catch (SistemaIndisponibileException | RemoteException | NotBoundException e) {
             labelErrore.setText("Errore di connessione al server.");
             e.printStackTrace();
@@ -180,11 +180,24 @@ public class SignUpController {
 
     @FXML
     private void handleScegliDataNascita() {
-        LocalDate dataIniziale = LocalDate.now();
+        LocalDate dataCorrente;
+        try {
+            dataCorrente = ServerConnection.getServer().ottieniDataCorrente();
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
+            labelErrore.setText("Non è stato possibile verificare l'intervallo delle date.");
+            e.printStackTrace();
+            return;
+        }
+
+        LocalDate dataIniziale = dataCorrente;
         String testoData = dataNascitaField.getText().trim();
         if (!testoData.isEmpty()) {
             try {
-                dataIniziale = LocalDate.parse(testoData, DATE_FORMATTER);
+                LocalDate dataInserita = LocalDate.parse(testoData, DATE_FORMATTER);
+                if (!dataInserita.isBefore(LocalDate.of(1900, 1, 1))
+                        && !dataInserita.isAfter(dataCorrente)) {
+                    dataIniziale = dataInserita;
+                }
             } catch (DateTimeParseException ignored) {
                 // Keep the calendar usable when replacing an invalid typed date.
             }
@@ -215,7 +228,7 @@ public class SignUpController {
         meseComboBox.setValue(dataIniziale.getMonth());
 
         ComboBox<Integer> annoComboBox = new ComboBox<>();
-        for (int anno = LocalDate.now().getYear(); anno >= 1900; anno--) {
+        for (int anno = dataCorrente.getYear(); anno >= 1900; anno--) {
             annoComboBox.getItems().add(anno);
         }
         annoComboBox.setValue(dataIniziale.getYear());
@@ -243,6 +256,7 @@ public class SignUpController {
                 LocalDate data = primoGiorno.withDayOfMonth(giorno);
                 Button pulsanteGiorno = new Button(Integer.toString(giorno));
                 pulsanteGiorno.setMaxWidth(Double.MAX_VALUE);
+                pulsanteGiorno.setDisable(data.isAfter(dataCorrente));
                 pulsanteGiorno.setOnAction(event -> {
                     dialog.setResult(data);
                     dialog.close();

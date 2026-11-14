@@ -14,6 +14,8 @@ import org.uninsubria.theknife.server.dao.UtenteDAO;
 import org.uninsubria.theknife.server.dao.UtenteDAO.UtenteConHash;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class UtenteService {
 
@@ -21,6 +23,8 @@ public class UtenteService {
 
     // Work Factor di BCrypt: bilanciamento ottimale tra sicurezza e performance
     private static final int BCRYPT_WORK_FACTOR = 12;
+    private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
     public UtenteDTO autentica(String email, String passwordInChiaro)
             throws CredenzialiErrateException, SistemaIndisponibileException {
@@ -52,6 +56,15 @@ public class UtenteService {
         return authData.utente();
     }
 
+    public LocalDate ottieniDataCorrente() throws SistemaIndisponibileException {
+        try {
+            return utenteDAO.dataCorrente();
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore durante il recupero della data corrente: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
+    }
+
     public UtenteDTO registra(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
 
@@ -62,6 +75,22 @@ public class UtenteService {
                 nuovoUtente.domicilio() == null || nuovoUtente.domicilio().trim().isEmpty() ||
                 nuovoUtente.ruolo() == null) {
             throw new DatiMancantiException("Tutti i campi (incluso il domicilio) sono obbligatori per la registrazione.");
+        }
+
+        if (nuovoUtente.dataNascita() == null) {
+            throw new DatiMancantiException("Inserisci la data di nascita.");
+        }
+
+        LocalDate dataCorrente = ottieniDataCorrente();
+
+        if (nuovoUtente.dataNascita().isAfter(dataCorrente)) {
+            throw new DatiMancantiException("La data di nascita non può essere nel futuro.");
+        }
+        if (nuovoUtente.dataNascita().isBefore(DATA_NASCITA_MINIMA)) {
+            throw new DatiMancantiException(
+                    "La data di nascita non può essere precedente al "
+                            + DATA_NASCITA_MINIMA.format(FORMATO_DATA)
+                            + ".");
         }
 
         // Generazione dell'hash sicuro con BCrypt

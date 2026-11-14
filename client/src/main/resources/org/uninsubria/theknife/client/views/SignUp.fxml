@@ -110,7 +110,7 @@
                         </VBox>
 
                         <!-- Messaggio di errore -->
-                        <Label fx:id="labelErrore" styleClass="error-label" />
+                        <Label fx:id="labelErrore" styleClass="error-label" wrapText="true" />
 
                         <!-- SEPARATORE -->
                         <Separator>

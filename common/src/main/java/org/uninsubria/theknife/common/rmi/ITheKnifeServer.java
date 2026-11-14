@@ -9,6 +9,7 @@ import org.uninsubria.theknife.common.exceptions.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +29,9 @@ public interface ITheKnifeServer extends Remote {
 
     UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException;
+
+    LocalDate ottieniDataCorrente()
+            throws RemoteException, SistemaIndisponibileException;
 
     // --- ESPLORAZIONE E CATALOGO ---
     List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)

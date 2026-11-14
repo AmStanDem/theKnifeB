@@ -15,6 +15,17 @@ public class UtenteDAO {
 
     public record UtenteConHash(UtenteDTO utente, String passwordHash) {}
 
+    public LocalDate dataCorrente() throws SQLException {
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT CURRENT_DATE");
+             ResultSet rs = stmt.executeQuery()) {
+            if (!rs.next()) {
+                throw new SQLException("Impossibile recuperare la data corrente dal database.");
+            }
+            return rs.getDate(1).toLocalDate();
+        }
+    }
+
     public boolean inserisciUtente(UtenteDTO utente, String passwordHash) throws SQLException {
         String sql = "INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
