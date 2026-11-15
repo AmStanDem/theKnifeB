@@ -37,7 +37,6 @@ public class RestaurantItemController {
     @FXML private Label nameLabel;
     @FXML private Label ratingValueLabel;
     @FXML private Label addressLabel;
-    @FXML private Label descriptionLabel;
     @FXML private Label metaLabel;
     @FXML private FlowPane cuisineTags;
     @FXML private Label deliveryTag;
@@ -64,20 +63,12 @@ public class RestaurantItemController {
         System.out.println(ristorante.toString());
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
-        aggiornaDescrizione(ristorante.descrizione());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
         metaLabel.setText(formattaMeta(ristorante.prezzoMedio(), ristorante.prezzoStimato()));
 
         aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.delivery()));
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));
-    }
-
-    private void aggiornaDescrizione(String descrizione) {
-        boolean disponibile = descrizione != null && !descrizione.isBlank();
-        descriptionLabel.setText(disponibile ? descrizione.trim() : "Descrizione non disponibile.");
-        descriptionLabel.setVisible(true);
-        descriptionLabel.setManaged(true);
     }
 
     /**

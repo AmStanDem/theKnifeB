@@ -35,9 +35,6 @@
     <!-- INDIRIZZO -->
     <Label fx:id="addressLabel" text="Indirizzo ristorante" styleClass="card-address"/>
 
-    <Label fx:id="descriptionLabel" text="Descrizione ristorante" styleClass="card-description"
-           wrapText="true" maxWidth="Infinity"/>
-
     <!-- TIPOLOGIE CUCINA -->
     <FlowPane fx:id="cuisineTags" hgap="6" vgap="6" styleClass="cuisine-tags"/>
 
