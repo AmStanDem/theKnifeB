@@ -195,6 +195,16 @@
     -fx-line-spacing: 2px;
 }
 
+.restaurant-info-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-padding: 0;
+}
+
+.restaurant-info-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
 .profile-link {
     -fx-text-fill: #276B2D;
     -fx-font-size: 17px;

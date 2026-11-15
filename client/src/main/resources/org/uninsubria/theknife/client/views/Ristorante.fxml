@@ -108,8 +108,10 @@
 
     </center>
    <left>
-
-          <VBox alignment="CENTER" maxWidth="579.0" prefHeight="603.0" prefWidth="512.0" spacing="15.0" BorderPane.alignment="CENTER">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="512.0"
+                    styleClass="restaurant-info-scroll-pane" BorderPane.alignment="CENTER">
+           <content>
+           <VBox alignment="CENTER" maxWidth="579.0" prefWidth="512.0" spacing="15.0">
 
               <!-- TITOLO -->
               <Label styleClass="profile-title" text="Informazioni ristorante" />
@@ -148,7 +150,7 @@
                   <VBox spacing="6.0">
                       <Label styleClass="profile-label" text="Descrizione:" />
                       <Label fx:id="lblDescrizione" styleClass="profile-description"
-                             wrapText="true" maxWidth="450.0" />
+                             wrapText="true" maxWidth="Infinity" />
                   </VBox>
 
                      <!-- TELEFONO -->
@@ -197,8 +199,8 @@
                   <Button fx:id="rimuoviRecensione" mnemonicParsing="false" onAction="#onRimuoviRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Rimuovi recensione" visible="false" managed="false" />
                   <Button fx:id="aggiungiPreferito" mnemonicParsing="false" onAction="#onPreferitiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Aggiungi ai preferiti" />
           </VBox>
-
-
+          </content>
+       </ScrollPane>
    </left>
 
 </BorderPane>
