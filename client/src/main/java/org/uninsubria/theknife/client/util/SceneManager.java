@@ -196,23 +196,12 @@ public class SceneManager {
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setFullScreenExitHint("");
         stage.setResizable(false);
-
-        stage.setMaximized(true);
-
-        stage.showingProperty().addListener((observable, precedente, visibile) -> {
-            if (visibile) {
-                Platform.runLater(() -> {
-                    stage.setMaximized(true);
-                    stage.setFullScreen(true);
-                });
-            }
-        });
+        stage.setFullScreen(true);
 
         stage.iconifiedProperty().addListener((observable, precedente, minimizzata) -> {
             if (!minimizzata) {
                 Platform.runLater(() -> {
                     if (stage.isShowing()) {
-                        stage.setMaximized(true);
                         stage.setFullScreen(true);
                     }
                 });
