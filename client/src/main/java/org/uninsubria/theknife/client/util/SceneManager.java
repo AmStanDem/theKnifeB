@@ -19,12 +19,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
-import javafx.animation.ScaleTransition;
-import javafx.util.Duration;
 import javafx.stage.PopupWindow;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
@@ -44,7 +39,6 @@ public class SceneManager {
     private static final Map<Stage, Object> currentControllers = new HashMap<>();
     private static final Map<Stage, Set<Window>> popupWindows = new HashMap<>();
     private static final Set<Stage> configuredStages = new HashSet<>();
-    private static final Set<Stage> openingAnimations = new HashSet<>();
     private static Stage applicationStage;
     private static boolean popupListenerInstalled;
 
@@ -103,7 +97,6 @@ public class SceneManager {
                 stage.sizeToScene();
             }
 
-            preparaAnimazioneApertura(stage, applicationRoot);
             currentControllers.put(stage, loader.getController());
             currentFxmlMap.put(stage, fxmlPath);
             mantieneFullscreen(stage);
@@ -129,23 +122,15 @@ public class SceneManager {
     }
 
     public static void avviaFullscreen(Stage stage) {
-        if (!stage.isShowing()) {
-            return;
+        if (stage.isShowing() && !stage.isFullScreen()) {
+            stage.setFullScreen(true);
         }
-
-        applicaFullscreen(stage);
-        Platform.runLater(() -> {
-            applicaFullscreen(stage);
-            Platform.runLater(() -> applicaFullscreen(stage));
-        });
     }
 
     private static void mantieneFullscreen(Stage stage) {
         configuraStagePrincipale(stage);
         if (!popupWindows.containsKey(stage)) {
             popupWindows.put(stage, new HashSet<>());
-            stage.addEventHandler(WindowEvent.WINDOW_SHOWN, event ->
-                    ripristinaFullscreen(stage));
             stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
                 Object controller = currentControllers.remove(stage);
                 if (controller != null) {
@@ -153,7 +138,6 @@ public class SceneManager {
                 }
                 popupWindows.remove(stage);
                 configuredStages.remove(stage);
-                openingAnimations.remove(stage);
                 historyMap.remove(stage);
                 currentFxmlMap.remove(stage);
             });
@@ -215,22 +199,6 @@ public class SceneManager {
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setFullScreenExitHint("");
         stage.setResizable(false);
-        stage.setFullScreen(true);
-
-        stage.showingProperty().addListener((observable, precedente, visibile) -> {
-            if (visibile) {
-                applicaFullscreen(stage);
-                Platform.runLater(() -> {
-                    applicaFullscreen(stage);
-                    Platform.runLater(() -> {
-                        applicaFullscreen(stage);
-                        if (openingAnimations.add(stage)) {
-                            animaApertura(stage);
-                        }
-                    });
-                });
-            }
-        });
 
         stage.iconifiedProperty().addListener((observable, precedente, minimizzata) -> {
             if (!minimizzata) {
@@ -243,32 +211,6 @@ public class SceneManager {
         });
     }
 
-    private static void preparaAnimazioneApertura(Stage stage, StackPane root) {
-        if (!stage.isShowing() && !openingAnimations.contains(stage)) {
-            root.setOpacity(0);
-            root.setScaleX(0.98);
-            root.setScaleY(0.98);
-        }
-    }
-
-    private static void animaApertura(Stage stage) {
-        if (stage.getScene() == null || !(stage.getScene().getRoot() instanceof StackPane root)) {
-            return;
-        }
-
-        FadeTransition dissolvenza = new FadeTransition(Duration.millis(350), root);
-        dissolvenza.setFromValue(0);
-        dissolvenza.setToValue(1);
-
-        ScaleTransition scala = new ScaleTransition(Duration.millis(350), root);
-        scala.setFromX(0.98);
-        scala.setFromY(0.98);
-        scala.setToX(1);
-        scala.setToY(1);
-
-        new ParallelTransition(dissolvenza, scala).play();
-    }
-
     private static void ripristinaFullscreen(Stage stage) {
 
         if (!stage.isShowing()) {
@@ -279,19 +221,8 @@ public class SceneManager {
     }
 
     private static void applicaFullscreen(Stage stage) {
-        if (!stage.isShowing()) {
-            return;
-        }
-
-        stage.setMaximized(true);
-        stage.setFullScreen(true);
-
-        if (!stage.isFullScreen()) {
-            var bounds = Screen.getPrimary().getBounds();
-            stage.setX(bounds.getMinX());
-            stage.setY(bounds.getMinY());
-            stage.setWidth(bounds.getWidth());
-            stage.setHeight(bounds.getHeight());
+        if (stage.isShowing() && !stage.isFullScreen()) {
+            stage.setFullScreen(true);
         }
     }
 
