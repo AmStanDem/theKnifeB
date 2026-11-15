@@ -60,7 +60,7 @@
             <Label fx:id="likeCountLabel"
                    style="-fx-font-size: 11px; -fx-text-fill: #70757a; -fx-font-weight: bold;"
                    styleClass="like-count"
-                   text="RISPOSTE" />
+                   text="RISPOSTA" />
 
             <Region HBox.hgrow="ALWAYS" />
 
