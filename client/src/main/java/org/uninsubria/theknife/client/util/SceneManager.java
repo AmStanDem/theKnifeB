@@ -128,6 +128,18 @@ public class SceneManager {
         configuraStagePrincipale(stage);
     }
 
+    public static void avviaFullscreen(Stage stage) {
+        if (!stage.isShowing()) {
+            return;
+        }
+
+        applicaFullscreen(stage);
+        Platform.runLater(() -> {
+            applicaFullscreen(stage);
+            Platform.runLater(() -> applicaFullscreen(stage));
+        });
+    }
+
     private static void mantieneFullscreen(Stage stage) {
         configuraStagePrincipale(stage);
         if (!popupWindows.containsKey(stage)) {
