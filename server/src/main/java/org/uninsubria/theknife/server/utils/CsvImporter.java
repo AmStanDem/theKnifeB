@@ -24,11 +24,13 @@ public class CsvImporter {
     private static final int BATCH_SIZE = 1_000;
 
     public static void importaSeNecessario() {
+        long importStartTime = System.nanoTime();
         if (datiGiaPresenti()) {
             int aggiornati = aggiornaPrezziMancanti();
             int contattiAggiornati = aggiornaContattiDataset();
-            System.out.printf("[ETL_INFO] Ristoranti già presenti; aggiornati prezzi per %d record e contatti per %d record.%n",
-                    aggiornati, contattiAggiornati);
+            double elapsedSeconds = (System.nanoTime() - importStartTime) / 1_000_000_000.0;
+            System.out.printf("[ETL_INFO] Ristoranti già presenti; aggiornati prezzi per %d record e dati dataset per %d record in %.1f secondi.%n",
+                    aggiornati, contattiAggiornati, elapsedSeconds);
             return;
         }
 
@@ -290,6 +292,9 @@ public class CsvImporter {
                   AND LOWER(r.citta) = LOWER(?) AND LOWER(r.nazione) = LOWER(?)
                   AND ROUND(r.longitudine, 7) = ROUND(?::numeric, 7)
                   AND ROUND(r.latitudine, 7) = ROUND(?::numeric, 7)
+                  AND (r.telefono IS DISTINCT FROM ?
+                       OR r.sito_web IS DISTINCT FROM ?
+                       OR r.descrizione IS DISTINCT FROM ?)
                 """;
         int aggiornati = 0;
         try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps_clean.csv");
@@ -313,6 +318,9 @@ public class CsvImporter {
                 stmt.setString(7, country);
                 stmt.setString(8, pulisciStringa(record.get(5)));
                 stmt.setString(9, pulisciStringa(record.get(6)));
+                stmt.setString(10, valoreDataset(record, 7));
+                stmt.setString(11, valoreDataset(record, 9));
+                stmt.setString(12, valoreDataset(record, 13));
                 aggiornati += stmt.executeUpdate();
             }
         } catch (Exception e) {
