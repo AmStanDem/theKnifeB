@@ -479,7 +479,7 @@ public class AreaRistoranteController {
         istogramma.setMaxWidth(Double.MAX_VALUE);
 
         BarChart.Series<String, Number> serie = new BarChart.Series<>();
-        for (int indice = 0; indice < conteggi.length; indice++) {
+        for (int indice = 2; indice < conteggi.length; indice++) {
             double valutazione = indice / 2.0;
             String voto = formattaValutazione(valutazione);
             double percentuale = totale == 0 ? 0 : conteggi[indice] * 100.0 / totale;
@@ -488,13 +488,13 @@ public class AreaRistoranteController {
             barra.getStyleClass().add("rating-histogram-node");
             Region riempimento = new Region();
             riempimento.getStyleClass().add("rating-histogram-bar");
-            Label percentualeLabel = new Label(String.format(Locale.ROOT, "%.1f%%", percentuale));
-            percentualeLabel.getStyleClass().add("rating-histogram-percentage");
-            percentualeLabel.setVisible(false);
-            percentualeLabel.setMouseTransparent(true);
-            barra.getChildren().setAll(riempimento, percentualeLabel);
-            barra.setOnMouseEntered(event -> percentualeLabel.setVisible(true));
-            barra.setOnMouseExited(event -> percentualeLabel.setVisible(false));
+            Label valoreLabel = new Label(String.format(Locale.ROOT, "%.1f", percentuale));
+            valoreLabel.getStyleClass().add("rating-histogram-percentage");
+            valoreLabel.setVisible(false);
+            valoreLabel.setMouseTransparent(true);
+            barra.getChildren().setAll(riempimento, valoreLabel);
+            barra.setOnMouseEntered(event -> valoreLabel.setVisible(true));
+            barra.setOnMouseExited(event -> valoreLabel.setVisible(false));
             barra.setOnMouseClicked(event -> {
                 valutazioneSelezionata = valutazione;
                 mostraRecensioniFiltrate(gestoreProprietario);
