@@ -140,9 +140,9 @@ public class ListaRistorantiController {
     private void configuraFiltriFissi() {
         priceFilterCombo.getItems().setAll(
                 TUTTI_PREZZI,
-                "€ (Economico < 25€)",
-                "€€ (Medio 25€ - 50€)",
-                "€€€ (Medio-Alto 50€ - 80€)",
+                "€ (Economico ≤ 25€)",
+                "€€ (Medio 25,01€ - 50€)",
+                "€€€ (Medio-Alto 50,01€ - 80€)",
                 "€€€€ (Lusso > 80€)"
         );
         priceFilterCombo.setValue(TUTTI_PREZZI);
@@ -235,7 +235,7 @@ public class ListaRistorantiController {
             if (prezzo.startsWith("€ (Economico")) {
                 prezzoMax = 25.0;
             } else if (prezzo.startsWith("€€ (Medio")) {
-                prezzoMin = 25.0;
+                prezzoMin = 25.01;
                 prezzoMax = 50.0;
             } else if (prezzo.startsWith("€€€ (Medio-Alto")) {
                 prezzoMin = 50.01;
