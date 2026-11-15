@@ -155,7 +155,7 @@ public class ScriviRecensioneController {
                 RecensioneSelezionata.pulisci();
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione aggiornata",
                         "Le modifiche sono state salvate.");
-                tornaAlleRecensioni(actionEvent);
+                tornaAlRistoranteRecensito(actionEvent);
             } else {
                 RecensioneDTO recensione = new RecensioneDTO(
                         null,
@@ -185,12 +185,12 @@ public class ScriviRecensioneController {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione non disponibile",
                     "La recensione è stata eliminata o non è più modificabile.");
             RecensioneSelezionata.pulisci();
-            tornaAlleRecensioni(actionEvent);
+            tornaAlRistoranteRecensito(actionEvent);
         } catch (ModificaObsoletaException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione modificata altrove",
                     "Un altro dispositivo ha aggiornato questa recensione. Ricarica i dati prima di riprovare.");
             RecensioneSelezionata.pulisci();
-            tornaAlleRecensioni(actionEvent);
+            tornaAlRistoranteRecensito(actionEvent);
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
                     "Impossibile salvare la recensione. Riprova più tardi.");
@@ -202,13 +202,13 @@ public class ScriviRecensioneController {
         boolean modificaInCorso = recensioneDaModificare != null;
         RecensioneSelezionata.pulisci();
         if (modificaInCorso) {
-            tornaAlleRecensioni(actionEvent);
+            tornaAlRistoranteRecensito(actionEvent);
         } else {
             SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
         }
     }
 
-    private void tornaAlleRecensioni(ActionEvent actionEvent) {
+    private void tornaAlRistoranteRecensito(ActionEvent actionEvent) {
         RecensioneSelezionata.pulisci();
         SceneManager.switchScene(
                 actionEvent,

@@ -239,6 +239,16 @@ public class AggiungiRistoranteController {
                 return;
             }
 
+            if (!telefonoValido(telefono)) {
+                mostraMessaggio(
+                        Alert.AlertType.WARNING,
+                        "Numero di telefono non valido",
+                        "Inserisci un numero valido con almeno 7 e massimo 15 cifre."
+                );
+                txtTelefono.requestFocus();
+                return;
+            }
+
 
 
             // 7. Creazione del DTO da inviare al server.
@@ -332,5 +342,40 @@ public class AggiungiRistoranteController {
         alert.setHeaderText(null);
         alert.setContentText(contenuto);
         alert.showAndWait();
+    }
+
+
+    private boolean telefonoValido(String telefono) {
+        if (telefono == null || telefono.isBlank()) {
+            return true;
+        }
+
+        String telefonoPulito = telefono.trim();
+
+        // Sono ammessi solo numeri, +, spazi, parentesi e trattini.
+        if (!telefonoPulito.matches("^\\+?[0-9\\s()\\-]+$")) {
+            return false;
+        }
+
+        // Il numero deve contenere da 7 a 15 cifre.
+        long numeroCifre = telefonoPulito.chars()
+                .filter(Character::isDigit)
+                .count();
+
+        if (numeroCifre < 7 || numeroCifre > 15) {
+            return false;
+        }
+
+        // Controllo del prefisso internazionale, se presente.
+        if (telefonoPulito.startsWith("+")) {
+            String numeroSenzaSimboli = telefonoPulito.replaceAll("[\\s()\\-]", "");
+
+            // Il prefisso deve contenere da 1 a 3 cifre.
+            if (!numeroSenzaSimboli.matches("^\\+[1-9][0-9]{0,2}[0-9]{6,14}$")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
