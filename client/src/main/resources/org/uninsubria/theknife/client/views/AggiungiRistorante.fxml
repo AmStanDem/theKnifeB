@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -60,6 +61,24 @@
                         </VBox>
                     </HBox>
 
+                    <!-- Contatti e descrizione facoltativi -->
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Numero di telefono" />
+                            <TextField fx:id="txtTelefono" promptText="Es. 02 1234567" styleClass="custom-text-field" />
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Pagina web del ristorante" />
+                            <TextField fx:id="txtSitoWeb" promptText="https://www.esempio.it" styleClass="custom-text-field" />
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Descrizione del ristorante" />
+                        <TextArea fx:id="txtDescrizione" prefRowCount="4"
+                                  promptText="Racconta il ristorante, la cucina e l'atmosfera..."
+                                  styleClass="custom-text-field" wrapText="true" />
+                    </VBox>
 
 
                     <!-- Tipologie di Cucina (ControlsFX) -->

@@ -206,8 +206,17 @@ public class SceneManager {
         stage.setFullScreen(true);
 
         stage.showingProperty().addListener((observable, precedente, visibile) -> {
-            if (visibile && openingAnimations.add(stage)) {
-                Platform.runLater(() -> animaApertura(stage));
+            if (visibile) {
+                // Su Windows il fullscreen impostato prima di show() può essere ignorato.
+                stage.setFullScreen(true);
+                Platform.runLater(() -> {
+                    if (stage.isShowing() && !stage.isFullScreen()) {
+                        stage.setFullScreen(true);
+                    }
+                    if (openingAnimations.add(stage)) {
+                        animaApertura(stage);
+                    }
+                });
             }
         });
 

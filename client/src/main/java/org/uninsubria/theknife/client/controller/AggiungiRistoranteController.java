@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import org.controlsfx.control.CheckComboBox;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SceneManager;
@@ -44,6 +45,14 @@ public class AggiungiRistoranteController {
     @FXML
     private TextField txtPrezzoMedio;
 
+    @FXML
+    private TextField txtTelefono;
+
+    @FXML
+    private TextField txtSitoWeb;
+
+    @FXML
+    private TextArea txtDescrizione;
 
     @FXML
     private CheckComboBox<String> comboCucine;
@@ -146,6 +155,9 @@ public class AggiungiRistoranteController {
             String indirizzo = txtIndirizzo.getText().trim();
             String citta = txtCitta.getText().trim();
             String nazione = txtNazione.getText().trim();
+            String telefono = testoFacoltativo(txtTelefono.getText());
+            String sitoWeb = testoFacoltativo(txtSitoWeb.getText());
+            String descrizione = testoFacoltativo(txtDescrizione.getText());
 
             boolean delivery = chkDelivery.isSelected();
             boolean bookingOnline = chkBookingOnline.isSelected();
@@ -242,7 +254,11 @@ public class AggiungiRistoranteController {
                     prezzoMedio,
                     delivery,
                     bookingOnline,
-                    null                // Media stelle iniziale
+                    null,               // Media stelle iniziale
+                    false,
+                    telefono,
+                    sitoWeb,
+                    descrizione
             );
 
             // 8. Inserimento effettivo tramite RMI.
@@ -286,6 +302,11 @@ public class AggiungiRistoranteController {
 
             e.printStackTrace();
         }
+
+    }
+
+    private String testoFacoltativo(String valore) {
+        return valore == null || valore.isBlank() ? null : valore.trim();
     }
 
     @FXML

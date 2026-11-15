@@ -35,6 +35,12 @@
     -fx-text-fill: #6B7280;
 }
 
+.card-description {
+    -fx-font-size: 13px;
+    -fx-text-fill: #4B5563;
+    -fx-line-spacing: 2px;
+}
+
 .card-meta {
     -fx-font-size: 13px;
     -fx-text-fill: #374151;

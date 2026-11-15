@@ -42,7 +42,7 @@ public class PreferitiDAO {
 
         String sql = "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, " +
                 "r.latitudine, r.longitudine, r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, " +
-                "r.telefono, r.sito_web, " +
+                "r.telefono, r.sito_web, r.descrizione, " +
                 "COALESCE(rec.media_stelle, 0.0) AS media_stelle, cucine.tipi_cucina " +
                 "FROM RistorantiTheKnife r " +
                 "JOIN Preferiti p ON r.id_ristorante = p.id_ristorante " +
@@ -81,7 +81,8 @@ public class PreferitiDAO {
                             rs.getDouble("media_stelle"),
                             rs.getBoolean("prezzo_stimato"),
                             rs.getString("telefono"),
-                            rs.getString("sito_web")
+                            rs.getString("sito_web"),
+                            rs.getString("descrizione")
                     ));
                 }
             }

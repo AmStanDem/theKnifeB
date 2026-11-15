@@ -145,6 +145,12 @@
                          <Label fx:id="lblIndirizzo" styleClass="profile-value"  />
                   </HBox>
 
+                  <VBox spacing="6.0">
+                      <Label styleClass="profile-label" text="Descrizione:" />
+                      <Label fx:id="lblDescrizione" styleClass="profile-description"
+                             wrapText="true" maxWidth="450.0" />
+                  </VBox>
+
                      <!-- TELEFONO -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                       <Label styleClass="profile-label" text="Telefono:" />

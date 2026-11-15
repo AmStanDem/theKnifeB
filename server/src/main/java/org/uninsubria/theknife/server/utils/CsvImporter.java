@@ -99,7 +99,8 @@ public class CsvImporter {
                         longitudine NUMERIC(10, 7) NOT NULL,
                         prezzo_medio NUMERIC(6, 2),
                         telefono TEXT,
-                        sito_web TEXT
+                        sito_web TEXT,
+                        descrizione TEXT
                     ) ON COMMIT DROP
                     """);
             stmt.execute("""
@@ -116,8 +117,8 @@ public class CsvImporter {
         String sqlRestaurant = """
                 INSERT INTO tmp_dataset_restaurants
                     (row_no, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio,
-                     telefono, sito_web)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     telefono, sito_web, descrizione)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         String sqlCuisine = """
                 INSERT INTO tmp_dataset_cuisines (row_no, nome) VALUES (?, ?)
@@ -164,6 +165,7 @@ public class CsvImporter {
                     restaurants.setObject(8, estimatedPrice);
                     restaurants.setString(9, valoreDataset(record, 7));
                     restaurants.setString(10, valoreDataset(record, 9));
+                    restaurants.setString(11, valoreDataset(record, 13));
                     restaurants.addBatch();
                     pendingRestaurants++;
 
@@ -252,10 +254,10 @@ public class CsvImporter {
                     INSERT INTO RistorantiTheKnife
                         (id_ristorante, id_gestore, nome, indirizzo, citta, nazione,
                          latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato,
-                         telefono, sito_web)
+                         telefono, sito_web, descrizione)
                     SELECT r.id_ristorante, u.id_utente, r.nome, r.indirizzo, r.citta, r.nazione,
                            r.latitudine, r.longitudine, r.prezzo_medio, FALSE, FALSE,
-                           r.prezzo_medio IS NOT NULL, r.telefono, r.sito_web
+                           r.prezzo_medio IS NOT NULL, r.telefono, r.sito_web, r.descrizione
                     FROM tmp_dataset_restaurants r
                     JOIN Utenti u ON u.email =
                         'dataset.manager.' || MD5(LOWER(r.nazione) || '|' || LOWER(r.citta))
@@ -283,7 +285,7 @@ public class CsvImporter {
     private static int aggiornaContattiDataset() {
         String sql = """
                 UPDATE RistorantiTheKnife r
-                SET telefono = ?, sito_web = ?
+                SET telefono = ?, sito_web = ?, descrizione = ?
                 WHERE r.nome = ? AND r.indirizzo = ?
                   AND LOWER(r.citta) = LOWER(?) AND LOWER(r.nazione) = LOWER(?)
                   AND ROUND(r.longitudine, 7) = ROUND(?::numeric, 7)
@@ -304,12 +306,13 @@ public class CsvImporter {
                 String country = locationParts.length > 1 ? locationParts[1].trim() : "Non specificata";
                 stmt.setString(1, valoreDataset(record, 7));
                 stmt.setString(2, valoreDataset(record, 9));
-                stmt.setString(3, pulisciStringa(record.get(0)));
-                stmt.setString(4, pulisciStringa(record.get(1)));
-                stmt.setString(5, city);
-                stmt.setString(6, country);
-                stmt.setString(7, pulisciStringa(record.get(5)));
-                stmt.setString(8, pulisciStringa(record.get(6)));
+                stmt.setString(3, valoreDataset(record, 13));
+                stmt.setString(4, pulisciStringa(record.get(0)));
+                stmt.setString(5, pulisciStringa(record.get(1)));
+                stmt.setString(6, city);
+                stmt.setString(7, country);
+                stmt.setString(8, pulisciStringa(record.get(5)));
+                stmt.setString(9, pulisciStringa(record.get(6)));
                 aggiornati += stmt.executeUpdate();
             }
         } catch (Exception e) {

@@ -66,6 +66,9 @@ public class AreaRistoranteController {
     private Label lblIndirizzo;
 
     @FXML
+    private Label lblDescrizione;
+
+    @FXML
     private Hyperlink lblTelefono;
 
     @FXML
@@ -260,6 +263,9 @@ public class AreaRistoranteController {
 
         lblNomeRistorante.setText(ristorante.nome());
         lblIndirizzo.setText(ristorante.indirizzo());
+        lblDescrizione.setText(ristorante.descrizione() == null || ristorante.descrizione().isBlank()
+                ? "Descrizione non disponibile."
+                : ristorante.descrizione().trim());
         impostaLink(lblTelefono, ristorante.telefono());
         impostaLink(lblSitoWeb, ristorante.sitoWeb());
 
