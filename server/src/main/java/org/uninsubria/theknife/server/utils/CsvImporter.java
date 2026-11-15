@@ -28,9 +28,10 @@ public class CsvImporter {
         if (datiGiaPresenti()) {
             int aggiornati = aggiornaPrezziMancanti();
             int contattiAggiornati = aggiornaContattiDataset();
+            int serviziAggiornati = distribuisciServiziDataset();
             double elapsedSeconds = (System.nanoTime() - importStartTime) / 1_000_000_000.0;
-            System.out.printf("[ETL_INFO] Ristoranti già presenti; aggiornati prezzi per %d record e dati dataset per %d record in %.1f secondi.%n",
-                    aggiornati, contattiAggiornati, elapsedSeconds);
+            System.out.printf("[ETL_INFO] Ristoranti già presenti; aggiornati prezzi per %d record, dati dataset per %d record e servizi per %d record in %.1f secondi.%n",
+                    aggiornati, contattiAggiornati, serviziAggiornati, elapsedSeconds);
             return;
         }
 
@@ -258,7 +259,8 @@ public class CsvImporter {
                          latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato,
                          telefono, sito_web, descrizione)
                     SELECT r.id_ristorante, u.id_utente, r.nome, r.indirizzo, r.citta, r.nazione,
-                           r.latitudine, r.longitudine, r.prezzo_medio, FALSE, FALSE,
+                           r.latitudine, r.longitudine, r.prezzo_medio,
+                           r.row_no % 2 = 0, (r.row_no / 2) % 2 = 0,
                            r.prezzo_medio IS NOT NULL, r.telefono, r.sito_web, r.descrizione
                     FROM tmp_dataset_restaurants r
                     JOIN Utenti u ON u.email =
@@ -277,6 +279,29 @@ public class CsvImporter {
                     JOIN Tipologia_Cucina c ON c.nome = tc.nome
                     ON CONFLICT DO NOTHING
                     """);
+        }
+    }
+
+    private static int distribuisciServiziDataset() {
+        String sql = """
+                WITH dataset AS (
+                    SELECT r.id_ristorante,
+                           ROW_NUMBER() OVER (ORDER BY r.id_ristorante) AS posizione
+                    FROM RistorantiTheKnife r
+                    JOIN Utenti u ON u.id_utente = r.id_gestore
+                    WHERE u.email LIKE 'dataset.manager.%@example.invalid'
+                )
+                UPDATE RistorantiTheKnife r
+                SET delivery = dataset.posizione % 2 = 0,
+                    booking_online = (dataset.posizione / 2) % 2 = 0
+                FROM dataset
+                WHERE r.id_ristorante = dataset.id_ristorante
+                """;
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException("Impossibile distribuire i servizi del dataset.", e);
         }
     }
 
