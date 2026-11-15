@@ -119,6 +119,7 @@ public class MieRecensioniController {
     // RICERCA E LISTA
     // =========================================================
 
+    ///
     @FXML
     private void onSearch() {
         String query = txtRicerca.getText() == null ? "" : txtRicerca.getText().trim().toLowerCase();
