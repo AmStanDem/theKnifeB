@@ -16,6 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.PopupWindow;
 import javafx.stage.Screen;
@@ -205,6 +207,17 @@ public class SceneManager {
                 });
             }
         });
+
+        stage.iconifiedProperty().addListener((observable, precedente, minimizzata) -> {
+            if (!minimizzata) {
+                Platform.runLater(() -> {
+                    if (stage.isShowing()) {
+                        stage.setMaximized(true);
+                        stage.setFullScreen(true);
+                    }
+                });
+            }
+        });
     }
 
     private static void ripristinaFullscreen(Stage stage) {
@@ -247,6 +260,12 @@ public class SceneManager {
         StackPane root = new StackPane(contenuto);
         root.setPickOnBounds(false);
 
+        Button minimizza = new Button("−");
+        minimizza.getStyleClass().add("app-minimize-button");
+        minimizza.setAccessibleText("Minimizza applicazione");
+        minimizza.setTooltip(new javafx.scene.control.Tooltip("Minimizza applicazione"));
+        minimizza.setOnAction(event -> stage.setIconified(true));
+
         Button esci = new Button("×");
         esci.getStyleClass().add("app-exit-button");
         esci.setAccessibleText("Esci dall'applicazione");
@@ -256,9 +275,11 @@ public class SceneManager {
             Platform.exit();
         });
 
-        root.getChildren().add(esci);
-        StackPane.setAlignment(esci, Pos.TOP_RIGHT);
-        StackPane.setMargin(esci, new Insets(10, 12, 0, 0));
+        HBox controlliFinestra = new HBox(8, minimizza, esci);
+        controlliFinestra.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        root.getChildren().add(controlliFinestra);
+        StackPane.setAlignment(controlliFinestra, Pos.TOP_RIGHT);
+        StackPane.setMargin(controlliFinestra, new Insets(10, 12, 0, 0));
         return root;
     }
 

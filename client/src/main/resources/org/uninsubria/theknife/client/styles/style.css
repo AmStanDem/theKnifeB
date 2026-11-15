@@ -77,6 +77,26 @@
     -fx-cursor: hand;
 }
 
+.app-minimize-button {
+    -fx-pref-width: 38px;
+    -fx-min-width: 38px;
+    -fx-max-width: 38px;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
+    -fx-padding: 0 0 5px 0;
+    -fx-background-color: #667085;
+    -fx-background-radius: 19px;
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.app-minimize-button:hover {
+    -fx-background-color: #475467;
+}
+
 .app-exit-button:hover {
     -fx-background-color: #B42318;
 }
