@@ -58,8 +58,9 @@ public class MainLayoutController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
+
         GeocodingService.Luogo luogo = txtLocalita.getLuogoSelezionato();
-        if (!txtLocalita.getText().isBlank() && luogo == null) {
+        if (txtLocalita.getText().isBlank() && luogo == null) {
             mostraErrore(
                     "Località da selezionare",
                     "Scegli una località tra i suggerimenti oppure usa la mappa."
