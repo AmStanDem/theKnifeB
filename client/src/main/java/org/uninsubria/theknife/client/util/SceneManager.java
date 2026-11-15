@@ -207,15 +207,15 @@ public class SceneManager {
 
         stage.showingProperty().addListener((observable, precedente, visibile) -> {
             if (visibile) {
-                // Su Windows il fullscreen impostato prima di show() può essere ignorato.
-                stage.setFullScreen(true);
+                applicaFullscreen(stage);
                 Platform.runLater(() -> {
-                    if (stage.isShowing() && !stage.isFullScreen()) {
-                        stage.setFullScreen(true);
-                    }
-                    if (openingAnimations.add(stage)) {
-                        animaApertura(stage);
-                    }
+                    applicaFullscreen(stage);
+                    Platform.runLater(() -> {
+                        applicaFullscreen(stage);
+                        if (openingAnimations.add(stage)) {
+                            animaApertura(stage);
+                        }
+                    });
                 });
             }
         });
@@ -224,7 +224,7 @@ public class SceneManager {
             if (!minimizzata) {
                 Platform.runLater(() -> {
                     if (stage.isShowing()) {
-                        stage.setFullScreen(true);
+                        applicaFullscreen(stage);
                     }
                 });
             }
@@ -263,12 +263,23 @@ public class SceneManager {
             return;
         }
 
+        applicaFullscreen(stage);
+    }
+
+    private static void applicaFullscreen(Stage stage) {
+        if (!stage.isShowing()) {
+            return;
+        }
+
+        stage.setMaximized(true);
+        stage.setFullScreen(true);
+
         if (!stage.isFullScreen()) {
-            Platform.runLater(() -> {
-                if (stage.isShowing() && !stage.isFullScreen()) {
-                    stage.setFullScreen(true);
-                }
-            });
+            var bounds = Screen.getPrimary().getBounds();
+            stage.setX(bounds.getMinX());
+            stage.setY(bounds.getMinY());
+            stage.setWidth(bounds.getWidth());
+            stage.setHeight(bounds.getHeight());
         }
     }
 
