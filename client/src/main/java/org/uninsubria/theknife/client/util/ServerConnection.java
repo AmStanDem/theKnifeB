@@ -48,6 +48,11 @@ public final class ServerConnection {
         endpoint = new Endpoint(nuovoHost.trim(), nuovaPorta, null);
     }
 
+    public static void invalidaConnessione() {
+        Endpoint current = endpoint;
+        endpoint = new Endpoint(current.host(), current.port(), null);
+    }
+
     /**
      * Restituisce lo stub remoto del server, connettendosi se non è già
      * stata stabilita una connessione attiva.

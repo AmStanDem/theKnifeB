@@ -320,16 +320,23 @@ public class RicercaAvanzataController {
 
     @FXML
     private void cercaRistorante(ActionEvent event) {
-        GeocodingService.Luogo luogo = txtLocalita.getLuogoSelezionato();
-        if (luogo == null) {
+        if (txtLocalita.getText().isBlank()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             SceneManager.initOwner(alert);
             alert.setTitle("Località da selezionare");
             alert.setHeaderText(null);
-            alert.setContentText("Seleziona una località dai suggerimenti prima di cercare.");
+            alert.setContentText("Inserisci una località oppure selezionala sulla mappa.");
             alert.showAndWait();
             return;
         }
+
+        txtLocalita.risolviLuogo(
+                luogo -> avviaRicerca(event, luogo),
+                messaggio -> mostraErroreLocalita(messaggio)
+        );
+    }
+
+    private void avviaRicerca(ActionEvent event, GeocodingService.Luogo luogo) {
         double prezzoMinimo = rangeSliderPrezzo.getLowValue();
         double prezzoMassimo = rangeSliderPrezzo.getHighValue();
         RicercaIniziale.imposta(
@@ -343,6 +350,15 @@ public class RicercaAvanzataController {
                 chkPrenotazione.isSelected()
         );
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/listaRistoranti.fxml");
+    }
+
+    private void mostraErroreLocalita(String messaggio) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        SceneManager.initOwner(alert);
+        alert.setTitle("Località non valida");
+        alert.setHeaderText(null);
+        alert.setContentText(messaggio);
+        alert.showAndWait();
     }
 
     @FXML

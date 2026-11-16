@@ -198,25 +198,19 @@ public class ModificaRistoranteController {
         }
         if (txtNome.getText().trim().isEmpty()
                 || txtIndirizzo.getText().trim().isEmpty()
-                || txtCitta.getText().trim().isEmpty()
-                || txtNazione.getText().trim().isEmpty()
                 || txtPrezzoMedio.getText().trim().isEmpty()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Campi mancanti",
                     "Compila tutti i campi obbligatori (*).");
             return;
         }
 
-        GeocodingService.Luogo luogo = txtIndirizzo.getLuogoSelezionato();
-        if (luogo == null
-                || !luogo.etichetta().equals(txtIndirizzo.getText().trim())
-                || !luogo.localita().equalsIgnoreCase(txtCitta.getText().trim())
-                || !luogo.nazione().equalsIgnoreCase(txtNazione.getText().trim())) {
-            mostraMessaggio(Alert.AlertType.WARNING, "Indirizzo da verificare",
-                    "Seleziona un indirizzo valido dai suggerimenti o dalla mappa.");
-            txtIndirizzo.requestFocus();
-            return;
-        }
+        txtIndirizzo.risolviLuogo(
+                luogo -> salvaRistorante(event, luogo),
+                messaggio -> mostraMessaggio(Alert.AlertType.WARNING, "Località non valida", messaggio)
+        );
+    }
 
+    private void salvaRistorante(ActionEvent event, GeocodingService.Luogo luogo) {
         double prezzoMedio;
         try {
             prezzoMedio = Double.parseDouble(txtPrezzoMedio.getText().trim().replace(",", "."));

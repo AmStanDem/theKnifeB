@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
@@ -39,7 +40,7 @@ public class ModificaAccountController {
     @FXML private TextField cognomeField;
     @FXML private TextField emailField;
     @FXML private TextField dataNascitaField;
-    @FXML private TextField domicilioField;
+    @FXML private LuogoInput domicilioField;
     @FXML private PasswordField passwordCorrenteField;
     @FXML private PasswordField nuovaPasswordField;
     @FXML private PasswordField confermaPasswordField;
@@ -56,6 +57,8 @@ public class ModificaAccountController {
         titoloLabel.setText(utente.ruolo() == UtenteDTO.RuoloUtente.GESTORE
                 ? "Modifica account ristoratore"
                 : "Modifica account cliente");
+        domicilioField.setPromptText("Inizia a scrivere e seleziona un luogo");
+        domicilioField.addTextFieldStyleClass("custom-text-field");
         nomeField.setText(utente.nome());
         cognomeField.setText(utente.cognome());
         emailField.setText(utente.email());
@@ -103,12 +106,33 @@ public class ModificaAccountController {
             return;
         }
 
+        salvaButton.setDisable(true);
+        messaggioLabel.setText("Verifica della località...");
+        domicilioField.risolviLuogo(
+                luogo -> aggiornaAccount(event, utente, nome, cognome, email, dataNascita,
+                        passwordCorrente, nuovaPassword, luogo.etichetta()),
+                messaggio -> {
+                    messaggioLabel.setText(messaggio);
+                    salvaButton.setDisable(false);
+                }
+        );
+    }
+
+    private void aggiornaAccount(
+            ActionEvent event,
+            UtenteDTO utente,
+            String nome,
+            String cognome,
+            String email,
+            LocalDate dataNascita,
+            String passwordCorrente,
+            String nuovaPassword,
+            String domicilio
+    ) {
         UtenteDTO aggiornato = new UtenteDTO(
                 utente.idUtente(), nome, cognome, email, dataNascita, domicilio, utente.ruolo());
         Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        salvaButton.setDisable(true);
         messaggioLabel.setText("Salvataggio in corso...");
-
         Thread.startVirtualThread(() -> {
             try {
                 UtenteDTO risultato = ServerConnection.getServer()

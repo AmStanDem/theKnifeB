@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.RicercaIniziale;
 import org.uninsubria.theknife.client.util.SceneManager;
@@ -58,21 +57,21 @@ public class MainLayoutController {
 
     @FXML
     private void onRicercaClick(ActionEvent event) {
-
-        GeocodingService.Luogo luogo = txtLocalita.getLuogoSelezionato();
-        if (txtLocalita.getText().isBlank() && luogo == null) {
+        if (txtLocalita.getText().isBlank()) {
             mostraErrore(
                     "Località da selezionare",
-                    "Scegli una località tra i suggerimenti oppure usa la mappa."
+                    "Inserisci una località, selezionala dai suggerimenti oppure usa la mappa."
             );
             return;
         }
 
-        RicercaIniziale.imposta(txtRicerca.getText(), luogo);
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/listaRistoranti.fxml"
-        );
+        txtLocalita.risolviLuogo(luogo -> {
+            RicercaIniziale.imposta(txtRicerca.getText(), luogo);
+            SceneManager.switchScene(
+                    event,
+                    "/org/uninsubria/theknife/client/views/listaRistoranti.fxml"
+            );
+        }, messaggio -> mostraErrore("Località non valida", messaggio));
     }
 
     @FXML

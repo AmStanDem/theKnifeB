@@ -17,6 +17,7 @@ import org.controlsfx.control.CheckComboBox;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
@@ -25,7 +26,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
 
 public class AggiungiRistoranteController {
@@ -122,8 +122,6 @@ public class AggiungiRistoranteController {
         // 1. Verifica che tutti i campi obbligatori siano compilati.
         if (txtNome.getText().trim().isEmpty()
                 || txtIndirizzo.getText().trim().isEmpty()
-                || txtCitta.getText().trim().isEmpty()
-                || txtNazione.getText().trim().isEmpty()
                 || txtPrezzoMedio.getText().trim().isEmpty()) {
 
             mostraMessaggio(
@@ -148,42 +146,32 @@ public class AggiungiRistoranteController {
         }
 
 
-        try {
+        txtIndirizzo.risolviLuogo(
+                luogo -> salvaRistorante(event, utente, luogo),
+                messaggio -> mostraMessaggio(Alert.AlertType.WARNING, "Località non valida", messaggio)
+        );
+    }
 
-            // 6. Recupero degli altri dati.
+    private void salvaRistorante(
+            ActionEvent event,
+            UtenteDTO utente,
+            GeocodingService.Luogo luogoSelezionato
+    ) {
+        try {
             String nome = txtNome.getText().trim();
-            String indirizzo = txtIndirizzo.getText().trim();
-            String citta = txtCitta.getText().trim();
-            String nazione = txtNazione.getText().trim();
+            String indirizzo = luogoSelezionato.indirizzo();
+            String citta = luogoSelezionato.localita();
+            String nazione = luogoSelezionato.nazione();
             String telefono = testoFacoltativo(txtTelefono.getText());
             String sitoWeb = testoFacoltativo(txtSitoWeb.getText());
             String descrizione = testoFacoltativo(txtDescrizione.getText());
-
             boolean delivery = chkDelivery.isSelected();
             boolean bookingOnline = chkBookingOnline.isSelected();
-
-            // 3. Conversione dei campi numerici.
             double prezzoMedio = Double.parseDouble(
                     txtPrezzoMedio.getText().trim().replace(",", ".")
             );
-
-            GeocodingService.Luogo luogoSelezionato =
-                    txtIndirizzo.getLuogoSelezionato();
-            if (luogoSelezionato == null
-                    || !luogoSelezionato.etichetta().equals(indirizzo)
-                    || !luogoSelezionato.localita().equalsIgnoreCase(citta)
-                    || !luogoSelezionato.nazione().equalsIgnoreCase(nazione)) {
-                mostraMessaggio(
-                        Alert.AlertType.WARNING,
-                        "Indirizzo da verificare",
-                        "Seleziona un luogo valido dai suggerimenti. Città e nazione devono corrispondere al risultato scelto."
-                );
-                txtIndirizzo.requestFocus();
-                return;
-            }
             double latitudine = luogoSelezionato.latitudine();
             double longitudine = luogoSelezionato.longitudine();
-            indirizzo = luogoSelezionato.indirizzo();
 
             // 4. Controllo dei valori inseriti.
             if (!Double.isFinite(prezzoMedio)
@@ -291,7 +279,7 @@ public class AggiungiRistoranteController {
             mostraMessaggio(
                     Alert.AlertType.ERROR,
                     "Errore di formato",
-                    "Prezzo, latitudine e longitudine devono essere valori numerici validi."
+                    "Il prezzo medio deve essere un valore numerico valido."
             );
 
         } catch (RemoteException e) {
@@ -312,7 +300,6 @@ public class AggiungiRistoranteController {
 
             e.printStackTrace();
         }
-
     }
 
     private String testoFacoltativo(String valore) {

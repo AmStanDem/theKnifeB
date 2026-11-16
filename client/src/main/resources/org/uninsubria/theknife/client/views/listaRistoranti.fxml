@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.ProgressIndicator?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.uninsubria.theknife.client.controller.ListaRistorantiController"
@@ -100,9 +101,14 @@
                 <Insets top="8" right="32" bottom="24" left="32"/>
             </padding>
 
-            <Label fx:id="resultsCountLabel"
-                   text="0 ristoranti trovati"
-                   styleClass="results-count"/>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label fx:id="resultsCountLabel"
+                       text="0 ristoranti trovati"
+                       styleClass="results-count"/>
+                <ProgressIndicator fx:id="loadingIndicator"
+                                   prefWidth="24" prefHeight="24"
+                                   visible="false" managed="false"/>
+            </HBox>
 
             <ScrollPane fx:id="restaurantScrollPane"
                         styleClass="restaurant-scroll-pane"

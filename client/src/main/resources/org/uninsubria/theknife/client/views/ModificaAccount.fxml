@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.theknife.client.util.LuogoInput?>
 
 <StackPane prefHeight="768.0" prefWidth="1024.0"
            styleClass="root-pane"
@@ -53,7 +54,8 @@
                         </VBox>
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                             <Label text="Domicilio *" styleClass="input-label"/>
-                            <TextField fx:id="domicilioField" styleClass="custom-text-field" promptText="Città o indirizzo"/>
+                            <LuogoInput fx:id="domicilioField" prefHeight="40.0"
+                                        promptText="Inizia a scrivere e seleziona un luogo"/>
                         </VBox>
                     </HBox>
 

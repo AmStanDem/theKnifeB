@@ -5,6 +5,7 @@
 package org.uninsubria.theknife.client.util;
 
 import javafx.geometry.Pos;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -14,6 +15,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.beans.property.StringProperty;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -127,6 +130,50 @@ public final class LuogoInput extends HBox {
 
     public void setLuogoSelezionato(GeocodingService.Luogo luogo) {
         autocomplete.seleziona(Objects.requireNonNull(luogo));
+    }
+
+    public void risolviLuogo(
+            Consumer<GeocodingService.Luogo> alSuccesso,
+            Consumer<String> alErrore
+    ) {
+        Objects.requireNonNull(alSuccesso);
+        Objects.requireNonNull(alErrore);
+        String query = campo.getText() == null ? "" : campo.getText().trim();
+        GeocodingService.Luogo selezionato = getLuogoSelezionato();
+        if (selezionato != null && selezionato.etichetta().equals(query)) {
+            alSuccesso.accept(selezionato);
+            return;
+        }
+        if (query.length() < 3) {
+            alErrore.accept("Inserisci almeno tre caratteri per cercare una località.");
+            return;
+        }
+
+        Thread.startVirtualThread(() -> {
+            try {
+                List<GeocodingService.Luogo> suggerimenti = GeocodingService.suggerisciLuoghi(query);
+                Platform.runLater(() -> {
+                    if (!query.equals(campo.getText().trim())) {
+                        alErrore.accept("La località è cambiata. Verifica il testo e riprova.");
+                    } else if (suggerimenti.isEmpty()) {
+                        alErrore.accept("Nessuna località trovata. Verifica il testo inserito.");
+                    } else {
+                        GeocodingService.Luogo primoSuggerimento = suggerimenti.getFirst();
+                        autocomplete.seleziona(primoSuggerimento);
+                        alSuccesso.accept(primoSuggerimento);
+                    }
+                });
+            } catch (IOException e) {
+                System.err.println("[GEOCODING] Impossibile risolvere la località: " + e.getMessage());
+                Platform.runLater(() ->
+                        alErrore.accept("Ricerca località temporaneamente non disponibile."));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.err.println("[GEOCODING] Ricerca località interrotta.");
+                Platform.runLater(() ->
+                        alErrore.accept("Ricerca località temporaneamente non disponibile."));
+            }
+        });
     }
 
     public void setOnLuogoSelezionato(Consumer<GeocodingService.Luogo> listener) {

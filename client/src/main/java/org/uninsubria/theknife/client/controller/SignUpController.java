@@ -127,13 +127,6 @@ public class SignUpController {
 
         ruolo = ruolo.trim();
 
-        GeocodingService.Luogo luogo = indirizzo.getLuogoSelezionato();
-        if (luogo == null || !luogo.etichetta().equals(domicilio.trim())) {
-            labelErrore.setText("Seleziona un domicilio valido dai suggerimenti.");
-            indirizzo.requestFocus();
-            return;
-        }
-
         if (!password.equals(confermaPassword)) {
             labelErrore.setText("Le password non coincidono.");
             confermaPasswordField.requestFocus();
@@ -156,6 +149,23 @@ public class SignUpController {
             return;
         }
 
+        String ruoloValidato = ruolo;
+        indirizzo.risolviLuogo(
+                luogo -> registraUtente(event, nome, cognome, ruoloValidato, email, password, dataNascita, luogo),
+                labelErrore::setText
+        );
+    }
+
+    private void registraUtente(
+            ActionEvent event,
+            String nome,
+            String cognome,
+            String ruolo,
+            String email,
+            String password,
+            LocalDate dataNascita,
+            GeocodingService.Luogo luogo
+    ) {
         try {
             RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
             var server = ServerConnection.getServer();
@@ -172,7 +182,8 @@ public class SignUpController {
                 return;
             }
 
-            UtenteDTO utente = new UtenteDTO(null, nome, cognome, email, dataNascita, domicilio, ruoloEnum);
+            UtenteDTO utente = new UtenteDTO(
+                    null, nome, cognome, email, dataNascita, luogo.etichetta(), ruoloEnum);
 
             // Chiamata remota al server
             utente = server.registraCliente(utente, password);
