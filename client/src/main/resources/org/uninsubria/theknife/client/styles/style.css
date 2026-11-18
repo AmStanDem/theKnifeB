@@ -40,12 +40,16 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
+    /* I bottoni standard mantengono l'ombra e lo stile nativo di JavaFX */
 }
 
 /* Bottone Primario Verde (es. Conferma, Login, Invia) */
 .button-primary {
     -fx-background-color: -fx-primary-green;
     -fx-text-fill: white;
+    -fx-background-insets: 0;         /* Rimuove i layer multipli/bordi bianchi */
+    -fx-faint-focus-color: transparent; /* Rimuove l'alone di focus sfocato */
+    -fx-focus-color: transparent;       /* Rimuove il bordo di focus */
 }
 
 .button-primary:hover {
@@ -57,52 +61,71 @@
     -fx-background-color: white;
     -fx-border-color: -fx-border-gray;
     -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
     -fx-text-fill: -fx-text-dark;
     -fx-font-weight: 600;
+    -fx-background-insets: 0;         /* Rimuove i layer multipli/bordi bianchi */
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
 }
 
 .button-outline:hover {
     -fx-background-color: #F9FAFB;
+    -fx-border-color: -fx-border-gray;
 }
 
 .app-exit-button {
-    -fx-pref-width: 38px;
-    -fx-min-width: 38px;
-    -fx-max-width: 38px;
-    -fx-pref-height: 38px;
-    -fx-min-height: 38px;
-    -fx-max-height: 38px;
+    -fx-pref-width: 16px;
+    -fx-min-width: 16px;
+    -fx-max-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-min-height: 16px;
+    -fx-max-height: 16px;
     -fx-padding: 0;
-    -fx-background-color: #D92D20;
-    -fx-background-radius: 19px;
-    -fx-text-fill: white;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
+    -fx-background-color: #FF5F57;
+    -fx-background-radius: 8px;
+    -fx-text-fill: transparent;
     -fx-cursor: hand;
+    -fx-background-insets: 0;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
 }
 
 .app-minimize-button {
-    -fx-pref-width: 38px;
-    -fx-min-width: 38px;
-    -fx-max-width: 38px;
-    -fx-pref-height: 38px;
-    -fx-min-height: 38px;
-    -fx-max-height: 38px;
-    -fx-padding: 0 0 5px 0;
-    -fx-background-color: #667085;
-    -fx-background-radius: 19px;
-    -fx-text-fill: white;
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
+    -fx-pref-width: 16px;
+    -fx-min-width: 16px;
+    -fx-max-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-min-height: 16px;
+    -fx-max-height: 16px;
+    -fx-padding: 0;
+    -fx-background-color: -fx-primary-green;
+    -fx-background-radius: 8px;
+    -fx-text-fill: transparent;
     -fx-cursor: hand;
+    -fx-background-insets: 0;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+}
+
+.app-control-icon {
+    -fx-fill: transparent;
 }
 
 .app-minimize-button:hover {
-    -fx-background-color: #475467;
+    -fx-background-color: #3E9330;
+}
+
+.app-minimize-button:hover .app-control-icon {
+    -fx-fill: #0B3B2C;
 }
 
 .app-exit-button:hover {
-    -fx-background-color: #B42318;
+    -fx-background-color: #E5484D;
+}
+
+.app-exit-button:hover .app-control-icon {
+    -fx-fill: #7A1B16;
 }
 
 .location-input-field {
@@ -152,3 +175,4 @@
     -fx-font-weight: 600;
     -fx-text-fill: -fx-text-dark;
 }
+

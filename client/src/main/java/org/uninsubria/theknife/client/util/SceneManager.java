@@ -15,10 +15,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.SVGPath;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontSmoothingType;
+import javafx.scene.text.Text;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -32,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-
+// TODO: sistemare i bordi del testo in hover per x e - . credo sia un problema di ombre che però non sono riuscito a risolvere
 public class SceneManager {
 
     private static final Map<Stage, Stack<String>> historyMap = new HashMap<>();
@@ -267,27 +273,55 @@ public class SceneManager {
         StackPane root = new StackPane(contenuto);
         root.setPickOnBounds(false);
 
-        Button minimizza = new Button("−");
+        Button minimizza = new Button();
+        SVGPath iconaMinimizza = new SVGPath();
+        iconaMinimizza.setContent("M 1 4 H 9 V 6 H 1 Z");
+        iconaMinimizza.getStyleClass().add("app-control-icon");
+        minimizza.setGraphic(iconaMinimizza);
         minimizza.getStyleClass().add("app-minimize-button");
         minimizza.setAccessibleText("Minimizza applicazione");
-        minimizza.setTooltip(new javafx.scene.control.Tooltip("Minimizza applicazione"));
+        minimizza.setTooltip(creaTooltip("Minimizza applicazione"));
         minimizza.setOnAction(event -> stage.setIconified(true));
 
-        Button esci = new Button("×");
+        Button esci = new Button();
+        SVGPath iconaEsci = new SVGPath();
+        iconaEsci.setContent("M 2 1 L 1 2 L 4 5 L 1 8 L 2 9 L 5 6 L 8 9 L 9 8 L 6 5 L 9 2 L 8 1 L 5 4 Z");
+        iconaEsci.getStyleClass().add("app-control-icon");
+        esci.setGraphic(iconaEsci);
         esci.getStyleClass().add("app-exit-button");
         esci.setAccessibleText("Esci dall'applicazione");
-        esci.setTooltip(new javafx.scene.control.Tooltip("Esci dall'applicazione"));
+        esci.setTooltip(creaTooltip("Esci dall'applicazione"));
         esci.setOnAction(event -> {
             stage.close();
             Platform.exit();
         });
 
-        HBox controlliFinestra = new HBox(8, minimizza, esci);
+        HBox controlliFinestra = new HBox(6, minimizza, esci);
         controlliFinestra.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         root.getChildren().add(controlliFinestra);
         StackPane.setAlignment(controlliFinestra, Pos.TOP_RIGHT);
         StackPane.setMargin(controlliFinestra, new Insets(10, 12, 0, 0));
         return root;
+    }
+
+    private static Tooltip creaTooltip(String testo) {
+        Text testoTooltip = new Text(testo);
+        testoTooltip.setFont(Font.font("Segoe UI", 12));
+        testoTooltip.setFontSmoothingType(FontSmoothingType.GRAY);
+        testoTooltip.setFill(Color.WHITE);
+
+        Tooltip tooltip = new Tooltip();
+        tooltip.setGraphic(testoTooltip);
+        tooltip.setStyle(
+                "-fx-background-color: #343434;" +
+                "-fx-background-insets: 0;" +
+                "-fx-background-radius: 8px;" +
+                "-fx-border-color: transparent;" +
+                "-fx-border-width: 0;" +
+                "-fx-effect: none;" +
+                "-fx-padding: 8px 12px;"
+        );
+        return tooltip;
     }
 
     /**
