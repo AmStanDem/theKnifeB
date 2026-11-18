@@ -296,6 +296,10 @@ public class CsvImporter {
                     booking_online = (dataset.posizione / 2) % 2 = 0
                 FROM dataset
                 WHERE r.id_ristorante = dataset.id_ristorante
+                  AND (
+                      r.delivery IS DISTINCT FROM (dataset.posizione % 2 = 0)
+                      OR r.booking_online IS DISTINCT FROM ((dataset.posizione / 2) % 2 = 0)
+                  )
                 """;
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -322,6 +326,7 @@ public class CsvImporter {
                        OR r.descrizione IS DISTINCT FROM ?)
                 """;
         int aggiornati = 0;
+        int pending = 0;
         try (InputStream is = CsvImporter.class.getResourceAsStream("/dataset/michelin_my_maps_clean.csv");
              BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
              CSVParser csv = CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get().parse(reader);
@@ -346,7 +351,15 @@ public class CsvImporter {
                 stmt.setString(10, valoreDataset(record, 7));
                 stmt.setString(11, valoreDataset(record, 9));
                 stmt.setString(12, valoreDataset(record, 13));
-                aggiornati += stmt.executeUpdate();
+                stmt.addBatch();
+
+                if (++pending >= BATCH_SIZE) {
+                    aggiornati += contaAggiornamenti(stmt.executeBatch());
+                    pending = 0;
+                }
+            }
+            if (pending > 0) {
+                aggiornati += contaAggiornamenti(stmt.executeBatch());
             }
         } catch (Exception e) {
             throw new IllegalStateException("Impossibile aggiornare i contatti dal dataset.", e);
