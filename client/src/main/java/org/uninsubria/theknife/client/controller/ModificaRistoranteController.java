@@ -7,11 +7,7 @@ package org.uninsubria.theknife.client.controller;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
@@ -42,6 +38,10 @@ public class ModificaRistoranteController {
     @FXML private CheckBox chkDelivery;
     @FXML private CheckBox chkBookingOnline;
     @FXML private Button btnSalva;
+
+    @FXML private TextField txtTelefono;
+    @FXML private TextField txtSitoWeb;
+    @FXML private TextArea txtDescrizione;
 
     private RistoranteDTO ristorante;
     private boolean tipologieCaricate;
@@ -136,6 +136,15 @@ public class ModificaRistoranteController {
         txtPrezzoMedio.setText(String.valueOf(ristorante.prezzoMedio()));
         chkDelivery.setSelected(Boolean.TRUE.equals(ristorante.delivery()));
         chkBookingOnline.setSelected(Boolean.TRUE.equals(ristorante.bookingOnline()));
+
+        txtTelefono.setText(ristorante.telefono() != null
+                ? ristorante.telefono() : "");
+
+        txtSitoWeb.setText(ristorante.sitoWeb() != null
+                ? ristorante.sitoWeb() : "");
+
+        txtDescrizione.setText(ristorante.descrizione() != null
+                ? ristorante.descrizione() : "");
 
         if (ristorante.latitudine() != null && ristorante.longitudine() != null) {
             txtIndirizzo.setLuogoSelezionato(new GeocodingService.Luogo(
@@ -246,7 +255,11 @@ public class ModificaRistoranteController {
                 prezzoMedio,
                 chkDelivery.isSelected(),
                 chkBookingOnline.isSelected(),
-                ristorante.mediaStelle()
+                ristorante.mediaStelle(),
+                ristorante.prezzoStimato(),
+                txtTelefono.getText().trim(),
+                txtSitoWeb.getText().trim(),
+                txtDescrizione.getText().trim()
         );
 
         try {
