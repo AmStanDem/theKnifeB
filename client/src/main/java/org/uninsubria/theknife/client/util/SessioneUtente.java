@@ -39,6 +39,7 @@ public final class SessioneUtente {
      */
     public static void logout() {
         utenteCorrente = null;
+
     }
 
     /**

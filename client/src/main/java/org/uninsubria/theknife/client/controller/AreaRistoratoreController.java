@@ -47,6 +47,7 @@ public class AreaRistoratoreController {
     }
 
     public void onLogOutClick(ActionEvent event) {
+        SceneManager.clearHistory(SceneManager.getStage(event));
         SessioneUtente.logout();
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }

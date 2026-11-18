@@ -23,7 +23,7 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import org.uninsubria.clientTK.controller.BaseLayoutController;
+import org.uninsubria.theknife.client.controller.BaseLayoutController;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -53,6 +53,13 @@ public class SceneManager {
     public static void switchScene(Event event, String fxmlPath) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         switchScene(stage, fxmlPath);
+    }
+
+    /**
+     * Ricava lo Stage associato a un evento JavaFX.
+     */
+    public static Stage getStage(Event event) {
+        return (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 
     /**

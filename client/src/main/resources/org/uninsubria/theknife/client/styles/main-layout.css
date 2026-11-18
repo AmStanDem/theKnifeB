@@ -59,6 +59,24 @@
     -fx-background-color: #3E9330;
 }
 
+.logout-button {
+    -fx-background-color: #D32F2F;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.logout-button:hover {
+    -fx-background-color: #B71C1C;
+}
+
+.logout-button:pressed {
+    -fx-background-color: #9A1717;
+}
+
 /* =========================
    TITOLO RICERCA
    ========================= */

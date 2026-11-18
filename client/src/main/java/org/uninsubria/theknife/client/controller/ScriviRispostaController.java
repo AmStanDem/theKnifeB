@@ -83,6 +83,7 @@ public class ScriviRispostaController {
     @FXML
     public void onLogOutClick(ActionEvent actionEvent) {
         RecensioneDaRispondere.pulisci();
+        SceneManager.clearHistory(SceneManager.getStage(actionEvent));
         SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }

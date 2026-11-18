@@ -116,6 +116,7 @@ public class ScriviRecensioneController {
 
     @FXML
     public void onLogOutClick(ActionEvent actionEvent) {
+        SceneManager.clearHistory(SceneManager.getStage(actionEvent));
         SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }

@@ -95,6 +95,7 @@ public class LoginController {
      */
     @FXML
     private void onContinuaComeGuest(ActionEvent event) {
+        SceneManager.clearHistory(SceneManager.getStage(event));
         SessioneUtente.logout();
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }

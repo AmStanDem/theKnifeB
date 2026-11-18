@@ -1,4 +1,4 @@
-package org.uninsubria.clientTK.controller;
+package org.uninsubria.theknife.client.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,6 +27,9 @@ public class BaseLayoutController {
     @FXML
     private ImageView imgUtente;
 
+    @FXML
+    private Button btnLogOut;
+
     private boolean paginaLogin;
     private boolean loggato;
 
@@ -35,6 +38,8 @@ public class BaseLayoutController {
         loggato = SessioneUtente.getUtenteCorrente() != null;
         imgUtente.setVisible(loggato);
         imgUtente.setManaged(loggato);
+        btnLogOut.setVisible(loggato);
+        btnLogOut.setManaged(loggato);
         aggiornaPulsanteAccesso();
     }
 
@@ -64,6 +69,16 @@ public class BaseLayoutController {
         SceneManager.switchScene(
                 event,
                 "/org/uninsubria/theknife/client/views/AreaPersonale.fxml"
+        );
+    }
+
+    @FXML
+    private void onLogOutClick(ActionEvent event) {
+        SceneManager.clearHistory(SceneManager.getStage(event));
+        SessioneUtente.logout();
+        SceneManager.switchScene(
+                event,
+                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
         );
     }
 
