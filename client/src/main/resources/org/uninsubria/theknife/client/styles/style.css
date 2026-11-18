@@ -14,6 +14,10 @@
     -fx-background-color: #F9FAFB;
 }
 
+.base-layout {
+    -fx-background-color: #F9FAFB;
+}
+
 /* ===================== CAMPI DI TESTO GLOBALI ===================== */
 .text-input {
     -fx-pref-height: 44px;

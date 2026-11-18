@@ -7,8 +7,8 @@ package org.uninsubria.theknife.client.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import org.uninsubria.theknife.client.util.GeocodingService;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import org.uninsubria.theknife.client.util.LuogoInput;
@@ -25,17 +25,8 @@ public class MainLayoutController {
     private TextField txtRicerca;
 
     @FXML
-    private Button btnAccediRegistrati;
-
-    @FXML
-    private ImageView imgUtente;
-
-    @FXML
     public void initialize() {
-        boolean loggato = SessioneUtente.getUtenteCorrente() != null;
-        aggiornaHeader(loggato);
-
-        if(loggato) {
+        if (SessioneUtente.getUtenteCorrente() != null) {
             String domicilio = SessioneUtente.getUtenteCorrente().domicilio();
             if (domicilio != null && !domicilio.isBlank()) {
                 txtLocalita.setText(domicilio);
@@ -44,15 +35,6 @@ public class MainLayoutController {
 
         txtLocalita.setTextFieldPrefHeight(65);
         txtLocalita.setMapButtonPrefWidth(65);
-    }
-
-
-
-    private void aggiornaHeader(boolean loggato) {
-        btnAccediRegistrati.setVisible(!loggato);
-        btnAccediRegistrati.setManaged(!loggato);
-        imgUtente.setVisible(loggato);
-        imgUtente.setManaged(loggato);
     }
 
     @FXML
@@ -72,22 +54,6 @@ public class MainLayoutController {
                     "/org/uninsubria/theknife/client/views/listaRistoranti.fxml"
             );
         }, messaggio -> mostraErrore("Località non valida", messaggio));
-    }
-
-    @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/LoginView.fxml"
-        );
-    }
-
-    @FXML
-    private void onAreaPersonaleLoggatoClick(MouseEvent event) {
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/AreaPersonale.fxml"
-        );
     }
 
     @FXML

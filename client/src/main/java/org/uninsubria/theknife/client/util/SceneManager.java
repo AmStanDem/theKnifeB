@@ -23,6 +23,7 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import org.uninsubria.clientTK.controller.BaseLayoutController;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,6 +43,8 @@ public class SceneManager {
     private static Stage applicationStage;
     private static boolean popupListenerInstalled;
 
+    private static final String BASE_LAYOUT_FXML = "/org/uninsubria/theknife/client/views/BaseLayout.fxml";
+    private static final String LOGIN_VIEW_FXML = "/org/uninsubria/theknife/client/views/LoginView.fxml";
     private static final String GLOBAL_CSS = "/org/uninsubria/theknife/client/styles/style.css";
 
     /**
@@ -76,17 +79,23 @@ public class SceneManager {
         try {
             String currentFxml = currentFxmlMap.get(stage);
 
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
+            Parent page = loader.load();
+
+            FXMLLoader baseLayoutLoader = new FXMLLoader(SceneManager.class.getResource(BASE_LAYOUT_FXML));
+            Parent baseLayout = baseLayoutLoader.load();
+            BaseLayoutController baseLayoutController = baseLayoutLoader.getController();
+            baseLayoutController.setContent(page);
+            baseLayoutController.setLoginPage(LOGIN_VIEW_FXML.equals(fxmlPath));
+            baseLayoutController.setCanGoBack(hasPreviousPage(stage)
+                    || (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)));
+
             if (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)) {
                 historyMap.computeIfAbsent(stage, k -> new Stack<>()).push(currentFxml);
             }
+            currentFxmlMap.put(stage, fxmlPath);
 
-            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
-            Parent root = loader.load();
-            StackPane applicationRoot = creaRootApplicativa(stage, root);
-            Object previousController = currentControllers.get(stage);
-            if (previousController != null) {
-                RemoteRefreshManager.unsubscribeOwner(previousController);
-            }
+            StackPane applicationRoot = creaRootApplicativa(stage, baseLayout);
 
             if (stage.getScene() != null) {
                 stage.getScene().setRoot(applicationRoot);
@@ -295,6 +304,11 @@ public class SceneManager {
         } else {
             System.out.println("Nessuna pagina precedente nello storico per questo stage.");
         }
+    }
+
+    public static boolean hasPreviousPage(Stage stage) {
+        Stack<String> history = historyMap.get(stage);
+        return history != null && !history.isEmpty();
     }
 
     /**

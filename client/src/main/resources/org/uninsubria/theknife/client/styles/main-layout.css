@@ -6,6 +6,23 @@
     -fx-background-color: #1A1A1E;
 }
 
+.back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 8px;
+    -fx-cursor: hand;
+}
+
+.back-button:hover {
+    -fx-background-color: #333338;
+}
+
+.back-button:disabled {
+    -fx-opacity: 0.4;
+}
+
 .flat {
     -fx-background-color: #E8E8E8;
     -fx-text-fill: #1A1A1E;

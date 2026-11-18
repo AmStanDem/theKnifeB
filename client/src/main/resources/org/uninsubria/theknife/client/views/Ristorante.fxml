@@ -16,42 +16,6 @@
 
 <BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.AreaRistoranteController">
 
-    <!-- HEADER -->
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="header" BorderPane.alignment="CENTER">
-
-            <padding>
-                <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
-            </padding>
-
-            <children>
-
-                <!-- LOGO A SINISTRA -->
-                <HomeLogo />
-
-                <!-- SPAZIO -->
-                <Region HBox.hgrow="ALWAYS" />
-
-                <Button fx:id="tornaAiMieiRistoranti"
-                        mnemonicParsing="false"
-                        onAction="#onTornaAiMieiRistorantiClick"
-                        styleClass="recensione"
-                        text="Torna ai miei ristoranti"
-                        visible="false"
-                        managed="false" />
-
-                <!-- LOGOUT -->
-                <!--
-                <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#onLogOutClick" prefHeight="63.0" prefWidth="285.0" styleClass="accent" text="Esci" />
-                -->
-
-            </children>
-
-        </HBox>
-    </top>
-
-
-    <!-- CONTENUTO CENTRALE -->
     <!-- CONTENUTO CENTRALE -->
     <center>
 
@@ -198,6 +162,7 @@
                   <Button fx:id="modificaRecensione" mnemonicParsing="false" onAction="#onModificaRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Modifica recensione" visible="false" managed="false" />
                   <Button fx:id="rimuoviRecensione" mnemonicParsing="false" onAction="#onRimuoviRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Rimuovi recensione" visible="false" managed="false" />
                   <Button fx:id="aggiungiPreferito" mnemonicParsing="false" onAction="#onPreferitiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Aggiungi ai preferiti" />
+                  <Button fx:id="tornaAiMieiRistoranti" mnemonicParsing="false" onAction="#onTornaAiMieiRistorantiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Torna ai miei ristoranti" visible="false" managed="false" />
           </VBox>
           </content>
        </ScrollPane>

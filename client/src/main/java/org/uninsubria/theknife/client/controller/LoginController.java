@@ -65,6 +65,7 @@ public class LoginController {
                 UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
                 Platform.runLater(() -> {
                     SessioneUtente.login(utente);
+                    SceneManager.clearHistory(stage);
                     SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
                 });
             } catch (CredenzialiErrateException e) {
@@ -95,6 +96,6 @@ public class LoginController {
     @FXML
     private void onContinuaComeGuest(ActionEvent event) {
         SessioneUtente.logout();
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/home.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 }

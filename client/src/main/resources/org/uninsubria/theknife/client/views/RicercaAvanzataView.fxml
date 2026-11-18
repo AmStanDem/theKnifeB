@@ -35,31 +35,6 @@
             stylesheets="@../styles/ricerca-avanzata.css"
             styleClass="root-pane">
 
-    <!-- ===================== HEADER ===================== -->
-    <top>
-        <HBox alignment="CENTER_LEFT"
-              spacing="20.0"
-              styleClass="header-bar"
-              BorderPane.alignment="CENTER">
-
-            <padding>
-                <Insets bottom="15.0"
-                        left="25.0"
-                        right="25.0"
-                        top="15.0" />
-            </padding>
-
-            <children>
-
-                <!-- LOGO A SINISTRA -->
-                <HomeLogo />
-            </children>
-
-        </HBox>
-    </top>
-
-
-
     <!-- ===================== CONTENUTO ===================== -->
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-container">
