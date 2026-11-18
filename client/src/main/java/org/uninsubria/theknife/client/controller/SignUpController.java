@@ -201,10 +201,6 @@ public class SignUpController {
     }
 
     @FXML
-    public void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
     private void aggiornaDataMassimaCalendario() {
         LocalDate dataCorrenteDispositivo = LocalDate.now();
         try {

@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <BorderPane prefHeight="768.0"
             prefWidth="1024.0"
@@ -37,16 +38,7 @@
             <children>
 
                 <!-- LOGO A SINISTRA -->
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true"
-                           onMouseClicked="#handleLogoClick">
-
-                    <image>
-                        <Image url="@../images/img_1.png" />
-                    </image>
-
-                </ImageView>
+                <HomeLogo />
 
                 <!-- SPAZIO -->
                 <Region HBox.hgrow="ALWAYS" />

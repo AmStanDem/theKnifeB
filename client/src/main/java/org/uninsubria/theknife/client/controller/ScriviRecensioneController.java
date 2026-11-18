@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 
 
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
@@ -119,11 +118,6 @@ public class ScriviRecensioneController {
     public void onLogOutClick(ActionEvent actionEvent) {
         SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
-    @FXML
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        SceneManager.switchScene(mouseEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
     @FXML

@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
 <?import org.uninsubria.theknife.client.util.components.DataNascitaInput?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <BorderPane styleClass="root" stylesheets="@../styles/signUp-style.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.SignUpController">
 
@@ -36,11 +37,11 @@
 
                         <!-- LOGO -->
                         <StackPane styleClass="logo-container">
-                            <ImageView fitHeight="55.0" fitWidth="55.0" onMouseClicked="#handleLogoClick" preserveRatio="true">
+                            <HomeLogo fitHeight="55.0" fitWidth="55.0">
                                 <image>
                                     <Image url="@../images/circle-logo.png" />
                                 </image>
-                            </ImageView>
+                            </HomeLogo>
                         </StackPane>
 
                         <!-- TITOLO -->

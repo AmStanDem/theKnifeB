@@ -6,12 +6,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <HBox prefHeight="750" prefWidth="1200" stylesheets="@../styles/login-style.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.LoginController">
 
@@ -78,9 +77,7 @@
         <VBox alignment="CENTER" spacing="24">
             <StackPane prefHeight="240" prefWidth="240" styleClass="illustration-circle">
             <children>
-                  <ImageView fitHeight="249.0" fitWidth="416.0" onMouseClicked="#handleLogoClick" preserveRatio="true">
-                      <Image url="@../images/img_1.png" />
-                  </ImageView>
+                  <HomeLogo fitHeight="249.0" fitWidth="416.0" />
             </children>
             </StackPane>
             <Label maxWidth="320" styleClass="illustration-text" text="Ingredienti freschi, ricette genuine" textAlignment="CENTER" wrapText="true" />

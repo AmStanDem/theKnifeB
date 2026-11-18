@@ -8,7 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 
@@ -75,8 +74,4 @@ public class AreaRistoratoreController {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml");
     }
 
-    @FXML
-    public void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
 }

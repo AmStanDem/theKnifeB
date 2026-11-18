@@ -8,7 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.application.Platform;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.RangeSlider;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.GeocodingService;
@@ -179,11 +178,6 @@ public class RicercaAvanzataController {
 
     private String formattaPrezzoMassimo(int prezzo) {
         return prezzo == PREZZO_MASSIMO ? PREZZO_MASSIMO + "+" : Integer.toString(prezzo);
-    }
-
-    @FXML
-    private void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
     @FXML

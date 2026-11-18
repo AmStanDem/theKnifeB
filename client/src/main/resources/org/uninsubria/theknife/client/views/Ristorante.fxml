@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.AreaRistoranteController">
 
@@ -26,10 +27,7 @@
             <children>
 
                 <!-- LOGO A SINISTRA -->
-                <ImageView fitHeight="133.0" fitWidth="441.0" preserveRatio="true" onMouseClicked="#handleLogoClick">
-
-                    <Image url="@../images/img_1.png"/>
-                </ImageView>
+                <HomeLogo />
 
                 <!-- SPAZIO -->
                 <Region HBox.hgrow="ALWAYS" />

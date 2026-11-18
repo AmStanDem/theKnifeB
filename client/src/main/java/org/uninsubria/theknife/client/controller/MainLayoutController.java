@@ -99,13 +99,6 @@ public class MainLayoutController {
     }
 
     @FXML
-    public void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
-        );
-    }
-
     private void mostraErrore(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         SceneManager.initOwner(alert);

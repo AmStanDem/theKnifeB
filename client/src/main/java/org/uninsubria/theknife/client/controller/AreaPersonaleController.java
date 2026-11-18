@@ -8,7 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
@@ -216,14 +215,5 @@ public class AreaPersonaleController {
             SceneManager.clearHistory(stage);
             SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
         }
-    }
-
-
-    @FXML
-    private void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
-        );
     }
 }

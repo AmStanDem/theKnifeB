@@ -19,14 +19,13 @@
 <?import org.controlsfx.control.RangeSlider?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
 <?import org.uninsubria.theknife.client.util.stars.RatingContainer?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <!--
     Pagina di Ricerca Avanzata - TheKnife (Formato Orizzontale)
     Controller di riferimento: RicercaAvanzataController
 -->
 <?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <BorderPane
             prefHeight="768.0"
             prefWidth="1024.0"
@@ -53,16 +52,7 @@
             <children>
 
                 <!-- LOGO A SINISTRA -->
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true"
-                           onMouseClicked="#handleLogoClick">
-
-                    <image>
-                        <Image url="@../images/img_1.png" />
-                    </image>
-
-                </ImageView>
+                <HomeLogo />
             </children>
 
         </HBox>

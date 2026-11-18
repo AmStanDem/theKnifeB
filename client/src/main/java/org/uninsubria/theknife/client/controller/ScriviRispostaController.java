@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RecensioneDaRispondere;
 import org.uninsubria.theknife.client.util.ServerConnection;
@@ -86,11 +85,6 @@ public class ScriviRispostaController {
         RecensioneDaRispondere.pulisci();
         SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
-    @FXML
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        SceneManager.switchScene(mouseEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
     @FXML
