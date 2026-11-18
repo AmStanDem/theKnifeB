@@ -162,6 +162,7 @@
                   <Button fx:id="modificaRecensione" mnemonicParsing="false" onAction="#onModificaRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Modifica recensione" visible="false" managed="false" />
                   <Button fx:id="rimuoviRecensione" mnemonicParsing="false" onAction="#onRimuoviRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Rimuovi recensione" visible="false" managed="false" />
                   <Button fx:id="aggiungiPreferito" mnemonicParsing="false" onAction="#onPreferitiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Aggiungi ai preferiti" />
+                  <Button fx:id="tornaAiMieiRistoranti" mnemonicParsing="false" onAction="#onTornaAiMieiRistorantiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Torna ai miei ristoranti" visible="false" managed="false" />
           </VBox>
           </content>
        </ScrollPane>
