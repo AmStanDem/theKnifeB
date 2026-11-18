@@ -114,8 +114,12 @@ public class RistoranteDAO {
 
     public boolean modificaRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRistorante = "UPDATE RistorantiTheKnife SET nome = ?, indirizzo = ?, citta = ?, " +
-                "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, prezzo_stimato = FALSE, delivery = ?, " +
-                "booking_online = ? WHERE id_ristorante = ? AND id_gestore = ?";
+                "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, prezzo_stimato = FALSE, " +
+                "delivery = ?, booking_online = ?, " +
+                "telefono = COALESCE(NULLIF(TRIM(?), ''), telefono), " +
+                "sito_web = COALESCE(NULLIF(TRIM(?), ''), sito_web), " +
+                "descrizione = COALESCE(NULLIF(TRIM(?), ''), descrizione) " +
+                "WHERE id_ristorante = ? AND id_gestore = ?";
         String sqlEliminaTipologie = "DELETE FROM Ristoranti_Tipologie WHERE id_ristorante = ?";
         String sqlAggiungiTipologia = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) " +
                 "SELECT ?, id_tipologia FROM Tipologia_Cucina WHERE LOWER(nome) = LOWER(?) " +
@@ -135,8 +139,14 @@ public class RistoranteDAO {
                     stmt.setDouble(7, r.prezzoMedio());
                     stmt.setBoolean(8, Boolean.TRUE.equals(r.delivery()));
                     stmt.setBoolean(9, Boolean.TRUE.equals(r.bookingOnline()));
-                    stmt.setInt(10, r.idRistorante());
-                    stmt.setInt(11, idGestore);
+
+                    stmt.setString(10, r.telefono());
+                    stmt.setString(11, r.sitoWeb());
+                    stmt.setString(12, r.descrizione());
+
+                    stmt.setInt(13, r.idRistorante());
+                    stmt.setInt(14, idGestore);
+
                     aggiornati = stmt.executeUpdate();
                 }
                 if (aggiornati == 0) {

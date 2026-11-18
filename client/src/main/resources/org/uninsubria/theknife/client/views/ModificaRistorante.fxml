@@ -13,6 +13,7 @@
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
 <?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
 
+<?import javafx.scene.control.TextArea?>
 <StackPane prefHeight="768.0" prefWidth="1024.0"
            styleClass="root-pane"
            stylesheets="@../styles/modificaRistorante.css"
@@ -71,6 +72,29 @@
                                        styleClass="custom-text-field"/>
                         </VBox>
                     </HBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Numero di telefono"/>
+                        <TextField fx:id="txtTelefono"
+                                   promptText="Es. +39 333 1234567"
+                                   styleClass="custom-text-field"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Sito web"/>
+                        <TextField fx:id="txtSitoWeb"
+                                   promptText="Es. https://www.mioristorante.it"
+                                   styleClass="custom-text-field"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Descrizione"/>
+                        <TextArea fx:id="txtDescrizione"
+                                  promptText="Descrivi il tuo ristorante, i piatti e i servizi offerti..."
+                                  prefRowCount="4"
+                                  wrapText="true"
+                                  styleClass="custom-text-field"/>
+                    </VBox>
 
                     <VBox spacing="5.0">
                         <Label styleClass="input-label" text="Tipologie di cucina *"/>
