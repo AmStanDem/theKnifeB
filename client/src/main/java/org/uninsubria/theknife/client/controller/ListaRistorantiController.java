@@ -11,11 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -24,6 +21,7 @@ import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.RicercaSessione;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.RicercaIniziale;
+import org.uninsubria.theknife.client.util.components.CuisineSelector;
 import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
@@ -45,7 +43,7 @@ public class ListaRistorantiController {
     @FXML private ComboBox<String> ratingFilterCombo;
     @FXML private CheckBox deliveryFilterCheckBox;
     @FXML private CheckBox bookingOnlineFilterCheckBox;
-    @FXML private MenuButton cuisineMenuButton;
+    @FXML private CuisineSelector cuisineSelector;
     @FXML private Button resetFiltersButton;
 
     @FXML private Label locationFilterLabel;
@@ -56,8 +54,6 @@ public class ListaRistorantiController {
     @FXML private Button loadMoreButton;
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
-    private final Set<String> selectedCuisines = new HashSet<>();
-    private final List<CheckBox> cuisineCheckBoxes = new ArrayList<>();
     private static final int PAGE_SIZE = 20;
 
     private static final String TUTTI_PREZZI = "Tutti i prezzi";
@@ -85,7 +81,7 @@ public class ListaRistorantiController {
             latitudineRicerca = criteri.latitudine();
             longitudineRicerca = criteri.longitudine();
             localitaRicerca = criteri.localita();
-            selectedCuisines.addAll(criteri.tipologieCucina());
+            cuisineSelector.setSelectedCuisines(criteri.tipologieCucina());
             prezzoMinPersonalizzato = criteri.prezzoMin();
             prezzoMaxPersonalizzato = criteri.prezzoMax();
             if (prezzoMinPersonalizzato != null || prezzoMaxPersonalizzato != null) {
@@ -137,7 +133,6 @@ public class ListaRistorantiController {
         }
         deliveryFilterCheckBox.setSelected(criteri.delivery());
         bookingOnlineFilterCheckBox.setSelected(criteri.bookingOnline());
-        aggiornaEtichettaMenuCucine();
     }
 
 
@@ -300,7 +295,7 @@ public class ListaRistorantiController {
         return new RicercaRistorantiPaginaDTO(
                 "",
                 searchField.getText(),
-                new ArrayList<>(selectedCuisines),
+                cuisineSelector.getSelectedCuisines(),
                 prezzoMin,
                 prezzoMax,
                 valutazioneMinima,
@@ -315,92 +310,7 @@ public class ListaRistorantiController {
     }
 
     private void popolaMenuCucine(List<String> tipologie) {
-        VBox menuContent = new VBox(8);
-        menuContent.setPadding(new Insets(8));
-        menuContent.setPrefWidth(260);
-
-        // Barra di ricerca interna con classe CSS dedicata
-        TextField searchCuisineInput = new TextField();
-        searchCuisineInput.setPromptText("Filtra cucine...");
-        searchCuisineInput.getStyleClass().add("search-cuisine-input");
-
-        // Impedisce alla barra spaziatrice di attivare scorciatoie di menu
-        searchCuisineInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.SPACE) {
-                searchCuisineInput.insertText(searchCuisineInput.getCaretPosition(), " ");
-                event.consume();
-            }
-        });
-
-        VBox checkBoxesBox = new VBox(6);
-        cuisineCheckBoxes.clear();
-
-        for (String tipo : tipologie) {
-            if (tipo == null || tipo.isBlank()) continue;
-
-            CheckBox cb = new CheckBox(tipo.trim());
-            cb.setStyle("-fx-text-fill: #1e293b;"); // Garanzia inline contro override di Modena
-            cb.setSelected(selectedCuisines.contains(cb.getText()));
-
-            cb.setOnAction(e -> {
-                if (cb.isSelected()) {
-                    selectedCuisines.add(cb.getText());
-                } else {
-                    selectedCuisines.remove(cb.getText());
-                }
-                aggiornaEtichettaMenuCucine();
-                //caricaPagina(true);
-            });
-
-            cuisineCheckBoxes.add(cb);
-            checkBoxesBox.getChildren().add(cb);
-        }
-        aggiornaEtichettaMenuCucine();
-
-        // Filtro in tempo reale sui CheckBox
-        searchCuisineInput.textProperty().addListener((obs, oldVal, newVal) -> {
-            String q = (newVal == null) ? "" : newVal.trim().toLowerCase();
-            for (CheckBox cb : cuisineCheckBoxes) {
-                boolean visibile = q.isEmpty() || cb.getText().toLowerCase().contains(q);
-                cb.setVisible(visibile);
-                cb.setManaged(visibile);
-            }
-        });
-
-        ScrollPane scroll = new ScrollPane(checkBoxesBox);
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(180);
-        scroll.setMaxHeight(220);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
-        Button clearBtn = new Button("Deseleziona tutte");
-        clearBtn.setMaxWidth(Double.MAX_VALUE);
-        clearBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-cursor: hand;");
-        clearBtn.setOnAction(e -> {
-            for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
-            selectedCuisines.clear();
-            aggiornaEtichettaMenuCucine();
-            //caricaPagina(true);
-        });
-
-        menuContent.getChildren().addAll(searchCuisineInput, scroll, clearBtn);
-
-        CustomMenuItem item = new CustomMenuItem(menuContent, false);
-        item.setHideOnClick(false);
-        cuisineMenuButton.getItems().setAll(item);
-
-        // Quando si apre il menu, porta subito il focus sulla casella di testo
-        cuisineMenuButton.setOnShowing(e -> Platform.runLater(searchCuisineInput::requestFocus));
-    }
-
-    private void aggiornaEtichettaMenuCucine() {
-        if (selectedCuisines.isEmpty()) {
-            cuisineMenuButton.setText("Tipo di cucina");
-        } else if (selectedCuisines.size() == 1) {
-            cuisineMenuButton.setText(selectedCuisines.iterator().next());
-        } else {
-            cuisineMenuButton.setText("Cucine (" + selectedCuisines.size() + ")");
-        }
+        cuisineSelector.setCuisines(tipologie);
     }
 
     @FXML
@@ -430,9 +340,7 @@ public class ListaRistorantiController {
         bookingOnlineFilterCheckBox.setSelected(false);
         aggiornaEtichettaPosizione();
 
-        for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
-        selectedCuisines.clear();
-        aggiornaEtichettaMenuCucine();
+        cuisineSelector.clearSelection();
 
         caricaPagina(true);
     }

@@ -5,7 +5,6 @@
 package org.uninsubria.theknife.client.controller;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -13,11 +12,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
-import org.controlsfx.control.CheckComboBox;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.client.util.GeocodingService;
+import org.uninsubria.theknife.client.util.components.CuisineSelector;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
@@ -55,7 +54,7 @@ public class AggiungiRistoranteController {
     private TextArea txtDescrizione;
 
     @FXML
-    private CheckComboBox<String> comboCucine;
+    private CuisineSelector comboCucine;
 
     @FXML
     private CheckBox chkDelivery;
@@ -90,7 +89,7 @@ public class AggiungiRistoranteController {
             try {
                 List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
                 Platform.runLater(() -> {
-                    comboCucine.getItems().setAll(FXCollections.observableArrayList(tipologie));
+                    comboCucine.setCuisines(tipologie);
                     comboCucine.setDisable(false);
                     btnSalva.setDisable(false);
                     tipologieCaricate = true;
@@ -214,9 +213,7 @@ public class AggiungiRistoranteController {
             }
 
             // 5. Recupero delle tipologie di cucina selezionate.
-            List<String> cucineSelezionate = List.copyOf(
-                    comboCucine.getCheckModel().getCheckedItems()
-            );
+            List<String> cucineSelezionate = comboCucine.getSelectedCuisines();
 
             if (cucineSelezionate.isEmpty()) {
                 mostraMessaggio(

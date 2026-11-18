@@ -16,6 +16,7 @@ import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.client.util.LuogoInput;
+import org.uninsubria.theknife.client.util.components.DataNascitaInput;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
@@ -39,7 +40,7 @@ public class ModificaAccountController {
     @FXML private TextField nomeField;
     @FXML private TextField cognomeField;
     @FXML private TextField emailField;
-    @FXML private TextField dataNascitaField;
+    @FXML private DataNascitaInput dataNascitaField;
     @FXML private LuogoInput domicilioField;
     @FXML private PasswordField passwordCorrenteField;
     @FXML private PasswordField nuovaPasswordField;
@@ -59,6 +60,7 @@ public class ModificaAccountController {
                 : "Modifica account cliente");
         domicilioField.setPromptText("Inizia a scrivere e seleziona un luogo");
         domicilioField.addTextFieldStyleClass("custom-text-field");
+        dataNascitaField.setDataMassima(LocalDate.now());
         nomeField.setText(utente.nome());
         cognomeField.setText(utente.cognome());
         emailField.setText(utente.email());

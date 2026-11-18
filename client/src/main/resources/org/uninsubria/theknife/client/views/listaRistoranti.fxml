@@ -13,8 +13,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.uninsubria.theknife.client.controller.ListaRistorantiController"
@@ -81,10 +81,10 @@
                           onAction="#onFilterChanged"/>
 
                 <!-- MenuButton per selezione multipla cucine -->
-                <MenuButton fx:id="cuisineMenuButton"
+                <CuisineSelector fx:id="cuisineSelector"
                             text="Tipo di cucina"
                             styleClass="filter-combo">
-                </MenuButton>
+                </CuisineSelector>
 
                 <Button fx:id="resetFiltersButton"
                         text="Azzera filtri"

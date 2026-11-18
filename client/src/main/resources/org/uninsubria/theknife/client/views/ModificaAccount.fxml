@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
+<?import org.uninsubria.theknife.client.util.components.DataNascitaInput?>
 
 <StackPane prefHeight="768.0" prefWidth="1024.0"
            styleClass="root-pane"
@@ -50,7 +51,7 @@
                     <HBox spacing="16.0">
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                             <Label text="Data di nascita *" styleClass="input-label"/>
-                            <TextField fx:id="dataNascitaField" styleClass="custom-text-field" promptText="gg/mm/aaaa"/>
+                            <DataNascitaInput fx:id="dataNascitaField" prefHeight="40.0"/>
                         </VBox>
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                             <Label text="Domicilio *" styleClass="input-label"/>

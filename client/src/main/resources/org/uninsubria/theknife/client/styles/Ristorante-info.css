@@ -337,8 +337,14 @@
 }
 
 .rating-total-reviews {
-    -fx-font-size: 17px;
+    -fx-font-size: 14px;
     -fx-text-fill: #5A5A5D;
+    -fx-wrap-text: true;
+    -fx-text-overrun: clip;
+    -fx-alignment: center;
+    -fx-pref-height: 38px;
+    -fx-min-height: 38px;
+    -fx-max-height: 38px;
 }
 
 

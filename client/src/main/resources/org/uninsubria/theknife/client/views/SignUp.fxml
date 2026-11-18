@@ -17,6 +17,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
+<?import org.uninsubria.theknife.client.util.components.DataNascitaInput?>
 
 <BorderPane styleClass="root" stylesheets="@../styles/signUp-style.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.SignUpController">
 
@@ -64,10 +65,7 @@
                         <!-- DATA DI NASCITA -->
                         <VBox spacing="4.0">
                             <Label styleClass="field-label" text="Data di nascita" />
-                            <HBox spacing="8.0">
-                                <TextField fx:id="dataNascitaField" HBox.hgrow="ALWAYS" prefHeight="40.0" promptText="gg/mm/aaaa" />
-                                <Button mnemonicParsing="false" onAction="#handleScegliDataNascita" prefHeight="40.0" styleClass="date-picker-button" text="Scegli" />
-                            </HBox>
+                            <DataNascitaInput fx:id="dataNascitaField" prefHeight="40.0" />
                         </VBox>
 
                         <!-- DOMICILIO -->

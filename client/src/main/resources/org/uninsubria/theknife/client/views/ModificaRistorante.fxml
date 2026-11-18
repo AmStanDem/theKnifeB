@@ -10,8 +10,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import org.controlsfx.control.CheckComboBox?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
+<?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
 
 <StackPane prefHeight="768.0" prefWidth="1024.0"
            styleClass="root-pane"
@@ -74,8 +74,8 @@
 
                     <VBox spacing="5.0">
                         <Label styleClass="input-label" text="Tipologie di cucina *"/>
-                        <CheckComboBox fx:id="comboCucine" maxWidth="Infinity"
-                                       styleClass="custom-check-combo"/>
+                        <CuisineSelector fx:id="comboCucine" maxWidth="Infinity"
+                                         styleClass="custom-check-combo"/>
                         <Label styleClass="form-subtitle"
                                text="Seleziona una o più tipologie dal catalogo completo."/>
                     </VBox>

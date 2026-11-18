@@ -5,7 +5,6 @@
 package org.uninsubria.theknife.client.controller;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -14,13 +13,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
-import org.controlsfx.control.CheckComboBox;
 import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.components.CuisineSelector;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
@@ -39,7 +38,7 @@ public class ModificaRistoranteController {
     @FXML private TextField txtCitta;
     @FXML private TextField txtNazione;
     @FXML private TextField txtPrezzoMedio;
-    @FXML private CheckComboBox<String> comboCucine;
+    @FXML private CuisineSelector comboCucine;
     @FXML private CheckBox chkDelivery;
     @FXML private CheckBox chkBookingOnline;
     @FXML private Button btnSalva;
@@ -157,7 +156,7 @@ public class ModificaRistoranteController {
             try {
                 List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
                 Platform.runLater(() -> {
-                    comboCucine.getItems().setAll(FXCollections.observableArrayList(tipologie));
+                    comboCucine.setCuisines(tipologie);
                     comboCucine.setDisable(false);
                     tipologieCaricate = true;
                     aggiornaTipologieSelezionate();
@@ -177,12 +176,8 @@ public class ModificaRistoranteController {
     }
 
     private void aggiornaTipologieSelezionate() {
-        comboCucine.getCheckModel().clearChecks();
-        if (ristorante != null && ristorante.tipologieCucina() != null) {
-            for (String tipologia : ristorante.tipologieCucina()) {
-                comboCucine.getCheckModel().check(tipologia);
-            }
-        }
+        comboCucine.setSelectedCuisines(
+                ristorante == null ? List.of() : ristorante.tipologieCucina());
     }
 
     private void aggiornaStatoSalvataggio() {
@@ -225,7 +220,7 @@ public class ModificaRistoranteController {
             return;
         }
 
-        List<String> cucine = List.copyOf(comboCucine.getCheckModel().getCheckedItems());
+        List<String> cucine = comboCucine.getSelectedCuisines();
         if (cucine.isEmpty()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Selezione mancante",
                     "Seleziona almeno una tipologia di cucina.");

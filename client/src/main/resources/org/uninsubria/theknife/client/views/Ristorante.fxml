@@ -77,7 +77,9 @@
                     <HBox fx:id="averageRatingContainer" alignment="CENTER" styleClass="average-rating" />
 
                     <!-- NUMERO RECENSIONI -->
-                    <Label fx:id="resultsCountLabel" styleClass="rating-total-reviews" text="0 recensioni" />
+                    <Label fx:id="resultsCountLabel" maxWidth="Infinity"
+                           styleClass="rating-total-reviews" text="0 recensioni"
+                           textAlignment="CENTER" wrapText="true" />
 
                 </VBox>
 
