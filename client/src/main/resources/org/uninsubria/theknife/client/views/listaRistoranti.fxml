@@ -13,7 +13,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.uninsubria.theknife.client.controller.ListaRistorantiController"
@@ -70,7 +71,7 @@
                           onAction="#onFilterChanged"/>
 
                 <CheckBox fx:id="deliveryFilterCheckBox"
-                          text="Delivery"
+                          text="Consegna a domicilio"
                           styleClass="service-filter-checkbox"
                           onAction="#onFilterChanged"/>
 
@@ -80,10 +81,10 @@
                           onAction="#onFilterChanged"/>
 
                 <!-- MenuButton per selezione multipla cucine -->
-                <MenuButton fx:id="cuisineMenuButton"
+                <CuisineSelector fx:id="cuisineSelector"
                             text="Tipo di cucina"
                             styleClass="filter-combo">
-                </MenuButton>
+                </CuisineSelector>
 
                 <Button fx:id="resetFiltersButton"
                         text="Azzera filtri"
@@ -100,9 +101,14 @@
                 <Insets top="8" right="32" bottom="24" left="32"/>
             </padding>
 
-            <Label fx:id="resultsCountLabel"
-                   text="0 ristoranti trovati"
-                   styleClass="results-count"/>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label fx:id="resultsCountLabel"
+                       text="0 ristoranti trovati"
+                       styleClass="results-count"/>
+                <ProgressIndicator fx:id="loadingIndicator"
+                                   prefWidth="24" prefHeight="24"
+                                   visible="false" managed="false"/>
+            </HBox>
 
             <ScrollPane fx:id="restaurantScrollPane"
                         styleClass="restaurant-scroll-pane"

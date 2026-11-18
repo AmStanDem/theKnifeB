@@ -11,18 +11,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.RicercaSessione;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.RicercaIniziale;
+import org.uninsubria.theknife.client.util.components.CuisineSelector;
 import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
@@ -44,27 +43,28 @@ public class ListaRistorantiController {
     @FXML private ComboBox<String> ratingFilterCombo;
     @FXML private CheckBox deliveryFilterCheckBox;
     @FXML private CheckBox bookingOnlineFilterCheckBox;
-    @FXML private MenuButton cuisineMenuButton;
+    @FXML private CuisineSelector cuisineSelector;
     @FXML private Button resetFiltersButton;
 
     @FXML private Label locationFilterLabel;
     @FXML private Label resultsCountLabel;
+    @FXML private ProgressIndicator loadingIndicator;
     @FXML private ScrollPane restaurantScrollPane;
     @FXML private VBox restaurantContainer;
     @FXML private Button loadMoreButton;
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
-    private final Set<String> selectedCuisines = new HashSet<>();
-    private final List<CheckBox> cuisineCheckBoxes = new ArrayList<>();
     private static final int PAGE_SIZE = 20;
 
     private static final String TUTTI_PREZZI = "Tutti i prezzi";
-    private static final String TUTTI_RATING = "Tutti i rating";
+    private static final String TUTTI_RATING = "Tutte le valutazioni";
     private PauseTransition searchDebounce;
+    private PauseTransition retryTransition;
     private long requestGeneration;
     private boolean hasMore;
     private boolean caricamentoInCorso;
     private boolean tipologieCaricate;
+    private boolean serverNonDisponibile;
     private Double latitudineRicerca;
     private Double longitudineRicerca;
     private String localitaRicerca;
@@ -81,7 +81,7 @@ public class ListaRistorantiController {
             latitudineRicerca = criteri.latitudine();
             longitudineRicerca = criteri.longitudine();
             localitaRicerca = criteri.localita();
-            selectedCuisines.addAll(criteri.tipologieCucina());
+            cuisineSelector.setSelectedCuisines(criteri.tipologieCucina());
             prezzoMinPersonalizzato = criteri.prezzoMin();
             prezzoMaxPersonalizzato = criteri.prezzoMax();
             if (prezzoMinPersonalizzato != null || prezzoMaxPersonalizzato != null) {
@@ -91,10 +91,15 @@ public class ListaRistorantiController {
         }
         configuraFiltriFissi();
         applicaCriteriIniziali(criteri);
-        searchDebounce = new PauseTransition(javafx.util.Duration.millis(350));
+        searchDebounce = new PauseTransition(Duration.millis(350));
         searchDebounce.setOnFinished(event -> caricaPagina(true));
-
-
+        retryTransition = new PauseTransition(Duration.seconds(2));
+        restaurantContainer.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene == null) {
+                searchDebounce.stop();
+                retryTransition.stop();
+            }
+        });
 
         String nomeRistorante = RicercaSessione.getNomeRistorante();
 
@@ -111,10 +116,7 @@ public class ListaRistorantiController {
     }
 
     private void applicaCriteriIniziali(RicercaIniziale.Criteri criteri) {
-        locationFilterLabel.setText(localitaRicerca == null || localitaRicerca.isBlank()
-                ? "Posizione: ovunque"
-                : "Posizione: " + localitaRicerca + " (raggio "
-                + (int) RicercaIniziale.RAGGIO_RICERCA_KM + " km)");
+        aggiornaEtichettaPosizione();
         if (criteri == null) {
             return;
         }
@@ -131,7 +133,6 @@ public class ListaRistorantiController {
         }
         deliveryFilterCheckBox.setSelected(criteri.delivery());
         bookingOnlineFilterCheckBox.setSelected(criteri.bookingOnline());
-        aggiornaEtichettaMenuCucine();
     }
 
 
@@ -139,9 +140,9 @@ public class ListaRistorantiController {
     private void configuraFiltriFissi() {
         priceFilterCombo.getItems().setAll(
                 TUTTI_PREZZI,
-                "€ (Economico < 25€)",
-                "€€ (Medio 25€ - 50€)",
-                "€€€ (Medio-Alto 50€ - 80€)",
+                "€ (Economico ≤ 25€)",
+                "€€ (Medio 25,01€ - 50€)",
+                "€€€ (Medio-Alto 50,01€ - 80€)",
                 "€€€€ (Lusso > 80€)"
         );
         priceFilterCombo.setValue(TUTTI_PREZZI);
@@ -161,12 +162,24 @@ public class ListaRistorantiController {
     }
 
     private void caricaPagina(boolean nuovaRicerca) {
-        if (caricamentoInCorso && !nuovaRicerca) {
-            return;
-        }
-
         if (nuovaRicerca) {
             requestGeneration++;
+            retryTransition.stop();
+        }
+        if (latitudineRicerca == null || longitudineRicerca == null
+                || localitaRicerca == null || localitaRicerca.isBlank()) {
+            resultsCountLabel.setText("Seleziona una posizione prima di cercare i ristoranti.");
+            caricamentoInCorso = false;
+            serverNonDisponibile = false;
+            nascondiCaricamento();
+            retryTransition.stop();
+            loadMoreButton.setVisible(false);
+            loadMoreButton.setManaged(false);
+            loadMoreButton.setDisable(true);
+            return;
+        }
+        if (caricamentoInCorso && !nuovaRicerca) {
+            return;
         }
 
         long generation = requestGeneration;
@@ -175,8 +188,18 @@ public class ListaRistorantiController {
         boolean caricaTipologie = !tipologieCaricate;
         caricamentoInCorso = true;
         loadMoreButton.setDisable(true);
-        resultsCountLabel.setText("Caricamento ristoranti...");
+        mostraCaricamento("Caricamento ristoranti...");
 
+        eseguiRicerca(richiesta, nuovaRicerca, offset, caricaTipologie, generation);
+    }
+
+    private void eseguiRicerca(
+            RicercaRistorantiPaginaDTO richiesta,
+            boolean nuovaRicerca,
+            int offset,
+            boolean caricaTipologie,
+            long generation
+    ) {
         Thread.startVirtualThread(() -> {
             try {
                 ITheKnifeServer server = ServerConnection.getServer();
@@ -196,6 +219,9 @@ public class ListaRistorantiController {
                         return;
                     }
                     caricamentoInCorso = false;
+                    serverNonDisponibile = false;
+                    retryTransition.stop();
+                    nascondiCaricamento();
                     if (tipologieRisultanti != null) {
                         popolaMenuCucine(tipologieRisultanti);
                         tipologieCaricate = true;
@@ -208,19 +234,35 @@ public class ListaRistorantiController {
                     aggiornaLista(nuovaRicerca, offset);
                 });
             } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
-                System.err.println("[SEARCH_ERROR] Ricerca paginata non riuscita: " + e.getMessage());
+                if (e instanceof RemoteException) {
+                    ServerConnection.invalidaConnessione();
+                }
                 Platform.runLater(() -> {
                     if (generation == requestGeneration) {
-                        caricamentoInCorso = false;
-                        resultsCountLabel.setText(ristorantiCompleti.size() + " ristoranti caricati");
-                        loadMoreButton.setVisible(hasMore);
-                        loadMoreButton.setManaged(hasMore);
-                        loadMoreButton.setDisable(false);
-                        mostraErrore("Ricerca non riuscita", "Impossibile caricare i ristoranti dal server.");
+                        if (!serverNonDisponibile) {
+                            System.err.println("[SEARCH_ERROR] Ricerca paginata non riuscita: "
+                                    + e.getMessage());
+                            serverNonDisponibile = true;
+                        }
+                        mostraCaricamento("Server non disponibile. Riprovo automaticamente...");
+                        retryTransition.setOnFinished(event ->
+                                eseguiRicerca(richiesta, nuovaRicerca, offset, caricaTipologie, generation));
+                        retryTransition.playFromStart();
                     }
                 });
             }
         });
+    }
+
+    private void mostraCaricamento(String messaggio) {
+        resultsCountLabel.setText(messaggio);
+        loadingIndicator.setVisible(true);
+        loadingIndicator.setManaged(true);
+    }
+
+    private void nascondiCaricamento() {
+        loadingIndicator.setVisible(false);
+        loadingIndicator.setManaged(false);
     }
 
     private RicercaRistorantiPaginaDTO creaRichiesta(int offset) {
@@ -234,7 +276,7 @@ public class ListaRistorantiController {
             if (prezzo.startsWith("€ (Economico")) {
                 prezzoMax = 25.0;
             } else if (prezzo.startsWith("€€ (Medio")) {
-                prezzoMin = 25.0;
+                prezzoMin = 25.01;
                 prezzoMax = 50.0;
             } else if (prezzo.startsWith("€€€ (Medio-Alto")) {
                 prezzoMin = 50.01;
@@ -251,9 +293,9 @@ public class ListaRistorantiController {
         }
 
         return new RicercaRistorantiPaginaDTO(
-                latitudineRicerca == null ? RicercaSessione.getLocalita() : "",
+                "",
                 searchField.getText(),
-                new ArrayList<>(selectedCuisines),
+                cuisineSelector.getSelectedCuisines(),
                 prezzoMin,
                 prezzoMax,
                 valutazioneMinima,
@@ -268,103 +310,17 @@ public class ListaRistorantiController {
     }
 
     private void popolaMenuCucine(List<String> tipologie) {
-        VBox menuContent = new VBox(8);
-        menuContent.setPadding(new Insets(8));
-        menuContent.setPrefWidth(260);
-
-        // Barra di ricerca interna con classe CSS dedicata
-        TextField searchCuisineInput = new TextField();
-        searchCuisineInput.setPromptText("Filtra cucine...");
-        searchCuisineInput.getStyleClass().add("search-cuisine-input");
-
-        // Impedisce alla barra spaziatrice di attivare scorciatoie di menu
-        searchCuisineInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.SPACE) {
-                searchCuisineInput.insertText(searchCuisineInput.getCaretPosition(), " ");
-                event.consume();
-            }
-        });
-
-        VBox checkBoxesBox = new VBox(6);
-        cuisineCheckBoxes.clear();
-
-        for (String tipo : tipologie) {
-            if (tipo == null || tipo.isBlank()) continue;
-
-            CheckBox cb = new CheckBox(tipo.trim());
-            cb.setStyle("-fx-text-fill: #1e293b;"); // Garanzia inline contro override di Modena
-            cb.setSelected(selectedCuisines.contains(cb.getText()));
-
-            cb.setOnAction(e -> {
-                if (cb.isSelected()) {
-                    selectedCuisines.add(cb.getText());
-                } else {
-                    selectedCuisines.remove(cb.getText());
-                }
-                aggiornaEtichettaMenuCucine();
-                caricaPagina(true);
-            });
-
-            cuisineCheckBoxes.add(cb);
-            checkBoxesBox.getChildren().add(cb);
-        }
-        aggiornaEtichettaMenuCucine();
-
-        // Filtro in tempo reale sui CheckBox
-        searchCuisineInput.textProperty().addListener((obs, oldVal, newVal) -> {
-            String q = (newVal == null) ? "" : newVal.trim().toLowerCase();
-            for (CheckBox cb : cuisineCheckBoxes) {
-                boolean visibile = q.isEmpty() || cb.getText().toLowerCase().contains(q);
-                cb.setVisible(visibile);
-                cb.setManaged(visibile);
-            }
-        });
-
-        ScrollPane scroll = new ScrollPane(checkBoxesBox);
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(180);
-        scroll.setMaxHeight(220);
-        scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
-
-        Button clearBtn = new Button("Deseleziona tutte");
-        clearBtn.setMaxWidth(Double.MAX_VALUE);
-        clearBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-cursor: hand;");
-        clearBtn.setOnAction(e -> {
-            for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
-            selectedCuisines.clear();
-            aggiornaEtichettaMenuCucine();
-            caricaPagina(true);
-        });
-
-        menuContent.getChildren().addAll(searchCuisineInput, scroll, clearBtn);
-
-        CustomMenuItem item = new CustomMenuItem(menuContent, false);
-        item.setHideOnClick(false);
-        cuisineMenuButton.getItems().setAll(item);
-
-        // Quando si apre il menu, porta subito il focus sulla casella di testo
-        cuisineMenuButton.setOnShowing(e -> Platform.runLater(searchCuisineInput::requestFocus));
-    }
-
-    private void aggiornaEtichettaMenuCucine() {
-        if (selectedCuisines.isEmpty()) {
-            cuisineMenuButton.setText("Tipo di cucina");
-        } else if (selectedCuisines.size() == 1) {
-            cuisineMenuButton.setText(selectedCuisines.iterator().next());
-        } else {
-            cuisineMenuButton.setText("Cucine (" + selectedCuisines.size() + ")");
-        }
+        cuisineSelector.setCuisines(tipologie);
     }
 
     @FXML
     private void onSearch() {
-        searchDebounce.stop();
         caricaPagina(true);
     }
 
     @FXML
     private void onFilterChanged() {
-        caricaPagina(true);
+        //caricaPagina(true);
     }
 
     @FXML
@@ -382,14 +338,9 @@ public class ListaRistorantiController {
         ratingFilterCombo.setValue(TUTTI_RATING);
         deliveryFilterCheckBox.setSelected(false);
         bookingOnlineFilterCheckBox.setSelected(false);
-        latitudineRicerca = null;
-        longitudineRicerca = null;
-        localitaRicerca = null;
-        locationFilterLabel.setText("Posizione: ovunque");
+        aggiornaEtichettaPosizione();
 
-        for (CheckBox cb : cuisineCheckBoxes) cb.setSelected(false);
-        selectedCuisines.clear();
-        aggiornaEtichettaMenuCucine();
+        cuisineSelector.clearSelection();
 
         caricaPagina(true);
     }
@@ -445,15 +396,6 @@ public class ListaRistorantiController {
         System.out.println("Apertura dettagli: " + r.nome());
     }
 
-    private void mostraErrore(String titolo, String messaggio) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
-    }
-
     private String formattaEtichettaPrezzo(Double prezzoMin, Double prezzoMax) {
         String minimo = prezzoMin == null ? "qualsiasi" : "da " + formatoEuro(prezzoMin);
         String massimo = prezzoMax == null ? "350+ €" : "fino a " + formatoEuro(prezzoMax);
@@ -462,5 +404,12 @@ public class ListaRistorantiController {
 
     private String formatoEuro(double valore) {
         return String.format(Locale.ROOT, "%.0f €", valore);
+    }
+
+    private void aggiornaEtichettaPosizione() {
+        locationFilterLabel.setText(localitaRicerca == null || localitaRicerca.isBlank()
+                ? "Posizione: non selezionata"
+                : "Posizione: " + localitaRicerca + " (raggio "
+                + (int) RicercaIniziale.RAGGIO_RICERCA_KM + " km)");
     }
 }

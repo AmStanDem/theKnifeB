@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -11,6 +12,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <BorderPane prefHeight="768.0" prefWidth="1024.0" styleClass="root" stylesheets="@../styles/Ristorante-info.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.AreaRistoranteController">
 
@@ -37,7 +39,9 @@
                     <HBox fx:id="averageRatingContainer" alignment="CENTER" styleClass="average-rating" />
 
                     <!-- NUMERO RECENSIONI -->
-                    <Label fx:id="resultsCountLabel" styleClass="rating-total-reviews" text="0 recensioni" />
+                    <Label fx:id="resultsCountLabel" maxWidth="Infinity"
+                           styleClass="rating-total-reviews" text="0 recensioni"
+                           textAlignment="CENTER" wrapText="true" />
 
                 </VBox>
 
@@ -68,8 +72,10 @@
 
     </center>
    <left>
-
-          <VBox alignment="CENTER" maxWidth="579.0" prefHeight="603.0" prefWidth="512.0" spacing="15.0" BorderPane.alignment="CENTER">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="512.0"
+                    styleClass="restaurant-info-scroll-pane" BorderPane.alignment="CENTER">
+           <content>
+           <VBox alignment="CENTER" maxWidth="579.0" prefWidth="512.0" spacing="15.0">
 
               <!-- TITOLO -->
               <Label styleClass="profile-title" text="Informazioni ristorante" />
@@ -105,6 +111,24 @@
                          <Label fx:id="lblIndirizzo" styleClass="profile-value"  />
                   </HBox>
 
+                  <VBox spacing="6.0">
+                      <Label styleClass="profile-label" text="Descrizione:" />
+                      <Label fx:id="lblDescrizione" styleClass="profile-description"
+                             wrapText="true" maxWidth="Infinity" />
+                  </VBox>
+
+                     <!-- TELEFONO -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Telefono:" />
+                      <Hyperlink fx:id="lblTelefono" onAction="#apriTelefono" styleClass="profile-link" />
+                  </HBox>
+
+                     <!-- SITO WEB -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                      <Label styleClass="profile-label" text="Sito web:" />
+                      <Hyperlink fx:id="lblSitoWeb" onAction="#apriSitoWeb" styleClass="profile-link" />
+                  </HBox>
+
 
                      <!-- FASCIA DI PREZZO -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -115,7 +139,7 @@
 
                      <!-- DELIVERY -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
-                      <Label styleClass="profile-label" text="Delivery:" />
+                      <Label styleClass="profile-label" text="Consegna a domicilio:" />
 
                          <Label fx:id="lblDelivery" styleClass="profile-value"  />
                   </HBox>
@@ -139,8 +163,8 @@
                   <Button fx:id="rimuoviRecensione" mnemonicParsing="false" onAction="#onRimuoviRecensioneClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Rimuovi recensione" visible="false" managed="false" />
                   <Button fx:id="aggiungiPreferito" mnemonicParsing="false" onAction="#onPreferitiClick" prefHeight="63.0" prefWidth="285.0" styleClass="recensione" text="Aggiungi ai preferiti" />
           </VBox>
-
-
+          </content>
+       </ScrollPane>
    </left>
 
 </BorderPane>

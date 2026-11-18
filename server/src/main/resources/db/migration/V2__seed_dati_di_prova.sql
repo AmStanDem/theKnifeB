@@ -12,10 +12,10 @@ TRUNCATE TABLE Tipologia_Cucina RESTART IDENTITY CASCADE;
 -- password: password123
 -- ==============================================================================
 INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES
-                                                                                        ('massimo.bottura@theknife.it', '$2a$12$D2M/O3T3sW9XQG9lH9wR6e.t7Wc3J/U1lP8tN0V3yJ2bV0Z5c/Cqe', 'Massimo', 'Bottura', '1962-09-30', 'Modena', 'gestore'),
-                                                                                        ('gordon.ramsay@theknife.it', '$2a$12$D2M/O3T3sW9XQG9lH9wR6e.t7Wc3J/U1lP8tN0V3yJ2bV0Z5c/Cqe', 'Gordon', 'Ramsay', '1966-11-08', 'Londra', 'gestore'),
-                                                                                        ('mario.rossi@theknife.it', '$2a$12$D2M/O3T3sW9XQG9lH9wR6e.t7Wc3J/U1lP8tN0V3yJ2bV0Z5c/Cqe', 'Mario', 'Rossi', '2001-05-20', 'Milano', 'cliente'),
-                                                                                        ('alberto.cliente@theknife.it', '$2a$12$D2M/O3T3sW9XQG9lH9wR6e.t7Wc3J/U1lP8tN0V3yJ2bV0Z5c/Cqe', 'Alberto', 'Neri', '1999-03-12', 'Varese', 'cliente');
+                                                                                        ('massimo.bottura@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Massimo', 'Bottura', '1962-09-30', 'Modena', 'gestore'),
+                                                                                        ('gordon.ramsay@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Gordon', 'Ramsay', '1966-11-08', 'Londra', 'gestore'),
+                                                                                        ('mario.rossi@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Mario', 'Rossi', '2001-05-20', 'Milano', 'cliente'),
+                                                                                        ('alberto.cliente@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Alberto', 'Neri', '1999-03-12', 'Varese', 'cliente');
 
 -- ==============================================================================
 -- 2. RISTORANTI THE KNIFE

@@ -5,12 +5,13 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import org.controlsfx.control.CheckComboBox?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
+<?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
 
 <StackPane prefHeight="768.0" prefWidth="1024.0" styleClass="root-pane" stylesheets="@../styles/registraRistorante.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.AggiungiRistoranteController">
 
@@ -60,12 +61,31 @@
                         </VBox>
                     </HBox>
 
+                    <!-- Contatti e descrizione facoltativi -->
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Numero di telefono" />
+                            <TextField fx:id="txtTelefono" promptText="Es. 02 1234567" styleClass="custom-text-field" />
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Pagina web del ristorante" />
+                            <TextField fx:id="txtSitoWeb" promptText="https://www.esempio.it" styleClass="custom-text-field" />
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Descrizione del ristorante" />
+                        <TextArea fx:id="txtDescrizione" prefRowCount="4"
+                                  promptText="Racconta il ristorante, la cucina e l'atmosfera..."
+                                  styleClass="custom-text-field" wrapText="true" />
+                    </VBox>
 
 
-                    <!-- Tipologie di Cucina (ControlsFX) -->
+                    <!-- Tipologie di Cucina -->
                     <VBox spacing="5.0">
                         <Label styleClass="input-label" text="Tipologie di Cucina *" />
-                        <CheckComboBox fx:id="comboCucine" maxWidth="Infinity" styleClass="custom-check-combo" />
+                        <CuisineSelector fx:id="comboCucine" maxWidth="Infinity"
+                                         styleClass="custom-check-combo" />
                         <Label styleClass="form-subtitle" text="Seleziona una o più tipologie dal catalogo completo." />
                     </VBox>
 
@@ -73,8 +93,8 @@
                     <VBox spacing="8.0">
                         <Label styleClass="input-label" text="Servizi Offerti" />
                         <HBox spacing="20.0">
-                            <CheckBox fx:id="chkDelivery" mnemonicParsing="false" styleClass="custom-checkbox" text="Servizio Delivery" />
-                            <CheckBox fx:id="chkBookingOnline" mnemonicParsing="false" styleClass="custom-checkbox" text="Prenotazione Online" />
+                            <CheckBox fx:id="chkDelivery" mnemonicParsing="false" styleClass="custom-checkbox" text="Consegna a domicilio" />
+                            <CheckBox fx:id="chkBookingOnline" mnemonicParsing="false" styleClass="custom-checkbox" text="Prenotazione online" />
                         </HBox>
                     </VBox>
 

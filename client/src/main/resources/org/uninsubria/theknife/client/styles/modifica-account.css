@@ -1,0 +1,13 @@
+.account-message {
+    -fx-font-size: 13px;
+    -fx-text-fill: #B42318;
+}
+
+.account-message.success {
+    -fx-text-fill: #267A2E;
+}
+
+.card-container .separator .line {
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1 0 0 0;
+}

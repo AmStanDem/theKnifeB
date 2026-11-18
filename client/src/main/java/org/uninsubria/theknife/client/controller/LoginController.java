@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import org.uninsubria.theknife.client.util.SceneManager;
@@ -40,11 +39,6 @@ public class LoginController {
 
     @FXML
     private void handleSignIn(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
-    @FXML
-    public void handleLogoClick(MouseEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
@@ -78,7 +72,7 @@ public class LoginController {
                 Platform.runLater(() -> mostraErroreLogin("Email o password non corretti."));
             } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
                 Platform.runLater(() -> mostraErroreLogin(
-                        "Errore server: " + e.getClass().getSimpleName() + " - " + e.getMessage()));
+                        "Impossibile contattare il server. Verifica la connessione e riprova."));
             }
         });
     }

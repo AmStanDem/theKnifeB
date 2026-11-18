@@ -83,13 +83,35 @@ Il server applica le migrazioni, chiede i parametri del database e resta in asco
 Rimane attivo finché non interrompi Maven con `Ctrl+C`. Nel secondo avvia il client:
 
 ```sh
-mvn -pl client -am -Prun-client integration-test
+mvn -pl client -am -Prun-client process-classes
 ```
+
+Il profilo `run-client` usa le librerie JavaFX native della piattaforma corrente
+e avvia il client dai sorgenti; non esegue le fasi di packaging dei JAR.
+La build multipiattaforma dei JAR resta disponibile con `mvn clean package`.
 
 In alternativa, dopo la build puoi avviare i JAR con `java -jar`: prima il server e
 poi il client Linux o Windows corrispondente. Premi Invio per accettare i valori
 predefiniti. Se scegli una porta diversa nel prompt, configura la stessa
 `DB_HOST_PORT` in `.env` e riavvia Compose prima di connettere il server.
+
+### Account dimostrativi
+
+Flyway crea automaticamente quattro clienti e quattro ristoratori alla prima
+migrazione del database. Per tutti la password è `KnifeDemo2026!`.
+
+Clienti: `cliente.demo1@theknife.it`, `cliente.demo2@theknife.it`,
+`cliente.demo3@theknife.it`, `cliente.demo4@theknife.it`.
+
+Ristoratori: `ristoratore.demo1@theknife.it`, `ristoratore.demo2@theknife.it`,
+`ristoratore.demo3@theknife.it`, `ristoratore.demo4@theknife.it`.
+
+La migrazione viene eseguita all'avvio del server anche su un database esistente
+non ancora aggiornato alla versione 9. Gli account con email già presenti non
+vengono duplicati o sovrascritti. Ricostruire l'immagine Docker, da solo, non
+riapplica una migrazione già registrata; con il volume PostgreSQL persistente gli
+account rimangono nel database. Su un database vuoto Flyway li crea al primo
+avvio del server.
 
 ### Test concorrenti RMI
 

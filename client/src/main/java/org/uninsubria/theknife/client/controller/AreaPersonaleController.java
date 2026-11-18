@@ -8,7 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
@@ -46,6 +45,9 @@ public class AreaPersonaleController {
 
     @FXML
     private Button btnAggiungi;
+
+    @FXML
+    private Button btnModificaCredenziali;
 
 
     @FXML
@@ -98,6 +100,8 @@ public class AreaPersonaleController {
 
             btnRecensioni.setVisible(true);
             btnRecensioni.setManaged(true);
+            btnModificaCredenziali.setVisible(true);
+            btnModificaCredenziali.setManaged(true);
 
             // Nasconde pulsanti ristoratore
             btnRistoranti.setVisible(false);
@@ -150,6 +154,9 @@ public class AreaPersonaleController {
 
             btnAggiungi.setVisible(true);
             btnAggiungi.setManaged(true);
+
+            btnModificaCredenziali.setVisible(true);
+            btnModificaCredenziali.setManaged(true);
         }
     }
 
@@ -189,6 +196,14 @@ public class AreaPersonaleController {
         );
     }
 
+    @FXML
+    private void onModificaCredenzialiClick(ActionEvent event) {
+        SceneManager.switchScene(
+                event,
+                "/org/uninsubria/theknife/client/views/ModificaAccount.fxml"
+        );
+    }
+
 
     @FXML
     private void onLogOutClick(ActionEvent event) {
@@ -200,14 +215,5 @@ public class AreaPersonaleController {
             SceneManager.clearHistory(stage);
             SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
         }
-    }
-
-
-    @FXML
-    private void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
-        );
     }
 }

@@ -21,6 +21,7 @@ public class PreferitoItemController {
     @FXML private Label nameLabel;
     @FXML private Label ratingValueLabel;
     @FXML private Label addressLabel;
+    @FXML private Label descriptionLabel;
     @FXML private Label metaLabel;
     @FXML private FlowPane cuisineTags;
     @FXML private Label deliveryTag;
@@ -36,6 +37,9 @@ public class PreferitoItemController {
 
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
+        descriptionLabel.setText(ristorante.descrizione() == null || ristorante.descrizione().isBlank()
+                ? "Descrizione non disponibile."
+                : ristorante.descrizione().trim());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
         metaLabel.setText(formattaMeta(ristorante.prezzoMedio(), ristorante.prezzoStimato()));

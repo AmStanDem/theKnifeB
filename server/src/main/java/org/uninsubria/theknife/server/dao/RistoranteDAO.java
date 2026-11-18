@@ -25,8 +25,8 @@ public class RistoranteDAO {
             "ST_SetSRID(ST_MakePoint(?::double precision, ?::double precision), 4326)::geography";
 
     public Integer inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
-        String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato, telefono, sito_web, descrizione) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlTipologiaCheck = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO NOTHING";
         String sqlTipologiaId = "SELECT id_tipologia FROM Tipologia_Cucina WHERE nome = ?";
         String sqlRistoTipo = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES (?, ?) ON CONFLICT DO NOTHING";
@@ -46,6 +46,9 @@ public class RistoranteDAO {
                 stmt.setBoolean(9, r.delivery() != null ? r.delivery() : false);
                 stmt.setBoolean(10, r.bookingOnline() != null && r.bookingOnline());
                 stmt.setBoolean(11, false);
+                stmt.setString(12, r.telefono());
+                stmt.setString(13, r.sitoWeb());
+                stmt.setString(14, r.descrizione());
 
                 if (stmt.executeUpdate() == 0) {
                     conn.rollback();
@@ -379,7 +382,7 @@ public class RistoranteDAO {
     private String costruisciQueryBase() {
         // Separiamo le recensioni per evitare righe duplicate provocate dalle molteplici tipologie cucina
         return "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, r.latitudine, r.longitudine, " +
-                "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, " +
+                "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, r.telefono, r.sito_web, r.descrizione, " +
                 "COALESCE(AVG(rec_stat.valutazione), 0.0) as media_stelle, " +
                 "STRING_AGG(DISTINCT tc.nome, ',') as tipologie_cucina " +
                 "FROM RistorantiTheKnife r " +
@@ -421,7 +424,10 @@ public class RistoranteDAO {
                 rs.getBoolean("delivery"),
                 rs.getBoolean("booking_online"),
                 rs.getDouble("media_stelle"),
-                rs.getBoolean("prezzo_stimato")
+                rs.getBoolean("prezzo_stimato"),
+                rs.getString("telefono"),
+                rs.getString("sito_web"),
+                rs.getString("descrizione")
         );
     }
 }

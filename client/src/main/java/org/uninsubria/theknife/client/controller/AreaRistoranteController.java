@@ -14,8 +14,8 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Priority;
@@ -63,6 +63,15 @@ public class AreaRistoranteController {
 
     @FXML
     private Label lblIndirizzo;
+
+    @FXML
+    private Label lblDescrizione;
+
+    @FXML
+    private Hyperlink lblTelefono;
+
+    @FXML
+    private Hyperlink lblSitoWeb;
 
 
     @FXML
@@ -121,6 +130,9 @@ public class AreaRistoranteController {
     @FXML
     private Button aggiungiPreferito;
 
+    @FXML
+    private Button tornaAiMieiRistoranti;
+
     private boolean ristorantePreferito;
     private RecensioneDTO recensioneUtente;
 
@@ -136,6 +148,10 @@ public class AreaRistoranteController {
     public void initialize() {
 
         System.out.println("AreaRistoranteController inizializzato");
+        boolean mostraRitornoMieiRistoranti =
+                RistoranteSelezionato.consumaRitornoAiMieiRistoranti();
+        tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
+        tornaAiMieiRistoranti.setManaged(mostraRitornoMieiRistoranti);
         averageRating = new BaseRatingView(5, 0);
         averageRating.setSpacing(2);
         averageRating.setScaleX(0.75);
@@ -246,6 +262,11 @@ public class AreaRistoranteController {
 
         lblNomeRistorante.setText(ristorante.nome());
         lblIndirizzo.setText(ristorante.indirizzo());
+        lblDescrizione.setText(ristorante.descrizione() == null || ristorante.descrizione().isBlank()
+                ? "Descrizione non disponibile."
+                : ristorante.descrizione().trim());
+        impostaLink(lblTelefono, ristorante.telefono());
+        impostaLink(lblSitoWeb, ristorante.sitoWeb());
 
         lblCitta.setText(ristorante.citta());
         System.out.println("citta: " + ristorante.citta());
@@ -267,6 +288,42 @@ public class AreaRistoranteController {
         );
 
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
+    }
+
+    private void impostaLink(Hyperlink link, String valore) {
+        boolean disponibile = valore != null && !valore.isBlank();
+        link.setText(disponibile ? valore : "N/D");
+        link.setDisable(!disponibile);
+        link.setVisited(false);
+    }
+
+    @FXML
+    private void apriSitoWeb() {
+        if (ristorante == null || ristorante.sitoWeb() == null || ristorante.sitoWeb().isBlank()) {
+            return;
+        }
+        String sito = ristorante.sitoWeb().trim();
+        if (!sito.matches("(?i)^[a-z][a-z0-9+.-]*://.*$")) {
+            sito = "https://" + sito;
+        }
+        apriURI(sito);
+    }
+
+    @FXML
+    private void apriTelefono() {
+        if (ristorante == null || ristorante.telefono() == null || ristorante.telefono().isBlank()) {
+            return;
+        }
+        apriURI("tel:" + ristorante.telefono().replaceAll("[^0-9+]", ""));
+    }
+
+    private void apriURI(String valore) {
+        try {
+            org.uninsubria.theknife.client.MainClient.apriCollegamento(valore);
+        } catch (Exception e) {
+            mostraMessaggio(Alert.AlertType.ERROR, "Collegamento non disponibile",
+                    "Impossibile aprire il collegamento: " + e.getMessage());
+        }
     }
 
     private void caricaRecensioni() {
@@ -421,7 +478,7 @@ public class AreaRistoranteController {
         istogramma.setMaxWidth(Double.MAX_VALUE);
 
         BarChart.Series<String, Number> serie = new BarChart.Series<>();
-        for (int indice = 0; indice < conteggi.length; indice++) {
+        for (int indice = 2; indice < conteggi.length; indice++) {
             double valutazione = indice / 2.0;
             String voto = formattaValutazione(valutazione);
             double percentuale = totale == 0 ? 0 : conteggi[indice] * 100.0 / totale;
@@ -430,13 +487,13 @@ public class AreaRistoranteController {
             barra.getStyleClass().add("rating-histogram-node");
             Region riempimento = new Region();
             riempimento.getStyleClass().add("rating-histogram-bar");
-            Label percentualeLabel = new Label(String.format(Locale.ROOT, "%.1f%%", percentuale));
-            percentualeLabel.getStyleClass().add("rating-histogram-percentage");
-            percentualeLabel.setVisible(false);
-            percentualeLabel.setMouseTransparent(true);
-            barra.getChildren().setAll(riempimento, percentualeLabel);
-            barra.setOnMouseEntered(event -> percentualeLabel.setVisible(true));
-            barra.setOnMouseExited(event -> percentualeLabel.setVisible(false));
+            Label valoreLabel = new Label(String.format(Locale.ROOT, "%.1f", percentuale));
+            valoreLabel.getStyleClass().add("rating-histogram-percentage");
+            valoreLabel.setVisible(false);
+            valoreLabel.setMouseTransparent(true);
+            barra.getChildren().setAll(riempimento, valoreLabel);
+            barra.setOnMouseEntered(event -> valoreLabel.setVisible(true));
+            barra.setOnMouseExited(event -> valoreLabel.setVisible(false));
             barra.setOnMouseClicked(event -> {
                 valutazioneSelezionata = valutazione;
                 mostraRecensioniFiltrate(gestoreProprietario);
@@ -628,12 +685,11 @@ public class AreaRistoranteController {
 
      */
 
-    // =========================================================
-    // LOGO
-    // =========================================================
-
     @FXML
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        SceneManager.switchScene(mouseEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+    private void onTornaAiMieiRistorantiClick(ActionEvent event) {
+        SceneManager.switchScene(
+                event,
+                "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml"
+        );
     }
 }

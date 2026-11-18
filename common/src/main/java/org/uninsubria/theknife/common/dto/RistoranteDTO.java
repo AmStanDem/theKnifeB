@@ -21,7 +21,10 @@ public record RistoranteDTO(
         Boolean delivery,
         Boolean bookingOnline,
         Double mediaStelle,
-        boolean prezzoStimato
+        boolean prezzoStimato,
+        String telefono,
+        String sitoWeb,
+        String descrizione
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -42,5 +45,47 @@ public record RistoranteDTO(
     ) {
         this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
                 tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle, false);
+    }
+
+    public RistoranteDTO(
+            Integer idRistorante,
+            String nome,
+            String indirizzo,
+            String citta,
+            String nazione,
+            Double latitudine,
+            Double longitudine,
+            List<String> tipologieCucina,
+            Double prezzoMedio,
+            Boolean delivery,
+            Boolean bookingOnline,
+            Double mediaStelle,
+            boolean prezzoStimato
+    ) {
+        this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
+                tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle,
+                prezzoStimato, null, null, null);
+    }
+
+    public RistoranteDTO(
+            Integer idRistorante,
+            String nome,
+            String indirizzo,
+            String citta,
+            String nazione,
+            Double latitudine,
+            Double longitudine,
+            List<String> tipologieCucina,
+            Double prezzoMedio,
+            Boolean delivery,
+            Boolean bookingOnline,
+            Double mediaStelle,
+            boolean prezzoStimato,
+            String telefono,
+            String sitoWeb
+    ) {
+        this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
+                tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle,
+                prezzoStimato, telefono, sitoWeb, null);
     }
 }

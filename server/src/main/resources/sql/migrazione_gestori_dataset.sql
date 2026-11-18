@@ -56,7 +56,8 @@ SELECT
     s.source_id,
     r.id_ristorante,
     COALESCE(NULLIF(BTRIM(SPLIT_PART(s.localita, ',', 1)), ''), 'Sconosciuta') AS nuova_citta,
-    COALESCE(NULLIF(BTRIM(SPLIT_PART(s.localita, ',', 2)), ''), 'Non specificata') AS nuova_nazione
+    COALESCE(NULLIF(BTRIM(SPLIT_PART(s.localita, ',', 2)), ''), 'Non specificata') AS nuova_nazione,
+    s.descrizione
 FROM csv_dataset s
 CROSS JOIN migrazione_parametri p
 JOIN RistorantiTheKnife r
@@ -92,13 +93,15 @@ CREATE TEMP TABLE migrazione_target (
     id_gestore_attuale INT NOT NULL,
     nuova_citta TEXT NOT NULL,
     nuova_nazione TEXT NOT NULL,
+    descrizione TEXT,
     nuovo_gestore INT
 ) ON COMMIT DROP;
 
 INSERT INTO migrazione_target (
-    id_ristorante, id_gestore_attuale, nuova_citta, nuova_nazione
+    id_ristorante, id_gestore_attuale, nuova_citta, nuova_nazione, descrizione
 )
-SELECT c.id_ristorante, p.id_gestore_fittizio, c.nuova_citta, c.nuova_nazione
+SELECT c.id_ristorante, p.id_gestore_fittizio, c.nuova_citta, c.nuova_nazione,
+       c.descrizione
 FROM corrispondenze c
 CROSS JOIN migrazione_parametri p;
 
@@ -167,7 +170,8 @@ WHERE rr.id_recensione = rec.id_recensione
 UPDATE RistorantiTheKnife r
 SET id_gestore = t.nuovo_gestore,
     citta = t.nuova_citta,
-    nazione = t.nuova_nazione
+    nazione = t.nuova_nazione,
+    descrizione = t.descrizione
 FROM migrazione_target t
 WHERE r.id_ristorante = t.id_ristorante
   AND r.id_gestore = t.id_gestore_attuale;

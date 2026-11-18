@@ -15,6 +15,7 @@ import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
@@ -77,6 +78,13 @@ public class ListaRistorantiGestoreController {
                 Node card = loader.load();
                 RestaurantItemController controller = loader.getController();
                 controller.setRistorante(ristorante);
+                controller.setOnDettagliAction(ristoranteSelezionato ->
+                        RistoranteSelezionato.setRitornoAiMieiRistoranti(true));
+                controller.setOnModificaAction((event, ristoranteSelezionato) -> {
+                    RistoranteSelezionato.setRistorante(ristoranteSelezionato);
+                    SceneManager.switchScene(event,
+                            "/org/uninsubria/theknife/client/views/ModificaRistorante.fxml");
+                });
                 restaurantContainer.getChildren().add(card);
             }
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {

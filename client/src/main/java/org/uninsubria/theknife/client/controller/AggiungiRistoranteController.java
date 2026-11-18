@@ -5,17 +5,18 @@
 package org.uninsubria.theknife.client.controller;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import org.controlsfx.control.CheckComboBox;
+import javafx.scene.control.TextArea;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.GeocodingService;
+import org.uninsubria.theknife.client.util.components.CuisineSelector;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
@@ -24,7 +25,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
 
 public class AggiungiRistoranteController {
@@ -44,9 +44,17 @@ public class AggiungiRistoranteController {
     @FXML
     private TextField txtPrezzoMedio;
 
+    @FXML
+    private TextField txtTelefono;
 
     @FXML
-    private CheckComboBox<String> comboCucine;
+    private TextField txtSitoWeb;
+
+    @FXML
+    private TextArea txtDescrizione;
+
+    @FXML
+    private CuisineSelector comboCucine;
 
     @FXML
     private CheckBox chkDelivery;
@@ -81,7 +89,7 @@ public class AggiungiRistoranteController {
             try {
                 List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
                 Platform.runLater(() -> {
-                    comboCucine.getItems().setAll(FXCollections.observableArrayList(tipologie));
+                    comboCucine.setCuisines(tipologie);
                     comboCucine.setDisable(false);
                     btnSalva.setDisable(false);
                     tipologieCaricate = true;
@@ -113,8 +121,6 @@ public class AggiungiRistoranteController {
         // 1. Verifica che tutti i campi obbligatori siano compilati.
         if (txtNome.getText().trim().isEmpty()
                 || txtIndirizzo.getText().trim().isEmpty()
-                || txtCitta.getText().trim().isEmpty()
-                || txtNazione.getText().trim().isEmpty()
                 || txtPrezzoMedio.getText().trim().isEmpty()) {
 
             mostraMessaggio(
@@ -139,39 +145,32 @@ public class AggiungiRistoranteController {
         }
 
 
+        txtIndirizzo.risolviLuogo(
+                luogo -> salvaRistorante(event, utente, luogo),
+                messaggio -> mostraMessaggio(Alert.AlertType.WARNING, "Località non valida", messaggio)
+        );
+    }
+
+    private void salvaRistorante(
+            ActionEvent event,
+            UtenteDTO utente,
+            GeocodingService.Luogo luogoSelezionato
+    ) {
         try {
-
-            // 6. Recupero degli altri dati.
             String nome = txtNome.getText().trim();
-            String indirizzo = txtIndirizzo.getText().trim();
-            String citta = txtCitta.getText().trim();
-            String nazione = txtNazione.getText().trim();
-
+            String indirizzo = luogoSelezionato.indirizzo();
+            String citta = luogoSelezionato.localita();
+            String nazione = luogoSelezionato.nazione();
+            String telefono = testoFacoltativo(txtTelefono.getText());
+            String sitoWeb = testoFacoltativo(txtSitoWeb.getText());
+            String descrizione = testoFacoltativo(txtDescrizione.getText());
             boolean delivery = chkDelivery.isSelected();
             boolean bookingOnline = chkBookingOnline.isSelected();
-
-            // 3. Conversione dei campi numerici.
             double prezzoMedio = Double.parseDouble(
                     txtPrezzoMedio.getText().trim().replace(",", ".")
             );
-
-            GeocodingService.Luogo luogoSelezionato =
-                    txtIndirizzo.getLuogoSelezionato();
-            if (luogoSelezionato == null
-                    || !luogoSelezionato.etichetta().equals(indirizzo)
-                    || !luogoSelezionato.localita().equalsIgnoreCase(citta)
-                    || !luogoSelezionato.nazione().equalsIgnoreCase(nazione)) {
-                mostraMessaggio(
-                        Alert.AlertType.WARNING,
-                        "Indirizzo da verificare",
-                        "Seleziona un luogo valido dai suggerimenti. Città e nazione devono corrispondere al risultato scelto."
-                );
-                txtIndirizzo.requestFocus();
-                return;
-            }
             double latitudine = luogoSelezionato.latitudine();
             double longitudine = luogoSelezionato.longitudine();
-            indirizzo = luogoSelezionato.indirizzo();
 
             // 4. Controllo dei valori inseriti.
             if (!Double.isFinite(prezzoMedio)
@@ -214,9 +213,7 @@ public class AggiungiRistoranteController {
             }
 
             // 5. Recupero delle tipologie di cucina selezionate.
-            List<String> cucineSelezionate = List.copyOf(
-                    comboCucine.getCheckModel().getCheckedItems()
-            );
+            List<String> cucineSelezionate = comboCucine.getSelectedCuisines();
 
             if (cucineSelezionate.isEmpty()) {
                 mostraMessaggio(
@@ -224,6 +221,16 @@ public class AggiungiRistoranteController {
                         "Selezione mancante",
                         "Seleziona almeno una tipologia di cucina."
                 );
+                return;
+            }
+
+            if (!telefonoValido(telefono)) {
+                mostraMessaggio(
+                        Alert.AlertType.WARNING,
+                        "Numero di telefono non valido",
+                        "Inserisci un numero valido con almeno 7 e massimo 15 cifre."
+                );
+                txtTelefono.requestFocus();
                 return;
             }
 
@@ -242,7 +249,11 @@ public class AggiungiRistoranteController {
                     prezzoMedio,
                     delivery,
                     bookingOnline,
-                    null                // Media stelle iniziale
+                    null,               // Media stelle iniziale
+                    false,
+                    telefono,
+                    sitoWeb,
+                    descrizione
             );
 
             // 8. Inserimento effettivo tramite RMI.
@@ -259,13 +270,13 @@ public class AggiungiRistoranteController {
                             + "\" è stato registrato con successo."
             );
 
-            tornaAllaHome(event);
+            tornaAiMieiRistoranti(event);
 
         } catch (NumberFormatException e) {
             mostraMessaggio(
                     Alert.AlertType.ERROR,
                     "Errore di formato",
-                    "Prezzo, latitudine e longitudine devono essere valori numerici validi."
+                    "Il prezzo medio deve essere un valore numerico valido."
             );
 
         } catch (RemoteException e) {
@@ -288,15 +299,19 @@ public class AggiungiRistoranteController {
         }
     }
 
-    @FXML
-    public void onAnnullaClick(ActionEvent event) {
-        tornaAllaHome(event);
+    private String testoFacoltativo(String valore) {
+        return valore == null || valore.isBlank() ? null : valore.trim();
     }
 
-    private void tornaAllaHome(ActionEvent event) {
+    @FXML
+    public void onAnnullaClick(ActionEvent event) {
+        tornaAiMieiRistoranti(event);
+    }
+
+    private void tornaAiMieiRistoranti(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
+                "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml"
         );
     }
 
@@ -311,5 +326,40 @@ public class AggiungiRistoranteController {
         alert.setHeaderText(null);
         alert.setContentText(contenuto);
         alert.showAndWait();
+    }
+
+
+    private boolean telefonoValido(String telefono) {
+        if (telefono == null || telefono.isBlank()) {
+            return true;
+        }
+
+        String telefonoPulito = telefono.trim();
+
+        // Sono ammessi solo numeri, +, spazi, parentesi e trattini.
+        if (!telefonoPulito.matches("^\\+?[0-9\\s()\\-]+$")) {
+            return false;
+        }
+
+        // Il numero deve contenere da 7 a 15 cifre.
+        long numeroCifre = telefonoPulito.chars()
+                .filter(Character::isDigit)
+                .count();
+
+        if (numeroCifre < 7 || numeroCifre > 15) {
+            return false;
+        }
+
+        // Controllo del prefisso internazionale, se presente.
+        if (telefonoPulito.startsWith("+")) {
+            String numeroSenzaSimboli = telefonoPulito.replaceAll("[\\s()\\-]", "");
+
+            // Il prefisso deve contenere da 1 a 3 cifre.
+            if (!numeroSenzaSimboli.matches("^\\+[1-9][0-9]{0,2}[0-9]{6,14}$")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -16,9 +16,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.PopupWindow;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
@@ -129,12 +130,16 @@ public class SceneManager {
         configuraStagePrincipale(stage);
     }
 
+    public static void avviaFullscreen(Stage stage) {
+        if (stage.isShowing() && !stage.isFullScreen()) {
+            stage.setFullScreen(true);
+        }
+    }
+
     private static void mantieneFullscreen(Stage stage) {
         configuraStagePrincipale(stage);
         if (!popupWindows.containsKey(stage)) {
             popupWindows.put(stage, new HashSet<>());
-            stage.addEventHandler(WindowEvent.WINDOW_SHOWN, event ->
-                    ripristinaFullscreen(stage));
             stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
                 Object controller = currentControllers.remove(stage);
                 if (controller != null) {
@@ -195,42 +200,38 @@ public class SceneManager {
     }
 
     private static void configuraStagePrincipale(Stage stage) {
+
         if (!configuredStages.add(stage)) {
             return;
         }
+
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setFullScreenExitHint("");
         stage.setResizable(false);
-        stage.showingProperty().addListener((observable, precedente, visibile) -> {
-            if (visibile) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
-            }
-        });
-        stage.fullScreenProperty().addListener((observable, precedente, attivo) -> {
-            if (!attivo && stage.isShowing()) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
-            }
-        });
-        stage.focusedProperty().addListener((observable, precedente, attivo) -> {
-            if (attivo) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
+
+        stage.iconifiedProperty().addListener((observable, precedente, minimizzata) -> {
+            if (!minimizzata) {
+                Platform.runLater(() -> {
+                    if (stage.isShowing()) {
+                        applicaFullscreen(stage);
+                    }
+                });
             }
         });
     }
 
     private static void ripristinaFullscreen(Stage stage) {
-        if (!stage.isShowing() || stage.isFullScreen()) {
+
+        if (!stage.isShowing()) {
             return;
         }
-        stage.setFullScreen(true);
-        if (!stage.isFullScreen()) {
-            // Fallback per alcune configurazioni Windows/JavaFX: dimensiona la
-            // finestra sui bounds visibili senza lasciarla parzialmente fuori schermo.
-            javafx.geometry.Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
-            stage.setX(bounds.getMinX());
-            stage.setY(bounds.getMinY());
-            stage.setWidth(bounds.getWidth());
-            stage.setHeight(bounds.getHeight());
+
+        applicaFullscreen(stage);
+    }
+
+    private static void applicaFullscreen(Stage stage) {
+        if (stage.isShowing() && !stage.isFullScreen()) {
+            stage.setFullScreen(true);
         }
     }
 
@@ -259,6 +260,12 @@ public class SceneManager {
         StackPane root = new StackPane(contenuto);
         root.setPickOnBounds(false);
 
+        Button minimizza = new Button("−");
+        minimizza.getStyleClass().add("app-minimize-button");
+        minimizza.setAccessibleText("Minimizza applicazione");
+        minimizza.setTooltip(new javafx.scene.control.Tooltip("Minimizza applicazione"));
+        minimizza.setOnAction(event -> stage.setIconified(true));
+
         Button esci = new Button("×");
         esci.getStyleClass().add("app-exit-button");
         esci.setAccessibleText("Esci dall'applicazione");
@@ -268,9 +275,11 @@ public class SceneManager {
             Platform.exit();
         });
 
-        root.getChildren().add(esci);
-        StackPane.setAlignment(esci, Pos.TOP_RIGHT);
-        StackPane.setMargin(esci, new Insets(10, 12, 0, 0));
+        HBox controlliFinestra = new HBox(8, minimizza, esci);
+        controlliFinestra.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        root.getChildren().add(controlliFinestra);
+        StackPane.setAlignment(controlliFinestra, Pos.TOP_RIGHT);
+        StackPane.setMargin(controlliFinestra, new Insets(10, 12, 0, 0));
         return root;
     }
 

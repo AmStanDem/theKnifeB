@@ -12,6 +12,7 @@ import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 import org.uninsubria.theknife.server.service.*;
 
 import java.rmi.RemoteException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +55,18 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     public UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
         return utenteService.registra(nuovoUtente, passwordInChiaro);
+    }
+
+    @Override
+    public UtenteDTO aggiornaAccount(UtenteDTO utenteAggiornato, String passwordCorrente, String nuovaPassword)
+            throws RemoteException, CredenzialiErrateException, UtenteGiaEsistenteException,
+            DatiMancantiException, SistemaIndisponibileException {
+        return utenteService.aggiornaAccount(utenteAggiornato, passwordCorrente, nuovaPassword);
+    }
+
+    @Override
+    public LocalDate ottieniDataCorrente() throws RemoteException, SistemaIndisponibileException {
+        return utenteService.ottieniDataCorrente();
     }
 
     @Override

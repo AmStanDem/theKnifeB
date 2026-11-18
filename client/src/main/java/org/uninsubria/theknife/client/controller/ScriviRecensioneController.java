@@ -11,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 
 
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
@@ -100,9 +99,6 @@ public class ScriviRecensioneController {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/SignUp.fxml");
     }
 
-    @FXML
-    private void onGeolocalizzazioneClick() {
-    }
 
     @FXML
     public void onRicercaAvanzataClick(ActionEvent actionEvent) {
@@ -122,11 +118,6 @@ public class ScriviRecensioneController {
     public void onLogOutClick(ActionEvent actionEvent) {
         SessioneUtente.logout();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
-    @FXML
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        SceneManager.switchScene(mouseEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
     @FXML
@@ -212,22 +203,11 @@ public class ScriviRecensioneController {
     }
 
     private void tornaAlRistoranteRecensito(ActionEvent actionEvent) {
-        if (recensioneDaModificare == null || recensioneDaModificare.idRistorante() == null) {
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MieRecensioni.fxml");
-            return;
-        }
-
-        try {
-            RistoranteDTO ristoranteRecensito = ServerConnection.getServer()
-                    .getDettaglioRistorante(recensioneDaModificare.idRistorante());
-            RistoranteSelezionato.setRistorante(ristoranteRecensito);
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
-        } catch (RemoteException | NotBoundException | RistoranteNonTrovatoException
-                 | SistemaIndisponibileException e) {
-            mostraMessaggio(Alert.AlertType.ERROR, "Ristorante non disponibile",
-                    "La recensione è stata gestita, ma non è stato possibile aprire la scheda del ristorante.");
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MieRecensioni.fxml");
-        }
+        RecensioneSelezionata.pulisci();
+        SceneManager.switchScene(
+                actionEvent,
+                "/org/uninsubria/theknife/client/views/MieRecensioni.fxml"
+        );
     }
 
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {

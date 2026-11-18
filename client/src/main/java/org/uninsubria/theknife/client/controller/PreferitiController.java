@@ -63,13 +63,6 @@ public class PreferitiController {
     }
 
 
-
-
-    @FXML
-    public void handleLogoClick(MouseEvent mouseEvent) {
-        SceneManager.switchScene(mouseEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
     @FXML
     public void initialize() {
         caricaPreferiti();

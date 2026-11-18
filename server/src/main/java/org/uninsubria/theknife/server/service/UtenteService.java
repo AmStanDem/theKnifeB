@@ -14,6 +14,8 @@ import org.uninsubria.theknife.server.dao.UtenteDAO;
 import org.uninsubria.theknife.server.dao.UtenteDAO.UtenteConHash;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class UtenteService {
 
@@ -21,6 +23,8 @@ public class UtenteService {
 
     // Work Factor di BCrypt: bilanciamento ottimale tra sicurezza e performance
     private static final int BCRYPT_WORK_FACTOR = 12;
+    private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
     public UtenteDTO autentica(String email, String passwordInChiaro)
             throws CredenzialiErrateException, SistemaIndisponibileException {
@@ -52,6 +56,15 @@ public class UtenteService {
         return authData.utente();
     }
 
+    public LocalDate ottieniDataCorrente() throws SistemaIndisponibileException {
+        try {
+            return utenteDAO.dataCorrente();
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore durante il recupero della data corrente: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
+    }
+
     public UtenteDTO registra(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
 
@@ -62,6 +75,22 @@ public class UtenteService {
                 nuovoUtente.domicilio() == null || nuovoUtente.domicilio().trim().isEmpty() ||
                 nuovoUtente.ruolo() == null) {
             throw new DatiMancantiException("Tutti i campi (incluso il domicilio) sono obbligatori per la registrazione.");
+        }
+
+        if (nuovoUtente.dataNascita() == null) {
+            throw new DatiMancantiException("Inserisci la data di nascita.");
+        }
+
+        LocalDate dataCorrente = ottieniDataCorrente();
+
+        if (nuovoUtente.dataNascita().isAfter(dataCorrente)) {
+            throw new DatiMancantiException("La data di nascita non può essere nel futuro.");
+        }
+        if (nuovoUtente.dataNascita().isBefore(DATA_NASCITA_MINIMA)) {
+            throw new DatiMancantiException(
+                    "La data di nascita non può essere precedente al "
+                            + DATA_NASCITA_MINIMA.format(FORMATO_DATA)
+                            + ".");
         }
 
         // Generazione dell'hash sicuro con BCrypt
@@ -87,6 +116,79 @@ public class UtenteService {
             return registrato.utente();
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore durante il recupero dell'utente registrato: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
+    }
+
+    public UtenteDTO aggiornaAccount(UtenteDTO aggiornato, String passwordCorrente, String nuovaPassword)
+            throws CredenzialiErrateException, UtenteGiaEsistenteException,
+            DatiMancantiException, SistemaIndisponibileException {
+        if (aggiornato == null || aggiornato.idUtente() == null
+                || aggiornato.nome() == null || aggiornato.nome().isBlank()
+                || aggiornato.cognome() == null || aggiornato.cognome().isBlank()
+                || aggiornato.email() == null || aggiornato.email().isBlank()
+                || aggiornato.domicilio() == null || aggiornato.domicilio().isBlank()
+                || aggiornato.ruolo() == null || aggiornato.ruolo() == UtenteDTO.RuoloUtente.GUEST
+                || passwordCorrente == null || passwordCorrente.isBlank()) {
+            throw new DatiMancantiException("Compila tutti i campi obbligatori e inserisci la password attuale.");
+        }
+        if (aggiornato.dataNascita() == null) {
+            throw new DatiMancantiException("Inserisci la data di nascita.");
+        }
+        LocalDate dataCorrente = ottieniDataCorrente();
+        if (aggiornato.dataNascita().isAfter(dataCorrente)
+                || aggiornato.dataNascita().isBefore(DATA_NASCITA_MINIMA)) {
+            throw new DatiMancantiException("La data di nascita inserita non è valida.");
+        }
+
+        String email = aggiornato.email().trim();
+        String nuovaPasswordNormalizzata = nuovaPassword == null ? "" : nuovaPassword;
+        if (!nuovaPasswordNormalizzata.isEmpty()
+                && (nuovaPasswordNormalizzata.length() < 8 || nuovaPasswordNormalizzata.length() > 64
+                || nuovaPasswordNormalizzata.contains(" ")
+                || !nuovaPasswordNormalizzata.matches(".*[a-z].*")
+                || !nuovaPasswordNormalizzata.matches(".*[A-Z].*")
+                || !nuovaPasswordNormalizzata.matches(".*\\d.*")
+                || !nuovaPasswordNormalizzata.matches(".*[^A-Za-z0-9].*"))) {
+            throw new DatiMancantiException("La password non soddisfa i requisiti di sicurezza.");
+        }
+
+        UtenteConHash account;
+        try {
+            account = utenteDAO.trovaPerId(aggiornato.idUtente());
+        } catch (SQLException e) {
+            System.err.println("[DAO_ERROR] Errore durante il recupero dell'account: " + e.getMessage());
+            throw new SistemaIndisponibileException(e);
+        }
+        if (account == null || account.utente().ruolo() != aggiornato.ruolo()) {
+            throw new CredenzialiErrateException();
+        }
+        if (!BCrypt.checkpw(passwordCorrente, account.passwordHash())) {
+            throw new CredenzialiErrateException();
+        }
+
+        UtenteDTO datiAggiornati = new UtenteDTO(
+                aggiornato.idUtente(),
+                aggiornato.nome().trim(),
+                aggiornato.cognome().trim(),
+                email,
+                aggiornato.dataNascita(),
+                aggiornato.domicilio().trim(),
+                account.utente().ruolo()
+        );
+        String hashNuovo = nuovaPasswordNormalizzata.isEmpty()
+                ? account.passwordHash()
+                : BCrypt.hashpw(nuovaPasswordNormalizzata, BCrypt.gensalt(BCRYPT_WORK_FACTOR));
+        try {
+            if (!utenteDAO.aggiornaUtente(datiAggiornati, account.passwordHash(), hashNuovo)) {
+                throw new CredenzialiErrateException();
+            }
+            return datiAggiornati;
+        } catch (SQLException e) {
+            if ("23505".equals(e.getSQLState())) {
+                throw new UtenteGiaEsistenteException(email);
+            }
+            System.err.println("[DAO_ERROR] Errore durante l'aggiornamento dell'account: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
         }
     }

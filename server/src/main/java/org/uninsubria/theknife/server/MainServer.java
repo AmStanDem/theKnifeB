@@ -12,6 +12,11 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -32,8 +37,16 @@ public class MainServer {
     private static final String DEFAULT_DB_NAME = "theknife";
     private static final String DEFAULT_DB_USER = "admin";
     private static final String DEFAULT_DB_PASSWORD = "admin";
+    private static final String PROCESS_LOCK_FILE = "theknife-server.lock";
 
     public static void main(String[] args) {
+        System.out.println("[SYSTEM] Controllo istanza server in corso...");
+        System.out.flush();
+        ServerProcessLock processLock = acquireProcessLock();
+        if (processLock == null) {
+            return;
+        }
+
         System.out.println("=================================================");
         System.out.println("      THE KNIFE - CORE SERVER INITIALIZATION     ");
         System.out.println("=================================================\n");
@@ -86,6 +99,7 @@ public class MainServer {
                 server.close();
             }
             DatabaseConfig.close();
+            processLock.close();
         }, "theknife-server-shutdown"));
 
         Registry registry;
@@ -150,6 +164,88 @@ public class MainServer {
             // The object may not have been exported if startup failed partway through.
         }
     }
+
+    private static ServerProcessLock acquireProcessLock() {
+        Path lockPath = Paths.get(
+                System.getProperty("java.io.tmpdir"),
+                PROCESS_LOCK_FILE
+        );
+        try {
+            FileChannel channel = FileChannel.open(
+                    lockPath,
+                    java.nio.file.StandardOpenOption.CREATE,
+                    java.nio.file.StandardOpenOption.WRITE
+            );
+            try {
+                FileLock lock = channel.tryLock();
+                if (lock == null) {
+                    channel.close();
+                    stampaIstanzaAttiva(lockPath);
+                    return null;
+                }
+                String lockInfo = "PID=" + ProcessHandle.current().pid()
+                        + System.lineSeparator()
+                        + "PORTA_RMI=1099"
+                        + System.lineSeparator();
+                java.nio.ByteBuffer lockInfoBuffer = java.nio.ByteBuffer.wrap(
+                        lockInfo.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                while (lockInfoBuffer.hasRemaining()) {
+                    int bytesWritten = channel.write(lockInfoBuffer);
+                    if (bytesWritten == 0) {
+                        throw new IOException("Impossibile scrivere il contenuto del lock.");
+                    }
+                }
+                System.out.println("[SYSTEM] Lock server acquisito: " + lockPath);
+                System.out.flush();
+                return new ServerProcessLock(channel, lock, lockPath);
+            } catch (OverlappingFileLockException e) {
+                channel.close();
+                stampaIstanzaAttiva(lockPath);
+                return null;
+            } catch (IOException e) {
+                channel.close();
+                throw e;
+            }
+        } catch (IOException e) {
+            System.err.println("[FATAL ERROR] Impossibile creare il lock del server in "
+                    + lockPath + ": " + e.getMessage());
+            System.err.flush();
+            return null;
+        }
+    }
+
+    private static void stampaIstanzaAttiva(Path lockPath) {
+        String message = "[FATAL ERROR] Un'altra istanza del server è già attiva.";
+        String suggestion = "[SUGGERIMENTO] Lock: " + lockPath
+                + ". Usa Ctrl+C sull'istanza attiva; non Ctrl+Z, che sospende il processo.";
+        System.out.println(message);
+        System.out.println(suggestion);
+        System.out.flush();
+        System.err.println(message);
+        System.err.println(suggestion);
+        System.err.flush();
+    }
+
+    private record ServerProcessLock(FileChannel channel, FileLock lock, Path path) {
+
+        public void close() {
+                try {
+                    if (lock.isValid()) {
+                        lock.release();
+                    }
+                } catch (IOException e) {
+                    System.err.println("[CONFIG_WARN] Impossibile rilasciare il lock del server: "
+                            + e.getMessage());
+                } finally {
+                    try {
+                        channel.close();
+                    } catch (IOException e) {
+                        System.err.println("[CONFIG_WARN] Impossibile chiudere il file di lock "
+                                + path + ": " + e.getMessage());
+                    }
+                }
+            }
+        }
 
     private static String prompt(Scanner scanner, Console console, String label, String defaultValue) {
         String prompt = label + " [" + defaultValue + "]: ";

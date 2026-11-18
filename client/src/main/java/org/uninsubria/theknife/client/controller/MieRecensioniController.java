@@ -68,13 +68,6 @@ public class MieRecensioniController {
     private void onAreaPersonaleClick(MouseEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/AreaPersonale.fxml");
     }
-
-
-    @FXML
-    public void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
     // =========================================================
     // INIZIALIZZAZIONE
     // =========================================================
@@ -119,6 +112,7 @@ public class MieRecensioniController {
     // RICERCA E LISTA
     // =========================================================
 
+    ///
     @FXML
     private void onSearch() {
         String query = txtRicerca.getText() == null ? "" : txtRicerca.getText().trim().toLowerCase();

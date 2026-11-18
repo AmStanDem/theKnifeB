@@ -15,6 +15,17 @@ public class UtenteDAO {
 
     public record UtenteConHash(UtenteDTO utente, String passwordHash) {}
 
+    public LocalDate dataCorrente() throws SQLException {
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT CURRENT_DATE");
+             ResultSet rs = stmt.executeQuery()) {
+            if (!rs.next()) {
+                throw new SQLException("Impossibile recuperare la data corrente dal database.");
+            }
+            return rs.getDate(1).toLocalDate();
+        }
+    }
+
     public boolean inserisciUtente(UtenteDTO utente, String passwordHash) throws SQLException {
         String sql = "INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -74,5 +85,54 @@ public class UtenteDAO {
             }
         }
         return null;
+    }
+
+    public UtenteConHash trovaPerId(Integer idUtente) throws SQLException {
+        String sql = "SELECT id_utente, email, password, nome, cognome, data_nascita, domicilio, ruolo "
+                + "FROM Utenti WHERE id_utente = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idUtente);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+                Date dataNascita = rs.getDate("data_nascita");
+                UtenteDTO dto = new UtenteDTO(
+                        rs.getInt("id_utente"),
+                        rs.getString("nome"),
+                        rs.getString("cognome"),
+                        rs.getString("email"),
+                        dataNascita == null ? null : dataNascita.toLocalDate(),
+                        rs.getString("domicilio"),
+                        RuoloUtente.valueOf(rs.getString("ruolo").toUpperCase())
+                );
+                return new UtenteConHash(dto, rs.getString("password"));
+            }
+        }
+    }
+
+    public boolean aggiornaUtente(UtenteDTO utente, String hashPrecedente, String hashNuovo)
+            throws SQLException {
+        String sql = "UPDATE Utenti SET email = ?, password = ?, nome = ?, cognome = ?, "
+                + "data_nascita = ?, domicilio = ? WHERE id_utente = ? AND password = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, utente.email());
+            stmt.setString(2, hashNuovo);
+            stmt.setString(3, utente.nome());
+            stmt.setString(4, utente.cognome());
+            if (utente.dataNascita() == null) {
+                stmt.setNull(5, Types.DATE);
+            } else {
+                stmt.setDate(5, Date.valueOf(utente.dataNascita()));
+            }
+            stmt.setString(6, utente.domicilio());
+            stmt.setInt(7, utente.idUtente());
+            stmt.setString(8, hashPrecedente);
+            return stmt.executeUpdate() == 1;
+        }
     }
 }

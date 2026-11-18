@@ -14,6 +14,7 @@ import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.CuisineTags;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -45,7 +46,7 @@ public class RestaurantItemController {
 
     private RistoranteDTO ristorante;
     private Consumer<RistoranteDTO> onDettagliAction;
-    private Consumer<RistoranteDTO> onModificaAction;
+    private BiConsumer<ActionEvent, RistoranteDTO> onModificaAction;
 
     /**
      * Popola la card con i dati del ristorante passato.
@@ -85,7 +86,7 @@ public class RestaurantItemController {
         this.onDettagliAction = onDettagliAction;
     }
 
-    public void setOnModificaAction(Consumer<RistoranteDTO> onModificaAction) {
+    public void setOnModificaAction(BiConsumer<ActionEvent, RistoranteDTO> onModificaAction) {
         this.onModificaAction = onModificaAction;
         editButton.setVisible(onModificaAction != null);
         editButton.setManaged(onModificaAction != null);
@@ -103,13 +104,16 @@ public class RestaurantItemController {
      */
     private void onDetailsClicked(ActionEvent actionEvent) {
         RistoranteSelezionato.setRistorante(ristorante);
+        if (onDettagliAction != null) {
+            onDettagliAction.accept(ristorante);
+        }
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
     }
 
     @FXML
-    private void onEditClicked() {
+    private void onEditClicked(ActionEvent actionEvent) {
         if (ristorante != null && onModificaAction != null) {
-            onModificaAction.accept(ristorante);
+            onModificaAction.accept(actionEvent, ristorante);
         }
     }
 

@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <BorderPane prefHeight="768.0"
             prefWidth="1024.0"
@@ -36,16 +37,7 @@
             <children>
 
                 <!-- LOGO A SINISTRA -->
-                <ImageView fitHeight="133.0"
-                           fitWidth="441.0"
-                           preserveRatio="true"
-                           onMouseClicked="#handleLogoClick">
-
-                    <image>
-                        <Image url="@../images/img_1.png" />
-                    </image>
-
-                </ImageView>
+                <HomeLogo />
 
                 <!-- SPAZIO -->
                 <Region HBox.hgrow="ALWAYS" />
@@ -57,7 +49,7 @@
                         prefHeight="63.0"
                         prefWidth="285.0"
                         styleClass="accent"
-                        text="Log out" />
+                        text="Esci" />
 
 
             </children>
@@ -120,7 +112,7 @@
                         <!-- EMAIL -->
                         <HBox alignment="CENTER_LEFT"
                               spacing="10.0">
-                            <Label text="Email:"
+                            <Label text="E-mail:"
                                    styleClass="profile-label" />
 
                             <Label fx:id="lblEmail"
@@ -151,7 +143,7 @@
                             prefHeight="55.0"
                             prefWidth="500.0"
                             styleClass="profile-button"
-                            text="I miei ristoranti" />
+                            text="Gestisci i miei ristoranti" />
 
                     <!-- AGGIUNGI RISTORANTE -->
                     <Button fx:id="btnAggiungi"
@@ -162,6 +154,22 @@
                             styleClass="profile-button"
                             text="Aggiungi ristorante" />
 
+                    <Button fx:id="btnModificaRistorante"
+                            mnemonicParsing="false"
+                            onAction="#onModificaRistoranteClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="Modifica ristorante" />
+
+                    <Button fx:id="btnModificaCredenziali"
+                            mnemonicParsing="false"
+                            onAction="#onModificaCredenzialiClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="Modifica credenziali" />
+
                 </VBox>
 
             </children>
@@ -170,4 +178,3 @@
     </center>
 
 </BorderPane>
-
