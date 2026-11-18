@@ -171,7 +171,7 @@ public class RistoranteDAO {
     }
 
     public RistoranteDTO trovaPerId(int idRistorante) throws SQLException {
-        String sql = costruisciQueryBase() + " WHERE r.id_ristorante = ? GROUP BY r.id_ristorante";
+        String sql = costruisciQueryBase() + " WHERE r.id_ristorante = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idRistorante);
@@ -184,7 +184,7 @@ public class RistoranteDAO {
 
     public List<RistoranteDTO> trovaPerGestore(int idGestore) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
-        String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? GROUP BY r.id_ristorante ORDER BY r.nome ASC";
+        String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? ORDER BY r.nome ASC";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, idGestore);
@@ -246,10 +246,8 @@ public class RistoranteDAO {
                 sql.append(" AND r.booking_online = TRUE");
             }
 
-            sql.append(" GROUP BY r.id_ristorante");
-
             if (filtri.mediaStelleMinima() != null) {
-                sql.append(" HAVING COALESCE(AVG(rec_stat.valutazione), 0.0) >= ?");
+                sql.append(" AND COALESCE(rec_stat.media_stelle, 0.0) >= ?");
                 parametri.add(filtri.mediaStelleMinima());
             }
 
@@ -264,7 +262,7 @@ public class RistoranteDAO {
                 sql.append(" ORDER BY r.nome ASC");
             }
         } else {
-            sql.append(" GROUP BY r.id_ristorante ORDER BY r.nome ASC");
+            sql.append(" ORDER BY r.nome ASC");
         }
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -341,9 +339,8 @@ public class RistoranteDAO {
             sql.append(" AND r.booking_online = TRUE");
         }
 
-        sql.append(" GROUP BY r.id_ristorante");
         if (richiesta.mediaStelleMinima() != null) {
-            sql.append(" HAVING COALESCE(AVG(rec_stat.valutazione), 0.0) >= ?");
+            sql.append(" AND COALESCE(rec_stat.media_stelle, 0.0) >= ?");
             parametri.add(richiesta.mediaStelleMinima());
         }
         if (richiesta.latitudineRiferimento() != null) {
@@ -380,15 +377,17 @@ public class RistoranteDAO {
     }
 
     private String costruisciQueryBase() {
-        // Separiamo le recensioni per evitare righe duplicate provocate dalle molteplici tipologie cucina
         return "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, r.latitudine, r.longitudine, " +
                 "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, r.telefono, r.sito_web, r.descrizione, " +
-                "COALESCE(AVG(rec_stat.valutazione), 0.0) as media_stelle, " +
-                "STRING_AGG(DISTINCT tc.nome, ',') as tipologie_cucina " +
+                "COALESCE(rec_stat.media_stelle, 0.0) as media_stelle, " +
+                "cucine.tipologie_cucina " +
                 "FROM RistorantiTheKnife r " +
-                "LEFT JOIN Recensioni rec_stat ON r.id_ristorante = rec_stat.id_ristorante " +
-                "LEFT JOIN Ristoranti_Tipologie rt ON r.id_ristorante = rt.id_ristorante " +
-                "LEFT JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia";
+                "LEFT JOIN LATERAL (SELECT AVG(rec.valutazione) AS media_stelle " +
+                "FROM Recensioni rec WHERE rec.id_ristorante = r.id_ristorante) rec_stat ON TRUE " +
+                "LEFT JOIN LATERAL (SELECT STRING_AGG(DISTINCT tc.nome, ',') AS tipologie_cucina " +
+                "FROM Ristoranti_Tipologie rt " +
+                "JOIN Tipologia_Cucina tc ON rt.id_tipologia = tc.id_tipologia " +
+                "WHERE rt.id_ristorante = r.id_ristorante) cucine ON TRUE";
     }
 
     public List<String> ottieniTutteTipologieCucina() throws SQLException {
