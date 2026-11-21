@@ -159,6 +159,13 @@ public class RistoranteService {
         if (richiesta == null) {
             throw new IllegalArgumentException("La richiesta di ricerca è obbligatoria.");
         }
+        if (richiesta.localita().isBlank()
+                || richiesta.latitudineRiferimento() == null
+                || richiesta.longitudineRiferimento() == null
+                || richiesta.raggioKm() == null) {
+            throw new IllegalArgumentException(
+                    "Per la ricerca paginata sono obbligatorie località, coordinate e raggio.");
+        }
         try {
             return ristoranteDAO.cercaPagina(richiesta);
         } catch (SQLException e) {

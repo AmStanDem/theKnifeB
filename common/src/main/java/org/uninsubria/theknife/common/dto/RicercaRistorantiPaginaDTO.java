@@ -45,11 +45,15 @@ public record RicercaRistorantiPaginaDTO(
         if (haLatitudine != haLongitudine || haLatitudine != haRaggio) {
             throw new IllegalArgumentException("Per la ricerca geografica servono coordinate e raggio.");
         }
-        if (haLatitudine && (!Double.isFinite(latitudineRiferimento)
+        if (localita.isBlank() || !haLatitudine) {
+            throw new IllegalArgumentException(
+                    "Per la ricerca paginata sono obbligatorie località, coordinate e raggio.");
+        }
+        if (!Double.isFinite(latitudineRiferimento)
                 || latitudineRiferimento < -90 || latitudineRiferimento > 90
                 || !Double.isFinite(longitudineRiferimento)
                 || longitudineRiferimento < -180 || longitudineRiferimento > 180
-                || !Double.isFinite(raggioKm) || raggioKm <= 0 || raggioKm > 500)) {
+                || !Double.isFinite(raggioKm) || raggioKm <= 0 || raggioKm > 500) {
             throw new IllegalArgumentException("Coordinate o raggio geografico non validi.");
         }
     }

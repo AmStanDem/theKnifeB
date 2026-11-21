@@ -48,6 +48,21 @@ public class DatabaseConfig {
 
         eseguiMigrazioniFlyway(url, username, password);
 
+        HikariDataSource pool = getPool(url, username, password);
+        try (Connection connection = pool.getConnection()) {
+            if (!connection.isValid((int) (VALIDATION_TIMEOUT_MS / 1_000))) {
+                throw new SQLException("Il database non ha superato la verifica di validità.");
+            }
+        } catch (SQLException e) {
+            pool.close();
+            throw new IllegalStateException("Bootstrapping del pool database fallito.", e);
+        }
+        dataSource = pool;
+        System.out.printf("[DB_INFO] HikariCP pronto (pool massimo: %d connessioni).%n",
+                MAXIMUM_POOL_SIZE);
+    }
+
+    private static HikariDataSource getPool(String url, String username, String password) {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(url);
         config.setUsername(username);
@@ -60,18 +75,7 @@ public class DatabaseConfig {
         config.setValidationTimeout(VALIDATION_TIMEOUT_MS);
         config.setInitializationFailTimeout(CONNECTION_TIMEOUT_MS);
 
-        HikariDataSource pool = new HikariDataSource(config);
-        try (Connection connection = pool.getConnection()) {
-            if (!connection.isValid((int) (VALIDATION_TIMEOUT_MS / 1_000))) {
-                throw new SQLException("Il database non ha superato la verifica di validità.");
-            }
-        } catch (SQLException e) {
-            pool.close();
-            throw new IllegalStateException("Bootstrapping del pool database fallito.", e);
-        }
-        dataSource = pool;
-        System.out.printf("[DB_INFO] HikariCP pronto (pool massimo: %d connessioni).%n",
-                MAXIMUM_POOL_SIZE);
+        return new HikariDataSource(config);
     }
 
     /**
