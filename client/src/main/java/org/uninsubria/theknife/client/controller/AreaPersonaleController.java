@@ -203,17 +203,4 @@ public class AreaPersonaleController {
                 "/org/uninsubria/theknife/client/views/ModificaAccount.fxml"
         );
     }
-
-
-    @FXML
-    private void onLogOutClick(ActionEvent event) {
-        SessioneUtente.logout();
-
-        // Ricaviamo lo Stage in modo sicuro da un componente grafico esistente (es. lblNome)
-        if (lblNome != null && lblNome.getScene() != null) {
-            Stage stage = (Stage) lblNome.getScene().getWindow();
-            SceneManager.clearHistory(stage);
-            SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-        }
-    }
 }
