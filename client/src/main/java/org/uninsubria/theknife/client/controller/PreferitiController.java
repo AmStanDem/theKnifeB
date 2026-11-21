@@ -6,16 +6,12 @@ package org.uninsubria.theknife.client.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.uninsubria.theknife.client.util.SceneManager;
@@ -37,31 +33,11 @@ import java.util.Objects;
 
 public class PreferitiController {
 
-    @FXML
-    private TextField txtLocalita;
-
-    @FXML
-    private TextField txtRicerca;
-
-    @FXML
-    private Button btnGeolocalizzazione;
-
     @FXML private Label resultsCountLabel;
     @FXML private ScrollPane restaurantScrollPane;
     @FXML private VBox restaurantContainer;
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
-
-    @FXML
-    private void onRicercaClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/listaPreferiti.fxml");
-    }
-
-    @FXML
-    private void onAreaPersonaleClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/AreaPersonale.fxml");
-    }
-
 
     @FXML
     public void initialize() {

@@ -92,13 +92,13 @@ La UI controlla la complessità della password, ma il servizio server richiede s
 
 Le operazioni server sono gestite da `PreferitiService` e `PreferitiDAO`. `PreferitiController.caricaPreferiti` mostra la lista e `rimuoviPreferito` gestisce la rimozione; la vista associata è `Preferiti.fxml`. Il dettaglio ristorante consente di aggiungere/togliere il preferito e aggiornare lo stato.
 
-Nel progetto esiste anche `ListaPreferitiController`, che presenta parti segnalate come TODO/dati di test. Non va confuso con la vista attiva `Preferiti.fxml`.
+La vecchia vista `listaPreferiti.fxml` e il controller `ListaPreferitiController`, che usavano dati di test, sono stati rimossi. La lista effettiva dei preferiti è gestita da `Preferiti.fxml` e `PreferitiController`.
 
 **Riferimenti:** `server/src/main/java/org/uninsubria/theknife/server/service/PreferitiService.java`; `server/src/main/java/org/uninsubria/theknife/server/dao/PreferitiDAO.java`; `client/src/main/java/org/uninsubria/theknife/client/controller/PreferitiController.java`; `client/src/main/resources/org/uninsubria/theknife/client/views/Preferiti.fxml`.
 
 **Prompt per l'IA**
 
-> Controlla il flusso attivo dei preferiti in `PreferitiService`, `PreferitiDAO`, `PreferitiController` e `Preferiti.fxml`. Verifica che un cliente autenticato possa aggiungere un ristorante, rimuoverlo e visualizzare la lista persistita, e che lo stato del pulsante nel dettaglio sia aggiornato correttamente. Individua eventuali collegamenti alla schermata incompleta `ListaPreferitiController` e correggili solo se sono effettivamente usati. Aggiungi test per aggiunta, rimozione, duplicati e lista vuota.
+> Controlla il flusso attivo dei preferiti in `PreferitiService`, `PreferitiDAO`, `PreferitiController` e `Preferiti.fxml`. Verifica che un cliente autenticato possa aggiungere un ristorante, rimuoverlo e visualizzare la lista persistita, e che lo stato del pulsante nel dettaglio sia aggiornato correttamente. Aggiungi test per aggiunta, rimozione, duplicati e lista vuota.
 
 ### `aggiungiRecensione()`
 
@@ -215,4 +215,3 @@ Il modulo nel repository si chiama `server`, non `serverTK`. Non risulta configu
 3. **Rendere coerenti i controlli server di `registrazione()`** con le regole password della UI e la politica di assegnazione del ruolo.
 4. **Verificare il vincolo geografico in tutti i percorsi di `cercaRistorante()`**, non solo nel controller.
 5. **Confermare con il professore** se il voto recensione può includere mezze stelle e se `serverTK` è un nome letterale obbligatorio.
-
