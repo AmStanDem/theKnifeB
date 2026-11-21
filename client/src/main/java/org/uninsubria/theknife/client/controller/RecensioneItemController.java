@@ -127,22 +127,6 @@ public class RecensioneItemController {
         replyButton.setManaged(false);
     }
 
-    public void setDati(
-            String nomeAutore,
-            boolean isLocalGuide,
-            String data,
-            double valutazione,
-            String testoRecensione,
-            String testoRisposta) {
-
-        setAutore(nomeAutore);
-        setLocalGuide(isLocalGuide);
-        setData(data);
-        setValutazione(valutazione);
-        setTesto(testoRecensione);
-        setRisposta(testoRisposta);
-    }
-
     public void setAutore(String nome) {
         if (nome == null || nome.isBlank()) {
             authorLabel.setText("Utente");

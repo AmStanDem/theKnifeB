@@ -508,29 +508,6 @@ public class AreaRistoranteController {
         return String.format(Locale.ROOT, "%.1f", valutazione).replace(".0", "");
     }
 
-    // =========================================================
-    // NAVIGAZIONE
-    // =========================================================
-
-    @FXML
-    private void onRicercaClick(ActionEvent event) {
-        System.out.println("Ricerca cliccata");
-    }
-
-    @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/SignUp.fxml");
-    }
-
-    @FXML
-    private void onGeolocalizzazioneClick() {
-    }
-
-    @FXML
-    public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/RicercaAvanzataView.fxml");
-    }
-
     public void onPreferitiClick(ActionEvent actionEvent) {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isCliente()) {
@@ -669,19 +646,6 @@ public class AreaRistoranteController {
                     "Impossibile rimuovere la recensione. Riprova più tardi.");
         }
     }
-
-    // =========================================================
-    // LOGOUT
-    // =========================================================
-
-    /*
-    @FXML
-    public void onLogOutClick(ActionEvent actionEvent) {
-        SessioneUtente.logout();
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
-     */
 
     @FXML
     private void onTornaAiMieiRistorantiClick(ActionEvent event) {

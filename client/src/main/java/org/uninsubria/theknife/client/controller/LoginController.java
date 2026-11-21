@@ -37,11 +37,6 @@ public class LoginController {
     @FXML
     private Button signInButton;
 
-    @FXML
-    private void handleSignIn(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
     /**
      * Gestisce il click sul pulsante "Accedi": invoca il login remoto e,
      * se le credenziali sono corrette, apre la home dell'utente.

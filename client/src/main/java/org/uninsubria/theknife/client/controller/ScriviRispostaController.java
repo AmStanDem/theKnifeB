@@ -53,42 +53,6 @@ public class ScriviRispostaController {
     }
 
     @FXML
-    private void onRicercaClick(ActionEvent event) {
-        System.out.println("Ricerca cliccata");
-    }
-
-    @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/SignUp.fxml");
-    }
-
-    @FXML
-    private void onGeolocalizzazioneClick() {
-    }
-
-    @FXML
-    public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/RicercaAvanzataView.fxml");
-    }
-
-    @FXML
-    public void onPreferitiClick(ActionEvent actionEvent) {
-    }
-
-    @FXML
-    public void onRecensioniClick(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/RecensioneItem.fxml");
-    }
-
-    @FXML
-    public void onLogOutClick(ActionEvent actionEvent) {
-        RecensioneDaRispondere.pulisci();
-        SceneManager.clearHistory(SceneManager.getStage(actionEvent));
-        SessioneUtente.logout();
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
-
-    @FXML
     public void onInviaRispostaClick(ActionEvent actionEvent) {
         UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
         if (!SessioneUtente.isGestore() || gestore == null

@@ -10,7 +10,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 
 
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
@@ -38,12 +37,6 @@ public class ScriviRecensioneController {
 
     @FXML
     private Label titoloLabel;
-
-    @FXML
-    private TextField txtLocalita;
-
-    @FXML
-    private Button btnGeolocalizzazione;
 
     @FXML
     private TextArea txtRecensione;
@@ -87,38 +80,6 @@ public class ScriviRecensioneController {
             mostraMessaggio(Alert.AlertType.ERROR, "Ristorante non selezionato",
                     "Apri la scheda di un ristorante prima di scrivere una recensione.");
         }
-    }
-
-    @FXML
-    private void onRicercaClick(ActionEvent event) {
-        System.out.println("Ricerca cliccata");
-    }
-
-    @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/SignUp.fxml");
-    }
-
-
-    @FXML
-    public void onRicercaAvanzataClick(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/RicercaAvanzataView.fxml");
-    }
-
-    @FXML
-    public void onPreferitiClick(ActionEvent actionEvent) {
-    }
-
-    @FXML
-    public void onRecensioniClick(ActionEvent actionEvent) {
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/RecensioneItem.fxml");
-    }
-
-    @FXML
-    public void onLogOutClick(ActionEvent actionEvent) {
-        SceneManager.clearHistory(SceneManager.getStage(actionEvent));
-        SessioneUtente.logout();
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
     @FXML
