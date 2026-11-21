@@ -89,14 +89,4 @@ public class LoginController {
     private void onVaiRegistrazione(ActionEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/SignUp.fxml");
     }
-
-    /**
-     * Salta l'autenticazione e prosegue come utente ospite (guest).
-     */
-    @FXML
-    private void onContinuaComeGuest(ActionEvent event) {
-        SceneManager.clearHistory(SceneManager.getStage(event));
-        SessioneUtente.logout();
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-    }
 }
