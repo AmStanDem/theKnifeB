@@ -18,7 +18,7 @@ public class InteractiveRatingView extends BaseRatingView {
     private Runnable onRatingChanged;
 
     public InteractiveRatingView(int maxStarsIgnored, double initialRating, boolean interactive) {
-        super(maxStarsIgnored, initialRating);
+        super(initialRating);
         this.interactive = interactive;
 
         for (int i = 0; i < stars.size(); i++) {
@@ -67,11 +67,6 @@ public class InteractiveRatingView extends BaseRatingView {
 
     public boolean isInteractive() {
         return interactive;
-    }
-
-    public void setRating(double rating) {
-        this.rating = Math.max(0.0, Math.min(maxStars, rating));
-        paintStars(this.rating);
     }
 
     public void setOnRatingChanged(Runnable onRatingChanged) {

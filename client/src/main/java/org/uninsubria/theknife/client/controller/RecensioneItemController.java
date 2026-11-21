@@ -75,7 +75,7 @@ public class RecensioneItemController {
 
     @FXML
     private void initialize() {
-        ratingControl = new BaseRatingView(5, 0);
+        ratingControl = new BaseRatingView(0);
         ratingControl.setSpacing(1);
         ratingControl.setScaleX(0.5);
         ratingControl.setScaleY(0.5);
@@ -165,7 +165,7 @@ public class RecensioneItemController {
     }
 
     public void setValutazione(double stelle) {
-        stelle = Math.max(0, Math.min(5, stelle));
+        stelle = Math.clamp(stelle, 0, 5);
         ratingControl.setRating(stelle);
     }
 

@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import static org.uninsubria.theknife.client.util.ServerConnection.getServer;
-
 public class AreaRistoranteController {
 
 
@@ -152,7 +150,7 @@ public class AreaRistoranteController {
                 RistoranteSelezionato.consumaRitornoAiMieiRistoranti();
         tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
         tornaAiMieiRistoranti.setManaged(mostraRitornoMieiRistoranti);
-        averageRating = new BaseRatingView(5, 0);
+        averageRating = new BaseRatingView(0);
         averageRating.setSpacing(2);
         averageRating.setScaleX(0.75);
         averageRating.setScaleY(0.75);

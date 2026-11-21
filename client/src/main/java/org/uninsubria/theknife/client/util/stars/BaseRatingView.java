@@ -32,7 +32,7 @@ public class BaseRatingView extends HBox {
 
     protected final List<SVGPath> stars = new ArrayList<>();
 
-    public BaseRatingView(int maxStarsIgnored, double initialRating) {
+    public BaseRatingView(double initialRating) {
         this.rating = initialRating;
         setSpacing(6);
         setPadding(new Insets(5));
@@ -77,7 +77,7 @@ public class BaseRatingView extends HBox {
     }
 
     public void setRating(double rating) {
-        this.rating = Math.max(0.0, Math.min(maxStars, rating));
+        this.rating = Math.clamp(rating, 0.0, maxStars);
         paintStars(this.rating);
     }
 
