@@ -77,20 +77,18 @@ public class UtenteService {
             throw new DatiMancantiException("Tutti i campi (incluso il domicilio) sono obbligatori per la registrazione.");
         }
 
-        if (nuovoUtente.dataNascita() == null) {
-            throw new DatiMancantiException("Inserisci la data di nascita.");
-        }
-
         LocalDate dataCorrente = ottieniDataCorrente();
 
-        if (nuovoUtente.dataNascita().isAfter(dataCorrente)) {
-            throw new DatiMancantiException("La data di nascita non può essere nel futuro.");
-        }
-        if (nuovoUtente.dataNascita().isBefore(DATA_NASCITA_MINIMA)) {
-            throw new DatiMancantiException(
-                    "La data di nascita non può essere precedente al "
-                            + DATA_NASCITA_MINIMA.format(FORMATO_DATA)
-                            + ".");
+        if (nuovoUtente.dataNascita() != null) {
+            if (nuovoUtente.dataNascita().isAfter(dataCorrente)) {
+                throw new DatiMancantiException("La data di nascita non può essere nel futuro.");
+            }
+            if (nuovoUtente.dataNascita().isBefore(DATA_NASCITA_MINIMA)) {
+                throw new DatiMancantiException(
+                        "La data di nascita non può essere precedente al "
+                                + DATA_NASCITA_MINIMA.format(FORMATO_DATA)
+                                + ".");
+            }
         }
 
         // Generazione dell'hash sicuro con BCrypt
@@ -132,12 +130,10 @@ public class UtenteService {
                 || passwordCorrente == null || passwordCorrente.isBlank()) {
             throw new DatiMancantiException("Compila tutti i campi obbligatori e inserisci la password attuale.");
         }
-        if (aggiornato.dataNascita() == null) {
-            throw new DatiMancantiException("Inserisci la data di nascita.");
-        }
         LocalDate dataCorrente = ottieniDataCorrente();
-        if (aggiornato.dataNascita().isAfter(dataCorrente)
-                || aggiornato.dataNascita().isBefore(DATA_NASCITA_MINIMA)) {
+        if (aggiornato.dataNascita() != null
+                && (aggiornato.dataNascita().isAfter(dataCorrente)
+                || aggiornato.dataNascita().isBefore(DATA_NASCITA_MINIMA))) {
             throw new DatiMancantiException("La data di nascita inserita non è valida.");
         }
 

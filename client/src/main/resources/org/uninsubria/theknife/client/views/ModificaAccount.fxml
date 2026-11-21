@@ -50,7 +50,7 @@
 
                     <HBox spacing="16.0">
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                            <Label text="Data di nascita *" styleClass="input-label"/>
+                            <Label text="Data di nascita (opzionale)" styleClass="input-label"/>
                             <DataNascitaInput fx:id="dataNascitaField" prefHeight="40.0"/>
                         </VBox>
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">

@@ -105,8 +105,7 @@ public class SignUpController {
         }
 
         if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
-                || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()
-                || dataNascita == null) {
+                || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
             labelErrore.setText("Compila tutti i campi obbligatori!");
             return;
         }
@@ -163,12 +162,12 @@ public class SignUpController {
             var server = ServerConnection.getServer();
             LocalDate dataCorrente = server.ottieniDataCorrente();
 
-            if (dataNascita.isBefore(DATA_NASCITA_MINIMA)) {
+            if (dataNascita != null && dataNascita.isBefore(DATA_NASCITA_MINIMA)) {
                 labelErrore.setText("La data di nascita non può essere precedente al 01/01/1900.");
                 dataNascitaField.requestFocus();
                 return;
             }
-            if (dataNascita.isAfter(dataCorrente)) {
+            if (dataNascita != null && dataNascita.isAfter(dataCorrente)) {
                 labelErrore.setText("La data di nascita non può essere successiva a oggi.");
                 dataNascitaField.requestFocus();
                 return;

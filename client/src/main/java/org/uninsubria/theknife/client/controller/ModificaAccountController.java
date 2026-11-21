@@ -80,7 +80,8 @@ public class ModificaAccountController {
 
         LocalDate dataNascita;
         try {
-            dataNascita = LocalDate.parse(dataNascitaField.getText().trim(), DATE_FORMAT);
+            String testoData = dataNascitaField.getText().trim();
+            dataNascita = testoData.isEmpty() ? null : LocalDate.parse(testoData, DATE_FORMAT);
         } catch (DateTimeParseException | NullPointerException e) {
             messaggioLabel.setText("Inserisci una data valida nel formato gg/mm/aaaa.");
             return;

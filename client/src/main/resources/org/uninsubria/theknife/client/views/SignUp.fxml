@@ -65,7 +65,7 @@
 
                         <!-- DATA DI NASCITA -->
                         <VBox spacing="4.0">
-                            <Label styleClass="field-label" text="Data di nascita" />
+                            <Label styleClass="field-label" text="Data di nascita (opzionale)" />
                             <DataNascitaInput fx:id="dataNascitaField" prefHeight="40.0" />
                         </VBox>
 
