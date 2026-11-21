@@ -24,7 +24,7 @@ public final class LuogoInput extends HBox {
 
     private final TextField campo = new TextField();
     private final Button mappa = new Button();
-    private AutocompleteLuoghi autocomplete;
+    private final AutocompleteLuoghi autocomplete;
     private Consumer<GeocodingService.Luogo> alSeleziona = luogo -> { };
 
     public LuogoInput() {
