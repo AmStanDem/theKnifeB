@@ -293,7 +293,7 @@ public class ListaRistorantiController {
         }
 
         return new RicercaRistorantiPaginaDTO(
-                "",
+                localitaRicerca,
                 searchField.getText(),
                 cuisineSelector.getSelectedCuisines(),
                 prezzoMin,
