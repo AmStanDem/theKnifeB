@@ -4,7 +4,15 @@
  */
 package org.uninsubria.theknife.common.exceptions;
 
+/**
+ * Eccezione lanciata quando viene ripetuta un'operazione già effettuata.
+ */
 public class AzioneDuplicataException extends TheKnifeException {
+    /**
+     * Crea l'eccezione descrivendo l'operazione duplicata.
+     *
+     * @param dettaglio descrizione dell'operazione duplicata
+     */
     public AzioneDuplicataException(String dettaglio) {
         super("Operazione già effettuata: " + dettaglio);
     }

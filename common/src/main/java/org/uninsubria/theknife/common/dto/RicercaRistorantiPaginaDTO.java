@@ -8,6 +8,26 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Parametri di una ricerca paginata di ristoranti.
+ *
+ * @param localita località geografica da utilizzare nella ricerca
+ * @param testo testo libero da cercare tra i dati dei ristoranti
+ * @param tipologieCucina tipologie di cucina da includere nella ricerca
+ * @param prezzoMin prezzo minimo accettato
+ * @param prezzoMax prezzo massimo accettato
+ * @param mediaStelleMinima valutazione media minima compresa tra 0 e 5
+ * @param offset numero di risultati da saltare
+ * @param limite numero massimo di risultati da restituire, compreso tra 1 e 100
+ * @param latitudineRiferimento latitudine del punto centrale della ricerca
+ * @param longitudineRiferimento longitudine del punto centrale della ricerca
+ * @param raggioKm raggio di ricerca in chilometri
+ * @param delivery indica se cercare ristoranti con consegna a domicilio
+ * @param bookingOnline indica se cercare ristoranti con prenotazione online
+ * @throws IllegalArgumentException se i filtri di prezzo o valutazione non sono validi,
+ * se la paginazione non è valida, se mancano le coordinate complete o se località,
+ * coordinate e raggio non soddisfano i requisiti della ricerca
+ */
 public record RicercaRistorantiPaginaDTO(
         String localita,
         String testo,

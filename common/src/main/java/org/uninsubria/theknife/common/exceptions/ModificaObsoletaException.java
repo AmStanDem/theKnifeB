@@ -4,7 +4,15 @@
  */
 package org.uninsubria.theknife.common.exceptions;
 
+/**
+ * Eccezione lanciata quando una modifica usa una versione obsoleta del dato.
+ */
 public class ModificaObsoletaException extends TheKnifeException {
+    /**
+     * Crea l'eccezione con il dettaglio del conflitto rilevato.
+     *
+     * @param message descrizione dell'obsolescenza o del conflitto di modifica
+     */
     public ModificaObsoletaException(String message) {
         super(message);
     }

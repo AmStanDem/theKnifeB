@@ -4,6 +4,9 @@
  */
 package org.uninsubria.theknife.common.exceptions;
 
+/**
+ * Eccezione lanciata quando email o password inserite non sono valide.
+ */
 public class CredenzialiErrateException extends TheKnifeException {
     public CredenzialiErrateException() {
         super("Le credenziali inserite non sono valide. Verifica email e password.");

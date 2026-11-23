@@ -4,7 +4,15 @@
  */
 package org.uninsubria.theknife.common.exceptions;
 
+/**
+ * Eccezione lanciata quando si tenta di registrare un indirizzo email già associato a un utente.
+ */
 public class UtenteGiaEsistenteException extends TheKnifeException {
+    /**
+     * Crea l'eccezione indicando l'indirizzo email già registrato.
+     *
+     * @param email indirizzo email duplicato
+     */
     public UtenteGiaEsistenteException(String email) {
         super("Impossibile procedere: l'email " + email + " è già registrata nel sistema.");
     }

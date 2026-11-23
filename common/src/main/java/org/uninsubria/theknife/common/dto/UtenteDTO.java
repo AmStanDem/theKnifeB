@@ -8,6 +8,17 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/**
+ * Rappresentazione dei dati anagrafici e del ruolo di un utente.
+ *
+ * @param idUtente identificativo univoco dell'utente
+ * @param nome nome dell'utente
+ * @param cognome cognome dell'utente
+ * @param email indirizzo email dell'utente
+ * @param dataNascita data di nascita dell'utente
+ * @param domicilio domicilio dell'utente
+ * @param ruolo ruolo assegnato all'utente
+ */
 public record UtenteDTO(
         Integer idUtente,
         String nome,
@@ -17,6 +28,9 @@ public record UtenteDTO(
         String domicilio,
         RuoloUtente ruolo
 ) implements Serializable {
+    /**
+     * Ruoli disponibili per gli utenti della piattaforma.
+     */
     public enum RuoloUtente {
         GUEST,
         CLIENTE,

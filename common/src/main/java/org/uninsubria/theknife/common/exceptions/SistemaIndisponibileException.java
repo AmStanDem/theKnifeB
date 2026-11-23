@@ -10,10 +10,18 @@ package org.uninsubria.theknife.common.exceptions;
  */
 public class SistemaIndisponibileException extends TheKnifeException {
 
+    /**
+     * Crea l'eccezione con il messaggio generico relativo al servizio indisponibile.
+     */
     public SistemaIndisponibileException() {
         super("Il servizio è temporaneamente non disponibile a causa di un problema tecnico. Riprovare più tardi.");
     }
 
+    /**
+     * Crea l'eccezione registrando internamente la causa tecnica.
+     *
+     * @param causeLoggataNelServer causa infrastrutturale dell'errore
+     */
     public SistemaIndisponibileException(Throwable causeLoggataNelServer) {
         // La causa viene passata a null verso il supercostruttore per evitare
         // che il Client tenti di deserializzare eccezioni SQL che non conosce.

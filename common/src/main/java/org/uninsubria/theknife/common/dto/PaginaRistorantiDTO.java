@@ -8,6 +8,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Pagina dei risultati di una ricerca di ristoranti.
+ *
+ * @param ristoranti ristoranti inclusi nella pagina
+ * @param hasMore indica se sono disponibili ulteriori pagine di risultati
+ * @throws NullPointerException se l'elenco dei ristoranti è {@code null} o contiene elementi {@code null}
+ */
 public record PaginaRistorantiDTO(
         List<RistoranteDTO> ristoranti,
         boolean hasMore

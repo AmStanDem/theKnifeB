@@ -9,6 +9,15 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Evento pubblicato quando i dati associati a una sottoscrizione cambiano.
+ *
+ * @param subscriptionId identificativo della sottoscrizione interessata
+ * @param eventId identificativo univoco dell'evento
+ * @param restaurantId identificativo del ristorante coinvolto
+ * @param type tipo di modifica avvenuta
+ * @param occurredAt istante in cui si è verificata la modifica
+ */
 public record DataChangedEvent(
         UUID subscriptionId,
         UUID eventId,
@@ -19,6 +28,9 @@ public record DataChangedEvent(
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Tipi di modifica notificabili ai sottoscrittori.
+     */
     public enum ChangeType {
         RESTAURANT_CHANGED,
         REVIEW_CREATED,
@@ -28,6 +40,12 @@ public record DataChangedEvent(
         FAVORITES_CHANGED
     }
 
+    /**
+     * Crea una copia dell'evento associata alla sottoscrizione indicata.
+     *
+     * @param id nuovo identificativo della sottoscrizione
+     * @return una copia con il nuovo identificativo di sottoscrizione
+     */
     public DataChangedEvent withSubscriptionId(UUID id) {
         return new DataChangedEvent(id, eventId, restaurantId, type, occurredAt);
     }

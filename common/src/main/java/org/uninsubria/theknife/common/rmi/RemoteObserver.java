@@ -9,6 +9,15 @@ import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+/**
+ * Osservatore remoto notificato dal server quando i dati sottoscritti cambiano.
+ */
 public interface RemoteObserver extends Remote {
+    /**
+     * Riceve la notifica di una modifica ai dati.
+     *
+     * @param event evento che descrive la modifica avvenuta
+     * @throws RemoteException se la comunicazione RMI non è disponibile
+     */
     void onDataChanged(DataChangedEvent event) throws RemoteException;
 }

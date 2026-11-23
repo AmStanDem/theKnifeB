@@ -4,8 +4,16 @@
  */
 package org.uninsubria.theknife.common.exceptions;
 
+/**
+ * Eccezione lanciata quando uno o più dati richiesti non sono stati forniti.
+ */
 public class DatiMancantiException extends TheKnifeException {
 
+    /**
+     * Crea l'eccezione con il dettaglio dei dati mancanti.
+     *
+     * @param message descrizione dei dati mancanti
+     */
     public DatiMancantiException(String message) {
         super(message);
     }

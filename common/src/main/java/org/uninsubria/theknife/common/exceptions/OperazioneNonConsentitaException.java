@@ -4,7 +4,15 @@
  */
 package org.uninsubria.theknife.common.exceptions;
 
+/**
+ * Eccezione lanciata quando un utente tenta un'operazione non consentita.
+ */
 public class OperazioneNonConsentitaException extends TheKnifeException {
+    /**
+     * Crea l'eccezione con la motivazione dell'errore.
+     *
+     * @param motivazione motivo per cui l'operazione non è consentita
+     */
     public OperazioneNonConsentitaException(String motivazione) {
         super("Accesso negato: " + motivazione);
     }
