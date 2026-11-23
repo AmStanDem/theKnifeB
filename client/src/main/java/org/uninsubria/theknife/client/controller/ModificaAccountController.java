@@ -30,6 +30,19 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 
+/**
+ * Controller JavaFX della schermata di modifica dell'account.
+ * <p>
+ * Popola il modulo con i dati dell'utente autenticato e consente di modificarne
+ * nome, cognome, email, data di nascita, domicilio e password. Prima del
+ * salvataggio valida i campi, risolve il domicilio tramite geocoding e invia
+ * l'aggiornamento al server tramite RMI.
+ * </p>
+ * <p>
+ * Dopo un aggiornamento riuscito rigenera la sessione con i dati restituiti dal
+ * server e torna alla schermata personale appropriata al ruolo dell'utente.
+ * </p>
+ */
 public class ModificaAccountController {
 
     private static final DateTimeFormatter DATE_FORMAT =
@@ -47,6 +60,14 @@ public class ModificaAccountController {
     @FXML private PasswordField confermaPasswordField;
     @FXML private Button salvaButton;
 
+    /**
+     * Inizializza il modulo con i dati dell'utente autenticato.
+     * <p>
+     * Verifica che la sessione sia valida, configura il campo data con una
+     * data massima pari alla data odierna e popola i campi con le informazioni
+     * correnti dell'account.
+     * </p>
+     */
     @FXML
     private void initialize() {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
@@ -70,6 +91,16 @@ public class ModificaAccountController {
         domicilioField.setText(utente.domicilio());
     }
 
+    /**
+     * Gestisce il salvataggio delle modifiche all'account.
+     * <p>
+     * Controlla la presenza dell'utente nella sessione, il formato della data,
+     * i campi obbligatori e la corrispondenza tra nuova password e conferma.
+     * Successivamente risolve il domicilio prima di inviare i dati al server.
+     * </p>
+     *
+     * @param event evento JavaFX usato per identificare la finestra e la scena
+     */
     @FXML
     private void onSalva(ActionEvent event) {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
@@ -121,6 +152,24 @@ public class ModificaAccountController {
         );
     }
 
+    /**
+     * Invia al server i dati aggiornati dell'account.
+     * <p>
+     * Crea il DTO dell'utente aggiornato, conferma la password attuale tramite
+     * il servizio remoto e aggiorna la sessione con il risultato restituito dal
+     * server.
+     * </p>
+     *
+     * @param event evento JavaFX associato al salvataggio
+     * @param utente dati correnti dell'utente autenticato
+     * @param nome nuovo nome dell'utente
+     * @param cognome nuovo cognome dell'utente
+     * @param email nuovo indirizzo email
+     * @param dataNascita nuova data di nascita, oppure {@code null}
+     * @param passwordCorrente password attuale necessaria per confermare il cambio
+     * @param nuovaPassword nuova password, oppure stringa vuota per mantenerla invariata
+     * @param domicilio domicilio risolto dal servizio di geocoding
+     */
     private void aggiornaAccount(
             ActionEvent event,
             UtenteDTO utente,
@@ -156,17 +205,33 @@ public class ModificaAccountController {
         });
     }
 
+    /**
+     * Annulla la modifica e torna alla schermata precedente.
+     *
+     * @param event evento JavaFX usato per la navigazione
+     */
     @FXML
     private void onAnnulla(ActionEvent event) {
         SceneManager.goBack(event);
     }
 
+    /**
+     * Restituisce la vista personale associata al ruolo dell'utente.
+     *
+     * @param utente utente del quale determinare la destinazione
+     * @return percorso FXML dell'area ristoratore o dell'area personale
+     */
     private String vistaProfilo(UtenteDTO utente) {
         return utente.ruolo() == UtenteDTO.RuoloUtente.GESTORE
                 ? "/org/uninsubria/theknife/client/views/AreaRistoratore.fxml"
                 : "/org/uninsubria/theknife/client/views/AreaPersonale.fxml";
     }
 
+    /**
+     * Visualizza un errore e riabilita il pulsante di salvataggio.
+     *
+     * @param messaggio testo dell'errore da mostrare
+     */
     private void mostraErrore(String messaggio) {
         Platform.runLater(() -> {
             messaggioLabel.setText(messaggio);

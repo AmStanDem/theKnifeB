@@ -26,13 +26,24 @@ import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.ModificaObsoletaException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.RecensioneNonTrovataException;
-import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 
+/**
+ * Controller JavaFX del modulo per scrivere o modificare una recensione.
+ * <p>
+ * Gestisce la compilazione e la validazione del testo e della valutazione,
+ * invia le recensioni al server e permette di aggiornare o annullare una
+ * recensione esistente.
+ * </p>
+ * <p>
+ * L'accesso alle operazioni è riservato agli utenti autenticati con ruolo
+ * cliente.
+ * </p>
+ */
 public class ScriviRecensioneController {
 
     @FXML
@@ -48,12 +59,17 @@ public class ScriviRecensioneController {
     @FXML
     private Button btnInviaRecensione;
 
-    @FXML
-    private Button btnAnnulla;
-
     private RecensioneDTO recensioneDaModificare;
     private RistoranteDTO ristorante;
 
+    /**
+     * Inizializza il modulo in base al contesto di apertura.
+     * <p>
+     * Recupera il ristorante selezionato e l'eventuale recensione da
+     * modificare. Se l'utente è un cliente, popola i campi per la modifica;
+     * in caso contrario disabilita l'invio e mostra un avviso.
+     * </p>
+     */
     @FXML
     public void initialize() {
         recensioneDaModificare = RecensioneSelezionata.get();
@@ -82,6 +98,17 @@ public class ScriviRecensioneController {
         }
     }
 
+    /**
+     * Gestisce l'invio di una nuova recensione o il salvataggio delle modifiche.
+     * <p>
+     * Verifica che l'utente sia un cliente e che siano presenti testo e
+     * valutazione validi, quindi esegue l'operazione appropriata sul server.
+     * Gestisce gli errori di validazione, concorrenza e comunicazione.
+     * </p>
+     *
+     * @param actionEvent evento JavaFX usato per la navigazione al termine
+     *                    dell'operazione
+     */
     @FXML
     public void onInviaRecensioneClick(ActionEvent actionEvent) {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
@@ -153,6 +180,12 @@ public class ScriviRecensioneController {
         }
     }
 
+    /**
+     * Annulla la scrittura o modifica della recensione e torna alla schermata
+     * appropriata.
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena
+     */
     @FXML
     public void onAnnullaClick(ActionEvent actionEvent) {
         boolean modificaInCorso = recensioneDaModificare != null;
@@ -164,6 +197,12 @@ public class ScriviRecensioneController {
         }
     }
 
+    /**
+     * Torna alla lista delle recensioni personali dopo la modifica di una
+     * recensione esistente e pulisce la selezione corrente.
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena
+     */
     private void tornaAlRistoranteRecensito(ActionEvent actionEvent) {
         RecensioneSelezionata.pulisci();
         SceneManager.switchScene(
@@ -172,6 +211,13 @@ public class ScriviRecensioneController {
         );
     }
 
+    /**
+     * Visualizza una finestra di dialogo con il messaggio indicato.
+     *
+     * @param tipo tipo dell'avviso
+     * @param titolo titolo della finestra
+     * @param messaggio testo da mostrare all'utente
+     */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
         SceneManager.initOwner(alert);

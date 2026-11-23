@@ -8,14 +8,23 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import org.uninsubria.theknife.client.util.GeocodingService;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.RicercaIniziale;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 
+/**
+ * Controller JavaFX della schermata principale (home) dell'applicazione.
+ * <p>
+ * Permette di avviare una ricerca per ristoranti tramite località e testo,
+ * precompilando la località con il domicilio dell'utente autenticato
+ * quando disponibile.
+ * </p>
+ * <p>
+ * Offre inoltre l'accesso alla ricerca avanzata e gestisce la validazione
+ * della località prima di cambiare scena.
+ * </p>
+ */
 public class MainLayoutController {
 
     @FXML
@@ -24,6 +33,13 @@ public class MainLayoutController {
     @FXML
     private TextField txtRicerca;
 
+    /**
+     * Inizializza i componenti della schermata principale.
+     * <p>
+     * Configura le dimensioni del campo località e, per un utente autenticato,
+     * precompila il campo con il domicilio salvato nel suo profilo.
+     * </p>
+     */
     @FXML
     public void initialize() {
         if (SessioneUtente.getUtenteCorrente() != null) {
@@ -37,6 +53,16 @@ public class MainLayoutController {
         txtLocalita.setMapButtonPrefWidth(65);
     }
 
+    /**
+     * Gestisce l'avvio di una ricerca semplice.
+     * <p>
+     * Verifica la presenza della località, risolve il luogo selezionato tramite
+     * geocoding e salva i criteri di ricerca prima di aprire la lista dei
+     * ristoranti.
+     * </p>
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     private void onRicercaClick(ActionEvent event) {
         if (txtLocalita.getText().isBlank()) {
@@ -56,6 +82,11 @@ public class MainLayoutController {
         }, messaggio -> mostraErrore("Località non valida", messaggio));
     }
 
+    /**
+     * Apre la schermata di ricerca avanzata.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     public void onRicercaAvanzataClick(ActionEvent event) {
         SceneManager.switchScene(
@@ -64,6 +95,12 @@ public class MainLayoutController {
         );
     }
 
+    /**
+     * Visualizza un avviso relativo alla ricerca o alla località.
+     *
+     * @param titolo titolo della finestra di avviso
+     * @param messaggio testo informativo mostrato all'utente
+     */
     @FXML
     private void mostraErrore(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.WARNING);

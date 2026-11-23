@@ -14,9 +14,26 @@ import org.uninsubria.theknife.client.util.SceneManager;
 
 import java.io.InputStream;
 
+/**
+ * Applicazione JavaFX principale del client TheKnife.
+ * <p>
+ * Configura la finestra principale, carica la schermata iniziale e gestisce
+ * l'avvio e l'arresto dei servizi condivisi del client. Fornisce inoltre
+ * l'accesso ai servizi JavaFX per aprire collegamenti esterni.
+ * </p>
+ */
 public class MainClient extends Application {
     private static HostServices hostServices;
 
+    /**
+     * Configura e mostra la finestra principale dell'applicazione.
+     * <p>
+     * Inizializza i servizi host, applica lo stile della finestra, carica
+     * l'icona e la vista iniziale e avvia la modalità a schermo intero.
+     * </p>
+     *
+     * @param stage finestra primaria fornita da JavaFX
+     */
     @Override
     public void start(Stage stage) {
         hostServices = getHostServices();
@@ -34,15 +51,34 @@ public class MainClient extends Application {
         SceneManager.avviaFullscreen(stage);
     }
 
+    /**
+     * Arresta i servizi del client prima della chiusura dell'applicazione.
+     * <p>
+     * Interrompe il gestore degli aggiornamenti remoti.
+     * </p>
+     */
     @Override
     public void stop() {
         RemoteRefreshManager.shutdown();
     }
 
+    /**
+     * Avvia l'applicazione JavaFX.
+     *
+     * @param args argomenti da riga di comando passati all'applicazione
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Apre un URI tramite il servizio del sistema operativo fornito da JavaFX.
+     *
+     * @param uri URI da aprire, ad esempio un indirizzo web o un collegamento
+     *            telefonico
+     * @throws IllegalStateException se i servizi JavaFX non sono ancora
+     *                               disponibili
+     */
     public static void apriCollegamento(String uri) {
         if (hostServices == null) {
             throw new IllegalStateException("I servizi del sistema non sono disponibili.");

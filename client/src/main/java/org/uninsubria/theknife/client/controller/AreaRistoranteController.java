@@ -47,8 +47,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Controller JavaFX della pagina di dettaglio di un ristorante.
+ * <p>
+ * Visualizza le informazioni del ristorante selezionato, la valutazione
+ * media e la distribuzione delle recensioni. Gestisce inoltre i filtri
+ * delle recensioni, i collegamenti a sito e telefono e le azioni consentite
+ * all'utente autenticato, come preferiti e gestione delle recensioni.
+ * </p>
+ * <p>
+ * I dati vengono caricati tramite il server RMI e vengono aggiornati
+ * automaticamente quando ricevono eventi di modifica pubblicati dal
+ * gestore di aggiornamento remoto.
+ * </p>
+ */
 public class AreaRistoranteController {
-
 
     @FXML
     private Label lblNomeRistorante;
@@ -71,7 +84,6 @@ public class AreaRistoranteController {
     @FXML
     private Hyperlink lblSitoWeb;
 
-
     @FXML
     private Label lblFasciaPrezzo;
 
@@ -83,8 +95,6 @@ public class AreaRistoranteController {
 
     @FXML
     private FlowPane cuisineTags;
-
-
 
     // =========================================================
     // RECENSIONI
@@ -106,7 +116,6 @@ public class AreaRistoranteController {
     private List<RecensioneDTO> recensioniCaricate = List.of();
     private Double valutazioneSelezionata;
     private boolean gestoreProprietario;
-
 
     @FXML
     private Label averageRatingLabel;
@@ -142,6 +151,14 @@ public class AreaRistoranteController {
     // INIZIALIZZAZIONE
     // =========================================================
 
+    /**
+     * Inizializza la vista del ristorante selezionato.
+     * <p>
+     * Configura il componente della valutazione media, recupera il
+     * ristorante dalla sessione di selezione, mostra i suoi dati e attiva
+     * le sottoscrizioni agli aggiornamenti remoti.
+     * </p>
+     */
     @FXML
     public void initialize() {
 
@@ -201,6 +218,9 @@ public class AreaRistoranteController {
         caricaRecensioni();
     }
 
+    /**
+     * Aggiorna i dati dettagliati del ristorante dal server.
+     */
     private void aggiornaDettaglioRistorante() {
         try {
             ristorante = ServerConnection.getServer().getDettaglioRistorante(ristorante.idRistorante());
@@ -212,6 +232,11 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Aggiorna la disponibilità dei pulsanti per gestire le recensioni.
+     *
+     * @param clienteLoggato indica se l'utente autenticato ha ruolo cliente
+     */
     private void aggiornaAzioniRecensione(boolean clienteLoggato) {
         recensisci.setVisible(clienteLoggato && recensioneUtente == null);
         recensisci.setManaged(clienteLoggato && recensioneUtente == null);
@@ -251,12 +276,13 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Popola i componenti della vista con i dati del ristorante selezionato.
+     */
     private void mostraDatiRistorante() {
         if (ristorante == null) {
             return;
         }
-
-
 
         lblNomeRistorante.setText(ristorante.nome());
         lblIndirizzo.setText(ristorante.indirizzo());
@@ -288,6 +314,12 @@ public class AreaRistoranteController {
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
     }
 
+    /**
+     * Imposta il testo e lo stato di un collegamento JavaFX.
+     *
+     * @param link collegamento da aggiornare
+     * @param valore testo da visualizzare
+     */
     private void impostaLink(Hyperlink link, String valore) {
         boolean disponibile = valore != null && !valore.isBlank();
         link.setText(disponibile ? valore : "N/D");
@@ -295,6 +327,9 @@ public class AreaRistoranteController {
         link.setVisited(false);
     }
 
+    /**
+     * Apre il sito web del ristorante nel browser esterno.
+     */
     @FXML
     private void apriSitoWeb() {
         if (ristorante == null || ristorante.sitoWeb() == null || ristorante.sitoWeb().isBlank()) {
@@ -307,6 +342,9 @@ public class AreaRistoranteController {
         apriURI(sito);
     }
 
+    /**
+     * Apre il numero di telefono del ristorante tramite il gestore URI.
+     */
     @FXML
     private void apriTelefono() {
         if (ristorante == null || ristorante.telefono() == null || ristorante.telefono().isBlank()) {
@@ -315,6 +353,11 @@ public class AreaRistoranteController {
         apriURI("tel:" + ristorante.telefono().replaceAll("[^0-9+]", ""));
     }
 
+    /**
+     * Apre un collegamento esterno tramite il client principale.
+     *
+     * @param valore URI da aprire
+     */
     private void apriURI(String valore) {
         try {
             org.uninsubria.theknife.client.MainClient.apriCollegamento(valore);
@@ -324,6 +367,10 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Carica dal server le recensioni del ristorante e verifica la proprietà
+     * del ristorante da parte del gestore autenticato.
+     */
     private void caricaRecensioni() {
         System.out.println("caricaRecensioni() chiamato");
 
@@ -356,6 +403,11 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Mostra le recensioni che soddisfano il filtro di valutazione attivo.
+     *
+     * @param gestoreProprietario indica se il gestore può rispondere alle recensioni
+     */
     private void mostraRecensioniFiltrate(boolean gestoreProprietario) {
         if (reviewContainer == null) {
             System.out.println("ERRORE: reviewContainer è NULL");
@@ -396,6 +448,9 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Rimuove il filtro di valutazione applicato alle recensioni.
+     */
     @FXML
     private void azzeraFiltriRecensioni() {
         valutazioneSelezionata = null;
@@ -403,6 +458,11 @@ public class AreaRistoranteController {
     }
 
 
+    /**
+     * Aggiorna la valutazione media mostrata nella vista.
+     *
+     * @param recensioni recensioni usate per calcolare la media
+     */
     private void aggiornaMediaRecensioni(List<RecensioneDTO> recensioni) {
 
         if (recensioni == null || recensioni.isEmpty()) {
@@ -426,6 +486,11 @@ public class AreaRistoranteController {
         averageRating.setRating(media);
     }
 
+    /**
+     * Ricrea l'istogramma della distribuzione delle valutazioni.
+     *
+     * @param recensioni recensioni da analizzare
+     */
     private void aggiornaDistribuzioneRecensioni(List<RecensioneDTO> recensioni) {
 
         int[] conteggi = new int[11];
@@ -504,10 +569,21 @@ public class AreaRistoranteController {
         ratingDistributionContainer.getChildren().setAll(istogramma);
     }
 
+    /**
+     * Formatta una valutazione per l'interfaccia.
+     *
+     * @param valutazione valore da visualizzare
+     * @return valutazione formattata con al massimo una cifra decimale
+     */
     private String formattaValutazione(double valutazione) {
         return String.format(Locale.ROOT, "%.1f", valutazione).replace(".0", "");
     }
 
+    /**
+     * Gestisce l'aggiunta o la rimozione del ristorante dai preferiti.
+     *
+     * @param actionEvent evento generato dal click sul pulsante preferiti
+     */
     public void onPreferitiClick(ActionEvent actionEvent) {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isCliente()) {
@@ -550,6 +626,9 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Verifica lo stato del ristorante nei preferiti dell'utente cliente.
+     */
     private void aggiornaStatoPreferito() {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         boolean clienteLoggato = utente != null && SessioneUtente.isCliente();
@@ -572,12 +651,22 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Aggiorna l'etichetta del pulsante dei preferiti in base allo stato attuale.
+     */
     private void aggiornaTestoPulsantePreferito() {
         aggiungiPreferito.setText(ristorantePreferito
                 ? "Rimuovi dai preferiti"
                 : "Aggiungi ai preferiti");
     }
 
+    /**
+     * Visualizza una finestra di dialogo configurabile.
+     *
+     * @param tipo tipo dell'avviso
+     * @param titolo titolo della finestra
+     * @param messaggio contenuto da mostrare all'utente
+     */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
         SceneManager.initOwner(alert);
@@ -591,12 +680,22 @@ public class AreaRistoranteController {
     // SCRIVI RECENSIONE
     // =========================================================
 
+    /**
+     * Gestisce l'apertura del modulo per creare una nuova recensione.
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena
+     */
     @FXML
     public void onRecensioniClick(ActionEvent actionEvent) {
         RecensioneSelezionata.pulisci();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
+    /**
+     * Gestisce l'apertura del modulo per modificare la recensione dell'utente.
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena
+     */
     @FXML
     private void onModificaRecensioneClick(ActionEvent actionEvent) {
         if (recensioneUtente == null) {
@@ -606,6 +705,9 @@ public class AreaRistoranteController {
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
+    /**
+     * Rimuove la recensione dell'utente dopo conferma.
+     */
     @FXML
     private void onRimuoviRecensioneClick() {
         if (recensioneUtente == null) {
@@ -647,6 +749,11 @@ public class AreaRistoranteController {
         }
     }
 
+    /**
+     * Torna alla lista dei ristoranti gestiti dal ristoratore.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     private void onTornaAiMieiRistorantiClick(ActionEvent event) {
         SceneManager.switchScene(

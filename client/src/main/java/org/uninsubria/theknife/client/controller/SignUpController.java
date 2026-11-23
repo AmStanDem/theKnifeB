@@ -31,6 +31,14 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
+/**
+ * Controller JavaFX della schermata di registrazione di un nuovo utente.
+ * <p>
+ * Gestisce la raccolta e la validazione dei dati anagrafici, del ruolo,
+ * dell'indirizzo email e della password. Risolve il domicilio tramite
+ * geocoding e invia la richiesta di registrazione al server.
+ * </p>
+ */
 public class SignUpController {
     private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
     private static final DateTimeFormatter DATE_FORMATTER =
@@ -67,6 +75,13 @@ public class SignUpController {
     @FXML
     private Label labelErrore;
 
+    /**
+     * Inizializza il modulo di registrazione.
+     * <p>
+     * Configura il campo domicilio, aggiorna la data massima del calendario
+     * e controlla dinamicamente la corrispondenza tra password e conferma.
+     * </p>
+     */
     @FXML
     private void initialize() {
         indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
@@ -81,6 +96,17 @@ public class SignUpController {
         );
     }
 
+    /**
+     * Valida i dati inseriti e avvia la risoluzione del domicilio.
+     * <p>
+     * Verifica i campi obbligatori, il formato dell'email, il ruolo, la
+     * corrispondenza e i requisiti della password. Quando i controlli
+     * preliminari sono superati, delega il completamento della registrazione
+     * alla risoluzione del luogo.
+     * </p>
+     *
+     * @param event evento JavaFX associato al pulsante di registrazione
+     */
     @FXML
     private void handleRegistrati(ActionEvent event) {
         labelErrore.setText("");
@@ -124,8 +150,6 @@ public class SignUpController {
             return;
         }
 
-
-
         if (!ruolo.equals("Cliente") && !ruolo.equals("Ristoratore")) {
             labelErrore.setText("Il ruolo selezionato non è valido.");
             ruoloComboBox.requestFocus();
@@ -147,6 +171,22 @@ public class SignUpController {
         );
     }
 
+    /**
+     * Registra l'utente sul server e avvia la sessione dopo il successo.
+     * <p>
+     * Converte il ruolo selezionato, verifica la data di nascita rispetto
+     * alla data corrente del server e invia i dati tramite il servizio remoto.
+     * </p>
+     *
+     * @param event evento JavaFX usato per cambiare scena dopo la registrazione
+     * @param nome nome dell'utente
+     * @param cognome cognome dell'utente
+     * @param ruolo ruolo selezionato nel modulo
+     * @param email indirizzo email dell'utente
+     * @param password password dell'account
+     * @param dataNascita data di nascita, oppure {@code null} se non specificata
+     * @param luogo domicilio risolto dal servizio di geocoding
+     */
     private void registraUtente(
             ActionEvent event,
             String nome,
@@ -194,11 +234,23 @@ public class SignUpController {
         }
     }
 
+    /**
+     * Apre la schermata di accesso per chi possiede già un account.
+     *
+     * @param event evento JavaFX generato dal click sul collegamento
+     */
     @FXML
     public void handleAccedi(MouseEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/LoginView.fxml");
     }
 
+    /**
+     * Aggiorna la data massima selezionabile nel calendario.
+     * <p>
+     * Usa la data corrente fornita dal server; se il server non è disponibile,
+     * imposta temporaneamente la data del dispositivo e informa l'utente.
+     * </p>
+     */
     @FXML
     private void aggiornaDataMassimaCalendario() {
         LocalDate dataCorrenteDispositivo = LocalDate.now();
@@ -211,6 +263,10 @@ public class SignUpController {
         dataNascitaField.setDataMassima(dataCorrenteDispositivo);
     }
 
+    /**
+     * Aggiorna lo stile del campo di conferma in base alla corrispondenza
+     * con la password.
+     */
     private void controllaConfermaPassword() {
         String password = passwordField.getText();
         String confermaPassword = confermaPasswordField.getText();

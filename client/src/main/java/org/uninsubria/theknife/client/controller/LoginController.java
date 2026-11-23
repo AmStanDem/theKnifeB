@@ -23,6 +23,14 @@ import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+/**
+ * Controller JavaFX della schermata di autenticazione.
+ * <p>
+ * Gestisce la raccolta delle credenziali, la validazione dei campi,
+ * l'autenticazione tramite il server RMI e la navigazione verso la
+ * schermata di registrazione o la home dopo il login.
+ * </p>
+ */
 public class LoginController {
 
     @FXML
@@ -40,6 +48,8 @@ public class LoginController {
     /**
      * Gestisce il click sul pulsante "Accedi": invoca il login remoto e,
      * se le credenziali sono corrette, apre la home dell'utente.
+     *
+     * @param event evento JavaFX generato dal pulsante di accesso
      */
     @FXML
     private void onAccedi(ActionEvent event) {
@@ -72,6 +82,11 @@ public class LoginController {
         });
     }
 
+    /**
+     * Mostra un messaggio di errore di autenticazione e riabilita il pulsante.
+     *
+     * @param messaggio testo dell'errore da visualizzare
+     */
     private void mostraErroreLogin(String messaggio) {
         labelErrore.setText(messaggio);
         signInButton.setDisable(false);
@@ -79,6 +94,8 @@ public class LoginController {
 
     /**
      * Passa alla schermata di registrazione di un nuovo utente.
+     *
+     * @param event evento JavaFX usato per cambiare scena
      */
     @FXML
     private void onVaiRegistrazione(ActionEvent event) {

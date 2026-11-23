@@ -27,6 +27,18 @@ import java.util.List;
 
 import org.uninsubria.theknife.client.util.LuogoInput;
 
+/**
+ * Controller JavaFX della schermata di inserimento di un nuovo ristorante.
+ * <p>
+ * Gestisce il caricamento delle tipologie di cucina dal server, la
+ * compilazione e la validazione dei dati del modulo, il geocoding
+ * dell'indirizzo e la registrazione del ristorante tramite RMI.
+ * </p>
+ * <p>
+ * La registrazione è consentita esclusivamente a un utente autenticato
+ * con ruolo gestore.
+ * </p>
+ */
 public class AggiungiRistoranteController {
 
     @FXML
@@ -65,11 +77,16 @@ public class AggiungiRistoranteController {
     @FXML
     private Button btnSalva;
 
-    @FXML
-    private Button btnAnnulla;
-
     private boolean tipologieCaricate;
 
+    /**
+     * Inizializza i componenti della vista.
+     * <p>
+     * Disabilita il selettore delle cucine e il pulsante di salvataggio,
+     * configura i campi derivati dal luogo selezionato e avvia il
+     * caricamento delle tipologie di cucina disponibili.
+     * </p>
+     */
     @FXML
     public void initialize() {
         comboCucine.setDisable(true);
@@ -84,6 +101,15 @@ public class AggiungiRistoranteController {
         caricaTipologieCucina();
     }
 
+    /**
+     * Recupera dal server tutte le tipologie di cucina disponibili.
+     * <p>
+     * L'operazione viene eseguita in un thread virtuale; una volta ottenuto
+     * il risultato, i componenti JavaFX vengono aggiornati sul thread
+     * dell'applicazione. In caso di errore viene visualizzato un messaggio
+     * all'utente.
+     * </p>
+     */
     private void caricaTipologieCucina() {
         Thread.startVirtualThread(() -> {
             try {
@@ -107,6 +133,17 @@ public class AggiungiRistoranteController {
         });
     }
 
+    /**
+     * Gestisce il click sul pulsante di salvataggio.
+     * <p>
+     * Verifica che il catalogo delle cucine sia stato caricato, che i campi
+     * obbligatori siano compilati e che l'utente corrente abbia il ruolo
+     * di gestore. Se i controlli preliminari sono superati, risolve la
+     * località inserita prima di procedere con il salvataggio.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     public void onSalvaClick(ActionEvent event) {
         if (!tipologieCaricate) {
@@ -151,6 +188,20 @@ public class AggiungiRistoranteController {
         );
     }
 
+    /**
+     * Valida i dati del modulo e registra il nuovo ristorante tramite RMI.
+     * <p>
+     * Converte e controlla il prezzo medio e le coordinate geografiche,
+     * verifica la selezione delle cucine e la validità del numero di
+     * telefono, quindi crea un {@link RistoranteDTO} e lo invia al server.
+     * Al termine mostra l'esito dell'operazione e torna alla lista dei
+     * ristoranti del gestore.
+     * </p>
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     * @param utente utente gestore autenticato che effettua la registrazione
+     * @param luogoSelezionato luogo risolto dal servizio di geocoding
+     */
     private void salvaRistorante(
             ActionEvent event,
             UtenteDTO utente,
@@ -299,15 +350,36 @@ public class AggiungiRistoranteController {
         }
     }
 
+    /**
+     * Normalizza il valore di un campo facoltativo.
+     *
+     * @param valore testo inserito dall'utente
+     * @return il testo privo di spazi iniziali e finali, oppure {@code null}
+     *         se il valore è vuoto
+     */
     private String testoFacoltativo(String valore) {
         return valore == null || valore.isBlank() ? null : valore.trim();
     }
 
+    /**
+     * Gestisce il click sul pulsante di annullamento.
+     * <p>
+     * Chiude il modulo senza salvare e torna alla lista dei ristoranti
+     * gestiti dall'utente.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     public void onAnnullaClick(ActionEvent event) {
         tornaAiMieiRistoranti(event);
     }
 
+    /**
+     * Mostra la lista dei ristoranti del gestore nella scena corrente.
+     *
+     * @param event evento JavaFX contenente l'origine del cambio scena
+     */
     private void tornaAiMieiRistoranti(ActionEvent event) {
         SceneManager.switchScene(
                 event,
@@ -315,6 +387,13 @@ public class AggiungiRistoranteController {
         );
     }
 
+    /**
+     * Visualizza una finestra di dialogo con il messaggio indicato.
+     *
+     * @param alertType tipo di avviso da mostrare
+     * @param titolo titolo della finestra di dialogo
+     * @param contenuto testo informativo da presentare all'utente
+     */
     private void mostraMessaggio(
             Alert.AlertType alertType,
             String titolo,
@@ -329,6 +408,18 @@ public class AggiungiRistoranteController {
     }
 
 
+    /**
+     * Verifica la validità formale di un numero di telefono.
+     * <p>
+     * Il campo può essere vuoto. Quando valorizzato, deve contenere da 7
+     * a 15 cifre e può includere il prefisso internazionale, spazi,
+     * parentesi e trattini.
+     * </p>
+     *
+     * @param telefono numero di telefono da controllare
+     * @return {@code true} se il numero è vuoto o valido; {@code false}
+     *         altrimenti
+     */
     private boolean telefonoValido(String telefono) {
         if (telefono == null || telefono.isBlank()) {
             return true;

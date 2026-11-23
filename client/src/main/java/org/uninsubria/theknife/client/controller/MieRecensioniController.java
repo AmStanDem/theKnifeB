@@ -6,15 +6,12 @@ package org.uninsubria.theknife.client.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -34,19 +31,20 @@ import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller JavaFX della lista delle recensioni scritte dall'utente.
+ * <p>
+ * Recupera le recensioni del cliente autenticato e consente di modificare
+ * o eliminare ogni recensione propria.
+ * </p>
+ * <p>
+ * L'elenco viene aggiornato anche in seguito agli eventi remoti relativi
+ * all'utente, esclusi quelli limitati alla modifica dei preferiti.
+ * </p>
+ */
 public class MieRecensioniController {
-
-    @FXML
-    private TextField txtLocalita;
-
-    @FXML
-    private TextField txtRicerca;
-
-    @FXML
-    private Button btnGeolocalizzazione;
 
     @FXML
     private Label resultsCountLabel;
@@ -64,6 +62,11 @@ public class MieRecensioniController {
     // NAVIGAZIONE
     // =========================================================
 
+    /**
+     * Apre l'area personale dell'utente.
+     *
+     * @param event evento generato dal click sull'area personale
+     */
     @FXML
     private void onAreaPersonaleClick(MouseEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/AreaPersonale.fxml");
@@ -72,6 +75,13 @@ public class MieRecensioniController {
     // INIZIALIZZAZIONE
     // =========================================================
 
+    /**
+     * Inizializza la vista caricando le recensioni dell'utente.
+     * <p>
+     * Attiva inoltre la sottoscrizione agli aggiornamenti remoti dell'utente
+     * per ricaricare l'elenco quando cambia uno dei dati rilevanti.
+     * </p>
+     */
     @FXML
     public void initialize() {
         caricaRecensioni();
@@ -90,6 +100,13 @@ public class MieRecensioniController {
         }
     }
 
+    /**
+     * Recupera dal server le recensioni scritte dall'utente autenticato.
+     * <p>
+     * L'operazione richiede un utente cliente. In caso di accesso mancante o
+     * errore di comunicazione svuota l'elenco e mostra un avviso.
+     * </p>
+     */
     private void caricaRecensioni() {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isCliente()) {
@@ -112,30 +129,11 @@ public class MieRecensioniController {
     // RICERCA E LISTA
     // =========================================================
 
-    ///
-    @FXML
-    private void onSearch() {
-        String query = txtRicerca.getText() == null ? "" : txtRicerca.getText().trim().toLowerCase();
-
-        if (query.isEmpty()) {
-            aggiornaLista(recensioniComplete);
-            return;
-        }
-
-        List<RecensioneDTO> filtrate = new ArrayList<>();
-        for (RecensioneDTO recensione : recensioniComplete) {
-            boolean matchTesto = recensione.testo() != null && recensione.testo().toLowerCase().contains(query);
-            boolean matchAutore = recensione.nomeAutore() != null && recensione.nomeAutore().toLowerCase().contains(query);
-            boolean matchRistorante = recensione.nomeRistorante() != null
-                    && recensione.nomeRistorante().toLowerCase().contains(query);
-
-            if (matchTesto || matchAutore || matchRistorante) {
-                filtrate.add(recensione);
-            }
-        }
-        aggiornaLista(filtrate);
-    }
-
+    /**
+     * Ricrea la lista grafica delle recensioni fornite.
+     *
+     * @param nuovaLista recensioni da visualizzare
+     */
     private void aggiornaLista(List<RecensioneDTO> nuovaLista) {
         restaurantContainer.getChildren().clear();
 
@@ -150,6 +148,16 @@ public class MieRecensioniController {
         restaurantScrollPane.setVvalue(0);
     }
 
+    /**
+     * Crea la card grafica di una recensione caricando la relativa vista FXML.
+     * <p>
+     * Configura le azioni di modifica ed eliminazione disponibili per
+     * l'utente proprietario della recensione.
+     * </p>
+     *
+     * @param recensione recensione da rappresentare
+     * @return nodo JavaFX della card, oppure {@code null} se il caricamento fallisce
+     */
     private Node creaCardRecensione(RecensioneDTO recensione) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RecensioneItem.fxml"));
@@ -165,12 +173,27 @@ public class MieRecensioniController {
         }
     }
 
+    /**
+     * Seleziona una recensione e apre il modulo per modificarla.
+     *
+     * @param recensione recensione da modificare
+     */
     private void modificaRecensione(RecensioneDTO recensione) {
         RecensioneSelezionata.imposta(recensione);
         Stage stage = (Stage) restaurantContainer.getScene().getWindow();
         SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
+    /**
+     * Richiede conferma e elimina una recensione dal server.
+     * <p>
+     * Dopo l'eliminazione aggiorna l'elenco locale. Se la recensione non è
+     * più disponibile o il server restituisce un errore, gestisce l'esito
+     * appropriato con un messaggio all'utente.
+     * </p>
+     *
+     * @param recensione recensione da eliminare
+     */
     private void confermaEliminazione(RecensioneDTO recensione) {
         Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
         SceneManager.initOwner(conferma);
@@ -205,6 +228,13 @@ public class MieRecensioniController {
         }
     }
 
+    /**
+     * Visualizza una finestra di dialogo con messaggio configurabile.
+     *
+     * @param tipo tipo dell'avviso
+     * @param titolo titolo della finestra
+     * @param messaggio testo da mostrare all'utente
+     */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
         SceneManager.initOwner(alert);

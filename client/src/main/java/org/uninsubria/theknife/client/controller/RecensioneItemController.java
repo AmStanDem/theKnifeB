@@ -21,6 +21,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Consumer;
 
+/**
+ * Controller JavaFX della scheda di una recensione.
+ * <p>
+ * Visualizza autore, data, valutazione, testo e risposta del gestore.
+ * In base al contesto della vista abilita le azioni per rispondere,
+ * modificare o eliminare la recensione.
+ * </p>
+ */
 public class RecensioneItemController {
 
     @FXML
@@ -73,6 +81,9 @@ public class RecensioneItemController {
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ITALIAN);
 
+    /**
+     * Inizializza il componente grafico della valutazione.
+     */
     @FXML
     private void initialize() {
         ratingControl = new BaseRatingView(0);
@@ -83,6 +94,12 @@ public class RecensioneItemController {
         ratingStarsContainer.getChildren().add(ratingControl);
     }
 
+    /**
+     * Popola la scheda con i dati della recensione.
+     *
+     * @param recensione recensione da visualizzare; se {@code null}, la scheda
+     *                   non viene modificata
+     */
     public void setRecensione(RecensioneDTO recensione) {
         if (recensione == null) {
             return;
@@ -113,6 +130,15 @@ public class RecensioneItemController {
         setRisposta(recensione.rispostaGestore());
     }
 
+    /**
+     * Configura le azioni di modifica ed eliminazione della recensione.
+     * <p>
+     * Mostra i relativi pulsanti e nasconde quello per rispondere.
+     * </p>
+     *
+     * @param onModificaAction azione da invocare per la modifica
+     * @param onEliminaAction azione da invocare per l'eliminazione
+     */
     public void setAzioniProprie(
             Consumer<RecensioneDTO> onModificaAction,
             Consumer<RecensioneDTO> onEliminaAction
@@ -127,6 +153,12 @@ public class RecensioneItemController {
         replyButton.setManaged(false);
     }
 
+    /**
+     * Imposta il nome dell'autore e l'iniziale mostrata nell'avatar.
+     *
+     * @param nome nome dell'autore; se vuoto o {@code null}, viene mostrato
+     *             il nome generico "Utente"
+     */
     public void setAutore(String nome) {
         if (nome == null || nome.isBlank()) {
             authorLabel.setText("Utente");
@@ -139,24 +171,53 @@ public class RecensioneItemController {
         avatarInitial.setText(String.valueOf(nome.charAt(0)).toUpperCase());
     }
 
+    /**
+     * Imposta la visibilità dell'indicatore di guida locale.
+     *
+     * @param isLocalGuide {@code true} per mostrare l'indicatore
+     */
     public void setLocalGuide(boolean isLocalGuide) {
         localGuideLabel.setVisible(isLocalGuide);
         localGuideLabel.setManaged(isLocalGuide);
     }
 
+    /**
+     * Imposta il testo della data della recensione.
+     *
+     * @param data data già formattata; se {@code null}, il testo viene svuotato
+     */
     public void setData(String data) {
         timeLabel.setText(data != null ? data : "");
     }
 
+    /**
+     * Imposta la valutazione mostrata dalle stelle, limitandola all'intervallo
+     * da 0 a 5.
+     *
+     * @param stelle valutazione da visualizzare
+     */
     public void setValutazione(double stelle) {
         stelle = Math.clamp(stelle, 0, 5);
         ratingControl.setRating(stelle);
     }
 
+    /**
+     * Imposta il testo della recensione.
+     *
+     * @param testo contenuto della recensione; se {@code null}, il testo viene
+     *              svuotato
+     */
     public void setTesto(String testo) {
         reviewTextField.setText(testo != null ? testo : "");
     }
 
+    /**
+     * Imposta la risposta del gestore e aggiorna la visibilità della relativa
+     * sezione.
+     *
+     * @param risposta risposta del gestore; se vuota o {@code null}, la sezione
+     *                 della risposta viene nascosta
+     */
     public void setRisposta(String risposta) {
         rispostaPresente = risposta != null && !risposta.isBlank();
 
@@ -175,11 +236,20 @@ public class RecensioneItemController {
         aggiornaPulsanteRisposta();
     }
 
+    /**
+     * Abilita o disabilita la possibilità di rispondere alla recensione.
+     *
+     * @param abilitata {@code true} se il gestore può rispondere
+     */
     public void setRispostaAbilitata(boolean abilitata) {
         rispostaAbilitata = abilitata;
         aggiornaPulsanteRisposta();
     }
 
+    /**
+     * Aggiorna la visibilità e lo stato del pulsante di risposta in base alle
+     * autorizzazioni e alla presenza di una risposta.
+     */
     private void aggiornaPulsanteRisposta() {
         boolean visibile = rispostaAbilitata && !rispostaPresente;
         replyButton.setVisible(visibile);
@@ -187,6 +257,11 @@ public class RecensioneItemController {
         replyButton.setDisable(!visibile);
     }
 
+    /**
+     * Apre il modulo per rispondere alla recensione, se l'azione è consentita.
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena
+     */
     @FXML
     public void onRispondiClicked(ActionEvent actionEvent) {
         if (rispostaAbilitata && SessioneUtente.isGestore()
@@ -197,6 +272,10 @@ public class RecensioneItemController {
         }
     }
 
+    /**
+     * Invoca l'azione di modifica configurata, se recensione e callback sono
+     * disponibili.
+     */
     @FXML
     private void onModificaClicked() {
         if (recensione != null && onModificaAction != null) {
@@ -204,6 +283,10 @@ public class RecensioneItemController {
         }
     }
 
+    /**
+     * Invoca l'azione di eliminazione configurata, se recensione e callback
+     * sono disponibili.
+     */
     @FXML
     private void onEliminaClicked() {
         if (recensione != null && onEliminaAction != null) {

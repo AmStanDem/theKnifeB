@@ -18,18 +18,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Controller JavaFX del componente riutilizzabile che rappresenta
- * un singolo ristorante all'interno della lista dei risultati.
+ * Controller JavaFX della card che rappresenta un ristorante in una lista.
  * <p>
- * Il controller gestisce la visualizzazione dei principali dati del
- * ristorante, tra cui nome, indirizzo, valutazione, tipologia di cucina,
- * prezzo medio e disponibilità dei servizi di delivery e prenotazione online.
- * </p>
- *
- * <p>
- * I dati vengono forniti tramite un oggetto {@link RistoranteDTO},
- * che viene utilizzato per popolare la card visualizzata nella relativa
- * vista FXML.
+ * Visualizza i dati essenziali del ristorante, inclusi nome, indirizzo,
+ * valutazione, cucina, prezzo medio e servizi disponibili. Espone callback
+ * configurabili per le azioni di apertura dei dettagli e modifica.
  * </p>
  */
 public class RestaurantItemController {
@@ -41,7 +34,6 @@ public class RestaurantItemController {
     @FXML private FlowPane cuisineTags;
     @FXML private Label deliveryTag;
     @FXML private Label bookingTag;
-    @FXML private Button detailsButton;
     @FXML private Button editButton;
 
     private RistoranteDTO ristorante;
@@ -49,14 +41,9 @@ public class RestaurantItemController {
     private BiConsumer<ActionEvent, RistoranteDTO> onModificaAction;
 
     /**
-     * Popola la card con i dati del ristorante passato.
-     * <p>
-     * Aggiorna il nome, l'indirizzo, la valutazione, le informazioni
-     * relative alla cucina e al prezzo medio e la visibilità dei tag
-     * relativi ai servizi disponibili.
-     * </p>
+     * Popola la card con i dati del ristorante.
      *
-     * @param ristorante ristorante di cui visualizzare i dati
+     * @param ristorante ristorante da visualizzare
      */
     public void setRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
@@ -72,36 +59,36 @@ public class RestaurantItemController {
     }
 
     /**
-     * Imposta l'azione da eseguire quando l'utente seleziona i dettagli
-     * del ristorante.
-     * <p>
-     * Permette al controller della lista dei ristoranti di definire
-     * il comportamento associato alla selezione della card.
-     * </p>
+     * Imposta l'azione da eseguire quando viene richiesto di aprire i dettagli.
      *
-     * @param onDettagliAction azione da eseguire passando il ristorante
-     *                         selezionato
+     * @param onDettagliAction callback invocata con il ristorante selezionato
      */
     public void setOnDettagliAction(Consumer<RistoranteDTO> onDettagliAction) {
         this.onDettagliAction = onDettagliAction;
     }
 
+    /**
+     * Imposta l'azione di modifica e aggiorna la visibilità del relativo pulsante.
+     *
+     * @param onModificaAction callback che riceve l'evento e il ristorante;
+     *                         se {@code null}, il pulsante viene nascosto
+     */
     public void setOnModificaAction(BiConsumer<ActionEvent, RistoranteDTO> onModificaAction) {
         this.onModificaAction = onModificaAction;
         editButton.setVisible(onModificaAction != null);
         editButton.setManaged(onModificaAction != null);
     }
 
-    @FXML
     /**
-     * Gestisce il click sul pulsante "Dettagli".
+     * Gestisce il click sul pulsante dei dettagli.
      * <p>
-     * Recupera la finestra attualmente visualizzata e sostituisce
-     * la scena corrente caricando la vista {@code Ristorante.fxml}.
+     * Memorizza il ristorante selezionato, invoca l'eventuale callback
+     * configurata e apre la schermata di dettaglio.
      * </p>
      *
-     * @param actionEvent evento generato dal click dell'utente
+     * @param actionEvent evento JavaFX usato per cambiare scena
      */
+    @FXML
     private void onDetailsClicked(ActionEvent actionEvent) {
         RistoranteSelezionato.setRistorante(ristorante);
         if (onDettagliAction != null) {
@@ -110,6 +97,11 @@ public class RestaurantItemController {
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
     }
 
+    /**
+     * Gestisce il click sul pulsante di modifica.
+     *
+     * @param actionEvent evento generato dal click sul pulsante
+     */
     @FXML
     private void onEditClicked(ActionEvent actionEvent) {
         if (ristorante != null && onModificaAction != null) {
@@ -118,15 +110,10 @@ public class RestaurantItemController {
     }
 
     /**
-     * Mostra o nasconde un tag relativo ai servizi disponibili.
-     * <p>
-     * Oltre alla visibilità del componente, viene aggiornata anche
-     * la proprietà {@code managed} per riservare o liberare lo spazio
-     * occupato dal tag all'interno del layout.
-     * </p>
+     * Mostra o nasconde un tag relativo ai servizi del ristorante.
      *
      * @param tagLabel etichetta da aggiornare
-     * @param visibile indica se il tag deve essere visualizzato
+     * @param visibile {@code true} per mostrare il tag
      */
     private void aggiornaTag(Label tagLabel, boolean visibile) {
         tagLabel.setVisible(visibile);
@@ -135,12 +122,9 @@ public class RestaurantItemController {
 
     /**
      * Formatta la valutazione media del ristorante.
-     * <p>
-     * Se la valutazione non è disponibile, viene restituito {@code "N/D"}.
-     * </p>
      *
-     * @param mediaStelle valutazione media del ristorante
-     * @return valutazione formattata con una cifra decimale
+     * @param mediaStelle valutazione media, oppure {@code null} se non disponibile
+     * @return valutazione con una cifra decimale o {@code "N/D"}
      */
     private String formattaRating(Double mediaStelle) {
         if (mediaStelle == null) {
@@ -150,14 +134,11 @@ public class RestaurantItemController {
     }
 
     /**
-     * Formatta le informazioni relative alla cucina e al prezzo medio.
-     * <p>
-     * Se la tipologia di cucina o il prezzo medio non sono disponibili,
-     * viene utilizzato un valore indicativo.
-     * </p>
+     * Formatta il prezzo medio e l'eventuale indicazione che sia stimato.
      *
      * @param prezzoMedio prezzo medio del ristorante
-     * @return stringa contenente tipologia di cucina e prezzo medio
+     * @param prezzoStimato indica se il prezzo è una stima
+     * @return testo descrittivo del prezzo medio
      */
     private String formattaMeta(Double prezzoMedio, boolean prezzoStimato) {
         String prezzo = (prezzoMedio != null)

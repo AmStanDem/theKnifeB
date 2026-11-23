@@ -26,6 +26,15 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+ * Controller JavaFX della schermata di modifica di un ristorante.
+ * <p>
+ * Consente a un gestore autenticato di selezionare uno dei propri ristoranti,
+ * modificarne i dati e inviare l'aggiornamento al server tramite RMI.
+ * Gestisce il caricamento delle tipologie di cucina, il geocoding dell'indirizzo
+ * e la validazione dei dati prima del salvataggio.
+ * </p>
+ */
 public class ModificaRistoranteController {
 
     @FXML private TextField txtNome;
@@ -47,6 +56,14 @@ public class ModificaRistoranteController {
     private boolean tipologieCaricate;
     private boolean ristorantiCaricati;
 
+    /**
+     * Inizializza il modulo di modifica.
+     * <p>
+     * Verifica il ruolo del gestore, configura il selettore dei ristoranti,
+     * i campi derivati dal luogo e avvia il caricamento dei ristoranti e delle
+     * tipologie di cucina disponibili.
+     * </p>
+     */
     @FXML
     public void initialize() {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
@@ -82,6 +99,15 @@ public class ModificaRistoranteController {
         caricaTipologieCucina();
     }
 
+    /**
+     * Carica dal server i ristoranti associati al gestore autenticato.
+     * <p>
+     * Popola il selettore sul thread JavaFX e seleziona il ristorante già
+     * memorizzato dalla navigazione precedente, se presente tra i risultati.
+     * </p>
+     *
+     * @param utente gestore proprietario dei ristoranti
+     */
     private void caricaRistoranti(UtenteDTO utente) {
         Thread.startVirtualThread(() -> {
             try {
@@ -119,6 +145,11 @@ public class ModificaRistoranteController {
         });
     }
 
+    /**
+     * Seleziona un ristorante e popola i campi del modulo.
+     *
+     * @param selezionato ristorante scelto dall'elenco
+     */
     private void selezionaRistorante(RistoranteDTO selezionato) {
         ristorante = selezionato;
         if (selezionato == null) {
@@ -129,6 +160,9 @@ public class ModificaRistoranteController {
         aggiornaStatoSalvataggio();
     }
 
+    /**
+     * Copia i dati del ristorante selezionato nei componenti della vista.
+     */
     private void popolaCampi() {
         txtNome.setText(ristorante.nome());
         txtCitta.setText(ristorante.citta());
@@ -160,6 +194,13 @@ public class ModificaRistoranteController {
         }
     }
 
+    /**
+     * Recupera dal server tutte le tipologie di cucina disponibili.
+     * <p>
+     * Una volta completato il caricamento, aggiorna il selettore sul thread
+     * JavaFX e ripristina le cucine associate al ristorante selezionato.
+     * </p>
+     */
     private void caricaTipologieCucina() {
         Thread.startVirtualThread(() -> {
             try {
@@ -184,15 +225,34 @@ public class ModificaRistoranteController {
         });
     }
 
+    /**
+     * Imposta nel selettore delle cucine le tipologie del ristorante selezionato.
+     */
     private void aggiornaTipologieSelezionate() {
         comboCucine.setSelectedCuisines(
                 ristorante == null ? List.of() : ristorante.tipologieCucina());
     }
 
+    /**
+     * Aggiorna lo stato del pulsante di salvataggio.
+     * <p>
+     * Il pulsante è disponibile solo dopo il caricamento dei ristoranti e delle
+     * tipologie e quando è stato selezionato un ristorante valido.
+     * </p>
+     */
     private void aggiornaStatoSalvataggio() {
         btnSalva.setDisable(!tipologieCaricate || !ristorantiCaricati || ristorante == null);
     }
 
+    /**
+     * Gestisce il click sul pulsante di salvataggio.
+     * <p>
+     * Verifica il catalogo delle cucine e i campi obbligatori, quindi risolve
+     * il luogo inserito prima di avviare la validazione finale e la modifica.
+     * </p>
+     *
+     * @param event evento JavaFX usato per cambiare scena dopo il salvataggio
+     */
     @FXML
     public void onSalvaClick(ActionEvent event) {
         if (!tipologieCaricate) {
@@ -214,6 +274,17 @@ public class ModificaRistoranteController {
         );
     }
 
+    /**
+     * Valida i dati finali e invia al server il ristorante aggiornato.
+     * <p>
+     * Controlla prezzo medio, selezione delle cucine e ruolo dell'utente,
+     * quindi crea un {@link RistoranteDTO} mantenendo l'identificatore e la
+     * valutazione esistenti del ristorante.
+     * </p>
+     *
+     * @param event evento JavaFX usato per tornare alla lista
+     * @param luogo luogo risolto dal servizio di geocoding
+     */
     private void salvaRistorante(ActionEvent event, GeocodingService.Luogo luogo) {
         double prezzoMedio;
         try {
@@ -276,16 +347,33 @@ public class ModificaRistoranteController {
         }
     }
 
+    /**
+     * Annulla la modifica e torna alla lista dei ristoranti del gestore.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     public void onAnnullaClick(ActionEvent event) {
         tornaAiMieiRistoranti(event);
     }
 
+    /**
+     * Mostra la lista dei ristoranti gestiti dall'utente.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     private void tornaAiMieiRistoranti(ActionEvent event) {
         SceneManager.switchScene(event,
                 "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml");
     }
 
+    /**
+     * Visualizza una finestra di dialogo con il messaggio indicato.
+     *
+     * @param tipo tipo dell'avviso
+     * @param titolo titolo della finestra
+     * @param contenuto testo da mostrare all'utente
+     */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String contenuto) {
         Alert alert = new Alert(tipo);
         SceneManager.initOwner(alert);

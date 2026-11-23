@@ -22,6 +22,14 @@ import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+/**
+ * Controller JavaFX del modulo per rispondere a una recensione.
+ * <p>
+ * Recupera la recensione selezionata e permette al gestore autenticato di
+ * inviare una risposta, purché la recensione sia valida e non disponga già
+ * di una risposta.
+ * </p>
+ */
 public class ScriviRispostaController {
 
     @FXML
@@ -30,11 +38,17 @@ public class ScriviRispostaController {
     @FXML
     private Button btnInviaRisposta;
 
-    @FXML
-    private Button btnAnnulla;
-
     private RecensioneDTO recensione;
 
+    /**
+     * Inizializza il modulo verificando che sia possibile rispondere alla
+     * recensione selezionata.
+     * <p>
+     * Se l'utente non è un gestore, la recensione non è valida o è già stata
+     * risposta, disabilita i controlli di compilazione e invio e mostra un
+     * avviso.
+     * </p>
+     */
     @FXML
     public void initialize() {
         recensione = RecensioneDaRispondere.get();
@@ -52,6 +66,16 @@ public class ScriviRispostaController {
         }
     }
 
+    /**
+     * Valida e invia al server la risposta alla recensione.
+     * <p>
+     * Richiede un gestore autenticato, una recensione identificabile e un
+     * testo non vuoto. Se l'operazione riesce, pulisce la selezione corrente
+     * e torna alla pagina del ristorante.
+     * </p>
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena dopo l'invio
+     */
     @FXML
     public void onInviaRispostaClick(ActionEvent actionEvent) {
         UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
@@ -84,12 +108,24 @@ public class ScriviRispostaController {
         }
     }
 
+    /**
+     * Annulla la compilazione della risposta e torna alla pagina del ristorante.
+     *
+     * @param actionEvent evento JavaFX usato per cambiare scena
+     */
     @FXML
     public void onAnnullaClick(ActionEvent actionEvent) {
         RecensioneDaRispondere.pulisci();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
     }
 
+    /**
+     * Visualizza una finestra di dialogo con il messaggio specificato.
+     *
+     * @param tipo tipo dell'avviso
+     * @param titolo titolo della finestra
+     * @param messaggio testo da mostrare all'utente
+     */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
         SceneManager.initOwner(alert);

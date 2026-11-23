@@ -34,17 +34,29 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.*;
 
+/**
+ * Controller JavaFX della lista dei ristoranti risultanti da una ricerca.
+ * <p>
+ * Gestisce i criteri di testo, posizione, prezzo, valutazione, cucina e
+ * servizi, interrogando il server in modalità paginata. La vista supporta
+ * il caricamento progressivo dei risultati e il caricamento automatico
+ * delle tipologie di cucina.
+ * </p>
+ * <p>
+ * Il controller aggiorna anche i risultati in seguito agli eventi remoti
+ * del catalogo e adotta un ritardo temporale per evitare ricerche a ogni
+ * modifica del testo digitato dall'utente.
+ * </p>
+ */
 public class ListaRistorantiController {
 
     @FXML private TextField searchField;
-    @FXML private Button searchButton;
 
     @FXML private ComboBox<String> priceFilterCombo;
     @FXML private ComboBox<String> ratingFilterCombo;
     @FXML private CheckBox deliveryFilterCheckBox;
     @FXML private CheckBox bookingOnlineFilterCheckBox;
     @FXML private CuisineSelector cuisineSelector;
-    @FXML private Button resetFiltersButton;
 
     @FXML private Label locationFilterLabel;
     @FXML private Label resultsCountLabel;
@@ -72,6 +84,15 @@ public class ListaRistorantiController {
     private Double prezzoMaxPersonalizzato;
     private String etichettaPrezzoPersonalizzata;
 
+    /**
+     * Inizializza i filtri, ripristina i criteri salvati e avvia il primo
+     * caricamento dei ristoranti.
+     * <p>
+     * Configura il debounce della ricerca, l'aggiornamento automatico remoto
+     * e il comportamento di arresto delle operazioni quando la vista viene
+     * rimossa dalla scena.
+     * </p>
+     */
     @FXML
     public void initialize() {
         System.out.println("[DEBUG] Inizializzazione ListaRistorantiController...");
@@ -115,6 +136,11 @@ public class ListaRistorantiController {
                 () -> caricaPagina(true));
     }
 
+    /**
+     * Applica alla vista i criteri iniziali recuperati dalla ricerca precedente.
+     *
+     * @param criteri criteri di ricerca iniziali da applicare
+     */
     private void applicaCriteriIniziali(RicercaIniziale.Criteri criteri) {
         aggiornaEtichettaPosizione();
         if (criteri == null) {
@@ -137,6 +163,9 @@ public class ListaRistorantiController {
 
 
 
+    /**
+     * Configura le opzioni fisse dei filtri prezzo e valutazione.
+     */
     private void configuraFiltriFissi() {
         priceFilterCombo.getItems().setAll(
                 TUTTI_PREZZI,
@@ -157,10 +186,23 @@ public class ListaRistorantiController {
         ratingFilterCombo.setValue(TUTTI_RATING);
     }
 
+    /**
+     * Avvia il caricamento iniziale dei dati dal server.
+     */
     private void caricaDatiDalServer() {
         caricaPagina(true);
     }
 
+    /**
+     * Avvia il caricamento di una pagina dei ristoranti.
+     * <p>
+     * Una nuova ricerca riparte dall'inizio; il caricamento successivo usa
+     * il numero di elementi già ottenuti come offset. Se manca una posizione
+     * valida, la ricerca viene sospesa.
+     * </p>
+     *
+     * @param nuovaRicerca {@code true} per avviare una nuova ricerca
+     */
     private void caricaPagina(boolean nuovaRicerca) {
         if (nuovaRicerca) {
             requestGeneration++;
@@ -193,6 +235,19 @@ public class ListaRistorantiController {
         eseguiRicerca(richiesta, nuovaRicerca, offset, caricaTipologie, generation);
     }
 
+    /**
+     * Esegue la richiesta paginata in un thread virtuale.
+     * <p>
+     * Dopo il risultato aggiorna la vista sul thread JavaFX e può ritentare
+     * automaticamente la ricerca quando il server non è disponibile.
+     * </p>
+     *
+     * @param richiesta criteri e paginazione da inviare al server
+     * @param nuovaRicerca indica se la lista deve essere azzerata
+     * @param offset posizione iniziale della pagina richiesta
+     * @param caricaTipologie indica se devono essere caricate anche le cucine
+     * @param generation identificatore della ricerca per ignorare risposte obsolete
+     */
     private void eseguiRicerca(
             RicercaRistorantiPaginaDTO richiesta,
             boolean nuovaRicerca,
@@ -254,17 +309,31 @@ public class ListaRistorantiController {
         });
     }
 
+    /**
+     * Mostra lo stato di caricamento nella vista.
+     *
+     * @param messaggio testo da visualizzare durante il caricamento
+     */
     private void mostraCaricamento(String messaggio) {
         resultsCountLabel.setText(messaggio);
         loadingIndicator.setVisible(true);
         loadingIndicator.setManaged(true);
     }
 
+    /**
+     * Nasconde l'indicatore di caricamento.
+     */
     private void nascondiCaricamento() {
         loadingIndicator.setVisible(false);
         loadingIndicator.setManaged(false);
     }
 
+    /**
+     * Crea il DTO della ricerca convertendo i valori selezionati nei filtri.
+     *
+     * @param offset posizione iniziale dei risultati richiesti
+     * @return criterio completo di ricerca paginata
+     */
     private RicercaRistorantiPaginaDTO creaRichiesta(int offset) {
         Double prezzoMin = null;
         Double prezzoMax = null;
@@ -309,20 +378,38 @@ public class ListaRistorantiController {
         );
     }
 
+    /**
+     * Popola il selettore delle tipologie di cucina disponibili.
+     *
+     * @param tipologie lista delle cucine recuperate dal server
+     */
     private void popolaMenuCucine(List<String> tipologie) {
         cuisineSelector.setCuisines(tipologie);
     }
 
+    /**
+     * Avvia una nuova ricerca usando il testo e i filtri correnti.
+     */
     @FXML
     private void onSearch() {
         caricaPagina(true);
     }
 
+    /**
+     * Gestisce la modifica dei filtri dell'interfaccia.
+     * <p>
+     * Il metodo è predisposto per eventuali azioni immediate sui filtri;
+     * al momento la ricarica avviene tramite il comando di ricerca o reset.
+     * </p>
+     */
     @FXML
     private void onFilterChanged() {
         //caricaPagina(true);
     }
 
+    /**
+     * Ripristina i filtri e avvia una nuova ricerca.
+     */
     @FXML
     private void onResetFilters() {
         searchDebounce.stop();
@@ -345,16 +432,30 @@ public class ListaRistorantiController {
         caricaPagina(true);
     }
 
+    /**
+     * Carica la pagina successiva dei risultati.
+     */
     @FXML
     private void onLoadMore() {
         caricaPagina(false);
     }
 
+    /**
+     * Torna alla schermata principale dell'applicazione.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     private void onHomeClick(ActionEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
+    /**
+     * Aggiorna il contenitore delle card con i risultati caricati.
+     *
+     * @param nuovaRicerca indica se la lista deve essere ricostruita
+     * @param offset posizione iniziale dei risultati da aggiungere
+     */
     private void aggiornaLista(boolean nuovaRicerca, int offset) {
         if (nuovaRicerca) {
             restaurantContainer.getChildren().clear();
@@ -376,6 +477,12 @@ public class ListaRistorantiController {
         }
     }
 
+    /**
+     * Crea la card grafica di un ristorante utilizzando la relativa vista FXML.
+     *
+     * @param r ristorante da rappresentare
+     * @return nodo JavaFX della card, oppure {@code null} se il caricamento fallisce
+     */
     private Node creaCardRistorante(RistoranteDTO r) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RestaurantItem.fxml"));
@@ -392,20 +499,41 @@ public class ListaRistorantiController {
         }
     }
 
+    /**
+     * Gestisce l'apertura dei dettagli di un ristorante dalla lista.
+     *
+     * @param r ristorante selezionato
+     */
     private void apriDettagliRistorante(RistoranteDTO r) {
         System.out.println("Apertura dettagli: " + r.nome());
     }
 
+    /**
+     * Formatta l'etichetta di un intervallo di prezzo personalizzato.
+     *
+     * @param prezzoMin limite minimo, oppure {@code null} se non definito
+     * @param prezzoMax limite massimo, oppure {@code null} se non definito
+     * @return descrizione leggibile dell'intervallo
+     */
     private String formattaEtichettaPrezzo(Double prezzoMin, Double prezzoMax) {
         String minimo = prezzoMin == null ? "qualsiasi" : "da " + formatoEuro(prezzoMin);
         String massimo = prezzoMax == null ? "350+ €" : "fino a " + formatoEuro(prezzoMax);
         return "Personalizzato: " + minimo + ", " + massimo;
     }
 
+    /**
+     * Formatta un valore monetario senza cifre decimali.
+     *
+     * @param valore importo da formattare
+     * @return importo seguito dal simbolo dell'euro
+     */
     private String formatoEuro(double valore) {
         return String.format(Locale.ROOT, "%.0f €", valore);
     }
 
+    /**
+     * Aggiorna l'etichetta che descrive la posizione e il raggio di ricerca.
+     */
     private void aggiornaEtichettaPosizione() {
         locationFilterLabel.setText(localitaRicerca == null || localitaRicerca.isBlank()
                 ? "Posizione: non selezionata"

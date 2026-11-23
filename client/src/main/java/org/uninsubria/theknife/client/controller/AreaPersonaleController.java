@@ -8,12 +8,24 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO.RuoloUtente;
 
+/**
+ * Controller JavaFX della schermata dell'area personale.
+ * <p>
+ * Visualizza i dati dell'utente autenticato e configura le informazioni
+ * e le azioni disponibili in base al ruolo, distinguendo tra cliente
+ * e gestore.
+ * </p>
+ * <p>
+ * L'area personale consente di accedere alle sezioni preferiti,
+ * recensioni, ristoranti gestiti, aggiunta di un ristorante e modifica
+ * delle credenziali.
+ * </p>
+ */
 public class AreaPersonaleController {
 
     @FXML
@@ -50,6 +62,15 @@ public class AreaPersonaleController {
     private Button btnModificaCredenziali;
 
 
+    /**
+     * Inizializza la vista dell'area personale.
+     * <p>
+     * Recupera l'utente dalla sessione corrente, quindi mostra i dati
+     * comuni e configura i campi e i pulsanti disponibili in base al ruolo.
+     * Se nessun utente è autenticato, il metodo termina senza modificare
+     * i componenti della vista.
+     * </p>
+     */
     @FXML
     private void initialize() {
 
@@ -161,6 +182,14 @@ public class AreaPersonaleController {
     }
 
 
+    /**
+     * Gestisce il click sul pulsante dei ristoranti preferiti.
+     * <p>
+     * Carica la schermata contenente l'elenco dei preferiti del cliente.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     private void onPreferitiClick(ActionEvent event) {
         SceneManager.switchScene(
@@ -170,6 +199,15 @@ public class AreaPersonaleController {
     }
 
 
+    /**
+     * Gestisce il click sul pulsante delle recensioni personali.
+     * <p>
+     * Carica la schermata con le recensioni scritte dal cliente
+     * autenticato.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     private void onRecensioniClick(ActionEvent event) {
         SceneManager.switchScene(
@@ -179,6 +217,15 @@ public class AreaPersonaleController {
     }
 
 
+    /**
+     * Gestisce il click sul pulsante di aggiunta di un ristorante.
+     * <p>
+     * Carica la schermata utilizzata da un gestore per inserire un nuovo
+     * ristorante.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     private void onAggiungiClick(ActionEvent event) {
         SceneManager.switchScene(
@@ -188,6 +235,14 @@ public class AreaPersonaleController {
     }
 
 
+    /**
+     * Gestisce il click sul pulsante dei ristoranti gestiti.
+     * <p>
+     * Carica la lista dei ristoranti associati al gestore autenticato.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     private void onRistorantiClick(ActionEvent event) {
         SceneManager.switchScene(
@@ -196,6 +251,15 @@ public class AreaPersonaleController {
         );
     }
 
+    /**
+     * Gestisce il click sul pulsante di modifica delle credenziali.
+     * <p>
+     * Carica la schermata per modificare i dati dell'account dell'utente
+     * autenticato.
+     * </p>
+     *
+     * @param event evento generato dal click sull'elemento JavaFX
+     */
     @FXML
     private void onModificaCredenzialiClick(ActionEvent event) {
         SceneManager.switchScene(

@@ -31,6 +31,14 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Controller JavaFX della lista dei ristoranti preferiti dall'utente cliente.
+ * <p>
+ * Recupera i preferiti dal server, crea una card per ciascun ristorante e
+ * consente di rimuovere un elemento dalla lista. I dati vengono aggiornati
+ * automaticamente in seguito alle modifiche dei preferiti o del catalogo.
+ * </p>
+ */
 public class PreferitiController {
 
     @FXML private Label resultsCountLabel;
@@ -39,6 +47,13 @@ public class PreferitiController {
 
     private final ObservableList<RistoranteDTO> ristorantiCompleti = FXCollections.observableArrayList();
 
+    /**
+     * Inizializza la vista dei preferiti.
+     * <p>
+     * Carica subito l'elenco e attiva le sottoscrizioni agli aggiornamenti
+     * dell'utente e del catalogo dei ristoranti.
+     * </p>
+     */
     @FXML
     public void initialize() {
         caricaPreferiti();
@@ -54,6 +69,13 @@ public class PreferitiController {
         }
     }
 
+    /**
+     * Recupera dal server i ristoranti preferiti dell'utente autenticato.
+     * <p>
+     * L'accesso richiede un cliente autenticato. In caso contrario o in caso
+     * di errore di comunicazione viene mostrato un messaggio all'utente.
+     * </p>
+     */
     private void caricaPreferiti() {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isCliente()) {
@@ -73,6 +95,11 @@ public class PreferitiController {
         }
     }
 
+    /**
+     * Ricrea la lista grafica dei ristoranti preferiti forniti.
+     *
+     * @param nuovaLista ristoranti da visualizzare
+     */
     private void aggiornaLista(List<RistoranteDTO> nuovaLista) {
         restaurantContainer.getChildren().clear();
 
@@ -87,6 +114,16 @@ public class PreferitiController {
         restaurantScrollPane.setVvalue(0);
     }
 
+    /**
+     * Crea la card grafica di un ristorante preferito.
+     * <p>
+     * Collega il pulsante di rimozione della card al metodo del controller
+     * responsabile dell'aggiornamento del preferito sul server.
+     * </p>
+     *
+     * @param ristorante ristorante da rappresentare
+     * @return nodo JavaFX della card, oppure {@code null} se il caricamento fallisce
+     */
     private Node creaCardRistorante(RistoranteDTO ristorante) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/PreferitoItem.fxml"));
@@ -105,6 +142,15 @@ public class PreferitiController {
         }
     }
 
+    /**
+     * Rimuove un ristorante dall'elenco dei preferiti dell'utente.
+     * <p>
+     * Dopo l'esito positivo aggiorna immediatamente la lista locale. Se il
+     * ristorante non è più disponibile ricarica i preferiti dal server.
+     * </p>
+     *
+     * @param ristorante ristorante da rimuovere dai preferiti
+     */
     private void rimuoviPreferito(RistoranteDTO ristorante) {
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isCliente()) {
@@ -128,6 +174,13 @@ public class PreferitiController {
         }
     }
 
+    /**
+     * Visualizza una finestra di dialogo con messaggio configurabile.
+     *
+     * @param tipo tipo dell'avviso
+     * @param titolo titolo della finestra
+     * @param messaggio testo da mostrare all'utente
+     */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
         Alert alert = new Alert(tipo);
         SceneManager.initOwner(alert);

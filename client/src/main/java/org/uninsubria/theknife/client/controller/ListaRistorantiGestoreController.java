@@ -26,6 +26,18 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+ * Controller JavaFX della lista dei ristoranti gestiti da un ristoratore.
+ * <p>
+ * Verifica che l'utente autenticato abbia il ruolo di gestore, recupera i
+ * ristoranti associati al suo account tramite RMI e crea una card per ogni
+ * ristorante utilizzando la relativa vista FXML.
+ * </p>
+ * <p>
+ * La vista permette di aprire i dettagli e accedere alla modifica di un
+ * ristorante, oltre a tornare al profilo o alla schermata di inserimento.
+ * </p>
+ */
 public class ListaRistorantiGestoreController {
 
     private static final String VISTA_PROFILO =
@@ -40,6 +52,14 @@ public class ListaRistorantiGestoreController {
     @FXML
     private VBox restaurantContainer;
 
+    /**
+     * Inizializza la lista dei ristoranti del gestore autenticato.
+     * <p>
+     * Verifica il ruolo dell'utente corrente. Se l'accesso non è valido,
+     * mostra uno stato vuoto e un avviso; altrimenti carica i ristoranti e
+     * attiva l'aggiornamento automatico del catalogo.
+     * </p>
+     */
     @FXML
     private void initialize() {
         UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
@@ -55,6 +75,15 @@ public class ListaRistorantiGestoreController {
                 () -> caricaRistoranti(gestore));
     }
 
+    /**
+     * Recupera dal server i ristoranti associati al gestore e aggiorna la vista.
+     * <p>
+     * Le card vengono configurate per aprire i dettagli o la schermata di
+     * modifica. Se non sono presenti ristoranti, viene mostrato lo stato vuoto.
+     * </p>
+     *
+     * @param gestore gestore autenticato proprietario dei ristoranti
+     */
     private void caricaRistoranti(UtenteDTO gestore) {
         try {
             List<RistoranteDTO> ristoranti =
@@ -98,16 +127,32 @@ public class ListaRistorantiGestoreController {
         }
     }
 
+    /**
+     * Apre l'area personale dell'utente.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     private void onProfiloClick(ActionEvent event) {
         SceneManager.switchScene(event, VISTA_PROFILO);
     }
 
+    /**
+     * Apre la schermata di inserimento di un nuovo ristorante.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
     @FXML
     private void onAggiungiClick(ActionEvent event) {
         SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/AggiungiRistorante.fxml");
     }
 
+    /**
+     * Visualizza una finestra di errore configurabile.
+     *
+     * @param titolo titolo della finestra
+     * @param messaggio descrizione dell'errore da mostrare
+     */
     private void showError(String titolo, String messaggio) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         SceneManager.initOwner(alert);
