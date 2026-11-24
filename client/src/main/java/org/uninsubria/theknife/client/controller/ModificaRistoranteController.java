@@ -22,6 +22,8 @@ import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -307,6 +309,35 @@ public class ModificaRistoranteController {
             return;
         }
 
+        String telefono = txtTelefono.getText().trim();
+        String sitoWeb = txtSitoWeb.getText().trim();
+
+        if (!telefonoValido(telefono)) {
+            mostraMessaggio(
+                    Alert.AlertType.WARNING,
+                    "Numero di telefono non valido",
+                    "Inserisci un numero valido con almeno 7 e massimo 15 cifre."
+            );
+            txtTelefono.requestFocus();
+            return;
+        }
+
+        if (!sitoWebValido(sitoWeb)) {
+            mostraMessaggio(
+                    Alert.AlertType.WARNING,
+                    "Sito web non valido",
+                    "Inserisci un indirizzo web valido, ad esempio www.ristorante.it."
+            );
+            txtSitoWeb.requestFocus();
+            return;
+        }
+
+
+        if (!sitoWeb.isEmpty()
+                && !sitoWeb.matches("(?i)^https?://.*")) {
+            sitoWeb = "https://" + sitoWeb;
+        }
+
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isGestore()) {
             mostraMessaggio(Alert.AlertType.ERROR, "Accesso non consentito",
@@ -328,8 +359,8 @@ public class ModificaRistoranteController {
                 chkBookingOnline.isSelected(),
                 ristorante.mediaStelle(),
                 ristorante.prezzoStimato(),
-                txtTelefono.getText().trim(),
-                txtSitoWeb.getText().trim(),
+                telefono,
+                sitoWeb,
                 txtDescrizione.getText().trim()
         );
 
@@ -381,5 +412,97 @@ public class ModificaRistoranteController {
         alert.setHeaderText(null);
         alert.setContentText(contenuto);
         alert.showAndWait();
+    }
+
+    private boolean sitoWebValido(String sitoWeb) {
+        if (sitoWeb == null || sitoWeb.isBlank()) {
+            return true;
+        }
+
+        String indirizzo = sitoWeb.trim();
+
+        if (indirizzo.contains(" ")) {
+            return false;
+        }
+
+        if (!indirizzo.matches("(?i)^https?://.*")) {
+            indirizzo = "https://" + indirizzo;
+        }
+
+        try {
+            URI uri = new URI(indirizzo);
+
+            String schema = uri.getScheme();
+            String host = uri.getHost();
+
+            if (schema == null
+                    || (!schema.equalsIgnoreCase("http")
+                    && !schema.equalsIgnoreCase("https"))) {
+                return false;
+            }
+
+            if (host == null || !host.contains(".")) {
+                return false;
+            }
+
+            String[] parti = host.split("\\.");
+
+            if (parti.length < 2) {
+                return false;
+            }
+
+            String estensione = parti[parti.length - 1];
+
+            return estensione.matches("[a-zA-Z]{2,}");
+
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Verifica la validità formale di un numero di telefono.
+     * <p>
+     * Il campo può essere vuoto. Quando valorizzato, deve contenere da 7
+     * a 15 cifre e può includere il prefisso internazionale, spazi,
+     * parentesi e trattini.
+     * </p>
+     *
+     * @param telefono numero di telefono da controllare
+     * @return {@code true} se il numero è vuoto o valido; {@code false}
+     *         altrimenti
+     */
+    private boolean telefonoValido(String telefono) {
+        if (telefono == null || telefono.isBlank()) {
+            return true;
+        }
+
+        String telefonoPulito = telefono.trim();
+
+        // Sono ammessi solo numeri, +, spazi, parentesi e trattini.
+        if (!telefonoPulito.matches("^\\+?[0-9\\s()\\-]+$")) {
+            return false;
+        }
+
+        // Il numero deve contenere da 7 a 15 cifre.
+        long numeroCifre = telefonoPulito.chars()
+                .filter(Character::isDigit)
+                .count();
+
+        if (numeroCifre < 7 || numeroCifre > 15) {
+            return false;
+        }
+
+        // Controllo del prefisso internazionale, se presente.
+        if (telefonoPulito.startsWith("+")) {
+            String numeroSenzaSimboli = telefonoPulito.replaceAll("[\\s()\\-]", "");
+
+            // Il prefisso deve contenere da 1 a 3 cifre.
+            if (!numeroSenzaSimboli.matches("^\\+[1-9][0-9]{0,2}[0-9]{6,14}$")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
