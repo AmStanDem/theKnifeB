@@ -1,3 +1,0 @@
-ALTER TABLE RistorantiTheKnife
-    ADD COLUMN IF NOT EXISTS telefono VARCHAR(64),
-    ADD COLUMN IF NOT EXISTS sito_web TEXT;

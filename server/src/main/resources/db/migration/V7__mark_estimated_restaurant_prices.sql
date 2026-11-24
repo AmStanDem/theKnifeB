@@ -1,2 +1,0 @@
-ALTER TABLE RistorantiTheKnife
-    ADD COLUMN prezzo_stimato BOOLEAN NOT NULL DEFAULT FALSE;
