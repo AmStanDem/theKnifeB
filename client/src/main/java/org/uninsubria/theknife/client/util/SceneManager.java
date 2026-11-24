@@ -85,6 +85,27 @@ public class SceneManager {
     }
 
     /**
+     * Sostituisce la vista corrente senza conservarla nello storico e rimuove
+     * un'eventuale voce duplicata della destinazione.
+     */
+    public static void replaceCurrentScene(Event event, String fxmlPath) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        replaceCurrentScene(stage, fxmlPath);
+    }
+
+    /**
+     * Sostituisce la vista corrente senza conservarla nello storico e rimuove
+     * un'eventuale voce duplicata della destinazione.
+     */
+    public static void replaceCurrentScene(Stage stage, String fxmlPath) {
+        Stack<String> history = historyMap.get(stage);
+        if (history != null && !history.isEmpty() && fxmlPath.equals(history.peek())) {
+            history.pop();
+        }
+        switchSceneAndGetController(stage, fxmlPath, false);
+    }
+
+    /**
      * Restituisce lo stage della finestra che contiene la sorgente dell'evento.
      *
      * @param event evento JavaFX associato a un nodo di una scena

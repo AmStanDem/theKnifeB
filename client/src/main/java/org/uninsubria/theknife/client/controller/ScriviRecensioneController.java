@@ -157,10 +157,9 @@ public class ScriviRecensioneController {
                 );
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione inviata",
                         "La tua recensione è stata pubblicata.");
-                SceneManager.switchScene(
+                SceneManager.replaceCurrentScene(
                         actionEvent,
-                        "/org/uninsubria/theknife/client/views/Ristorante.fxml",
-                        false
+                        "/org/uninsubria/theknife/client/views/Ristorante.fxml"
                 );
             }
         } catch (AzioneDuplicataException e) {
@@ -172,12 +171,12 @@ public class ScriviRecensioneController {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione non disponibile",
                     "La recensione è stata eliminata o non è più modificabile.");
             RecensioneSelezionata.pulisci();
-            tornaAlRistoranteRecensito(actionEvent, false);
+            tornaAlRistoranteRecensito(actionEvent, true);
         } catch (ModificaObsoletaException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione modificata altrove",
                     "Un altro dispositivo ha aggiornato questa recensione. Ricarica i dati prima di riprovare.");
             RecensioneSelezionata.pulisci();
-            tornaAlRistoranteRecensito(actionEvent, false);
+            tornaAlRistoranteRecensito(actionEvent, true);
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
                     "Impossibile salvare la recensione. Riprova più tardi.");
@@ -207,13 +206,19 @@ public class ScriviRecensioneController {
      *
      * @param actionEvent evento JavaFX usato per cambiare scena
      */
-    private void tornaAlRistoranteRecensito(ActionEvent actionEvent, boolean salvaStorico) {
+    private void tornaAlRistoranteRecensito(ActionEvent actionEvent, boolean scartaVistaCorrente) {
         RecensioneSelezionata.pulisci();
-        SceneManager.switchScene(
-                actionEvent,
-                "/org/uninsubria/theknife/client/views/MieRecensioni.fxml",
-                salvaStorico
-        );
+        if (scartaVistaCorrente) {
+            SceneManager.replaceCurrentScene(
+                    actionEvent,
+                    "/org/uninsubria/theknife/client/views/MieRecensioni.fxml"
+            );
+        } else {
+            SceneManager.switchScene(
+                    actionEvent,
+                    "/org/uninsubria/theknife/client/views/MieRecensioni.fxml"
+            );
+        }
     }
 
     /**

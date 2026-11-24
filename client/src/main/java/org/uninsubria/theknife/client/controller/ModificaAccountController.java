@@ -191,7 +191,10 @@ public class ModificaAccountController {
                         .aggiornaAccount(aggiornato, passwordCorrente, nuovaPassword);
                 Platform.runLater(() -> {
                     SessioneUtente.login(risultato);
-                    SceneManager.switchScene(stage, vistaProfilo(risultato));
+                    SceneManager.replaceCurrentScene(
+                            stage,
+                            vistaProfilo(risultato)
+                    );
                 });
             } catch (CredenzialiErrateException e) {
                 mostraErrore("La password attuale non è corretta.");

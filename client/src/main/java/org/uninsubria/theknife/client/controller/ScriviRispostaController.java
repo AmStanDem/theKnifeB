@@ -99,7 +99,10 @@ public class ScriviRispostaController {
             RecensioneDaRispondere.pulisci();
             mostraMessaggio(Alert.AlertType.INFORMATION, "Risposta inviata",
                     "La risposta è stata pubblicata.");
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
+            SceneManager.replaceCurrentScene(
+                    actionEvent,
+                    "/org/uninsubria/theknife/client/views/Ristorante.fxml"
+            );
         } catch (DatiMancantiException | OperazioneNonConsentitaException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Risposta non inviata", e.getMessage());
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
