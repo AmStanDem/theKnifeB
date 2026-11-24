@@ -177,4 +177,31 @@ public class RistoranteService {
         System.err.println("[DAO_ERROR] Errore durante " + operation + ": " + cause.getMessage());
         return new SistemaIndisponibileException(cause);
     }
+
+
+    public void eliminaRistorante(Integer idRistorante, Integer idGestore)
+            throws RistoranteNonTrovatoException,
+            OperazioneNonConsentitaException,
+            SistemaIndisponibileException {
+
+        if (idRistorante == null || idGestore == null) {
+            throw new OperazioneNonConsentitaException(
+                    "Accesso negato: identificativo ristorante o gestore mancante.");
+        }
+
+        try {
+            if (!ristoranteDAO.eliminaRistorante(idRistorante, idGestore)) {
+                throw new RistoranteNonTrovatoException(idRistorante);
+            }
+
+            subscriptions.publish(
+                    idRistorante,
+                    idGestore,
+                    DataChangedEvent.ChangeType.RESTAURANT_CHANGED);
+
+        } catch (SQLException e) {
+            throw databaseError("eliminazione ristorante", e);
+        }
+    }
+
 }

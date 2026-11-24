@@ -102,3 +102,20 @@
 .btn-secondary:hover {
     -fx-background-color: #D5D5D5;
 }
+
+
+.btn-delete {
+    -fx-background-color: #D9534F;
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-delete:hover {
+    -fx-background-color: #C9302C;
+}
+
+.btn-delete:disabled {
+    -fx-opacity: 0.5;
+}

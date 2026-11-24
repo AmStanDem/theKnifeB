@@ -124,6 +124,14 @@
                         <Button fx:id="btnSalva" mnemonicParsing="false"
                                 onAction="#onSalvaClick" prefHeight="45.0" prefWidth="220.0"
                                 styleClass="btn-primary" text="Salva modifiche"/>
+
+                        <Button fx:id="btnElimina" mnemonicParsing="false"
+                                onAction="#onEliminaClick"
+                                prefHeight="45.0" prefWidth="160.0"
+                                styleClass="btn-delete"
+                                text="Elimina ristorante"/>
+
+
                     </HBox>
                 </VBox>
             </content>

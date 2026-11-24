@@ -173,4 +173,11 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
         preferitiService.rimuovi(idUtente, idRistorante);
     }
+
+    @Override
+    public void eliminaRistorante(Integer idRistorante, Integer idGestore)
+            throws RemoteException, OperazioneNonConsentitaException,
+            RistoranteNonTrovatoException, SistemaIndisponibileException {
+        ristoranteService.eliminaRistorante(idRistorante, idGestore);
+    }
 }

@@ -180,6 +180,24 @@ public class RistoranteDAO {
         }
     }
 
+
+    public boolean eliminaRistorante(int idRistorante, int idGestore) throws SQLException {
+        String sql = """
+            DELETE FROM RistorantiTheKnife
+            WHERE id_ristorante = ? AND id_gestore = ?
+            """;
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idRistorante);
+            stmt.setInt(2, idGestore);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+
     public RistoranteDTO trovaPerId(int idRistorante) throws SQLException {
         String sql = costruisciQueryBase() + " WHERE r.id_ristorante = ?";
         try (Connection conn = DatabaseConfig.getConnection();

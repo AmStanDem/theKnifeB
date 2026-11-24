@@ -21,12 +21,15 @@ import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
+
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller JavaFX della schermata di modifica di un ristorante.
@@ -49,6 +52,8 @@ public class ModificaRistoranteController {
     @FXML private CheckBox chkDelivery;
     @FXML private CheckBox chkBookingOnline;
     @FXML private Button btnSalva;
+
+    @FXML private Button btnElimina;
 
     @FXML private TextField txtTelefono;
     @FXML private TextField txtSitoWeb;
@@ -243,8 +248,12 @@ public class ModificaRistoranteController {
      * </p>
      */
     private void aggiornaStatoSalvataggio() {
-        btnSalva.setDisable(!tipologieCaricate || !ristorantiCaricati || ristorante == null);
-    }
+        boolean disabilitato = !tipologieCaricate
+                || !ristorantiCaricati
+                || ristorante == null;
+
+        btnSalva.setDisable(disabilitato);
+        btnElimina.setDisable(disabilitato);}
 
     /**
      * Gestisce il click sul pulsante di salvataggio.
@@ -505,4 +514,89 @@ public class ModificaRistoranteController {
 
         return true;
     }
+
+
+    @FXML
+    public void onEliminaClick(ActionEvent event) {
+        if (ristorante == null) {
+            return;
+        }
+
+        Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
+        SceneManager.initOwner(conferma);
+        conferma.setTitle("Elimina ristorante");
+        conferma.setHeaderText("Eliminare " + ristorante.nome() + "?");
+        conferma.setContentText(
+                "Questa operazione eliminerà definitivamente il ristorante, "
+                        + "le recensioni, le risposte e i preferiti associati.\n\n"
+                        + "L'operazione non può essere annullata. Vuoi continuare?"
+        );
+
+        ButtonType elimina = new ButtonType(
+                "Elimina",
+                ButtonBar.ButtonData.OK_DONE
+        );
+
+        conferma.getButtonTypes().setAll(
+                elimina,
+                ButtonType.CANCEL
+        );
+
+        Optional<ButtonType> risultato = conferma.showAndWait();
+
+        if (risultato.isPresent() && risultato.get() == elimina) {
+            if (eliminaRistorante()) {
+                tornaAiMieiRistoranti(event);
+            }
+        }
+    }
+
+    private boolean eliminaRistorante() {
+        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+
+        if (utente == null || !SessioneUtente.isGestore()) {
+            mostraMessaggio(
+                    Alert.AlertType.ERROR,
+                    "Accesso non consentito",
+                    "Devi accedere con un account ristoratore per eliminare un ristorante."
+            );
+            return false;
+        }
+
+        try {
+            ServerConnection.getServer().eliminaRistorante(
+                    ristorante.idRistorante(),
+                    utente.idUtente()
+            );
+
+            mostraMessaggio(
+                    Alert.AlertType.INFORMATION,
+                    "Eliminazione completata",
+                    "Il ristorante \"" + ristorante.nome() + "\" è stato eliminato."
+            );
+
+            return true;
+
+        } catch (RemoteException | NotBoundException
+                 | OperazioneNonConsentitaException
+                 | RistoranteNonTrovatoException
+                 | SistemaIndisponibileException e) {
+
+            System.err.println(
+                    "[RESTAURANT_FORM_ERROR] Impossibile eliminare il ristorante: "
+                            + e.getMessage()
+            );
+
+            mostraMessaggio(
+                    Alert.AlertType.ERROR,
+                    "Errore durante l'eliminazione",
+                    "Il ristorante non è stato eliminato. Verifica la connessione e riprova."
+            );
+
+            return false;
+        }
+    }
+
+
+
 }

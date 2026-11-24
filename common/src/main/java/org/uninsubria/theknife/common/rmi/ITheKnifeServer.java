@@ -308,4 +308,19 @@ public interface ITheKnifeServer extends Remote {
     void rimuoviPreferito(Integer idUtente, Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException;
 
+
+    /**
+     * Elimina un ristorante esistente.
+     *
+     * @param idRistorante identificativo del ristorante da eliminare
+     * @param idGestore identificativo del gestore che richiede l'eliminazione
+     * @throws RemoteException se la comunicazione RMI non è disponibile
+     * @throws OperazioneNonConsentitaException se il gestore non può eliminare il ristorante
+     * @throws RistoranteNonTrovatoException se il ristorante non esiste
+     * @throws SistemaIndisponibileException se il sistema non è disponibile
+     */
+    void eliminaRistorante(Integer idRistorante, Integer idGestore)
+            throws RemoteException, OperazioneNonConsentitaException,
+            RistoranteNonTrovatoException, SistemaIndisponibileException;
+
 }
