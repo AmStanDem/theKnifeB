@@ -466,7 +466,7 @@ public class AreaRistoranteController {
     private void aggiornaMediaRecensioni(List<RecensioneDTO> recensioni) {
 
         if (recensioni == null || recensioni.isEmpty()) {
-            averageRatingLabel.setText("0.0 / 10");
+            averageRatingLabel.setText("0.0 / 5");
             averageRating.setRating(0);
             return;
         }
@@ -480,7 +480,7 @@ public class AreaRistoranteController {
         double media = somma / recensioni.size();
 
         averageRatingLabel.setText(
-                String.format(Locale.ROOT, "%.1f / 10", media * 2)
+                String.format(Locale.ROOT, "%.1f / 5", media)
         );
 
         averageRating.setRating(media);

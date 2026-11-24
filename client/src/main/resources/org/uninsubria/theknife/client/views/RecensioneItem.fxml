@@ -2,12 +2,12 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
-<?import javafx.scene.control.Button?>
 <VBox spacing="10"
       maxWidth="Infinity"
       stylesheets="@../styles/recensione-item.css"
@@ -15,6 +15,19 @@
       xmlns="http://javafx.com/javafx/21.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.uninsubria.theknife.client.controller.RecensioneItemController">
+
+    <!-- Header: Avatar + Autore + Ristorante + Badge -->
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="author-row">
+        <StackPane fx:id="avatarCircle" styleClass="avatar-circle">
+            <Circle radius="16" styleClass="avatar-bg"/>
+            <Label fx:id="avatarInitial" styleClass="avatar-initial" text="U"/>
+        </StackPane>
+        <VBox spacing="1">
+            <Label fx:id="authorLabel" styleClass="author-name" text="Utente"/>
+            <Label fx:id="restaurantLabel" styleClass="restaurant-name" text=""/>
+            <Label fx:id="localGuideLabel" styleClass="local-guide-badge" visible="false" managed="false" text="Guida locale"/>
+        </VBox>
+    </HBox>
 
     <!-- Riga Stelle + Data -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="rating-row">
@@ -26,7 +39,6 @@
     <Label fx:id="reviewTextField"
            maxWidth="Infinity"
            styleClass="review-text-field"
-           text="credo sia il gioco migliore a cui abbia mai giocato: ha ambientazioni, personaggi, dialoghi e storia impeccabili. prima di giocarci non mi sarei mai aspettato una mappa così vasta e tante missioni e personaggi, non manca nulla è davvero un bellissimo open word e lo consiglio. ha piccolissimi lati negativi come le poche ricompense ma quasi impercettibili durante il gioco perché diventa continuativo ma per niente stancante."
            wrapText="true" />
 
     <!-- Sezione Risposta -->
@@ -68,7 +80,6 @@
                maxWidth="Infinity"
                style="-fx-font-size: 13px; -fx-text-fill: #5f6368;"
                styleClass="response-text-field"
-               text="Risposta del ristoratore"
                wrapText="true" />
 
     </VBox>

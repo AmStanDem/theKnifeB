@@ -105,6 +105,16 @@
     -fx-font-size: 13px;
 }
 
+/* ===== Riga autore ===== */
+.author-row {
+    -fx-padding: 0 0 4 0;
+}
+
+.restaurant-name {
+    -fx-font-size: 11px;
+    -fx-text-fill: #70757a;
+}
+
 /* ===== Header testo ===== */
 .author-name {
     -fx-font-weight: bold;
