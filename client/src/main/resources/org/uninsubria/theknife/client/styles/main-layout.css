@@ -102,6 +102,11 @@
     -fx-padding: 0 15px 0 15px;
 }
 
+.search-field:hover {
+    -fx-border-color: #3E9330;
+    -fx-border-width: 2px;
+}
+
 .search-field:focused {
     -fx-border-color: #3E9330;
     -fx-border-width: 2px;
