@@ -2,14 +2,19 @@ package org.uninsubria.theknife.client.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.components.HomeLogo;
 
 import java.util.Objects;
 
@@ -32,6 +37,12 @@ public class BaseLayoutController {
     private StackPane contentContainer;
 
     @FXML
+    private StackPane layoutRoot;
+
+    @FXML
+    private BorderPane layoutPane;
+
+    @FXML
     private Button btnAccediRegistrati;
 
     @FXML
@@ -39,6 +50,12 @@ public class BaseLayoutController {
 
     @FXML
     private ImageView imgUtente;
+
+    @FXML
+    private HomeLogo imgLogo;
+
+    @FXML
+    private HBox header;
 
     private boolean paginaLogin;
     private boolean loggato;
@@ -79,23 +96,6 @@ public class BaseLayoutController {
         SceneManager.switchScene(
                 event,
                 "/org/uninsubria/theknife/client/views/LoginView.fxml"
-        );
-    }
-
-    /**
-     * Gestisce il click sul logo dell'applicazione.
-     * <p>
-     * Dalla posizione corrente viene aperta la schermata principale
-     * dell'applicazione.
-     * </p>
-     *
-     * @param event evento generato dal click sul logo
-     */
-    @FXML
-    public void handleLogoClick(MouseEvent event) {
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
         );
     }
 
@@ -142,6 +142,24 @@ public class BaseLayoutController {
      */
     public void setLoginPage(boolean loginPage) {
         paginaLogin = loginPage;
+        if (loginPage) {
+            layoutPane.setTop(null);
+            header.setMaxHeight(Region.USE_PREF_SIZE);
+            StackPane.setAlignment(header, Pos.TOP_LEFT);
+            if (!layoutRoot.getChildren().contains(header)) {
+                layoutRoot.getChildren().add(header);
+            }
+        } else {
+            layoutRoot.getChildren().remove(header);
+            layoutPane.setTop(header);
+        }
+        imgLogo.setVisible(!loginPage);
+        imgLogo.setManaged(!loginPage);
+        imgLogo.setMouseTransparent(loginPage);
+        header.getStyleClass().remove("login-header");
+        if (loginPage) {
+            header.getStyleClass().add("login-header");
+        }
         aggiornaPulsanteAccesso();
     }
 

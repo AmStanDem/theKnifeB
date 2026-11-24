@@ -10,21 +10,30 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
-<BorderPane styleClass="base-layout"
-            stylesheets="@../styles/main-layout.css"
-            xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.uninsubria.theknife.client.controller.BaseLayoutController"
-            prefHeight="768.0"
-            prefWidth="1024.0">
+<StackPane fx:id="layoutRoot"
+           styleClass="base-layout"
+           stylesheets="@../styles/main-layout.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.uninsubria.theknife.client.controller.BaseLayoutController"
+           prefHeight="768.0"
+           prefWidth="1024.0">
+    <children>
+        <BorderPane fx:id="layoutPane">
+            <center>
+                <StackPane fx:id="contentContainer" />
+            </center>
+        </BorderPane>
 
-        <!-- HEADER -->
-        <top>
-            <HBox alignment="CENTER_LEFT"
-                  spacing="20.0"
-                  styleClass="header"
-                  BorderPane.alignment="CENTER">
+        <!-- Header sits above the page on login and moves into the layout otherwise. -->
+        <HBox fx:id="header"
+              alignment="CENTER_LEFT"
+              maxWidth="1.7976931348623157E308"
+              spacing="20.0"
+              styleClass="header"
+              StackPane.alignment="TOP_CENTER">
 
                 <padding>
                     <Insets bottom="15.0"
@@ -42,14 +51,9 @@
                             styleClass="back-button" />
 
                     <!-- LOGO -->
-                    <ImageView fitHeight="133.0"
-                               fitWidth="441.0"
-                               preserveRatio="true"
-                               onMouseClicked="#handleLogoClick">
-                        <image>
-                            <Image url="@/org/uninsubria/theknife/client/images/img_1.png" />
-                        </image>
-                    </ImageView>
+                    <HomeLogo fx:id="imgLogo"
+                              fitHeight="133.0"
+                              fitWidth="441.0" />
 
                     <!-- SPAZIO -->
                     <Region HBox.hgrow="ALWAYS" />
@@ -77,9 +81,6 @@
                     </ImageView>
 
                 </children>
-            </HBox>
-        </top>
-    <center>
-        <StackPane fx:id="contentContainer" />
-    </center>
-</BorderPane>
+        </HBox>
+    </children>
+</StackPane>

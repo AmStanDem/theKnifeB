@@ -80,7 +80,9 @@ public final class HomeLogo extends Button {
      */
     public void setFitWidth(double fitWidth) {
         imageView.setFitWidth(fitWidth);
+        setMinWidth(fitWidth);
         setPrefWidth(fitWidth);
+        setMaxWidth(fitWidth);
     }
 
     /**
@@ -99,7 +101,9 @@ public final class HomeLogo extends Button {
      */
     public void setFitHeight(double fitHeight) {
         imageView.setFitHeight(fitHeight);
+        setMinHeight(fitHeight);
         setPrefHeight(fitHeight);
+        setMaxHeight(fitHeight);
     }
 
     /**

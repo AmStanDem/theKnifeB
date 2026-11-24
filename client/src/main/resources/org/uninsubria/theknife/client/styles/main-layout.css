@@ -6,6 +6,14 @@
     -fx-background-color: #1A1A1E;
 }
 
+.header.login-header {
+    -fx-background-color: transparent;
+}
+
+.login-header .back-button {
+    -fx-text-fill: #0B3B2C;
+}
+
 .back-button {
     -fx-background-color: transparent;
     -fx-text-fill: white;
@@ -16,7 +24,7 @@
 }
 
 .back-button:hover {
-    -fx-background-color: #333338;
+    -fx-background-color: rgba(11, 59, 44, 0.12);
 }
 
 .back-button:disabled {
