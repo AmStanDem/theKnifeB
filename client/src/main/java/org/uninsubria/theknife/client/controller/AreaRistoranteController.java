@@ -223,8 +223,13 @@ public class AreaRistoranteController {
         try {
             ristorante = ServerConnection.getServer().getDettaglioRistorante(ristorante.idRistorante());
             mostraDatiRistorante();
-        } catch (RemoteException | NotBoundException | SistemaIndisponibileException
-                 | org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException e) {
+        } catch (org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException e) {
+            // Il ristorante è stato eliminato: torna alla pagina precedente
+            mostraMessaggio(Alert.AlertType.WARNING, "Ristorante eliminato",
+                    "Il ristorante che stavi visualizzando è stato eliminato.");
+            SceneManager.goBack(
+                    (javafx.stage.Stage) lblNomeRistorante.getScene().getWindow());
+        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di aggiornamento",
                     "Impossibile aggiornare i dati del ristorante.");
         }
