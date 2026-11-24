@@ -212,6 +212,8 @@ public class ScriviRecensioneController {
                 );
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione inviata",
                         "La tua recensione è stata pubblicata.");
+                RistoranteSelezionato.setRitornoAiMieiRistoranti(
+                        RistoranteSelezionato.getRistorante() != null);
                 SceneManager.replaceCurrentScene(
                         actionEvent,
                         "/org/uninsubria/theknife/client/views/Ristorante.fxml"
@@ -270,6 +272,8 @@ public class ScriviRecensioneController {
             RecensioneDaRispondere.pulisci();
             mostraMessaggio(Alert.AlertType.INFORMATION, "Risposta inviata",
                     "La risposta è stata pubblicata.");
+            RistoranteSelezionato.setRitornoAiMieiRistoranti(
+                    RistoranteSelezionato.getRistorante() != null);
             SceneManager.replaceCurrentScene(
                     actionEvent,
                     "/org/uninsubria/theknife/client/views/Ristorante.fxml"
@@ -292,6 +296,8 @@ public class ScriviRecensioneController {
     public void onAnnullaClick(ActionEvent actionEvent) {
         if (modalitaRisposta) {
             RecensioneDaRispondere.pulisci();
+            RistoranteSelezionato.setRitornoAiMieiRistoranti(
+                    RistoranteSelezionato.getRistorante() != null);
             SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
             return;
         }
@@ -315,6 +321,10 @@ public class ScriviRecensioneController {
         String destinazione = origineModifica == RecensioneSelezionata.OrigineModifica.RISTORANTE
                 ? "/org/uninsubria/theknife/client/views/Ristorante.fxml"
                 : "/org/uninsubria/theknife/client/views/MieRecensioni.fxml";
+        if ("/org/uninsubria/theknife/client/views/Ristorante.fxml".equals(destinazione)) {
+            RistoranteSelezionato.setRitornoAiMieiRistoranti(
+                    RistoranteSelezionato.getRistorante() != null);
+        }
         SceneManager.replaceCurrentScene(actionEvent, destinazione);
     }
 
