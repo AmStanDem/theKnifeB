@@ -199,3 +199,20 @@
     -fx-background-color: #2E7025;
 }
 
+.profile-logout-button {
+    -fx-background-color: #D32F2F;
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.profile-logout-button:hover {
+    -fx-background-color: #B71C1C;
+}
+
+.profile-logout-button:pressed {
+    -fx-background-color: #9A1717;
+}

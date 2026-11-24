@@ -17,7 +17,7 @@ import java.util.Objects;
  * Controller JavaFX del layout principale condiviso dalle viste dell'applicazione.
  * <p>
  * Gestisce la barra di navigazione comune, il pulsante per tornare alla pagina
- * precedente, l'accesso o il logout dell'utente e la visualizzazione dinamica
+ * precedente, l'accesso dell'utente e la visualizzazione dinamica
  * del contenuto della vista corrente.
  * </p>
  * <p>
@@ -40,9 +40,6 @@ public class BaseLayoutController {
     @FXML
     private ImageView imgUtente;
 
-    @FXML
-    private Button btnLogOut;
-
     private boolean paginaLogin;
     private boolean loggato;
 
@@ -50,7 +47,7 @@ public class BaseLayoutController {
      * Inizializza i componenti comuni del layout.
      * <p>
      * Verifica lo stato della sessione utente, configura la visibilità
-     * dell'icona profilo e del pulsante di logout e aggiorna il pulsante
+     * dell'icona profilo e aggiorna il pulsante
      * di accesso o registrazione.
      * </p>
      */
@@ -59,8 +56,6 @@ public class BaseLayoutController {
         loggato = SessioneUtente.getUtenteCorrente() != null;
         imgUtente.setVisible(loggato);
         imgUtente.setManaged(loggato);
-        btnLogOut.setVisible(loggato);
-        btnLogOut.setManaged(loggato);
         aggiornaPulsanteAccesso();
     }
 
@@ -114,25 +109,6 @@ public class BaseLayoutController {
         SceneManager.switchScene(
                 event,
                 "/org/uninsubria/theknife/client/views/AreaPersonale.fxml"
-        );
-    }
-
-    /**
-     * Effettua il logout dell'utente corrente.
-     * <p>
-     * Cancella la cronologia delle scene, termina la sessione e torna alla
-     * schermata principale.
-     * </p>
-     *
-     * @param event evento generato dal pulsante di logout
-     */
-    @FXML
-    private void onLogOutClick(ActionEvent event) {
-        SceneManager.clearHistory(SceneManager.getStage(event));
-        SessioneUtente.logout();
-        SceneManager.switchScene(
-                event,
-                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
         );
     }
 

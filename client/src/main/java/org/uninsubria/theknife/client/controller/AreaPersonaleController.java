@@ -61,7 +61,6 @@ public class AreaPersonaleController {
     @FXML
     private Button btnModificaCredenziali;
 
-
     /**
      * Inizializza la vista dell'area personale.
      * <p>
@@ -265,6 +264,21 @@ public class AreaPersonaleController {
         SceneManager.switchScene(
                 event,
                 "/org/uninsubria/theknife/client/views/ModificaAccount.fxml"
+        );
+    }
+
+    /**
+     * Effettua il logout dell'utente corrente e torna alla schermata principale.
+     *
+     * @param event evento generato dal pulsante di logout
+     */
+    @FXML
+    private void onLogOutClick(ActionEvent event) {
+        SceneManager.clearHistory(SceneManager.getStage(event));
+        SessioneUtente.logout();
+        SceneManager.switchScene(
+                event,
+                "/org/uninsubria/theknife/client/views/MainLayout.fxml"
         );
     }
 }

@@ -63,17 +63,6 @@
                             styleClass="accent"
                             text="Accedi" />
 
-                    <!-- LOGOUT PER UTENTE LOGGATO -->
-                    <Button fx:id="btnLogOut"
-                            mnemonicParsing="false"
-                            onAction="#onLogOutClick"
-                            prefHeight="63.0"
-                            prefWidth="285.0"
-                            styleClass="logout-button"
-                            text="Esci"
-                            visible="false"
-                            managed="false" />
-
                     <!-- IMMAGINE PER UTENTE LOGGATO -->
                     <ImageView fx:id="imgUtente"
                                fitHeight="70.0"
