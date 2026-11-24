@@ -181,7 +181,10 @@ public class MieRecensioniController {
      * @param recensione recensione da modificare
      */
     private void modificaRecensione(RecensioneDTO recensione) {
-        RecensioneSelezionata.imposta(recensione);
+        RecensioneSelezionata.imposta(
+                recensione,
+                RecensioneSelezionata.OrigineModifica.MIE_RECENSIONI
+        );
         Stage stage = (Stage) restaurantContainer.getScene().getWindow();
         SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }

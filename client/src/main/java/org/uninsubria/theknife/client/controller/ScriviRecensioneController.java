@@ -61,6 +61,7 @@ public class ScriviRecensioneController {
 
     private RecensioneDTO recensioneDaModificare;
     private RistoranteDTO ristorante;
+    private RecensioneSelezionata.OrigineModifica origineModifica;
 
     /**
      * Inizializza il modulo in base al contesto di apertura.
@@ -73,6 +74,7 @@ public class ScriviRecensioneController {
     @FXML
     public void initialize() {
         recensioneDaModificare = RecensioneSelezionata.get();
+        origineModifica = RecensioneSelezionata.getOrigineModifica();
         ristorante = RistoranteSelezionato.getRistorante();
 
         boolean clienteLoggato = SessioneUtente.isCliente();
@@ -138,7 +140,7 @@ public class ScriviRecensioneController {
                 RecensioneSelezionata.pulisci();
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione aggiornata",
                         "Le modifiche sono state salvate.");
-                tornaAlRistoranteRecensito(actionEvent, false);
+                tornaAllaPaginaOrigine(actionEvent);
             } else {
                 RecensioneDTO recensione = new RecensioneDTO(
                         null,
@@ -171,12 +173,12 @@ public class ScriviRecensioneController {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione non disponibile",
                     "La recensione è stata eliminata o non è più modificabile.");
             RecensioneSelezionata.pulisci();
-            tornaAlRistoranteRecensito(actionEvent, true);
+            tornaAllaPaginaOrigine(actionEvent);
         } catch (ModificaObsoletaException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione modificata altrove",
                     "Un altro dispositivo ha aggiornato questa recensione. Ricarica i dati prima di riprovare.");
             RecensioneSelezionata.pulisci();
-            tornaAlRistoranteRecensito(actionEvent, true);
+            tornaAllaPaginaOrigine(actionEvent);
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
                     "Impossibile salvare la recensione. Riprova più tardi.");
@@ -194,31 +196,23 @@ public class ScriviRecensioneController {
         boolean modificaInCorso = recensioneDaModificare != null;
         RecensioneSelezionata.pulisci();
         if (modificaInCorso) {
-            tornaAlRistoranteRecensito(actionEvent, true);
+            tornaAllaPaginaOrigine(actionEvent);
         } else {
             SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
         }
     }
 
     /**
-     * Torna alla lista delle recensioni personali dopo la modifica di una
-     * recensione esistente e pulisce la selezione corrente.
+     * Torna alla schermata da cui è stata avviata la modifica della recensione.
      *
      * @param actionEvent evento JavaFX usato per cambiare scena
      */
-    private void tornaAlRistoranteRecensito(ActionEvent actionEvent, boolean scartaVistaCorrente) {
+    private void tornaAllaPaginaOrigine(ActionEvent actionEvent) {
         RecensioneSelezionata.pulisci();
-        if (scartaVistaCorrente) {
-            SceneManager.replaceCurrentScene(
-                    actionEvent,
-                    "/org/uninsubria/theknife/client/views/MieRecensioni.fxml"
-            );
-        } else {
-            SceneManager.switchScene(
-                    actionEvent,
-                    "/org/uninsubria/theknife/client/views/MieRecensioni.fxml"
-            );
-        }
+        String destinazione = origineModifica == RecensioneSelezionata.OrigineModifica.RISTORANTE
+                ? "/org/uninsubria/theknife/client/views/Ristorante.fxml"
+                : "/org/uninsubria/theknife/client/views/MieRecensioni.fxml";
+        SceneManager.replaceCurrentScene(actionEvent, destinazione);
     }
 
     /**
