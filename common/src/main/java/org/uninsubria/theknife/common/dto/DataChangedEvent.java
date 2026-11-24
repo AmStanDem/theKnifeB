@@ -37,7 +37,8 @@ public record DataChangedEvent(
         REVIEW_UPDATED,
         REVIEW_DELETED,
         REVIEW_REPLY_CHANGED,
-        FAVORITES_CHANGED
+        FAVORITES_CHANGED,
+        USER_UPDATED
     }
 
     /**

@@ -5,6 +5,7 @@
 package org.uninsubria.theknife.server.service;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
@@ -12,6 +13,7 @@ import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.theknife.common.exceptions.UtenteGiaEsistenteException;
 import org.uninsubria.theknife.server.dao.UtenteDAO;
 import org.uninsubria.theknife.server.dao.UtenteDAO.UtenteConHash;
+import org.uninsubria.theknife.server.rmi.RemoteSubscriptionManager;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -20,6 +22,11 @@ import java.time.format.DateTimeFormatter;
 public class UtenteService {
 
     private final UtenteDAO utenteDAO = new UtenteDAO();
+    private final RemoteSubscriptionManager subscriptions;
+
+    public UtenteService(RemoteSubscriptionManager subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     // Work Factor di BCrypt: bilanciamento ottimale tra sicurezza e performance
     private static final int BCRYPT_WORK_FACTOR = 12;
@@ -179,6 +186,7 @@ public class UtenteService {
             if (!utenteDAO.aggiornaUtente(datiAggiornati, account.passwordHash(), hashNuovo)) {
                 throw new CredenzialiErrateException();
             }
+            subscriptions.publish(null, datiAggiornati.idUtente(), DataChangedEvent.ChangeType.USER_UPDATED);
             return datiAggiornati;
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState())) {
