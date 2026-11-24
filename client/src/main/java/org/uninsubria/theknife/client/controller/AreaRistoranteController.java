@@ -760,7 +760,7 @@ public class AreaRistoranteController {
     private void onTornaAiMieiRistorantiClick(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/theknife/client/views/DashboardGestore.fxml"
+                "/org/uninsubria/theknife/client/views/ListaRistorantiGestore.fxml"
         );
     }
 }

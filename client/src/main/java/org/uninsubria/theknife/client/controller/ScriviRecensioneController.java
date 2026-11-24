@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 
-import org.uninsubria.theknife.client.util.RecensioneDaRispondere;
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
 import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.client.util.ServerConnection;
@@ -34,18 +33,16 @@ import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 
 /**
- * Controller JavaFX del modulo per scrivere, modificare una recensione o
- * rispondere a una recensione come gestore.
+ * Controller JavaFX del modulo per scrivere o modificare una recensione.
  * <p>
  * Gestisce la compilazione e la validazione del testo e della valutazione,
- * invia nuove recensioni al server e permette di aggiornare una recensione
- * esistente. In {@code modalitaRisposta} nasconde la valutazione a stelle e
- * invia una risposta tramite {@code rispondiARecensione}. Al termine di
- * un'operazione torna alla schermata da cui è stata avviata.
+ * invia nuove recensioni al server e permette di aggiornare o annullare una
+ * recensione esistente. Al termine di una modifica torna alla schermata da cui
+ * è stata avviata.
  * </p>
  * <p>
- * L'accesso alle operazioni di scrittura/modifica è riservato agli utenti
- * autenticati con ruolo cliente. La risposta è riservata ai gestori.
+ * L'accesso alle operazioni è riservato agli utenti autenticati con ruolo
+ * cliente.
  * </p>
  */
 public class ScriviRecensioneController {
@@ -56,6 +53,7 @@ public class ScriviRecensioneController {
     @FXML
     private TextArea txtRecensione;
 
+    // Cambia il tipo in RatingContainer
     @FXML
     private RatingContainer ratingRecensione;
 
@@ -63,64 +61,19 @@ public class ScriviRecensioneController {
     private Button btnInviaRecensione;
 
     private RecensioneDTO recensioneDaModificare;
-    private RecensioneDTO recensioneDaRispondere;
     private RistoranteDTO ristorante;
     private RecensioneSelezionata.OrigineModifica origineModifica;
-    private boolean modalitaRisposta;
 
     /**
      * Inizializza il modulo in base al contesto di apertura.
      * <p>
      * Recupera il ristorante selezionato, l'eventuale recensione da modificare
-     * o da rispondere e la schermata di provenienza. In modalità risposta
-     * nasconde il container delle stelle e adatta etichette e pulsanti; in
-     * modalità recensione si comporta come in precedenza.
+     * e la schermata di provenienza. Se l'utente è un cliente, popola i campi
+     * per la modifica; in caso contrario disabilita l'invio e mostra un avviso.
      * </p>
      */
     @FXML
     public void initialize() {
-        recensioneDaRispondere = RecensioneDaRispondere.get();
-        modalitaRisposta = recensioneDaRispondere != null
-                && recensioneDaRispondere.idRecensione() != null;
-
-        if (modalitaRisposta) {
-            inizializzaModalitaRisposta();
-        } else {
-            inizializzaModalitaRecensione();
-        }
-    }
-
-    /**
-     * Configura la UI per la modalità risposta (gestore).
-     */
-    private void inizializzaModalitaRisposta() {
-        ristorante = RistoranteSelezionato.getRistorante();
-
-        boolean abilitato = SessioneUtente.isGestore()
-                && recensioneDaRispondere.idRecensione() != null
-                && (recensioneDaRispondere.rispostaGestore() == null
-                || recensioneDaRispondere.rispostaGestore().isBlank());
-
-        txtRecensione.setDisable(!abilitato);
-        ratingRecensione.setVisible(false);
-        ratingRecensione.setManaged(false);
-        btnInviaRecensione.setDisable(!abilitato);
-
-        if (abilitato) {
-            titoloLabel.setText("Rispondi");
-            btnInviaRecensione.setText("Rispondi");
-        } else {
-            titoloLabel.setText("Rispondi");
-            btnInviaRecensione.setText("Rispondi");
-            mostraMessaggio(Alert.AlertType.WARNING, "Risposta non disponibile",
-                    "Seleziona una recensione senza risposta e accedi come gestore.");
-        }
-    }
-
-    /**
-     * Configura la UI per la modalità recensione (cliente).
-     */
-    private void inizializzaModalitaRecensione() {
         recensioneDaModificare = RecensioneSelezionata.get();
         origineModifica = RecensioneSelezionata.getOrigineModifica();
         ristorante = RistoranteSelezionato.getRistorante();
@@ -161,11 +114,6 @@ public class ScriviRecensioneController {
      */
     @FXML
     public void onInviaRecensioneClick(ActionEvent actionEvent) {
-        if (modalitaRisposta) {
-            onInviaRispostaClick(actionEvent);
-            return;
-        }
-
         UtenteDTO utente = SessioneUtente.getUtenteCorrente();
         if (utente == null || !SessioneUtente.isCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
@@ -219,7 +167,7 @@ public class ScriviRecensioneController {
             }
         } catch (AzioneDuplicataException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Recensione già presente",
-                    "Hai già recensito questo ristorante. Puoi modificare la recensione dalla sezione \"Le mie recensioni\".");
+                    "Hai già recensito questo ristorante. Puoi modificare la recensione dalla sezione “Le mie recensioni”.");
         } catch (DatiMancantiException | OperazioneNonConsentitaException e) {
             mostraMessaggio(Alert.AlertType.WARNING, "Operazione non riuscita", e.getMessage());
         } catch (RecensioneNonTrovataException e) {
@@ -239,63 +187,13 @@ public class ScriviRecensioneController {
     }
 
     /**
-     * Valida e invia al server la risposta alla recensione.
-     * <p>
-     * Richiede un gestore autenticato, una recensione identificabile e un
-     * testo non vuoto. Se l'operazione riesce, pulisce la selezione corrente
-     * e torna alla pagina del ristorante.
-     * </p>
-     *
-     * @param actionEvent evento JavaFX usato per cambiare scena dopo l'invio
-     */
-    private void onInviaRispostaClick(ActionEvent actionEvent) {
-        UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
-        if (!SessioneUtente.isGestore() || gestore == null
-                || recensioneDaRispondere == null || recensioneDaRispondere.idRecensione() == null) {
-            mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
-                    "Accedi come gestore e seleziona una recensione valida.");
-            return;
-        }
-
-        String testo = txtRecensione.getText();
-        if (testo == null || testo.isBlank()) {
-            mostraMessaggio(Alert.AlertType.WARNING, "Testo obbligatorio",
-                    "Inserisci il testo della risposta.");
-            return;
-        }
-
-        try {
-            ServerConnection.getServer().rispondiARecensione(
-                    recensioneDaRispondere.idRecensione(), testo.trim(), gestore.idUtente());
-            RecensioneDaRispondere.pulisci();
-            mostraMessaggio(Alert.AlertType.INFORMATION, "Risposta inviata",
-                    "La risposta è stata pubblicata.");
-            SceneManager.replaceCurrentScene(
-                    actionEvent,
-                    "/org/uninsubria/theknife/client/views/Ristorante.fxml"
-            );
-        } catch (DatiMancantiException | OperazioneNonConsentitaException e) {
-            mostraMessaggio(Alert.AlertType.WARNING, "Risposta non inviata", e.getMessage());
-        } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
-            mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
-                    "Impossibile inviare la risposta. Riprova più tardi.");
-        }
-    }
-
-    /**
-     * Annulla la scrittura o modifica della recensione o la risposta e torna
-     * alla schermata appropriata.
+     * Annulla la scrittura o modifica della recensione e torna alla schermata
+     * appropriata.
      *
      * @param actionEvent evento JavaFX usato per cambiare scena
      */
     @FXML
     public void onAnnullaClick(ActionEvent actionEvent) {
-        if (modalitaRisposta) {
-            RecensioneDaRispondere.pulisci();
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
-            return;
-        }
-
         boolean modificaInCorso = recensioneDaModificare != null;
         RecensioneSelezionata.pulisci();
         if (modificaInCorso) {

@@ -4,26 +4,21 @@
  */
 package org.uninsubria.theknife.client.controller;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
-import org.uninsubria.theknife.client.util.GeocodingService;
-import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.LuogoInput;
+import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.components.DataNascitaInput;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO.RuoloUtente;
-import org.uninsubria.theknife.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.theknife.common.exceptions.UtenteGiaEsistenteException;
@@ -37,14 +32,14 @@ import java.time.format.ResolverStyle;
 import java.util.Locale;
 
 /**
- * Controller unificato per autenticazione (login e registrazione).
+ * Controller JavaFX della schermata di registrazione di un nuovo utente.
  * <p>
- * Alterna tra la modalità login e registrazione tramite un singolo FXML
- * (AuthView.fxml), nascondendo/mostrando i relativi pannelli.
+ * Gestisce la raccolta e la validazione dei dati anagrafici, del ruolo,
+ * dell'indirizzo email e della password. Risolve il domicilio tramite
+ * geocoding e invia la richiesta di registrazione al server.
  * </p>
  */
-public class AuthController {
-
+public class SignUpController {
     private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/uuuu", Locale.ITALY)
@@ -53,30 +48,6 @@ public class AuthController {
     private static final String EMAIL_REGEX =
             "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
-    // --- Flag di modalità ---
-    private boolean modalitaRegistrazione = false;
-
-    // --- Pannelli di alternanza ---
-    @FXML
-    private javafx.scene.layout.VBox loginFields;
-
-    @FXML
-    private javafx.scene.layout.VBox registrazioneFields;
-
-    // --- Campi login ---
-    @FXML
-    private TextField campoEmail;
-
-    @FXML
-    private PasswordField campoPassword;
-
-    @FXML
-    private Label labelErrore;
-
-    @FXML
-    private Button signInButton;
-
-    // --- Campi registrazione ---
     @FXML
     private TextField nomeField;
 
@@ -102,10 +73,10 @@ public class AuthController {
     private PasswordField confermaPasswordField;
 
     @FXML
-    private Button registratiButton;
+    private Label labelErrore;
 
     /**
-     * Inizializza il controller.
+     * Inizializza il modulo di registrazione.
      * <p>
      * Configura il campo domicilio, aggiorna la data massima del calendario
      * e controlla dinamicamente la corrispondenza tra password e conferma.
@@ -113,13 +84,6 @@ public class AuthController {
      */
     @FXML
     private void initialize() {
-        // Imposta la modalità iniziale: login visibile, registrazione nascosta
-        modalitaRegistrazione = false;
-        loginFields.setVisible(true);
-        loginFields.setManaged(true);
-        registrazioneFields.setVisible(false);
-        registrazioneFields.setManaged(false);
-
         indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
         dataNascitaField.setOnPrimaDiMostrare(this::aggiornaDataMassimaCalendario);
 
@@ -131,95 +95,6 @@ public class AuthController {
                 controllaConfermaPassword()
         );
     }
-
-    /**
-     * Alterna alla modalità registrazione.
-     * <p>
-     * Mostra il pannello di registrazione e nasconde quello di login.
-     * </p>
-     */
-    @FXML
-    private void onVaiRegistrazione() {
-        modalitaRegistrazione = true;
-        loginFields.setVisible(false);
-        loginFields.setManaged(false);
-        registrazioneFields.setVisible(true);
-        registrazioneFields.setManaged(true);
-        labelErrore.setText("");
-    }
-
-    /**
-     * Alterna alla modalità login.
-     * <p>
-     * Mostra il pannello di login e nasconde quello di registrazione.
-     * </p>
-     *
-     * @param event evento JavaFX generato dal click sul collegamento
-     */
-    @FXML
-    private void onVaiLogin(MouseEvent event) {
-        modalitaRegistrazione = false;
-        registrazioneFields.setVisible(false);
-        registrazioneFields.setManaged(false);
-        loginFields.setVisible(true);
-        loginFields.setManaged(true);
-        labelErrore.setText("");
-    }
-
-    // =====================================================================
-    // LOGIN
-    // =====================================================================
-
-    /**
-     * Gestisce il click sul pulsante "Accedi": invoca il login remoto e,
-     * se le credenziali sono corrette, apre la home dell'utente.
-     *
-     * @param event evento JavaFX generato dal pulsante di accesso
-     */
-    @FXML
-    private void onAccedi(ActionEvent event) {
-        labelErrore.setText("");
-        String email = campoEmail.getText().trim();
-        String password = campoPassword.getText().trim();
-
-        if (email.isBlank() || password.isBlank()) {
-            labelErrore.setText("Inserisci email e password.");
-            return;
-        }
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        signInButton.setDisable(true);
-
-        Thread.startVirtualThread(() -> {
-            try {
-                UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
-                Platform.runLater(() -> {
-                    SessioneUtente.login(utente);
-                    SceneManager.clearHistory(stage);
-                    SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-                });
-            } catch (CredenzialiErrateException e) {
-                Platform.runLater(() -> mostraErroreLogin("Email o password non corretti."));
-            } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
-                Platform.runLater(() -> mostraErroreLogin(
-                        "Impossibile contattare il server. Verifica la connessione e riprova."));
-            }
-        });
-    }
-
-    /**
-     * Mostra un messaggio di errore di autenticazione e riabilita il pulsante.
-     *
-     * @param messaggio testo dell'errore da visualizzare
-     */
-    private void mostraErroreLogin(String messaggio) {
-        labelErrore.setText(messaggio);
-        signInButton.setDisable(false);
-    }
-
-    // =====================================================================
-    // REGISTRAZIONE
-    // =====================================================================
 
     /**
      * Valida i dati inseriti e avvia la risoluzione del domicilio.
@@ -357,6 +232,16 @@ public class AuthController {
             labelErrore.setText("Il server non è aggiornato o non è raggiungibile. Riavvialo e riprova.");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Apre la schermata di accesso per chi possiede già un account.
+     *
+     * @param event evento JavaFX generato dal click sul collegamento
+     */
+    @FXML
+    public void handleAccedi(MouseEvent event) {
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/LoginView.fxml");
     }
 
     /**

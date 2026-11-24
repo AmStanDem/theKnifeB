@@ -10,7 +10,7 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.uninsubria.theknife.client.controller.RistoranteItemController"
+      fx:controller="org.uninsubria.theknife.client.controller.RestaurantItemController"
       stylesheets="@../styles/ristorante-item.css"
       styleClass="card"
       spacing="10"
@@ -35,10 +35,6 @@
     <!-- INDIRIZZO -->
     <Label fx:id="addressLabel" text="Indirizzo ristorante" styleClass="card-address"/>
 
-    <!-- DESCRIZIONE (opzionale, visibile solo quando usato nei preferiti) -->
-    <Label fx:id="descriptionLabel" text="Descrizione ristorante" styleClass="card-description"
-           wrapText="true" maxWidth="Infinity" visible="false" managed="false"/>
-
     <!-- TIPOLOGIE CUCINA -->
     <FlowPane fx:id="cuisineTags" hgap="6" vgap="6" styleClass="cuisine-tags"/>
 
@@ -53,15 +49,9 @@
                visible="false" managed="false"/>
     </HBox>
 
-    <!-- AZIONI -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
+    <!-- AZIONE -->
+    <HBox alignment="CENTER_LEFT">
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="removeButton"
-                text="Rimuovi dai preferiti"
-                styleClass="remove-button"
-                onAction="#onRemoveClicked"
-                visible="false"
-                managed="false"/>
         <Button fx:id="editButton"
                 text="Modifica"
                 styleClass="details-button"

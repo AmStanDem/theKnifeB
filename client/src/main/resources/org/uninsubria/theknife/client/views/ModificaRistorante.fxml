@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.theknife.client.util.LuogoInput?>
+<?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
+
+<?import javafx.scene.control.TextArea?>
+<StackPane prefHeight="768.0" prefWidth="1024.0"
+           styleClass="root-pane"
+           stylesheets="@../styles/modificaRistorante.css"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="org.uninsubria.theknife.client.controller.ModificaRistoranteController">
+    <VBox alignment="CENTER" maxWidth="650.0" maxHeight="700.0" styleClass="card-container">
+        <ScrollPane fitToWidth="true" styleClass="form-scroll-pane">
+            <content>
+                <VBox alignment="TOP_LEFT" spacing="16.0" styleClass="form-body">
+                    <padding>
+                        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/>
+                    </padding>
+
+                    <VBox spacing="4.0">
+                        <Label styleClass="form-title" text="Modifica ristorante"/>
+                        <Label styleClass="form-subtitle"
+                               text="Aggiorna i dati della tua attività su TheKnife"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Ristorante da modificare *"/>
+                        <ComboBox fx:id="comboRistoranti" maxWidth="Infinity"
+                                  promptText="Seleziona un ristorante"
+                                  styleClass="custom-check-combo"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Nome ristorante *"/>
+                        <TextField fx:id="txtNome" promptText="Es. Trattoria Bella Italia"
+                                   styleClass="custom-text-field"/>
+                    </VBox>
+
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Indirizzo *"/>
+                            <LuogoInput fx:id="txtIndirizzo" prefHeight="40.0"
+                                        promptText="Digita e seleziona l'indirizzo"/>
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Città *"/>
+                            <TextField fx:id="txtCitta" promptText="Seleziona un indirizzo"
+                                       styleClass="custom-text-field"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Nazione *"/>
+                            <TextField fx:id="txtNazione" promptText="Seleziona un indirizzo"
+                                       styleClass="custom-text-field"/>
+                        </VBox>
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="input-label" text="Prezzo medio (€) *"/>
+                            <TextField fx:id="txtPrezzoMedio" promptText="25.50"
+                                       styleClass="custom-text-field"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Numero di telefono"/>
+                        <TextField fx:id="txtTelefono"
+                                   promptText="Es. +39 333 1234567"
+                                   styleClass="custom-text-field"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Sito web"/>
+                        <TextField fx:id="txtSitoWeb"
+                                   promptText="Es. https://www.mioristorante.it"
+                                   styleClass="custom-text-field"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Descrizione"/>
+                        <TextArea fx:id="txtDescrizione"
+                                  promptText="Descrivi il tuo ristorante, i piatti e i servizi offerti..."
+                                  prefRowCount="4"
+                                  wrapText="true"
+                                  styleClass="custom-text-field"/>
+                    </VBox>
+
+                    <VBox spacing="5.0">
+                        <Label styleClass="input-label" text="Tipologie di cucina *"/>
+                        <CuisineSelector fx:id="comboCucine" maxWidth="Infinity"
+                                         styleClass="custom-check-combo"/>
+                        <Label styleClass="form-subtitle"
+                               text="Seleziona una o più tipologie dal catalogo completo."/>
+                    </VBox>
+
+                    <VBox spacing="8.0">
+                        <Label styleClass="input-label" text="Servizi offerti"/>
+                        <HBox spacing="20.0">
+                            <CheckBox fx:id="chkDelivery" mnemonicParsing="false"
+                                      styleClass="custom-checkbox" text="Consegna a domicilio"/>
+                            <CheckBox fx:id="chkBookingOnline" mnemonicParsing="false"
+                                      styleClass="custom-checkbox" text="Prenotazione online"/>
+                        </HBox>
+                    </VBox>
+
+                    <HBox alignment="CENTER" spacing="15.0">
+                        <padding>
+                            <Insets top="10.0"/>
+                        </padding>
+                        <Button fx:id="btnAnnulla" mnemonicParsing="false"
+                                onAction="#onAnnullaClick" prefHeight="45.0" prefWidth="180.0"
+                                styleClass="btn-secondary" text="Annulla"/>
+                        <Button fx:id="btnSalva" mnemonicParsing="false"
+                                onAction="#onSalvaClick" prefHeight="45.0" prefWidth="220.0"
+                                styleClass="btn-primary" text="Salva modifiche"/>
+
+                        <Button fx:id="btnElimina" mnemonicParsing="false"
+                                onAction="#onEliminaClick"
+                                prefHeight="45.0" prefWidth="160.0"
+                                styleClass="btn-delete"
+                                text="Elimina ristorante"/>
+
+
+                    </HBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </VBox>
+</StackPane>

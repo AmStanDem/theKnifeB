@@ -124,23 +124,6 @@
     -fx-cursor: hand;
 }
 
-/* ---------- DATI UTENTE (DASHBOARD GESTORE) ---------- */
-.user-info-box {
-    -fx-background-color: #FFFFFF;
-    -fx-padding: 8 0 4 0;
-}
-
-.user-info-label {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #6B7280;
-}
-
-.user-info-value {
-    -fx-font-size: 13px;
-    -fx-text-fill: #1F2937;
-}
-
 /* ---------- CONTENUTO / RISULTATI ---------- */
 .content-box {
     -fx-background-color: #F7F8F9;

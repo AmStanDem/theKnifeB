@@ -108,18 +108,3 @@
     -fx-background-color: #1E8449;
     -fx-border-color: #1E8449;
 }
-
-/* ---------- PULSANTE RIMUOVI ---------- */
-.remove-button {
-    -fx-background-color: #e53935;
-    -fx-text-fill: white;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8px;
-    -fx-padding: 8px 14px;
-    -fx-cursor: hand;
-}
-
-.remove-button:hover {
-    -fx-background-color: #c62828;
-}

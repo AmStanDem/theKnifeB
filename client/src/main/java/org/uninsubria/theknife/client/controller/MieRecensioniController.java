@@ -70,7 +70,7 @@ public class MieRecensioniController {
      */
     @FXML
     private void onAreaPersonaleClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/ProfiloView.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/AreaPersonale.fxml");
     }
     // =========================================================
     // INIZIALIZZAZIONE
