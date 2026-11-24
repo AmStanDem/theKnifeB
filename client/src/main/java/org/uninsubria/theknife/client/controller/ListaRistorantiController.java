@@ -91,7 +91,6 @@ public class ListaRistorantiController {
 
     private static final String TUTTI_PREZZI = "Tutti i prezzi";
     private static final String TUTTI_RATING = "Tutte le valutazioni";
-    private PauseTransition searchDebounce;
     private PauseTransition retryTransition;
     private long requestGeneration;
     private boolean hasMore;
@@ -135,12 +134,9 @@ public class ListaRistorantiController {
         }
         configuraFiltriFissi();
         applicaCriteriIniziali(criteri);
-        searchDebounce = new PauseTransition(Duration.millis(350));
-        searchDebounce.setOnFinished(event -> caricaPagina(true));
         retryTransition = new PauseTransition(Duration.seconds(2));
         restaurantContainer.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene == null) {
-                searchDebounce.stop();
                 retryTransition.stop();
             }
         });
@@ -156,7 +152,8 @@ public class ListaRistorantiController {
             ripristinaRicerca(snapshot);
         }
 
-        searchField.textProperty().addListener((obs, oldVal, newVal) -> searchDebounce.playFromStart());
+        // Non attiviamo la ricerca automatica durante la digitazione:
+        // l'utente deve premere il pulsante di ricerca o premere Invio.
         if (snapshot == null) {
             caricaDatiDalServer();
         }
@@ -476,9 +473,7 @@ public class ListaRistorantiController {
      */
     @FXML
     private void onResetFilters() {
-        searchDebounce.stop();
         searchField.clear();
-        searchDebounce.stop();
         priceFilterCombo.setValue(TUTTI_PREZZI);
         if (etichettaPrezzoPersonalizzata != null) {
             priceFilterCombo.getItems().remove(etichettaPrezzoPersonalizzata);

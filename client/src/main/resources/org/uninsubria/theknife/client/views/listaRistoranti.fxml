@@ -37,6 +37,7 @@
                 <TextField fx:id="searchField"
                            promptText="Cerca per nome, indirizzo o cucina..."
                            styleClass="search-field"
+                           onAction="#onSearch"
                            HBox.hgrow="ALWAYS"/>
                 <Button fx:id="searchButton"
                         text="Cerca"
