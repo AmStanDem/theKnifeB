@@ -166,7 +166,9 @@ public class MieRecensioniController {
             controller.setRecensione(recensione);
             controller.setAzioniProprie(this::modificaRecensione, this::confermaEliminazione);
             return card;
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.err.println("ERRORE caricando RecensioneItem.fxml: " + e.getMessage());
+            e.printStackTrace();
             mostraMessaggio(Alert.AlertType.ERROR, "Errore",
                     "Impossibile visualizzare una delle tue recensioni.");
             return null;

@@ -91,7 +91,9 @@ public class RecensioneItemController {
         ratingControl.setScaleX(0.5);
         ratingControl.setScaleY(0.5);
         ratingControl.setColors(Color.web("#4CAF50"), Color.web("#dadce0"));
-        ratingStarsContainer.getChildren().add(ratingControl);
+        if (ratingStarsContainer != null) {
+            ratingStarsContainer.getChildren().add(ratingControl);
+        }
     }
 
     /**
@@ -110,9 +112,11 @@ public class RecensioneItemController {
         setLocalGuide(false);
         boolean mostraRistorante = recensione.nomeRistorante() != null
                 && !recensione.nomeRistorante().isBlank();
-        restaurantLabel.setText(mostraRistorante ? recensione.nomeRistorante() : "");
-        restaurantLabel.setVisible(mostraRistorante);
-        restaurantLabel.setManaged(mostraRistorante);
+        if (restaurantLabel != null) {
+            restaurantLabel.setText(mostraRistorante ? recensione.nomeRistorante() : "");
+            restaurantLabel.setVisible(mostraRistorante);
+            restaurantLabel.setManaged(mostraRistorante);
+        }
 
         if (recensione.dataCreazione() != null) {
             setData(recensione.dataCreazione().format(DATE_FORMATTER));
@@ -145,12 +149,18 @@ public class RecensioneItemController {
     ) {
         this.onModificaAction = onModificaAction;
         this.onEliminaAction = onEliminaAction;
-        editButton.setVisible(true);
-        editButton.setManaged(true);
-        deleteButton.setVisible(true);
-        deleteButton.setManaged(true);
-        replyButton.setVisible(false);
-        replyButton.setManaged(false);
+        if (editButton != null) {
+            editButton.setVisible(true);
+            editButton.setManaged(true);
+        }
+        if (deleteButton != null) {
+            deleteButton.setVisible(true);
+            deleteButton.setManaged(true);
+        }
+        if (replyButton != null) {
+            replyButton.setVisible(false);
+            replyButton.setManaged(false);
+        }
     }
 
     /**
@@ -161,14 +171,14 @@ public class RecensioneItemController {
      */
     public void setAutore(String nome) {
         if (nome == null || nome.isBlank()) {
-            authorLabel.setText("Utente");
-            avatarInitial.setText("U");
+            if (authorLabel != null) authorLabel.setText("Utente");
+            if (avatarInitial != null) avatarInitial.setText("U");
             return;
         }
 
         nome = nome.trim();
-        authorLabel.setText(nome);
-        avatarInitial.setText(String.valueOf(nome.charAt(0)).toUpperCase());
+        if (authorLabel != null) authorLabel.setText(nome);
+        if (avatarInitial != null) avatarInitial.setText(String.valueOf(nome.charAt(0)).toUpperCase());
     }
 
     /**
@@ -177,8 +187,10 @@ public class RecensioneItemController {
      * @param isLocalGuide {@code true} per mostrare l'indicatore
      */
     public void setLocalGuide(boolean isLocalGuide) {
-        localGuideLabel.setVisible(isLocalGuide);
-        localGuideLabel.setManaged(isLocalGuide);
+        if (localGuideLabel != null) {
+            localGuideLabel.setVisible(isLocalGuide);
+            localGuideLabel.setManaged(isLocalGuide);
+        }
     }
 
     /**
@@ -187,7 +199,7 @@ public class RecensioneItemController {
      * @param data data già formattata; se {@code null}, il testo viene svuotato
      */
     public void setData(String data) {
-        timeLabel.setText(data != null ? data : "");
+        if (timeLabel != null) timeLabel.setText(data != null ? data : "");
     }
 
     /**
@@ -198,7 +210,7 @@ public class RecensioneItemController {
      */
     public void setValutazione(double stelle) {
         stelle = Math.clamp(stelle, 0, 5);
-        ratingControl.setRating(stelle);
+        if (ratingControl != null) ratingControl.setRating(stelle);
     }
 
     /**
@@ -208,7 +220,7 @@ public class RecensioneItemController {
      *              svuotato
      */
     public void setTesto(String testo) {
-        reviewTextField.setText(testo != null ? testo : "");
+        if (reviewTextField != null) reviewTextField.setText(testo != null ? testo : "");
     }
 
     /**
@@ -222,16 +234,24 @@ public class RecensioneItemController {
         rispostaPresente = risposta != null && !risposta.isBlank();
 
         if (rispostaPresente) {
-            responseTextField.setText(risposta);
-            responseTextField.setVisible(true);
-            responseTextField.setManaged(true);
-            likeCountLabel.setVisible(true);
-            likeCountLabel.setManaged(true);
+            if (responseTextField != null) {
+                responseTextField.setText(risposta);
+                responseTextField.setVisible(true);
+                responseTextField.setManaged(true);
+            }
+            if (likeCountLabel != null) {
+                likeCountLabel.setVisible(true);
+                likeCountLabel.setManaged(true);
+            }
         } else {
-            responseTextField.setVisible(false);
-            responseTextField.setManaged(false);
-            likeCountLabel.setVisible(false);
-            likeCountLabel.setManaged(false);
+            if (responseTextField != null) {
+                responseTextField.setVisible(false);
+                responseTextField.setManaged(false);
+            }
+            if (likeCountLabel != null) {
+                likeCountLabel.setVisible(false);
+                likeCountLabel.setManaged(false);
+            }
         }
         aggiornaPulsanteRisposta();
     }
@@ -252,9 +272,11 @@ public class RecensioneItemController {
      */
     private void aggiornaPulsanteRisposta() {
         boolean visibile = rispostaAbilitata && !rispostaPresente;
-        replyButton.setVisible(visibile);
-        replyButton.setManaged(visibile);
-        replyButton.setDisable(!visibile);
+        if (replyButton != null) {
+            replyButton.setVisible(visibile);
+            replyButton.setManaged(visibile);
+            replyButton.setDisable(!visibile);
+        }
     }
 
     /**

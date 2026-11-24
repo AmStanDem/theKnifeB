@@ -442,7 +442,7 @@ public class AreaRistoranteController {
                 controller.setRispostaAbilitata(gestoreProprietario);
                 reviewContainer.getChildren().add(item);
             } catch (Exception e) {
-                System.out.println("ERRORE caricando la recensione:");
+                System.err.println("ERRORE caricando RecensioneItem.fxml: " + e.getMessage());
                 e.printStackTrace();
             }
         }
