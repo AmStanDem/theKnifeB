@@ -13,8 +13,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * DAO per la gestione delle associazioni tra utenti e ristoranti preferiti.
+ */
 public class PreferitiDAO {
 
+    /**
+     * Aggiunge un ristorante ai preferiti dell'utente.
+     * Se l'associazione esiste già, non la duplica.
+     *
+     * @param idUtente identificativo dell'utente
+     * @param idRistorante identificativo del ristorante
+     * @return {@code true} se è stata inserita una nuova associazione, {@code false} se esisteva già
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public boolean aggiungiPreferito(int idUtente, int idRistorante) throws SQLException {
         String sql = "INSERT INTO Preferiti (id_utente, id_ristorante) VALUES (?, ?) ON CONFLICT DO NOTHING";
 
@@ -26,6 +38,14 @@ public class PreferitiDAO {
         }
     }
 
+    /**
+     * Rimuove un ristorante dai preferiti dell'utente.
+     *
+     * @param idUtente identificativo dell'utente
+     * @param idRistorante identificativo del ristorante
+     * @return {@code true} se è stata rimossa un'associazione, {@code false} se non esisteva
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public boolean rimuoviPreferito(int idUtente, int idRistorante) throws SQLException {
         String sql = "DELETE FROM Preferiti WHERE id_utente = ? AND id_ristorante = ?";
 
@@ -37,6 +57,14 @@ public class PreferitiDAO {
         }
     }
 
+    /**
+     * Recupera i ristoranti preferiti dell'utente, ordinati per nome.
+     * I dati restituiti includono prezzo, servizi, tipologie di cucina e valutazione media.
+     *
+     * @param idUtente identificativo dell'utente
+     * @return lista dei ristoranti preferiti, vuota se non ne risultano associati
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public List<RistoranteDTO> ottieniPreferitiUtente(int idUtente) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
 

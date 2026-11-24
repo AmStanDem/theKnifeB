@@ -36,8 +36,9 @@ import java.time.LocalDateTime;
  * Controller JavaFX del modulo per scrivere o modificare una recensione.
  * <p>
  * Gestisce la compilazione e la validazione del testo e della valutazione,
- * invia le recensioni al server e permette di aggiornare o annullare una
- * recensione esistente.
+ * invia nuove recensioni al server e permette di aggiornare o annullare una
+ * recensione esistente. Al termine di una modifica torna alla schermata da cui
+ * è stata avviata.
  * </p>
  * <p>
  * L'accesso alle operazioni è riservato agli utenti autenticati con ruolo
@@ -66,9 +67,9 @@ public class ScriviRecensioneController {
     /**
      * Inizializza il modulo in base al contesto di apertura.
      * <p>
-     * Recupera il ristorante selezionato e l'eventuale recensione da
-     * modificare. Se l'utente è un cliente, popola i campi per la modifica;
-     * in caso contrario disabilita l'invio e mostra un avviso.
+     * Recupera il ristorante selezionato, l'eventuale recensione da modificare
+     * e la schermata di provenienza. Se l'utente è un cliente, popola i campi
+     * per la modifica; in caso contrario disabilita l'invio e mostra un avviso.
      * </p>
      */
     @FXML

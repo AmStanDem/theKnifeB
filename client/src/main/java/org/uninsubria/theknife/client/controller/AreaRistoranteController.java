@@ -53,7 +53,9 @@ import java.util.Objects;
  * Visualizza le informazioni del ristorante selezionato, la valutazione
  * media e la distribuzione delle recensioni. Gestisce inoltre i filtri
  * delle recensioni, i collegamenti a sito e telefono e le azioni consentite
- * all'utente autenticato, come preferiti e gestione delle recensioni.
+ * all'utente autenticato: preferiti e gestione della propria recensione.
+ * Abilita inoltre la risposta alle recensioni per il gestore proprietario
+ * del ristorante.
  * </p>
  * <p>
  * I dati vengono caricati tramite il server RMI e vengono aggiornati

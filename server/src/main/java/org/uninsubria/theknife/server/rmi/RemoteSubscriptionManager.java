@@ -16,8 +16,20 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Gestisce le sottoscrizioni dei client RMI e distribuisce in modo asincrono
+ * gli eventi di modifica agli osservatori interessati.
+ */
 public final class RemoteSubscriptionManager implements AutoCloseable {
 
+    /**
+     * Sottoscrizione registrata da un osservatore remoto.
+     *
+     * @param id identificativo della sottoscrizione
+     * @param topic ambito degli eventi a cui è sottoscritto l'osservatore
+     * @param targetId identificativo dell'entità interessata, se previsto dall'ambito
+     * @param observer osservatore remoto da notificare
+     */
     private record Subscription(
             UUID id,
             SubscriptionTopic topic,
@@ -28,18 +40,38 @@ public final class RemoteSubscriptionManager implements AutoCloseable {
     private final ConcurrentMap<UUID, Subscription> subscriptions = new ConcurrentHashMap<>();
     private final ExecutorService callbacks = Executors.newVirtualThreadPerTaskExecutor();
 
+    /**
+     * Registra un osservatore per il tipo di eventi e l'entità specificati.
+     *
+     * @param topic ambito degli eventi a cui sottoscriversi
+     * @param targetId identificativo dell'entità interessata, oppure {@code null}
+     * @param observer osservatore remoto da notificare
+     * @return identificativo univoco della sottoscrizione
+     */
     public UUID subscribe(SubscriptionTopic topic, Integer targetId, RemoteObserver observer) {
         UUID id = UUID.randomUUID();
         subscriptions.put(id, new Subscription(id, topic, targetId, observer));
         return id;
     }
 
+    /**
+     * Annulla la sottoscrizione indicata; un identificativo {@code null} viene ignorato.
+     *
+     * @param subscriptionId identificativo della sottoscrizione da rimuovere
+     */
     public void unsubscribe(UUID subscriptionId) {
         if (subscriptionId != null) {
             subscriptions.remove(subscriptionId);
         }
     }
 
+    /**
+     * Pubblica un evento di modifica e accoda una notifica per ogni sottoscrizione corrispondente.
+     *
+     * @param restaurantId identificativo del ristorante coinvolto, oppure {@code null}
+     * @param userId identificativo dell'utente coinvolto, oppure {@code null}
+     * @param type tipo di modifica pubblicata
+     */
     public void publish(
             Integer restaurantId,
             Integer userId,
@@ -89,6 +121,9 @@ public final class RemoteSubscriptionManager implements AutoCloseable {
         }
     }
 
+    /**
+     * Rimuove tutte le sottoscrizioni e arresta l'esecutore delle notifiche.
+     */
     @Override
     public void close() {
         subscriptions.clear();

@@ -7,12 +7,18 @@ package org.uninsubria.theknife.client.util;
 import org.uninsubria.theknife.common.dto.RecensioneDTO;
 
 /**
- * Conserva temporaneamente la recensione selezionata per la modifica.
+ * Conserva temporaneamente la recensione selezionata per la modifica e la schermata
+ * da cui è stata avviata, così il client può ripristinare il contesto al termine.
  */
 public final class RecensioneSelezionata {
 
+    /**
+     * Schermata da cui può essere avviata la modifica di una recensione.
+     */
     public enum OrigineModifica {
+        /** Scheda del ristorante. */
         RISTORANTE,
+        /** Elenco delle recensioni dell'utente corrente. */
         MIE_RECENSIONI
     }
 
@@ -26,7 +32,8 @@ public final class RecensioneSelezionata {
     }
 
     /**
-     * Imposta la recensione da modificare.
+     * Imposta la recensione da modificare, usando {@link OrigineModifica#MIE_RECENSIONI}
+     * come schermata di provenienza predefinita.
      *
      * @param recensioneDaModificare recensione selezionata, oppure {@code null}
      */
@@ -37,8 +44,8 @@ public final class RecensioneSelezionata {
     /**
      * Imposta la recensione da modificare e la schermata a cui tornare.
      *
-     * @param recensioneDaModificare recensione selezionata
-     * @param origine schermata da cui è stata avviata la modifica
+     * @param recensioneDaModificare recensione selezionata, oppure {@code null}
+     * @param origine schermata da cui è stata avviata la modifica, oppure {@code null}
      */
     public static void imposta(
             RecensioneDTO recensioneDaModificare,
@@ -60,7 +67,7 @@ public final class RecensioneSelezionata {
     /**
      * Restituisce la schermata da cui è stata avviata la modifica.
      *
-     * @return origine della modifica oppure {@code null} se non impostata
+     * @return origine della modifica oppure {@code null} se non è stata impostata
      */
     public static OrigineModifica getOrigineModifica() {
         return origineModifica;

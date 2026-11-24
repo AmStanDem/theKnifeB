@@ -19,11 +19,21 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Gestisce autenticazione, registrazione e aggiornamento degli account utente,
+ * applicando le validazioni e la protezione delle password.
+ */
 public class UtenteService {
 
     private final UtenteDAO utenteDAO = new UtenteDAO();
     private final RemoteSubscriptionManager subscriptions;
 
+    /**
+     * Crea il servizio usando il gestore delle sottoscrizioni per notificare
+     * le modifiche agli account.
+     *
+     * @param subscriptions gestore delle sottoscrizioni remote
+     */
     public UtenteService(RemoteSubscriptionManager subscriptions) {
         this.subscriptions = subscriptions;
     }
@@ -33,6 +43,15 @@ public class UtenteService {
     private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/uuuu");
 
+    /**
+     * Autentica un utente verificando la password con l'hash memorizzato.
+     *
+     * @param email indirizzo email dell'utente
+     * @param passwordInChiaro password fornita dall'utente
+     * @return dati dell'utente autenticato, senza hash della password
+     * @throws CredenzialiErrateException se email o password non sono valide
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public UtenteDTO autentica(String email, String passwordInChiaro)
             throws CredenzialiErrateException, SistemaIndisponibileException {
 
@@ -63,6 +82,12 @@ public class UtenteService {
         return authData.utente();
     }
 
+    /**
+     * Recupera la data corrente dal database.
+     *
+     * @return data corrente
+     * @throws SistemaIndisponibileException se non è possibile recuperare la data
+     */
     public LocalDate ottieniDataCorrente() throws SistemaIndisponibileException {
         try {
             return utenteDAO.dataCorrente();
@@ -72,6 +97,17 @@ public class UtenteService {
         }
     }
 
+    /**
+     * Registra un nuovo utente dopo aver validato i dati e memorizza la password
+     * sotto forma di hash BCrypt.
+     *
+     * @param nuovoUtente dati dell'utente da registrare
+     * @param passwordInChiaro password scelta dall'utente
+     * @return dati dell'utente registrato, senza hash della password
+     * @throws UtenteGiaEsistenteException se l'indirizzo email è già registrato
+     * @throws DatiMancantiException se i dati obbligatori o la data di nascita non sono validi
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public UtenteDTO registra(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
 
@@ -125,6 +161,19 @@ public class UtenteService {
         }
     }
 
+    /**
+     * Aggiorna i dati dell'account dopo aver verificato identità e password corrente.
+     * La password viene modificata solo se ne viene fornita una nuova valida.
+     *
+     * @param aggiornato dati aggiornati dell'utente
+     * @param passwordCorrente password attualmente associata all'account
+     * @param nuovaPassword nuova password, oppure {@code null} o vuota per mantenerla invariata
+     * @return dati aggiornati dell'utente
+     * @throws CredenzialiErrateException se l'account, il ruolo o la password corrente non sono validi
+     * @throws UtenteGiaEsistenteException se l'indirizzo email è già associato a un altro account
+     * @throws DatiMancantiException se mancano dati obbligatori o la nuova password non rispetta i requisiti
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public UtenteDTO aggiornaAccount(UtenteDTO aggiornato, String passwordCorrente, String nuovaPassword)
             throws CredenzialiErrateException, UtenteGiaEsistenteException,
             DatiMancantiException, SistemaIndisponibileException {

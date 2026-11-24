@@ -27,8 +27,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Punto di ingresso principale (Entry Point) per l'infrastruttura di backend.
- * Richiede all'avvio i parametri del database, proponendo valori predefiniti.
+ * Punto di ingresso del server TheKnife.
+ * Acquisisce il lock di processo, configura il database e il registro RMI,
+ * importa il dataset iniziale e mantiene il server attivo fino allo shutdown.
  */
 public class MainServer {
 
@@ -39,6 +40,14 @@ public class MainServer {
     private static final String DEFAULT_DB_PASSWORD = "admin";
     private static final String PROCESS_LOCK_FILE = "theknife-server.lock";
 
+    /**
+     * Avvia il server: acquisisce il lock esclusivo, legge la configurazione RMI
+     * da {@code .env}, richiede i parametri database, inizializza la persistenza,
+     * importa il dataset e pubblica il servizio nel registro RMI.
+     * Lo shutdown chiude il registro, il servizio, il pool database e il lock.
+     *
+     * @param args argomenti della riga di comando, attualmente non utilizzati
+     */
     public static void main(String[] args) {
         System.out.println("[SYSTEM] Controllo istanza server in corso...");
         System.out.flush();

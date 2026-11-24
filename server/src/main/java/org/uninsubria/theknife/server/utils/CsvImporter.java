@@ -20,9 +20,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
+/**
+ * Importa e aggiorna nel database il dataset dei ristoranti Michelin incluso
+ * nelle risorse dell'applicazione.
+ */
 public class CsvImporter {
     private static final int BATCH_SIZE = 1_000;
 
+    /**
+     * Importa il dataset se non sono già presenti ristoranti e, in caso contrario,
+     * aggiorna i prezzi mancanti, i dati di contatto e la distribuzione dei servizi
+     * per i ristoranti del dataset.
+     *
+     * @throws IllegalStateException se il file CSV non è disponibile o se
+     *         l'importazione o l'aggiornamento dei dati fallisce
+     */
     public static void importaSeNecessario() {
         long importStartTime = System.nanoTime();
         if (datiGiaPresenti()) {

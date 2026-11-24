@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * DAO per la persistenza, la ricerca e il recupero dei dati dei ristoranti.
+ */
 public class RistoranteDAO {
 
     private static final String POSIZIONE_RISTORANTE =
@@ -24,6 +27,14 @@ public class RistoranteDAO {
     private static final String POSIZIONE_RIFERIMENTO =
             "ST_SetSRID(ST_MakePoint(?::double precision, ?::double precision), 4326)::geography";
 
+    /**
+     * Inserisce un ristorante e le associazioni con le tipologie di cucina in un'unica transazione.
+     *
+     * @param r dati del ristorante da inserire
+     * @param idGestore identificativo del gestore proprietario
+     * @return identificativo generato del ristorante, oppure {@code null} se l'inserimento non è riuscito
+     * @throws SQLException se si verifica un errore durante l'inserimento
+     */
     public Integer inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato, telefono, sito_web, descrizione) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -112,6 +123,16 @@ public class RistoranteDAO {
         }
     }
 
+    /**
+     * Aggiorna i dati del ristorante appartenente al gestore e sostituisce le tipologie di cucina
+     * in un'unica transazione.
+     *
+     * @param r dati aggiornati del ristorante
+     * @param idGestore identificativo del gestore proprietario
+     * @return {@code true} se il ristorante è stato aggiornato, {@code false} se non esiste
+     *         o non appartiene al gestore
+     * @throws SQLException se si verifica un errore durante l'aggiornamento o l'associazione delle tipologie
+     */
     public boolean modificaRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRistorante = "UPDATE RistorantiTheKnife SET nome = ?, indirizzo = ?, citta = ?, " +
                 "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, prezzo_stimato = FALSE, " +
@@ -181,6 +202,14 @@ public class RistoranteDAO {
     }
 
 
+    /**
+     * Elimina il ristorante se appartiene al gestore specificato.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @param idGestore identificativo del gestore proprietario
+     * @return {@code true} se il ristorante è stato eliminato
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public boolean eliminaRistorante(int idRistorante, int idGestore) throws SQLException {
         String sql = """
             DELETE FROM RistorantiTheKnife
@@ -198,6 +227,13 @@ public class RistoranteDAO {
     }
 
 
+    /**
+     * Recupera un ristorante tramite identificativo.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @return dati del ristorante, oppure {@code null} se non è stato trovato
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public RistoranteDTO trovaPerId(int idRistorante) throws SQLException {
         String sql = costruisciQueryBase() + " WHERE r.id_ristorante = ?";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -210,6 +246,13 @@ public class RistoranteDAO {
         return null;
     }
 
+    /**
+     * Recupera i ristoranti appartenenti al gestore, ordinati per nome.
+     *
+     * @param idGestore identificativo del gestore
+     * @return ristoranti associati al gestore, eventualmente vuoto
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public List<RistoranteDTO> trovaPerGestore(int idGestore) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
         String sql = costruisciQueryBase() + " WHERE r.id_gestore = ? ORDER BY r.nome ASC";
@@ -223,6 +266,15 @@ public class RistoranteDAO {
         return lista;
     }
 
+    /**
+     * Cerca ristoranti applicando i filtri valorizzati.
+     * Se sono disponibili coordinate, limita i risultati al raggio indicato
+     * e li ordina per distanza; altrimenti li ordina per nome.
+     *
+     * @param filtri filtri di ricerca, oppure {@code null} per ottenere tutti i ristoranti
+     * @return ristoranti corrispondenti ai filtri
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public List<RistoranteDTO> cercaConFiltri(FiltriRicercaDTO filtri) throws SQLException {
         List<RistoranteDTO> lista = new ArrayList<>();
         StringBuilder sql = new StringBuilder(costruisciQueryBase() + " WHERE 1=1");
@@ -309,6 +361,14 @@ public class RistoranteDAO {
         return lista;
     }
 
+    /**
+     * Esegue una ricerca paginata applicando testo, posizione, cucina, prezzo,
+     * valutazione e servizi richiesti.
+     *
+     * @param richiesta criteri di ricerca e parametri di paginazione
+     * @return pagina dei ristoranti e indicatore della presenza di risultati successivi
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public PaginaRistorantiDTO cercaPagina(RicercaRistorantiPaginaDTO richiesta) throws SQLException {
         List<Object> parametri = new ArrayList<>();
         StringBuilder sql = new StringBuilder(costruisciQueryBase()).append(" WHERE 1=1");
@@ -412,6 +472,13 @@ public class RistoranteDAO {
                 "WHERE rt.id_ristorante = r.id_ristorante) cucine ON TRUE";
     }
 
+    /**
+     * Restituisce i nomi distinti delle tipologie di cucina presenti nel catalogo,
+     * ordinati alfabeticamente.
+     *
+     * @return elenco delle tipologie di cucina
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public List<String> ottieniTutteTipologieCucina() throws SQLException {
         List<String> tipologie = new ArrayList<>();
         String sql = "SELECT DISTINCT nome FROM Tipologia_Cucina ORDER BY nome";

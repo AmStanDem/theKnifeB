@@ -16,6 +16,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Implementazione RMI del contratto {@link ITheKnifeServer}.
+ * Delega le operazioni ai servizi applicativi e gestisce il ciclo di vita
+ * delle sottoscrizioni agli eventi remoti.
+ */
 public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
 
     private final RemoteSubscriptionManager subscriptions = new RemoteSubscriptionManager();
@@ -40,6 +45,9 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
         subscriptions.unsubscribe(subscriptionId);
     }
 
+    /**
+     * Arresta il gestore delle sottoscrizioni e le notifiche asincrone.
+     */
     @Override
     public void close() {
         subscriptions.close();
@@ -174,6 +182,16 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
         preferitiService.rimuovi(idUtente, idRistorante);
     }
 
+    /**
+     * Elimina un ristorante se il gestore è autorizzato a rimuoverlo.
+     *
+     * @param idRistorante identificativo del ristorante da eliminare
+     * @param idGestore identificativo del gestore che richiede l'eliminazione
+     * @throws RemoteException se si verifica un errore di comunicazione RMI
+     * @throws OperazioneNonConsentitaException se il gestore non è autorizzato
+     * @throws RistoranteNonTrovatoException se il ristorante non esiste
+     * @throws SistemaIndisponibileException se il servizio non è disponibile
+     */
     @Override
     public void eliminaRistorante(Integer idRistorante, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException,

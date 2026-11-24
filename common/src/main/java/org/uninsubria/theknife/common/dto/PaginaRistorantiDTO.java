@@ -13,7 +13,6 @@ import java.util.List;
  *
  * @param ristoranti ristoranti inclusi nella pagina
  * @param hasMore indica se sono disponibili ulteriori pagine di risultati
- * @throws NullPointerException se l'elenco dei ristoranti è {@code null} o contiene elementi {@code null}
  */
 public record PaginaRistorantiDTO(
         List<RistoranteDTO> ristoranti,
@@ -22,6 +21,11 @@ public record PaginaRistorantiDTO(
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Crea una pagina copiando l'elenco dei ristoranti in una lista non modificabile.
+     *
+     * @throws NullPointerException se l'elenco dei ristoranti è {@code null} o contiene elementi {@code null}
+     */
     public PaginaRistorantiDTO {
         ristoranti = List.copyOf(ristoranti);
     }
