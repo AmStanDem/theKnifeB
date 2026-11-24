@@ -698,7 +698,10 @@ public class AreaRistoranteController {
         if (recensioneUtente == null) {
             return;
         }
-        RecensioneSelezionata.imposta(recensioneUtente);
+        RecensioneSelezionata.imposta(
+                recensioneUtente,
+                RecensioneSelezionata.OrigineModifica.RISTORANTE
+        );
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 

@@ -11,7 +11,13 @@ import org.uninsubria.theknife.common.dto.RecensioneDTO;
  */
 public final class RecensioneSelezionata {
 
+    public enum OrigineModifica {
+        RISTORANTE,
+        MIE_RECENSIONI
+    }
+
     private static RecensioneDTO recensione;
+    private static OrigineModifica origineModifica;
 
     /**
      * Impedisce l'istanziazione della classe di utilità.
@@ -25,7 +31,21 @@ public final class RecensioneSelezionata {
      * @param recensioneDaModificare recensione selezionata, oppure {@code null}
      */
     public static void imposta(RecensioneDTO recensioneDaModificare) {
+        imposta(recensioneDaModificare, OrigineModifica.MIE_RECENSIONI);
+    }
+
+    /**
+     * Imposta la recensione da modificare e la schermata a cui tornare.
+     *
+     * @param recensioneDaModificare recensione selezionata
+     * @param origine schermata da cui è stata avviata la modifica
+     */
+    public static void imposta(
+            RecensioneDTO recensioneDaModificare,
+            OrigineModifica origine
+    ) {
         recensione = recensioneDaModificare;
+        origineModifica = origine;
     }
 
     /**
@@ -38,9 +58,19 @@ public final class RecensioneSelezionata {
     }
 
     /**
+     * Restituisce la schermata da cui è stata avviata la modifica.
+     *
+     * @return origine della modifica oppure {@code null} se non impostata
+     */
+    public static OrigineModifica getOrigineModifica() {
+        return origineModifica;
+    }
+
+    /**
      * Rimuove la recensione attualmente conservata.
      */
     public static void pulisci() {
         recensione = null;
+        origineModifica = null;
     }
 }

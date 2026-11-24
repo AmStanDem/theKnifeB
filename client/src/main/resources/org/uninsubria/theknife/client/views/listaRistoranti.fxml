@@ -31,18 +31,6 @@
 
             <HBox alignment="CENTER_LEFT" spacing="12" styleClass="title-bar">
                 <Label text="Trova il tuo ristorante" styleClass="page-title" HBox.hgrow="ALWAYS"/>
-                <Button mnemonicParsing="false"
-                        onAction="#onHomeClick"
-                        styleClass="home-button"
-                        accessibleText="Torna alla home">
-                    <graphic>
-                        <ImageView fitHeight="32" fitWidth="32" preserveRatio="true">
-                            <image>
-                                <Image url="@../images/home.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                </Button>
             </HBox>
 
             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="search-bar">

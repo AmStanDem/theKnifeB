@@ -12,14 +12,10 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
 <?import org.controlsfx.control.RangeSlider?>
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
 <?import org.uninsubria.theknife.client.util.stars.RatingContainer?>
-<?import org.uninsubria.theknife.client.util.components.HomeLogo?>
 
 <!--
     Pagina di Ricerca Avanzata - TheKnife (Formato Orizzontale)
