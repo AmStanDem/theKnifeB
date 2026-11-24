@@ -80,7 +80,7 @@ public final class SelettoreLuogoDialog {
     ) {
         Dialog<GeocodingService.Luogo> dialog = new Dialog<>();
         dialog.setTitle("Seleziona una località");
-        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initModality(Modality.WINDOW_MODAL);
         if (owner != null) {
             dialog.initOwner(owner);
         } else {

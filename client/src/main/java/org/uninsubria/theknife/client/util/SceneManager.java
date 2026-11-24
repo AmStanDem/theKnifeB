@@ -303,6 +303,19 @@ public class SceneManager {
         stage.setFullScreenExitHint("");
         stage.setResizable(false);
 
+        // Quando un dialog modale (Alert, ecc.) viene mostrato con showAndWait(),
+        // blocca il JavaFX Application Thread impedendo l'esecuzione dei task
+        // accodati con Platform.runLater(). Su alcune piattaforme il focus del
+        // dialog può far uscire momentaneamente dal fullscreen.
+        // Ascoltando fullScreenProperty intercettiamo subito il cambiamento
+        // e lo ripristiamo prima che Platform.runLater() possa eseguire,
+        // superando il blocco di showAndWait().
+        stage.fullScreenProperty().addListener((observable, precedente, corrente) -> {
+            if (!corrente && stage.isShowing()) {
+                stage.setFullScreen(true);
+            }
+        });
+
         stage.iconifiedProperty().addListener((observable, precedente, minimizzata) -> {
             if (!minimizzata) {
                 Platform.runLater(() -> {
