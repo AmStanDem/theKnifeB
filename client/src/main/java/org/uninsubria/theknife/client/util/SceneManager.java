@@ -407,22 +407,18 @@ public class SceneManager {
     }
 
     private static Tooltip creaTooltip(String testo) {
-        Text testoTooltip = new Text(testo);
-        testoTooltip.setFont(Font.font("Segoe UI", 12));
-        testoTooltip.setFontSmoothingType(FontSmoothingType.GRAY);
-        testoTooltip.setFill(Color.WHITE);
+        Tooltip tooltip = new Tooltip(testo);
 
-        Tooltip tooltip = new Tooltip();
-        tooltip.setGraphic(testoTooltip);
         tooltip.setStyle(
                 "-fx-background-color: #343434;" +
-                "-fx-background-insets: 0;" +
-                "-fx-background-radius: 8px;" +
-                "-fx-border-color: transparent;" +
-                "-fx-border-width: 0;" +
-                "-fx-effect: none;" +
-                "-fx-padding: 8px 12px;"
+                        "-fx-background-insets: 0;" +
+                        "-fx-background-radius: 0;" +
+                        "-fx-border-color: transparent;" +
+                        "-fx-border-width: 0;" +
+                        "-fx-padding: 8px 12px;" +
+                        "-fx-effect: null;"
         );
+
         return tooltip;
     }
 
