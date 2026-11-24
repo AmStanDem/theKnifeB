@@ -9,15 +9,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 /**
- * Container grafico che racchiude l'InteractiveRatingView,
- * mantenendo le stelle sempre interattive e modificabili.
+ * Contenitore grafico per una vista di valutazione a stelle interattiva.
  */
 public class RatingContainer extends HBox {
 
     private final InteractiveRatingView ratingView;
 
     /**
-     * Costruttore vuoto obbligatorio per l'istanziazione diretta tramite FXML.
+     * Crea un contenitore con valutazione iniziale pari a zero e selezione abilitata.
      */
     public RatingContainer() {
         setSpacing(10);
@@ -30,6 +29,12 @@ public class RatingContainer extends HBox {
         getChildren().add(ratingView);
     }
 
+    /**
+     * Crea un contenitore con valutazione e stato di interazione iniziali specificati.
+     *
+     * @param initialRating valutazione iniziale, limitata all'intervallo da 0 a 5
+     * @param initialLocked {@code true} per disabilitare inizialmente la modifica della valutazione
+     */
     public RatingContainer(double initialRating, boolean initialLocked) {
         setSpacing(10);
         setAlignment(Pos.CENTER);
@@ -41,24 +46,50 @@ public class RatingContainer extends HBox {
         getChildren().add(ratingView);
     }
 
+    /**
+     * Imposta i colori usati per le porzioni piene e vuote delle stelle.
+     *
+     * @param filled colore delle porzioni piene
+     * @param empty colore delle porzioni vuote
+     */
     public void setColors(Color filled, Color empty) {
         ratingView.setColors(filled, empty);
     }
 
+    /**
+     * Restituisce la valutazione corrente.
+     *
+     * @return valutazione compresa tra 0 e 5
+     */
     public double getRating() {
         return ratingView.getRating();
     }
 
+    /**
+     * Imposta la valutazione e abilita la modifica da parte dell'utente.
+     *
+     * @param rating valutazione da visualizzare, limitata all'intervallo da 0 a 5
+     */
     public void setRating(double rating) {
         // Imposta il voto senza bloccare l'interattività, così l'utente può sempre modificarlo
         ratingView.setRating(rating);
         ratingView.setInteractive(true);
     }
 
+    /**
+     * Abilita o disabilita la modifica della valutazione.
+     *
+     * @param interactive {@code true} per consentire la selezione
+     */
     public void setInteractive(boolean interactive) {
         ratingView.setInteractive(interactive);
     }
 
+    /**
+     * Imposta l'azione da eseguire quando l'utente conferma una nuova valutazione.
+     *
+     * @param onRatingChanged azione da eseguire, oppure {@code null} per non eseguirne alcuna
+     */
     public void setOnRatingChanged(Runnable onRatingChanged) {
         ratingView.setOnRatingChanged(onRatingChanged);
     }

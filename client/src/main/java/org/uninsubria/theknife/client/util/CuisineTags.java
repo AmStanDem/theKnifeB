@@ -9,11 +9,25 @@ import javafx.scene.layout.FlowPane;
 
 import java.util.List;
 
+/**
+ * Utility per visualizzare le tipologie di cucina come etichette in un {@link FlowPane}.
+ */
 public final class CuisineTags {
 
+    /**
+     * Impedisce l'istanziazione della classe di utilità.
+     */
     private CuisineTags() {
     }
 
+    /**
+     * Popola il contenitore con un'etichetta per ogni tipologia di cucina valida.
+     * Rimuove prima i contenuti precedenti e mostra un'etichetta predefinita
+     * se non sono disponibili tipologie valide.
+     *
+     * @param container contenitore da popolare
+     * @param cuisines tipologie di cucina da visualizzare, oppure {@code null}
+     */
     public static void populate(FlowPane container, List<String> cuisines) {
         container.getChildren().clear();
         if (cuisines != null) {

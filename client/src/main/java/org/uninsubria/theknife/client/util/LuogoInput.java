@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * Campo per inserire una località con suggerimenti automatici e selezione tramite mappa.
+ */
 public final class LuogoInput extends HBox {
 
     private final TextField campo = new TextField();
@@ -27,6 +30,9 @@ public final class LuogoInput extends HBox {
     private final AutocompleteLuoghi autocomplete;
     private Consumer<GeocodingService.Luogo> alSeleziona = luogo -> { };
 
+    /**
+     * Crea il campo di località con completamento automatico e pulsante per aprire la mappa.
+     */
     public LuogoInput() {
         setAlignment(Pos.CENTER);
         setSpacing(6);
@@ -70,68 +76,145 @@ public final class LuogoInput extends HBox {
         });
     }
 
+    /**
+     * Restituisce il testo inserito nel campo.
+     *
+     * @return testo del campo
+     */
     public String getText() {
         return campo.getText();
     }
 
+    /**
+     * Imposta il testo del campo.
+     *
+     * @param value testo da visualizzare
+     */
     public void setText(String value) {
         campo.setText(value);
     }
 
+    /**
+     * Imposta il testo segnaposto del campo.
+     *
+     * @param promptText testo segnaposto
+     */
     public void setPromptText(String promptText) {
         campo.setPromptText(promptText);
     }
 
+    /**
+     * Restituisce il testo segnaposto del campo.
+     *
+     * @return testo segnaposto
+     */
     public String getPromptText() {
         return campo.getPromptText();
     }
 
+    /**
+     * Restituisce la proprietà JavaFX del testo segnaposto.
+     *
+     * @return proprietà del testo segnaposto
+     */
     public StringProperty promptTextProperty() {
         return campo.promptTextProperty();
     }
 
+    /**
+     * Imposta la larghezza preferita del campo di testo.
+     *
+     * @param width larghezza preferita
+     */
     public void setTextFieldPrefWidth(double width) {
         campo.setPrefWidth(width);
     }
 
+    /**
+     * Aggiunge una classe CSS al campo di testo, se non è già presente.
+     *
+     * @param styleClass classe CSS da aggiungere
+     */
     public void addTextFieldStyleClass(String styleClass) {
         if (!campo.getStyleClass().contains(styleClass)) {
             campo.getStyleClass().add(styleClass);
         }
     }
 
+    /**
+     * Imposta l'altezza preferita del campo e del pulsante della mappa.
+     *
+     * @param height altezza preferita
+     */
     public void setTextFieldPrefHeight(double height) {
         campo.setPrefHeight(height);
         mappa.setPrefHeight(height);
     }
 
+    /**
+     * Imposta la larghezza fissa del pulsante della mappa.
+     *
+     * @param width larghezza del pulsante
+     */
     public void setMapButtonPrefWidth(double width) {
         mappa.setPrefWidth(width);
         mappa.setMinWidth(width);
         mappa.setMaxWidth(width);
     }
 
+    /**
+     * Imposta se il testo del campo può essere modificato.
+     *
+     * @param editable {@code true} per consentire la modifica
+     */
     public void setTextFieldEditable(boolean editable) {
         campo.setEditable(editable);
     }
 
+    /**
+     * Mostra o nasconde il pulsante per selezionare una località sulla mappa.
+     *
+     * @param visible {@code true} per mostrare il pulsante
+     */
     public void setMapButtonVisible(boolean visible) {
         mappa.setVisible(visible);
         mappa.setManaged(visible);
     }
 
+    /**
+     * Richiede il focus per il campo di testo.
+     */
     public void requestFocus() {
         campo.requestFocus();
     }
 
+    /**
+     * Restituisce la località attualmente selezionata.
+     *
+     * @return località selezionata oppure {@code null} se non è stata selezionata
+     */
     public GeocodingService.Luogo getLuogoSelezionato() {
         return autocomplete.getLuogoSelezionato();
     }
 
+    /**
+     * Imposta la località selezionata, aggiornando il testo e notificando il listener.
+     *
+     * @param luogo località da selezionare
+     * @throws NullPointerException se {@code luogo} è {@code null}
+     */
     public void setLuogoSelezionato(GeocodingService.Luogo luogo) {
         autocomplete.seleziona(Objects.requireNonNull(luogo));
     }
 
+    /**
+     * Risolve il testo del campo in una località. Se non è già selezionata una località
+     * corrispondente al testo, cerca i suggerimenti e usa il primo risultato disponibile.
+     *
+     * @param alSuccesso azione da eseguire con la località risolta
+     * @param alErrore azione da eseguire con il messaggio se non è possibile risolverla
+     * @throws NullPointerException se uno dei callback è {@code null}
+     */
     public void risolviLuogo(
             Consumer<GeocodingService.Luogo> alSuccesso,
             Consumer<String> alErrore
@@ -176,6 +259,12 @@ public final class LuogoInput extends HBox {
         });
     }
 
+    /**
+     * Imposta il listener invocato quando viene selezionata una località.
+     *
+     * @param listener callback da invocare con la località selezionata
+     * @throws NullPointerException se {@code listener} è {@code null}
+     */
     public void setOnLuogoSelezionato(Consumer<GeocodingService.Luogo> listener) {
         alSeleziona = Objects.requireNonNull(listener);
     }

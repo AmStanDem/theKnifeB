@@ -9,14 +9,21 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.shape.SVGPath;
 
 /**
- * Vista interattiva: l'hover mostra solo un'anteprima,
- * il click (tasto sinistro) fissa il voto in modo definitivo.
+ * Vista interattiva per visualizzare e selezionare una valutazione a stelle.
+ * Il puntamento mostra un'anteprima, mentre il clic sinistro conferma la valutazione.
  */
 public class InteractiveRatingView extends BaseRatingView {
 
     private boolean interactive;
     private Runnable onRatingChanged;
 
+    /**
+     * Crea una vista di valutazione configurabile come interattiva o di sola lettura.
+     *
+     * @param maxStarsIgnored parametro non utilizzato; la vista base mostra sempre cinque stelle
+     * @param initialRating valutazione iniziale, limitata all'intervallo da 0 a 5
+     * @param interactive {@code true} per consentire la selezione della valutazione
+     */
     public InteractiveRatingView(int maxStarsIgnored, double initialRating, boolean interactive) {
         super(initialRating);
         this.interactive = interactive;
@@ -59,16 +66,31 @@ public class InteractiveRatingView extends BaseRatingView {
         setCursor(interactive ? Cursor.HAND : Cursor.DEFAULT);
     }
 
+    /**
+     * Imposta se la valutazione può essere modificata dall'utente.
+     *
+     * @param interactive {@code true} per abilitare l'interazione
+     */
     public void setInteractive(boolean interactive) {
         this.interactive = interactive;
         updateCursor();
         paintStars(rating);
     }
 
+    /**
+     * Indica se la selezione della valutazione è abilitata.
+     *
+     * @return {@code true} se la vista è interattiva
+     */
     public boolean isInteractive() {
         return interactive;
     }
 
+    /**
+     * Imposta l'azione da eseguire quando l'utente conferma una nuova valutazione.
+     *
+     * @param onRatingChanged azione da eseguire, oppure {@code null} per non eseguirne alcuna
+     */
     public void setOnRatingChanged(Runnable onRatingChanged) {
         this.onRatingChanged = onRatingChanged;
     }

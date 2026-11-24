@@ -12,6 +12,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.uninsubria.theknife.client.util.SceneManager;
 
+/**
+ * Pulsante con il logo dell'applicazione che riporta alla schermata principale.
+ */
 public final class HomeLogo extends Button {
 
     private static final String HOME_VIEW =
@@ -21,6 +24,9 @@ public final class HomeLogo extends Button {
 
     private final ImageView imageView = new ImageView();
 
+    /**
+     * Crea il pulsante del logo e ne configura l'azione di ritorno alla home.
+     */
     public HomeLogo() {
         setImage(loadImage(DEFAULT_IMAGE));
         setFitWidth(441);
@@ -35,10 +41,21 @@ public final class HomeLogo extends Button {
         setOnAction(event -> SceneManager.switchScene(event, HOME_VIEW));
     }
 
+    /**
+     * Restituisce l'immagine visualizzata nel logo.
+     *
+     * @return immagine del logo
+     */
     public Image getImage() {
         return imageView.getImage();
     }
 
+    /**
+     * Imposta l'immagine visualizzata nel logo.
+     *
+     * @param image immagine da visualizzare
+     * @throws IllegalArgumentException se l'immagine è {@code null}
+     */
     public void setImage(Image image) {
         if (image == null) {
             throw new IllegalArgumentException("L'immagine del logo non può essere nulla.");
@@ -47,28 +64,58 @@ public final class HomeLogo extends Button {
         setGraphic(imageView);
     }
 
+    /**
+     * Restituisce la larghezza di adattamento dell'immagine.
+     *
+     * @return larghezza di adattamento
+     */
     public double getFitWidth() {
         return imageView.getFitWidth();
     }
 
+    /**
+     * Imposta la larghezza di adattamento dell'immagine e la larghezza preferita del pulsante.
+     *
+     * @param fitWidth larghezza di adattamento
+     */
     public void setFitWidth(double fitWidth) {
         imageView.setFitWidth(fitWidth);
         setPrefWidth(fitWidth);
     }
 
+    /**
+     * Restituisce l'altezza di adattamento dell'immagine.
+     *
+     * @return altezza di adattamento
+     */
     public double getFitHeight() {
         return imageView.getFitHeight();
     }
 
+    /**
+     * Imposta l'altezza di adattamento dell'immagine e l'altezza preferita del pulsante.
+     *
+     * @param fitHeight altezza di adattamento
+     */
     public void setFitHeight(double fitHeight) {
         imageView.setFitHeight(fitHeight);
         setPrefHeight(fitHeight);
     }
 
+    /**
+     * Indica se l'immagine mantiene le proprie proporzioni durante il ridimensionamento.
+     *
+     * @return {@code true} se le proporzioni vengono mantenute
+     */
     public boolean isPreserveRatio() {
         return imageView.isPreserveRatio();
     }
 
+    /**
+     * Imposta se mantenere le proporzioni dell'immagine durante il ridimensionamento.
+     *
+     * @param preserveRatio {@code true} per mantenere le proporzioni
+     */
     public void setPreserveRatio(boolean preserveRatio) {
         imageView.setPreserveRatio(preserveRatio);
     }

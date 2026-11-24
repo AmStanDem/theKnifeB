@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+/**
+ * Collega a un campo di testo suggerimenti automatici di località ottenuti tramite geocodifica.
+ * La ricerca parte dopo una breve pausa dall'inserimento di almeno tre caratteri.
+ */
 public final class AutocompleteLuoghi {
 
     private final TextField campo;
@@ -26,6 +30,12 @@ public final class AutocompleteLuoghi {
     private GeocodingService.Luogo luogoSelezionato;
     private boolean aggiornamentoInterno;
 
+    /**
+     * Configura i suggerimenti automatici per il campo indicato.
+     *
+     * @param campo campo di testo in cui inserire la località
+     * @param alSeleziona azione da eseguire quando viene selezionata una località
+     */
     public AutocompleteLuoghi(
             TextField campo,
             Consumer<GeocodingService.Luogo> alSeleziona
@@ -63,10 +73,20 @@ public final class AutocompleteLuoghi {
         });
     }
 
+    /**
+     * Restituisce la località selezionata, se presente.
+     *
+     * @return località selezionata oppure {@code null} se il testo non corrisponde a una selezione
+     */
     public GeocodingService.Luogo getLuogoSelezionato() {
         return luogoSelezionato;
     }
 
+    /**
+     * Seleziona una località, ne inserisce l'etichetta nel campo e invoca la callback configurata.
+     *
+     * @param luogo località da selezionare
+     */
     public void seleziona(GeocodingService.Luogo luogo) {
         luogoSelezionato = luogo;
         aggiornamentoInterno = true;

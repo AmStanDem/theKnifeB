@@ -19,6 +19,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+/**
+ * Servizio per cercare località e coordinate tramite il servizio Nominatim di OpenStreetMap.
+ */
 public final class GeocodingService {
 
     private static final HttpClient CLIENT = HttpClient.newBuilder()
@@ -33,9 +36,26 @@ public final class GeocodingService {
     private GeocodingService() {
     }
 
+    /**
+     * Coordinate geografiche espresse in gradi decimali.
+     *
+     * @param latitudine latitudine
+     * @param longitudine longitudine
+     */
     public record Coordinate(double latitudine, double longitudine) {
     }
 
+    /**
+     * Località geocodificata con etichetta, indirizzo e coordinate.
+     *
+     * @param etichetta etichetta completa da mostrare
+     * @param indirizzo indirizzo o riferimento stradale
+     * @param localita nome della città o della località
+     * @param nazione nome della nazione
+     * @param latitudine latitudine compresa tra -90 e 90 gradi
+     * @param longitudine longitudine compresa tra -180 e 180 gradi
+     * @throws IllegalArgumentException se i testi sono nulli o vuoti o le coordinate non sono valide
+     */
     public record Luogo(
             String etichetta,
             String indirizzo,
@@ -56,6 +76,14 @@ public final class GeocodingService {
         }
     }
 
+    /**
+     * Cerca località corrispondenti al testo inserito.
+     *
+     * @param query testo di ricerca; query nulle o più corte di tre caratteri non producono risultati
+     * @return fino a cinque località corrispondenti
+     * @throws IOException se il servizio di geocodifica non è raggiungibile o restituisce un errore
+     * @throws InterruptedException se la richiesta viene interrotta durante l'attesa
+     */
     public static List<Luogo> suggerisciLuoghi(String query) throws IOException, InterruptedException {
         if (query == null || query.trim().length() < 3) {
             return List.of();
@@ -88,6 +116,16 @@ public final class GeocodingService {
         return List.copyOf(luoghi);
     }
 
+    /**
+     * Ricava i dettagli della località corrispondente alle coordinate specificate.
+     *
+     * @param latitudine latitudine compresa tra -90 e 90 gradi
+     * @param longitudine longitudine compresa tra -180 e 180 gradi
+     * @return luogo identificato alle coordinate indicate
+     * @throws IllegalArgumentException se le coordinate non sono finite o fuori intervallo
+     * @throws IOException se il servizio non è raggiungibile o non identifica il luogo
+     * @throws InterruptedException se la richiesta viene interrotta durante l'attesa
+     */
     public static Luogo luogoDaCoordinate(double latitudine, double longitudine)
             throws IOException, InterruptedException {
         if (!Double.isFinite(latitudine) || latitudine < -90 || latitudine > 90
@@ -112,6 +150,16 @@ public final class GeocodingService {
         return new Luogo(displayName, address, locality, country, latitudine, longitudine);
     }
 
+    /**
+     * Cerca le coordinate associate all'indirizzo e alla località specificati.
+     *
+     * @param indirizzo indirizzo stradale, se disponibile
+     * @param citta città o località, se disponibile
+     * @param nazione nazione, se disponibile
+     * @return coordinate del primo risultato trovato, oppure {@code null} se non ci sono risultati
+     * @throws IOException se il servizio di geocodifica non è raggiungibile o restituisce un errore
+     * @throws InterruptedException se la richiesta viene interrotta durante l'attesa
+     */
     public static Coordinate ottieniCoordinate(String indirizzo, String citta, String nazione)
             throws IOException, InterruptedException {
         String query = String.join(", ", Stream.of(indirizzo, citta, nazione)

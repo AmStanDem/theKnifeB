@@ -21,6 +21,8 @@ import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -285,6 +287,23 @@ public class AggiungiRistoranteController {
                 return;
             }
 
+            if (!sitoWebValido(sitoWeb)) {
+                mostraMessaggio(
+                        Alert.AlertType.WARNING,
+                        "Sito web non valido",
+                        "Inserisci un indirizzo web valido, ad esempio www.ristorante.it."
+                );
+
+                txtSitoWeb.requestFocus();
+                return;
+            }
+
+            // Normalizzazione del sito web.
+            if (sitoWeb != null
+                    && !sitoWeb.matches("(?i)^https?://.*")) {
+                sitoWeb = "https://" + sitoWeb;
+            }
+
 
 
             // 7. Creazione del DTO da inviare al server.
@@ -452,5 +471,64 @@ public class AggiungiRistoranteController {
         }
 
         return true;
+    }
+
+    /**
+     * Verifica la validità formale di un indirizzo web.
+     *
+     * Il campo può essere vuoto. Se valorizzato, deve contenere
+     * un dominio valido, eventualmente preceduto da http:// o https://.
+     *
+     * @param sitoWeb indirizzo web da controllare
+     * @return true se vuoto o valido, false altrimenti
+     */
+    private boolean sitoWebValido(String sitoWeb) {
+        if (sitoWeb == null || sitoWeb.isBlank()) {
+            return true;
+        }
+
+        String indirizzo = sitoWeb.trim();
+
+        // Non sono ammessi spazi.
+        if (indirizzo.contains(" ")) {
+            return false;
+        }
+
+        // Se manca il protocollo, aggiunge https:// per la verifica.
+        if (!indirizzo.matches("(?i)^https?://.*")) {
+            indirizzo = "https://" + indirizzo;
+        }
+
+        try {
+            URI uri = new URI(indirizzo);
+
+            String schema = uri.getScheme();
+            String host = uri.getHost();
+
+            if (schema == null
+                    || (!schema.equalsIgnoreCase("http")
+                    && !schema.equalsIgnoreCase("https"))) {
+                return false;
+            }
+
+            if (host == null || !host.contains(".")) {
+                return false;
+            }
+
+            // Il dominio deve avere almeno due componenti.
+            String[] parti = host.split("\\.");
+
+            if (parti.length < 2) {
+                return false;
+            }
+
+            // L'ultima componente deve avere almeno 2 caratteri.
+            String estensione = parti[parti.length - 1];
+
+            return estensione.matches("[a-zA-Z]{2,}");
+
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 }

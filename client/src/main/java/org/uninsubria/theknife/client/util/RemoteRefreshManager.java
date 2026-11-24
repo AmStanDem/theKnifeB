@@ -20,6 +20,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
+/**
+ * Gestisce le sottoscrizioni RMI del client e inoltra gli eventi ricevuti ai listener JavaFX.
+ */
 public final class RemoteRefreshManager {
 
     private static volatile RemoteRefreshManager instance;
@@ -65,6 +68,9 @@ public final class RemoteRefreshManager {
     private final ExecutorService background = Executors.newVirtualThreadPerTaskExecutor();
     private final RemoteObserver observer;
 
+    /**
+     * Impedisce l'istanziazione diretta del gestore singleton.
+     */
     private RemoteRefreshManager() {
         try {
             observer = new ClientObserver();
@@ -74,6 +80,17 @@ public final class RemoteRefreshManager {
         Runtime.getRuntime().addShutdownHook(new Thread(this::close, "theknife-client-callback-shutdown"));
     }
 
+    /**
+     * Sottoscrive un proprietario agli eventi del server.
+     *
+     * @param owner oggetto proprietario della sottoscrizione, usato per annullarla in gruppo
+     * @param topic tipo di evento a cui sottoscriversi
+     * @param targetId identificativo dell'entità interessata, oppure {@code null}
+     * @param listener callback invocata quando viene ricevuta una notifica
+     * @param onSubscribed callback invocata quando la sottoscrizione remota è stata completata
+     * @return identificativo locale della sottoscrizione
+     * @throws IllegalArgumentException se proprietario, argomento o callback obbligatori sono {@code null}
+     */
     public static UUID subscribe(
             Object owner,
             SubscriptionTopic topic,
@@ -127,6 +144,11 @@ public final class RemoteRefreshManager {
         }
     }
 
+    /**
+     * Annulla tutte le sottoscrizioni associate al proprietario indicato.
+     *
+     * @param owner proprietario delle sottoscrizioni da annullare
+     */
     public static void unsubscribeOwner(Object owner) {
         RemoteRefreshManager manager = instance;
         if (manager != null) {
@@ -187,6 +209,9 @@ public final class RemoteRefreshManager {
         }
     }
 
+    /**
+     * Arresta il gestore e rilascia le risorse RMI e i thread usati per le sottoscrizioni.
+     */
     public static void shutdown() {
         RemoteRefreshManager manager = instance;
         if (manager != null) {

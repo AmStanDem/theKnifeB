@@ -28,6 +28,10 @@ import java.time.format.TextStyle;
 import java.time.format.ResolverStyle;
 import java.util.Locale;
 
+/**
+ * Campo per inserire una data di nascita o selezionarla da un calendario.
+ * Accetta date comprese tra il 1 gennaio 1900 e la data massima configurata.
+ */
 public final class DataNascitaInput extends HBox {
 
     private static final LocalDate DATA_MINIMA = LocalDate.of(1900, 1, 1);
@@ -40,6 +44,9 @@ public final class DataNascitaInput extends HBox {
     private LocalDate dataMassima = LocalDate.now();
     private Runnable primaDiMostrare = () -> { };
 
+    /**
+     * Crea il campo di inserimento della data con il pulsante per aprire il calendario.
+     */
     public DataNascitaInput() {
         setAlignment(Pos.CENTER);
         setSpacing(8);
@@ -59,18 +66,37 @@ public final class DataNascitaInput extends HBox {
         getChildren().addAll(campo, seleziona);
     }
 
+    /**
+     * Restituisce il testo attualmente inserito.
+     *
+     * @return testo del campo data
+     */
     public String getText() {
         return campo.getText();
     }
 
+    /**
+     * Imposta il testo del campo data.
+     *
+     * @param text testo da visualizzare
+     */
     public void setText(String text) {
         campo.setText(text);
     }
 
+    /**
+     * Richiede il focus per il campo di inserimento.
+     */
     public void requestFocus() {
         campo.requestFocus();
     }
 
+    /**
+     * Imposta la data più recente selezionabile nel calendario.
+     *
+     * @param dataMassima data limite inclusiva, non precedente al 1 gennaio 1900
+     * @throws IllegalArgumentException se la data è {@code null} o precedente al limite minimo
+     */
     public void setDataMassima(LocalDate dataMassima) {
         if (dataMassima == null || dataMassima.isBefore(DATA_MINIMA)) {
             throw new IllegalArgumentException("La data massima deve essere successiva al 01/01/1900.");
@@ -78,10 +104,21 @@ public final class DataNascitaInput extends HBox {
         this.dataMassima = dataMassima;
     }
 
+    /**
+     * Imposta un'azione da eseguire prima di mostrare il calendario.
+     * Se l'azione è {@code null}, non viene eseguita alcuna operazione.
+     *
+     * @param azione azione preliminare
+     */
     public void setOnPrimaDiMostrare(Runnable azione) {
         primaDiMostrare = azione == null ? () -> { } : azione;
     }
 
+    /**
+     * Mostra un calendario e, se viene selezionata una data, la scrive nel campo.
+     *
+     * @param proprietario finestra proprietaria del dialogo, oppure {@code null}
+     */
     public void mostraCalendario(Window proprietario) {
         LocalDate dataIniziale = dataMassima;
         try {
