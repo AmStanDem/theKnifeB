@@ -22,9 +22,23 @@ public final class PrezzoDatasetEstimator {
     private static final Set<String> VERY_HIGH_COST_COUNTRIES = Set.of(
             "denmark", "iceland", "luxembourg", "norway", "switzerland");
 
+    /**
+     * Impedisce l'istanziazione della classe di utilità.
+     */
     private PrezzoDatasetEstimator() {
     }
 
+    /**
+     * Stima il prezzo medio in euro usando la fascia di prezzo e il Paese.
+     * La fascia è ricavata da uno a quattro simboli di valuta. Per la stessa
+     * combinazione di ristorante, indirizzo e Paese la stima è deterministica.
+     *
+     * @param priceLevel fascia di prezzo rappresentata da simboli di valuta
+     * @param country Paese del ristorante, usato per il coefficiente economico
+     * @param restaurantName nome del ristorante, usato per rendere stabile la stima
+     * @param address indirizzo del ristorante, usato per rendere stabile la stima
+     * @return prezzo medio stimato in euro, oppure {@code null} se la fascia non è valida o assente
+     */
     public static Double stimaInEuro(String priceLevel, String country, String restaurantName, String address) {
         int tier = tier(priceLevel);
         if (tier == 0) {

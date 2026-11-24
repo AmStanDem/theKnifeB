@@ -24,9 +24,6 @@ import java.util.List;
  * @param raggioKm raggio di ricerca in chilometri
  * @param delivery indica se cercare ristoranti con consegna a domicilio
  * @param bookingOnline indica se cercare ristoranti con prenotazione online
- * @throws IllegalArgumentException se i filtri di prezzo o valutazione non sono validi,
- * se la paginazione non è valida, se mancano le coordinate complete o se località,
- * coordinate e raggio non soddisfano i requisiti della ricerca
  */
 public record RicercaRistorantiPaginaDTO(
         String localita,
@@ -46,6 +43,13 @@ public record RicercaRistorantiPaginaDTO(
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Normalizza la località e i tipi di cucina e valida filtri e paginazione.
+     *
+     * @throws IllegalArgumentException se prezzo, valutazione o paginazione non sono validi,
+     *         se mancano coordinate complete o se località, coordinate e raggio
+     *         non soddisfano i requisiti della ricerca
+     */
     public RicercaRistorantiPaginaDTO {
 
         localita = localita == null ? "" : localita.trim();

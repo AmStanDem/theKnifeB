@@ -21,8 +21,6 @@ import java.io.Serializable;
  * @param mediaStelleMinima valutazione media minima compresa tra 0.0 e 5.0
  * @param delivery indica se cercare ristoranti con consegna a domicilio
  * @param bookingOnline indica se cercare ristoranti con prenotazione online
- * @throws IllegalArgumentException se non è fornita una locazione valida,
- * se il prezzo minimo supera quello massimo o se la valutazione non è compresa tra 0.0 e 5.0
  */
 public record FiltriRicercaDTO(
         String locazione,
@@ -39,6 +37,12 @@ public record FiltriRicercaDTO(
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Crea i filtri di ricerca e ne verifica la coerenza.
+     *
+     * @throws IllegalArgumentException se non è fornita una locazione valida,
+     *         se il prezzo minimo supera quello massimo o se la valutazione non è compresa tra 0.0 e 5.0
+     */
     public FiltriRicercaDTO {
         boolean haLocazioneTestuale = locazione != null && !locazione.trim().isEmpty();
         boolean haCoordinateCompletate = latitudineRiferimento != null &&

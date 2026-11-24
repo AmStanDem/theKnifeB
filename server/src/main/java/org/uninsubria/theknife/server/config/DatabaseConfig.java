@@ -12,9 +12,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Gestore centralizzato per la configurazione e l'accesso al database PostgreSQL.
- * Pubblica un pool bounded, thread-safe, per le connessioni JDBC.
- * Gestisce l'allineamento automatico dello schema tramite Flyway.
+ * Gestisce il ciclo di vita delle connessioni al database del server.
+ * Applica le migrazioni dello schema con Flyway e mette a disposizione dei DAO
+ * un pool JDBC HikariCP condiviso tra i thread.
  */
 public class DatabaseConfig {
 
@@ -25,17 +25,21 @@ public class DatabaseConfig {
 
     private static volatile HikariDataSource dataSource;
 
-    // Costruttore privato per prevenire l'instanziazione multipla (Singleton)
     private DatabaseConfig() {
     }
 
     /**
-     * Inizializza l'infrastruttura di persistenza.
-     * Viene chiamato dal MainServer durante la fase di bootstrapping.
+     * Applica le migrazioni dello schema, inizializza il pool di connessioni e
+     * verifica che una connessione sia valida. Se il pool è già inizializzato,
+     * la chiamata non modifica la configurazione esistente.
      *
-     * @param url      L'URL JDBC completo, con la porta pubblicata del database (es. localhost:5432)
-     * @param username L'utente del database
-     * @param password La password del database
+     * @param url URL JDBC del database
+     * @param username nome utente del database
+     * @param password password del database
+     * @throws IllegalArgumentException se l'URL o il nome utente sono nulli o vuoti
+     *                                   oppure la password è {@code null}
+     * @throws IllegalStateException se la verifica della connessione del pool fallisce
+     * @throws RuntimeException se l'applicazione delle migrazioni Flyway fallisce
      */
     public static synchronized void init(String url, String username, String password) {
         if (dataSource != null) {
@@ -62,6 +66,14 @@ public class DatabaseConfig {
                 MAXIMUM_POOL_SIZE);
     }
 
+    /**
+     * Crea il pool HikariCP con i parametri di connessione e i limiti configurati.
+     *
+     * @param url URL JDBC del database
+     * @param username nome utente del database
+     * @param password password del database
+     * @return pool di connessioni configurato
+     */
     private static HikariDataSource getPool(String url, String username, String password) {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(url);
@@ -79,11 +91,13 @@ public class DatabaseConfig {
     }
 
     /**
-     * Eroga una nuova connessione JDBC isolata.
-     * I vari DAO (Data Access Object) richiameranno questo metodo per ogni singola transazione.
+     * Preleva una connessione JDBC dal pool condiviso.
+     * Il chiamante è responsabile di chiuderla, normalmente tramite
+     * {@code try-with-resources}, per restituirla al pool.
      *
-     * @return Oggetto Connection attivo e pronto all'uso
-     * @throws SQLException Se l'erogazione della connessione fallisce
+     * @return connessione JDBC presa in prestito dal pool
+     * @throws IllegalStateException se il pool non è stato inizializzato o è già chiuso
+     * @throws SQLException se non è possibile ottenere una connessione
      */
     public static Connection getConnection() throws SQLException {
         HikariDataSource pool = dataSource;
@@ -94,7 +108,9 @@ public class DatabaseConfig {
     }
 
     /**
-     * Chiude il pool durante lo shutdown del server.
+     * Chiude il pool di connessioni, se inizializzato, e azzera il riferimento condiviso.
+     * Dopo la chiusura è necessario chiamare {@link #init(String, String, String)}
+     * prima di richiedere nuove connessioni.
      */
     public static synchronized void close() {
         HikariDataSource pool = dataSource;

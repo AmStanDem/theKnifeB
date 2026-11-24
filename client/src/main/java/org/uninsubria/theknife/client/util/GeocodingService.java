@@ -54,7 +54,6 @@ public final class GeocodingService {
      * @param nazione nome della nazione
      * @param latitudine latitudine compresa tra -90 e 90 gradi
      * @param longitudine longitudine compresa tra -180 e 180 gradi
-     * @throws IllegalArgumentException se i testi sono nulli o vuoti o le coordinate non sono valide
      */
     public record Luogo(
             String etichetta,
@@ -64,6 +63,11 @@ public final class GeocodingService {
             double latitudine,
             double longitudine
     ) {
+        /**
+         * Crea un luogo verificando che i testi siano valorizzati e le coordinate valide.
+         *
+         * @throws IllegalArgumentException se i testi sono nulli o vuoti o le coordinate non sono valide
+         */
         public Luogo {
             if (etichetta == null || etichetta.isBlank()
                     || indirizzo == null || indirizzo.isBlank()

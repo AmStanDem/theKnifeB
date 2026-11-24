@@ -42,7 +42,7 @@ import java.util.Stack;
 /**
  * Gestisce la navigazione tra le viste JavaFX dell'applicazione.
  * Carica le schermate FXML nel layout principale, conserva lo storico per ciascuno stage
- * e configura la finestra principale e i relativi dialoghi a schermo intero.
+ * e mantiene la finestra principale a schermo intero monitorando le finestre popup associate.
  */
 public class SceneManager {
 
@@ -87,6 +87,10 @@ public class SceneManager {
     /**
      * Sostituisce la vista corrente senza conservarla nello storico e rimuove
      * un'eventuale voce duplicata della destinazione.
+     *
+     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
     public static void replaceCurrentScene(Event event, String fxmlPath) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -96,6 +100,10 @@ public class SceneManager {
     /**
      * Sostituisce la vista corrente senza conservarla nello storico e rimuove
      * un'eventuale voce duplicata della destinazione.
+     *
+     * @param stage stage in cui caricare la vista
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
     public static void replaceCurrentScene(Stage stage, String fxmlPath) {
         Stack<String> history = historyMap.get(stage);

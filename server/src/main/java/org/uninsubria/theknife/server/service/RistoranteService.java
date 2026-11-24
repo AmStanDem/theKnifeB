@@ -19,15 +19,35 @@ import org.uninsubria.theknife.server.rmi.RemoteSubscriptionManager;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Gestisce i casi d'uso relativi al catalogo dei ristoranti, applicando le
+ * validazioni di dominio e pubblicando gli eventi sulle modifiche.
+ */
 public class RistoranteService {
 
     private final RistoranteDAO ristoranteDAO = new RistoranteDAO();
     private final RemoteSubscriptionManager subscriptions;
 
+    /**
+     * Crea il servizio usando il gestore delle sottoscrizioni per notificare le modifiche.
+     *
+     * @param subscriptions gestore delle sottoscrizioni remote
+     */
     public RistoranteService(RemoteSubscriptionManager subscriptions) {
         this.subscriptions = subscriptions;
     }
 
+    /**
+     * Registra un ristorante dopo aver verificato i dati obbligatori, le coordinate
+     * e la presenza di almeno una tipologia di cucina.
+     *
+     * @param ristorante dati del ristorante da registrare
+     * @param idGestore identificativo del gestore proprietario
+     * @throws DatiMancantiException se i dati richiesti sono assenti o non validi
+     * @throws OperazioneNonConsentitaException se il ristorante o l'identificativo del gestore mancano
+     * @throws SistemaIndisponibileException se l'inserimento fallisce o si verifica
+     *         un errore durante l'accesso al database
+     */
     public void aggiungiRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
 
@@ -67,6 +87,17 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Aggiorna i dati di un ristorante e le tipologie di cucina associate,
+     * verificando che il ristorante appartenga al gestore.
+     *
+     * @param ristorante dati aggiornati del ristorante
+     * @param idGestore identificativo del gestore proprietario
+     * @throws DatiMancantiException se i dati o le tipologie di cucina sono assenti o non validi
+     * @throws OperazioneNonConsentitaException se il ristorante o il gestore non sono validi
+     *         oppure il ristorante non appartiene al gestore
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public void modificaRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
         if (ristorante == null || idGestore == null || ristorante.idRistorante() == null) {
@@ -110,6 +141,14 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Recupera i dati di un ristorante tramite identificativo.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @return dettaglio del ristorante
+     * @throws RistoranteNonTrovatoException se l'identificativo è nullo o il ristorante non esiste
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public RistoranteDTO ottieniDettaglio(Integer idRistorante)
             throws RistoranteNonTrovatoException, SistemaIndisponibileException {
         if (idRistorante == null) {
@@ -127,6 +166,12 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Restituisce tutte le tipologie di cucina presenti nel catalogo.
+     *
+     * @return elenco delle tipologie di cucina
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public List<String> ottieniTutteTipologieCucina() throws SistemaIndisponibileException {
         try {
             return ristoranteDAO.ottieniTutteTipologieCucina();
@@ -135,6 +180,13 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Recupera i ristoranti associati a un gestore.
+     *
+     * @param idGestore identificativo del gestore
+     * @return ristoranti del gestore, oppure lista vuota se l'identificativo è nullo
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public List<RistoranteDTO> ottieniRistorantiGestore(Integer idGestore) throws SistemaIndisponibileException {
         if (idGestore == null) {
             return List.of();
@@ -146,6 +198,13 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Cerca ristoranti applicando i filtri indicati.
+     *
+     * @param filtri filtri di ricerca, oppure {@code null} per non applicare filtri
+     * @return ristoranti corrispondenti ai criteri
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws SistemaIndisponibileException {
         try {
             return ristoranteDAO.cercaConFiltri(filtri);
@@ -154,6 +213,14 @@ public class RistoranteService {
         }
     }
 
+    /**
+     * Esegue una ricerca paginata verificando la presenza di località e coordinate geografiche.
+     *
+     * @param richiesta criteri di ricerca e parametri di paginazione
+     * @return pagina dei ristoranti corrispondenti
+     * @throws IllegalArgumentException se la richiesta è nulla o mancano località, coordinate o raggio
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
             throws SistemaIndisponibileException {
         if (richiesta == null) {
@@ -179,6 +246,15 @@ public class RistoranteService {
     }
 
 
+    /**
+     * Elimina il ristorante se appartiene al gestore e pubblica l'evento di modifica.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @param idGestore identificativo del gestore proprietario
+     * @throws RistoranteNonTrovatoException se il ristorante non esiste o non è associato al gestore
+     * @throws OperazioneNonConsentitaException se manca l'identificativo del ristorante o del gestore
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public void eliminaRistorante(Integer idRistorante, Integer idGestore)
             throws RistoranteNonTrovatoException,
             OperazioneNonConsentitaException,

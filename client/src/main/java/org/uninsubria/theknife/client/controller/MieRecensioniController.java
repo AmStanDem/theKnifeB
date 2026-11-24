@@ -36,12 +36,13 @@ import java.util.List;
 /**
  * Controller JavaFX della lista delle recensioni scritte dall'utente.
  * <p>
- * Recupera le recensioni del cliente autenticato e consente di modificare
- * o eliminare ogni recensione propria.
+ * Recupera le recensioni del cliente autenticato e consente di modificarle
+ * o eliminarle. Quando si avvia una modifica, conserva questa schermata come
+ * origine per tornarvi dopo il salvataggio o l'annullamento.
  * </p>
  * <p>
- * L'elenco viene aggiornato anche in seguito agli eventi remoti relativi
- * all'utente, esclusi quelli limitati alla modifica dei preferiti.
+ * L'elenco viene aggiornato in seguito agli eventi remoti relativi all'utente,
+ * ad eccezione di quelli limitati alla modifica dei preferiti.
  * </p>
  */
 public class MieRecensioniController {

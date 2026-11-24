@@ -11,10 +11,25 @@ import org.uninsubria.theknife.server.config.DatabaseConfig;
 import java.sql.*;
 import java.time.LocalDate;
 
+/**
+ * DAO per la lettura, la registrazione e l'aggiornamento degli account utente.
+ */
 public class UtenteDAO {
 
+    /**
+     * Dati utente associati all'hash della password memorizzato.
+     *
+     * @param utente dati pubblici dell'utente
+     * @param passwordHash hash della password
+     */
     public record UtenteConHash(UtenteDTO utente, String passwordHash) {}
 
+    /**
+     * Recupera la data corrente secondo il database.
+     *
+     * @return data corrente del database
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public LocalDate dataCorrente() throws SQLException {
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement("SELECT CURRENT_DATE");
@@ -26,6 +41,14 @@ public class UtenteDAO {
         }
     }
 
+    /**
+     * Inserisce un utente e il relativo hash della password.
+     *
+     * @param utente dati dell'utente da inserire
+     * @param passwordHash hash della password
+     * @return {@code true} se l'utente è stato inserito, {@code false} in caso di email duplicata
+     * @throws SQLException se si verifica un errore diverso da un vincolo univoco duplicato
+     */
     public boolean inserisciUtente(UtenteDTO utente, String passwordHash) throws SQLException {
         String sql = "INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -56,6 +79,13 @@ public class UtenteDAO {
         }
     }
 
+    /**
+     * Cerca un utente tramite indirizzo email.
+     *
+     * @param email indirizzo email da cercare
+     * @return dati dell'utente e hash della password, oppure {@code null} se non trovato
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public UtenteConHash trovaPerEmail(String email) throws SQLException {
         String sql = "SELECT id_utente, email, password, nome, cognome, data_nascita, domicilio, ruolo FROM Utenti WHERE email = ?";
 
@@ -87,6 +117,13 @@ public class UtenteDAO {
         return null;
     }
 
+    /**
+     * Cerca un utente tramite identificativo.
+     *
+     * @param idUtente identificativo dell'utente
+     * @return dati dell'utente e hash della password, oppure {@code null} se non trovato
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public UtenteConHash trovaPerId(Integer idUtente) throws SQLException {
         String sql = "SELECT id_utente, email, password, nome, cognome, data_nascita, domicilio, ruolo "
                 + "FROM Utenti WHERE id_utente = ?";
@@ -113,6 +150,16 @@ public class UtenteDAO {
         }
     }
 
+    /**
+     * Aggiorna i dati dell'utente e il suo hash password solo se l'hash attuale
+     * corrisponde a quello fornito.
+     *
+     * @param utente dati aggiornati dell'utente
+     * @param hashPrecedente hash password atteso, usato per verificare la versione corrente
+     * @param hashNuovo nuovo hash password
+     * @return {@code true} se è stato aggiornato un utente, {@code false} se non è stato aggiornato
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public boolean aggiornaUtente(UtenteDTO utente, String hashPrecedente, String hashNuovo)
             throws SQLException {
         String sql = "UPDATE Utenti SET email = ?, password = ?, nome = ?, cognome = ?, "

@@ -12,9 +12,25 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO per la lettura e la gestione delle recensioni e delle relative risposte.
+ */
 public class RecensioneDAO {
+    /**
+     * Identificativi del ristorante e dell'utente associati a una recensione.
+     *
+     * @param restaurantId identificativo del ristorante recensito
+     * @param userId identificativo dell'utente autore
+     */
     public record RecensioneTarget(int restaurantId, int userId) {}
 
+    /**
+     * Recupera il ristorante e l'utente associati alla recensione.
+     *
+     * @param idRecensione identificativo della recensione
+     * @return identificativi associati, oppure {@code null} se la recensione non esiste
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public RecensioneTarget trovaTargetRecensione(int idRecensione) throws SQLException {
         String sql = "SELECT id_ristorante, id_utente FROM Recensioni WHERE id_recensione = ?";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -28,6 +44,13 @@ public class RecensioneDAO {
         }
     }
 
+    /**
+     * Verifica se l'utente esiste ed è registrato con ruolo cliente.
+     *
+     * @param idUtente identificativo dell'utente
+     * @return {@code true} se l'utente ha ruolo cliente
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public boolean utenteCliente(int idUtente) throws SQLException {
         String sql = "SELECT EXISTS (SELECT 1 FROM Utenti WHERE id_utente = ? AND ruolo = 'cliente')";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -39,6 +62,15 @@ public class RecensioneDAO {
         }
     }
 
+    /**
+     * Inserisce una recensione per il cliente e il ristorante specificati.
+     *
+     * @param idCliente identificativo del cliente autore
+     * @param idRistorante identificativo del ristorante recensito
+     * @param r dati della recensione
+     * @return {@code true} se la recensione è stata inserita, {@code false} in caso di vincolo univoco duplicato
+     * @throws SQLException se si verifica un errore durante l'accesso al database diverso da un duplicato
+     */
     public boolean inserisciRecensione(int idCliente, int idRistorante, RecensioneDTO r) throws SQLException {
         String sql = "INSERT INTO Recensioni (id_utente, id_ristorante, valutazione, testo) VALUES (?, ?, ?, ?)";
 
@@ -57,6 +89,13 @@ public class RecensioneDAO {
         }
     }
 
+    /**
+     * Recupera le recensioni del ristorante, dalla più recente, includendo autore e risposta del gestore.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @return elenco delle recensioni del ristorante, eventualmente vuoto
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public List<RecensioneDTO> trovaPerRistorante(int idRistorante) throws SQLException {
         List<RecensioneDTO> lista = new ArrayList<>();
         String sql = "SELECT rec.*, u.nome as nome_autore, resp.testo as risposta_gestore, r.nome AS nome_ristorante " +
@@ -94,6 +133,14 @@ public class RecensioneDAO {
         return lista;
     }
 
+    /**
+     * Recupera le recensioni scritte dal cliente identificato, dalla più recente,
+     * includendo nome del ristorante e risposta del gestore.
+     *
+     * @param idUtente identificativo del cliente
+     * @return elenco delle recensioni dell'utente, eventualmente vuoto
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public List<RecensioneDTO> trovaPerUtente(int idUtente) throws SQLException {
         List<RecensioneDTO> lista = new ArrayList<>();
         String sql = "SELECT rec.*, u.nome AS nome_autore, r.nome AS nome_ristorante, " +
@@ -129,8 +176,27 @@ public class RecensioneDAO {
         return lista;
     }
 
+    /**
+     * Esito dell'aggiornamento ottimistico di una recensione.
+     *
+     * @param aggiornata indica se la recensione è stata aggiornata
+     * @param esiste indica se la recensione dell'utente esisteva
+     * @param restaurantId identificativo del ristorante in caso di aggiornamento, altrimenti {@code null}
+     */
     public record EsitoModifica(boolean aggiornata, boolean esiste, Integer restaurantId) {}
 
+    /**
+     * Aggiorna testo e valutazione della recensione solo se appartiene al cliente
+     * e la versione corrente corrisponde a quella attesa.
+     *
+     * @param idRecensione identificativo della recensione
+     * @param idCliente identificativo del cliente autore
+     * @param nuovoTesto nuovo testo della recensione
+     * @param nuoveStelle nuova valutazione
+     * @param versioneAttesa versione attesa del dato
+     * @return esito dell'aggiornamento, con l'identificativo del ristorante se aggiornato
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public EsitoModifica modificaRecensione(
             int idRecensione, int idCliente, String nuovoTesto, double nuoveStelle, int versioneAttesa)
             throws SQLException {
@@ -167,6 +233,14 @@ public class RecensioneDAO {
         }
     }
 
+    /**
+     * Elimina la recensione indicata se appartiene al cliente specificato.
+     *
+     * @param idRecensione identificativo della recensione
+     * @param idCliente identificativo del cliente autore
+     * @return {@code true} se una recensione è stata eliminata
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
     public boolean eliminaRecensione(int idRecensione, int idCliente) throws SQLException {
         String sql = "DELETE FROM Recensioni WHERE id_recensione = ? AND id_utente = ?";
 
@@ -178,6 +252,16 @@ public class RecensioneDAO {
         }
     }
 
+    /**
+     * Inserisce la risposta del gestore se il gestore è proprietario del ristorante
+     * e la recensione non ha già una risposta.
+     *
+     * @param idRecensione identificativo della recensione
+     * @param idGestore identificativo del gestore
+     * @param testoRisposta testo della risposta
+     * @return {@code true} se la risposta è stata inserita, {@code false} se non è stato possibile inserirla
+     * @throws SQLException se si verifica un errore durante l'accesso al database diverso da un duplicato
+     */
     public boolean aggiungiRispostaGestore(int idRecensione, int idGestore, String testoRisposta)
             throws SQLException {
         String sql = "INSERT INTO Risposte_Recensioni (id_recensione, id_gestore, testo) " +

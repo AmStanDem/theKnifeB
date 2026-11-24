@@ -13,15 +13,31 @@ import org.uninsubria.theknife.server.rmi.RemoteSubscriptionManager;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Gestisce i casi d'uso relativi a recensioni e risposte dei gestori,
+ * applicando le regole di validazione e pubblicando gli eventi di modifica.
+ */
 public class RecensioneService {
 
     private final RecensioneDAO recensioneDAO = new RecensioneDAO();
     private final RemoteSubscriptionManager subscriptions;
 
+    /**
+     * Crea il servizio usando il gestore delle sottoscrizioni per notificare le modifiche.
+     *
+     * @param subscriptions gestore delle sottoscrizioni remote
+     */
     public RecensioneService(RemoteSubscriptionManager subscriptions) {
         this.subscriptions = subscriptions;
     }
 
+    /**
+     * Recupera le recensioni associate a un ristorante.
+     *
+     * @param idRistorante identificativo del ristorante; se nullo, non vengono restituiti risultati
+     * @return recensioni del ristorante, eventualmente vuoto
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public List<RecensioneDTO> ottieniPerRistorante(Integer idRistorante)
             throws SistemaIndisponibileException {
         if (idRistorante == null) {
@@ -38,6 +54,10 @@ public class RecensioneService {
     /**
      * Recupera le recensioni di un ristorante oscurando l'identità dell'autore.
      * Utilizzato per la visualizzazione da parte degli utenti non loggati (Guest).
+     *
+     * @param idRistorante identificativo del ristorante; se nullo, non vengono restituiti risultati
+     * @return recensioni del ristorante con il nome dell'autore oscurato, eventualmente vuoto
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
      */
     public List<RecensioneDTO> ottieniPerRistoranteAnonimo(Integer idRistorante)
             throws SistemaIndisponibileException {
@@ -63,6 +83,14 @@ public class RecensioneService {
                 .toList();
     }
 
+    /**
+     * Recupera le recensioni scritte da un utente.
+     *
+     * @param idUtente identificativo dell'utente
+     * @return recensioni dell'utente, eventualmente vuoto
+     * @throws SistemaIndisponibileException se l'identificativo è nullo o si verifica
+     *         un errore durante l'accesso al database
+     */
     public List<RecensioneDTO> ottieniPerUtente(Integer idUtente) throws SistemaIndisponibileException {
         if (idUtente == null) {
             throw new SistemaIndisponibileException();
@@ -75,6 +103,17 @@ public class RecensioneService {
         }
     }
 
+    /**
+     * Inserisce una recensione dopo aver verificato i dati e il ruolo cliente dell'autore.
+     *
+     * @param recensione contenuto e valutazione da inserire
+     * @param idRistorante identificativo del ristorante recensito
+     * @param idUtente identificativo dell'autore
+     * @throws DatiMancantiException se mancano dati obbligatori o la valutazione non è valida
+     * @throws OperazioneNonConsentitaException se l'utente non ha ruolo cliente
+     * @throws AzioneDuplicataException se l'utente ha già recensito il ristorante
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public void aggiungiRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws DatiMancantiException, OperazioneNonConsentitaException,
             AzioneDuplicataException, SistemaIndisponibileException {
@@ -107,6 +146,20 @@ public class RecensioneService {
         }
     }
 
+    /**
+     * Modifica testo e valutazione di una recensione usando il controllo di versione ottimistico.
+     *
+     * @param idRecensione identificativo della recensione
+     * @param idUtente identificativo dell'utente autore
+     * @param nuovoTesto nuovo testo non vuoto
+     * @param nuoveStelle nuova valutazione valida da 1 a 5, a passi di mezza stella
+     * @param versioneAttesa versione della recensione attesa dal client
+     * @throws DatiMancantiException se testo, identificativi o versione non sono validi
+     * @throws RecensioneNonTrovataException se la recensione non esiste o non appartiene all'utente
+     * @throws ModificaObsoletaException se la recensione è stata modificata dopo il caricamento
+     * @throws OperazioneNonConsentitaException se la valutazione non è valida
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public void modifica(Integer idRecensione, Integer idUtente, String nuovoTesto,
                          Double nuoveStelle, Integer versioneAttesa)
             throws DatiMancantiException, RecensioneNonTrovataException, ModificaObsoletaException,
@@ -149,6 +202,14 @@ public class RecensioneService {
                 && Math.abs(valutazione * 2 - Math.rint(valutazione * 2)) < 1e-9;
     }
 
+    /**
+     * Elimina una recensione se appartiene all'utente indicato e pubblica l'evento di modifica.
+     *
+     * @param idRecensione identificativo della recensione
+     * @param idUtente identificativo dell'utente autore
+     * @throws RecensioneNonTrovataException se la recensione non esiste o non appartiene all'utente
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public void elimina(Integer idRecensione, Integer idUtente)
             throws RecensioneNonTrovataException, SistemaIndisponibileException {
         try {
@@ -165,6 +226,17 @@ public class RecensioneService {
         }
     }
 
+    /**
+     * Aggiunge la risposta del gestore a una recensione e pubblica l'evento di modifica.
+     *
+     * @param idRecensione identificativo della recensione
+     * @param idGestore identificativo del gestore
+     * @param testoRisposta testo della risposta
+     * @throws DatiMancantiException se recensione, gestore o testo della risposta mancano
+     * @throws OperazioneNonConsentitaException se il gestore non può rispondere
+     *         o la recensione ha già una risposta
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
     public void aggiungiRisposta(Integer idRecensione, Integer idGestore, String testoRisposta)
             throws DatiMancantiException, OperazioneNonConsentitaException, SistemaIndisponibileException {
 
