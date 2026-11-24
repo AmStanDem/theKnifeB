@@ -47,7 +47,6 @@ public class RestaurantItemController {
      */
     public void setRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
-        System.out.println(ristorante.toString());
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));

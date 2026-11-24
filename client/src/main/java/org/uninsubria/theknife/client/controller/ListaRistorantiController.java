@@ -95,7 +95,6 @@ public class ListaRistorantiController {
      */
     @FXML
     public void initialize() {
-        System.out.println("[DEBUG] Inizializzazione ListaRistorantiController...");
         RicercaIniziale.Criteri criteri = RicercaIniziale.consuma();
         if (criteri != null) {
             searchField.setText(criteri.testo() == null ? "" : criteri.testo());
@@ -507,7 +506,6 @@ public class ListaRistorantiController {
     private void apriDettagliRistorante(RistoranteDTO r) {
         // The actual navigation happens in RestaurantItemController.onDetailsClicked().
         // This callback allows additional logic before navigation, if needed.
-        System.out.println("[NAV] Navigazione ai dettagli: " + r.nome());
     }
 
     /**

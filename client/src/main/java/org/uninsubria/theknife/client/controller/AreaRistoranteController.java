@@ -162,7 +162,6 @@ public class AreaRistoranteController {
     @FXML
     public void initialize() {
 
-        System.out.println("AreaRistoranteController inizializzato");
         boolean mostraRitornoMieiRistoranti =
                 RistoranteSelezionato.consumaRitornoAiMieiRistoranti();
         tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
@@ -183,7 +182,6 @@ public class AreaRistoranteController {
         ristorante = RistoranteSelezionato.getRistorante();
 
         if (ristorante != null) {
-            System.out.println("Ristorante selezionato: " + ristorante.nome());
             mostraDatiRistorante();
             aggiornaStatoPreferito();
             RemoteRefreshManager.subscribe(
@@ -211,7 +209,7 @@ public class AreaRistoranteController {
                         }, this::aggiornaStatoPreferito);
             }
         } else {
-            System.out.println("Nessun ristorante selezionato");
+            // Nessun ristorante selezionato: la vista resta vuota
         }
         boolean clienteLoggato = SessioneUtente.isCliente();
         aggiornaAzioniRecensione(clienteLoggato);
@@ -293,9 +291,7 @@ public class AreaRistoranteController {
         impostaLink(lblSitoWeb, ristorante.sitoWeb());
 
         lblCitta.setText(ristorante.citta());
-        System.out.println("citta: " + ristorante.citta());
         lblNazione.setText(ristorante.nazione());
-        System.out.println("citta: " + ristorante.nazione());
         lblFasciaPrezzo.setText(
                 ristorante.prezzoMedio() != null
                         ? (ristorante.prezzoStimato() ? "≈ " : "")
@@ -372,9 +368,6 @@ public class AreaRistoranteController {
      * del ristorante da parte del gestore autenticato.
      */
     private void caricaRecensioni() {
-        System.out.println("caricaRecensioni() chiamato");
-
-
         try {
             if (ristorante == null || ristorante.idRistorante() == null) {
                 return;
@@ -410,7 +403,6 @@ public class AreaRistoranteController {
      */
     private void mostraRecensioniFiltrate(boolean gestoreProprietario) {
         if (reviewContainer == null) {
-            System.out.println("ERRORE: reviewContainer è NULL");
             return;
         }
 
