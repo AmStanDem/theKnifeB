@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Menu a selezione multipla delle tipologie di cucina, con filtro testuale.
+ */
 public final class CuisineSelector extends MenuButton {
 
     private static final String PLACEHOLDER = "Tipo di cucina";
@@ -30,11 +33,21 @@ public final class CuisineSelector extends MenuButton {
     private final Set<String> selectedCuisines = new LinkedHashSet<>();
     private final List<CheckBox> cuisineCheckBoxes = new ArrayList<>();
 
+    /**
+     * Crea un selettore di cucine inizialmente vuoto.
+     */
     public CuisineSelector() {
         setText(PLACEHOLDER);
         getStyleClass().add("cuisine-selector");
     }
 
+    /**
+     * Imposta le tipologie di cucina disponibili nel menu.
+     * Le selezioni vengono mantenute solo se la tipologia è ancora disponibile.
+     * I valori {@code null} e vuoti vengono ignorati.
+     *
+     * @param cuisines tipologie di cucina da mostrare, oppure {@code null} per non mostrarne
+     */
     public void setCuisines(Collection<String> cuisines) {
         cuisineCheckBoxes.clear();
         VBox menuContent = new VBox(8);
@@ -107,6 +120,12 @@ public final class CuisineSelector extends MenuButton {
         aggiornaEtichetta();
     }
 
+    /**
+     * Imposta le tipologie selezionate e aggiorna le caselle visibili.
+     * I valori {@code null} e vuoti vengono ignorati.
+     *
+     * @param cuisines tipologie da selezionare, oppure {@code null} per azzerare la selezione
+     */
     public void setSelectedCuisines(Collection<String> cuisines) {
         selectedCuisines.clear();
         if (cuisines != null) {
@@ -120,10 +139,18 @@ public final class CuisineSelector extends MenuButton {
         aggiornaEtichetta();
     }
 
+    /**
+     * Restituisce le tipologie selezionate nell'ordine in cui sono state selezionate.
+     *
+     * @return copia non modificabile delle tipologie selezionate
+     */
     public List<String> getSelectedCuisines() {
         return List.copyOf(selectedCuisines);
     }
 
+    /**
+     * Deseleziona tutte le tipologie.
+     */
     public void clearSelection() {
         selectedCuisines.clear();
         cuisineCheckBoxes.forEach(checkBox -> checkBox.setSelected(false));

@@ -39,6 +39,11 @@ import java.util.Set;
 import java.util.Stack;
 
 // TODO: sistemare i bordi del testo in hover per x e - . credo sia un problema di ombre che però non sono riuscito a risolvere
+/**
+ * Gestisce la navigazione tra le viste JavaFX dell'applicazione.
+ * Carica le schermate FXML nel layout principale, conserva lo storico per ciascuno stage
+ * e configura la finestra principale e i relativi dialoghi a schermo intero.
+ */
 public class SceneManager {
 
     private static final Map<Stage, Stack<String>> historyMap = new HashMap<>();
@@ -54,38 +59,78 @@ public class SceneManager {
     private static final String GLOBAL_CSS = "/org/uninsubria/theknife/client/styles/style.css";
 
     /**
-     * Cambia vista ricavando lo Stage dall'evento (ActionEvent, MouseEvent, ecc.)
+     * Carica una vista FXML nello stage associato all'evento e registra la vista corrente
+     * nello storico di navigazione, se diversa dalla destinazione.
+     *
+     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
     public static void switchScene(Event event, String fxmlPath) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        switchScene(stage, fxmlPath);
+        switchScene(event, fxmlPath, true);
     }
 
     /**
-     * Ricava lo Stage associato a un evento JavaFX.
+     * Carica una vista FXML nello stage associato all'evento, scegliendo se aggiungere
+     * la vista corrente allo storico di navigazione.
+     *
+     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @param saveToHistory {@code true} per salvare la vista corrente nello storico
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
+     */
+    public static void switchScene(Event event, String fxmlPath, boolean saveToHistory) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        switchSceneAndGetController(stage, fxmlPath, saveToHistory);
+    }
+
+    /**
+     * Restituisce lo stage della finestra che contiene la sorgente dell'evento.
+     *
+     * @param event evento JavaFX associato a un nodo di una scena
+     * @return stage che contiene il nodo sorgente dell'evento
      */
     public static Stage getStage(Event event) {
         return (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 
     /**
-     * Cambia la root della scena corrente sullo Stage specificato.
+     * Carica una vista FXML nello stage specificato e salva la vista corrente nello storico,
+     * se diversa dalla destinazione.
+     *
+     * @param stage stage in cui caricare la vista
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
     public static void switchScene(Stage stage, String fxmlPath) {
         switchSceneAndGetController(stage, fxmlPath, true);
     }
 
     /**
-     * Cambia la scena mantenendo la finestra principale a schermo intero.
+     * Carica una vista FXML nello stage specificato, mantenendo la finestra principale
+     * a schermo intero, e restituisce il controller della vista caricata.
+     *
+     * @param stage stage in cui caricare la vista
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @param <T> tipo del controller della vista
+     * @return controller associato alla vista caricata
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
     public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath) {
         return switchSceneAndGetController(stage, fxmlPath, true);
     }
 
     /**
-     * Metodo interno sovraccarico per gestire il salvataggio nello storico.
+     * Carica una vista FXML nello stage, la inserisce nel layout principale e restituisce
+     * il relativo controller. La vista precedente viene aggiunta allo storico solo se
+     * {@code saveToHistory} è {@code true} e la destinazione è diversa.
      *
-     * @param saveToHistory Se true, salva la pagina precedente nello stack. Se false (es. durante il "Back"), evita i loop.
+     * @param stage stage in cui caricare la vista
+     * @param fxmlPath percorso assoluto della risorsa FXML da caricare
+     * @param saveToHistory {@code true} per salvare la vista corrente nello storico
+     * @param <T> tipo del controller della vista
+     * @return controller associato alla vista caricata
+     * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
     public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath, boolean saveToHistory) {
         setApplicationStage(stage);
@@ -132,17 +177,32 @@ public class SceneManager {
         }
     }
 
+    /**
+     * Imposta lo stage dell'applicazione come proprietario del dialogo, se già configurato.
+     *
+     * @param dialog dialogo a cui assegnare lo stage proprietario
+     */
     public static void initOwner(Dialog<?> dialog) {
         if (applicationStage != null) {
             dialog.initOwner(applicationStage);
         }
     }
 
+    /**
+     * Imposta lo stage principale dell'applicazione e ne configura le proprietà della finestra.
+     *
+     * @param stage stage principale dell'applicazione
+     */
     public static void setApplicationStage(Stage stage) {
         applicationStage = stage;
         configuraStagePrincipale(stage);
     }
 
+    /**
+     * Attiva la modalità a schermo intero se lo stage è visibile e non è già a schermo intero.
+     *
+     * @param stage stage da visualizzare a schermo intero
+     */
     public static void avviaFullscreen(Stage stage) {
         if (stage.isShowing() && !stage.isFullScreen()) {
             stage.setFullScreen(true);
@@ -325,7 +385,9 @@ public class SceneManager {
     }
 
     /**
-     * Torna alla schermata precedente usando lo Stage ricavato dall'evento.
+     * Torna alla vista precedente nello storico dello stage associato all'evento.
+     *
+     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
      */
     public static void goBack(Event event) {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -333,7 +395,9 @@ public class SceneManager {
     }
 
     /**
-     * Torna alla schermata precedente sullo Stage specificato.
+     * Torna alla vista precedente nello storico dello stage specificato, se disponibile.
+     *
+     * @param stage stage per cui ripristinare la vista precedente
      */
     public static void goBack(Stage stage) {
         Stack<String> history = historyMap.get(stage);
@@ -347,13 +411,21 @@ public class SceneManager {
         }
     }
 
+    /**
+     * Indica se per lo stage è disponibile una vista precedente nello storico.
+     *
+     * @param stage stage di cui verificare lo storico
+     * @return {@code true} se è possibile tornare a una vista precedente
+     */
     public static boolean hasPreviousPage(Stage stage) {
         Stack<String> history = historyMap.get(stage);
         return history != null && !history.isEmpty();
     }
 
     /**
-     * Pulisce lo storico (utile ad esempio quando si fa il Logout o si torna al Menu Principale).
+     * Svuota lo storico di navigazione dello stage e rimuove la vista corrente registrata.
+     *
+     * @param stage stage di cui azzerare lo stato di navigazione
      */
     public static void clearHistory(Stage stage) {
         if (historyMap.containsKey(stage)) {
@@ -362,9 +434,6 @@ public class SceneManager {
         currentFxmlMap.remove(stage);
     }
 
-    /**
-     * Helper privato per applicare il CSS globale se presente.
-     */
     private static void applyCssIfAvailable(Scene scene) {
         if (SceneManager.class.getResource(GLOBAL_CSS) != null) {
             scene.getStylesheets().add(SceneManager.class.getResource(GLOBAL_CSS).toExternalForm());

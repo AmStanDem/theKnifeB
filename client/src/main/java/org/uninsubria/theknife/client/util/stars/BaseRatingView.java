@@ -16,9 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Superclasse base per il rendering delle stelle di valutazione.
- * Le stelle vengono create UNA SOLA VOLTA; per aggiornare la grafica
- * si cambia soltanto il riempimento (paintStars), senza ricreare i nodi.
+ * Vista base JavaFX per visualizzare una valutazione tramite cinque stelle.
+ * Le stelle vengono create una sola volta e aggiornate cambiandone il riempimento.
  */
 public class BaseRatingView extends HBox {
 
@@ -32,6 +31,11 @@ public class BaseRatingView extends HBox {
 
     protected final List<SVGPath> stars = new ArrayList<>();
 
+    /**
+     * Crea la vista delle stelle con la valutazione iniziale specificata.
+     *
+     * @param initialRating valutazione iniziale, limitata all'intervallo da 0 a 5
+     */
     public BaseRatingView(double initialRating) {
         this.rating = initialRating;
         setSpacing(6);
@@ -52,7 +56,11 @@ public class BaseRatingView extends HBox {
         }
     }
 
-    /** Aggiorna solo il colore delle stelle esistenti. */
+    /**
+     * Aggiorna il riempimento delle stelle esistenti in base alla valutazione.
+     *
+     * @param targetRating valutazione da rappresentare
+     */
     protected void paintStars(double targetRating) {
         for (int i = 1; i <= maxStars; i++) {
             SVGPath star = stars.get(i - 1);
@@ -66,6 +74,12 @@ public class BaseRatingView extends HBox {
         }
     }
 
+    /**
+     * Crea un gradiente per rappresentare una stella parzialmente riempita.
+     *
+     * @param filledFraction frazione della stella da riempire
+     * @return gradiente che combina il colore pieno e quello vuoto
+     */
     protected LinearGradient createPartialGradient(double filledFraction) {
         return new LinearGradient(
                 0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
@@ -76,17 +90,33 @@ public class BaseRatingView extends HBox {
         );
     }
 
+    /**
+     * Imposta la valutazione visualizzata.
+     *
+     * @param rating valutazione da visualizzare, limitata all'intervallo da 0 a 5
+     */
     public void setRating(double rating) {
         this.rating = Math.clamp(rating, 0.0, maxStars);
         paintStars(this.rating);
     }
 
+    /**
+     * Imposta i colori usati per le porzioni piene e vuote delle stelle.
+     *
+     * @param filled colore delle porzioni piene
+     * @param empty colore delle porzioni vuote
+     */
     public void setColors(Color filled, Color empty) {
         this.filledColor = filled;
         this.emptyColor = empty;
         paintStars(rating);
     }
 
+    /**
+     * Restituisce la valutazione attualmente visualizzata.
+     *
+     * @return valutazione compresa tra 0 e 5
+     */
     public double getRating() {
         return rating;
     }

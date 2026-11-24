@@ -49,14 +49,31 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+/**
+ * Utility per mostrare un dialogo modale di selezione della località tramite ricerca
+ * testuale o mappa OpenStreetMap.
+ */
 public final class SelettoreLuogoDialog {
 
     private static final ButtonType CONFERMA = new ButtonType(
             "Usa questo luogo", ButtonBar.ButtonData.OK_DONE);
 
+    /**
+     * Impedisce l'istanziazione della classe di utilità.
+     */
     private SelettoreLuogoDialog() {
     }
 
+    /**
+     * Mostra il dialogo di selezione della località.
+     * È possibile cercare una località per testo oppure selezionare il punto al centro
+     * della mappa; la conferma restituisce il luogo selezionato.
+     *
+     * @param owner finestra proprietaria del dialogo, oppure {@code null} per usare
+     *              lo stage principale configurato
+     * @param luogoIniziale località iniziale della mappa e della selezione, oppure {@code null}
+     * @return località selezionata se il dialogo viene confermato, altrimenti {@link Optional#empty()}
+     */
     public static Optional<GeocodingService.Luogo> mostra(
             Window owner,
             GeocodingService.Luogo luogoIniziale
