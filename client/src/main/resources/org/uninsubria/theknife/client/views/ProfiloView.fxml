@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.uninsubria.theknife.client.util.LuogoInput?>
+<?import org.uninsubria.theknife.client.util.components.DataNascitaInput?>
+
+<BorderPane prefHeight="768.0"
+            prefWidth="1024.0"
+            styleClass="root"
+            stylesheets="@../styles/areaUtente.css"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.uninsubria.theknife.client.controller.ProfiloController">
+
+    <center>
+        <StackPane alignment="CENTER">
+
+            <children>
+
+                <!-- ========================= -->
+                <!-- SEZIONE PROFILO -->
+                <!-- ========================= -->
+
+                <VBox fx:id="sezioneProfilo"
+                      alignment="CENTER"
+                      spacing="15.0"
+                      maxWidth="550.0"
+                      visible="true"
+                      managed="true">
+
+                    <!-- TITOLO -->
+                    <Label text="Il mio profilo"
+                           styleClass="profile-title" />
+
+                    <!-- INFORMAZIONI UTENTE -->
+                    <VBox spacing="10.0"
+                          styleClass="profile-container">
+
+                        <!-- NOME -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Nome:"
+                                   styleClass="profile-label" />
+                            <Label fx:id="lblNome"
+                                   text="-"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                        <!-- COGNOME -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Cognome:"
+                                   styleClass="profile-label" />
+                            <Label fx:id="lblCognome"
+                                   text="-"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                        <!-- DATA DI NASCITA -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Data di nascita:"
+                                   styleClass="profile-label" />
+                            <Label fx:id="lblData"
+                                   text="-"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                        <!-- DOMICILIO -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Domicilio:"
+                                   styleClass="profile-label" />
+                            <Label fx:id="lblDomicilio"
+                                   text="-"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                        <!-- RUOLO -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="Ruolo:"
+                                   styleClass="profile-label" />
+                            <Label fx:id="lblRuolo"
+                                   text="-"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                        <!-- EMAIL -->
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <Label text="E-mail:"
+                                   styleClass="profile-label" />
+                            <Label fx:id="lblEmail"
+                                   text="-"
+                                   styleClass="profile-value" />
+                        </HBox>
+
+                    </VBox>
+
+                    <!-- SPAZIO -->
+                    <Region prefHeight="10.0" />
+
+                    <!-- PULSANTI CLIENTE -->
+                    <Button fx:id="btnPreferiti"
+                            mnemonicParsing="false"
+                            onAction="#onPreferitiClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="I miei ristoranti preferiti" />
+
+                    <Button fx:id="btnRecensioni"
+                            mnemonicParsing="false"
+                            onAction="#onRecensioniClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="Le mie recensioni" />
+
+                    <!-- PULSANTI RISTORATORE -->
+                    <Button fx:id="btnRistoranti"
+                            mnemonicParsing="false"
+                            onAction="#onRistorantiClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="I miei ristoranti" />
+
+                    <Button fx:id="btnAggiungi"
+                            mnemonicParsing="false"
+                            onAction="#onAggiungiClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="Aggiungi ristorante" />
+
+                    <Button fx:id="btnModificaCredenziali"
+                            mnemonicParsing="false"
+                            onAction="#onModificaCredenzialiClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-button"
+                            text="Modifica credenziali"
+                            visible="false"
+                            managed="false" />
+
+                    <Button mnemonicParsing="false"
+                            onAction="#onLogOutClick"
+                            prefHeight="55.0"
+                            prefWidth="500.0"
+                            styleClass="profile-logout-button"
+                            text="Esci dall'account" />
+
+                </VBox>
+
+                <!-- ========================= -->
+                <!-- SEZIONE MODIFICA -->
+                <!-- ========================= -->
+
+                <VBox fx:id="sezioneModifica"
+                      alignment="CENTER"
+                      maxWidth="720.0"
+                      maxHeight="740.0"
+                      visible="false"
+                      managed="false">
+
+                    <ScrollPane fitToWidth="true"
+                                hbarPolicy="NEVER"
+                                styleClass="form-scroll-pane">
+                        <content>
+                            <VBox alignment="TOP_LEFT"
+                                  spacing="16.0"
+                                  styleClass="form-body">
+                                <padding>
+                                    <Insets top="32.0" right="40.0" bottom="32.0" left="40.0"/>
+                                </padding>
+
+                                <VBox spacing="4.0">
+                                    <Label text="Modifica account"
+                                           styleClass="form-title"/>
+                                    <Label text="Aggiorna i tuoi dati personali. Il ruolo non può essere modificato."
+                                           styleClass="form-subtitle" wrapText="true"/>
+                                </VBox>
+
+                                <HBox spacing="16.0">
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Nome *" styleClass="input-label"/>
+                                        <TextField fx:id="nomeField"
+                                                   styleClass="custom-text-field"
+                                                   promptText="Nome"/>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Cognome *" styleClass="input-label"/>
+                                        <TextField fx:id="cognomeField"
+                                                   styleClass="custom-text-field"
+                                                   promptText="Cognome"/>
+                                    </VBox>
+                                </HBox>
+
+                                <VBox spacing="5.0">
+                                    <Label text="E-mail *" styleClass="input-label"/>
+                                    <TextField fx:id="emailField"
+                                               styleClass="custom-text-field"
+                                               promptText="nome@esempio.it"/>
+                                </VBox>
+
+                                <HBox spacing="16.0">
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Data di nascita (opzionale)" styleClass="input-label"/>
+                                        <DataNascitaInput fx:id="dataNascitaField" prefHeight="40.0"/>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <Label text="Domicilio *" styleClass="input-label"/>
+                                        <LuogoInput fx:id="domicilioField" prefHeight="40.0"
+                                                    promptText="Inizia a scrivere e seleziona un luogo"/>
+                                    </VBox>
+                                </HBox>
+
+                                <Separator/>
+                                <Label text="Per salvare le modifiche, conferma la password attuale."
+                                       styleClass="form-subtitle" wrapText="true"/>
+                                <VBox spacing="5.0">
+                                    <Label text="Password attuale *" styleClass="input-label"/>
+                                    <PasswordField fx:id="passwordCorrenteField" styleClass="custom-text-field"
+                                                   promptText="Password necessaria per confermare"/>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <Label text="Nuova password (facoltativa)" styleClass="input-label"/>
+                                    <PasswordField fx:id="nuovaPasswordField" styleClass="custom-text-field"
+                                                   promptText="Lascia vuoto per mantenerla invariata"/>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <Label text="Conferma nuova password" styleClass="input-label"/>
+                                    <PasswordField fx:id="confermaPasswordField" styleClass="custom-text-field"
+                                                   promptText="Ripeti la nuova password"/>
+                                </VBox>
+                                <Label text="La nuova password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale."
+                                       styleClass="form-subtitle" wrapText="true"/>
+                                <Label fx:id="messaggioLabel" wrapText="true" styleClass="account-message"/>
+                                <HBox alignment="CENTER" spacing="15.0">
+                                    <padding>
+                                        <Insets top="8.0"/>
+                                    </padding>
+                                    <Button fx:id="btnAnnulla"
+                                            text="Annulla"
+                                            onAction="#onAnnullaModifica"
+                                            prefHeight="45.0" prefWidth="180.0"
+                                            styleClass="btn-secondary"/>
+                                    <Button fx:id="btnSalva"
+                                            text="Salva modifiche"
+                                            onAction="#onSalvaModifica"
+                                            prefHeight="45.0" prefWidth="220.0"
+                                            styleClass="btn-primary"/>
+                                </HBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+
+                </VBox>
+
+            </children>
+
+        </StackPane>
+    </center>
+
+</BorderPane>

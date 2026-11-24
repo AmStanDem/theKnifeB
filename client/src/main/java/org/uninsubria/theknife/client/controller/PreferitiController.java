@@ -9,15 +9,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
+import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
@@ -126,12 +129,17 @@ public class PreferitiController {
      */
     private Node creaCardRistorante(RistoranteDTO ristorante) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/PreferitoItem.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RistoranteItem.fxml"));
             Pane cardPane = loader.load();
 
-            PreferitoItemController controller = loader.getController();
+            RistoranteItemController controller = loader.getController();
             controller.setRistorante(ristorante);
             controller.setOnRemoveFavoriteAction(this::rimuoviPreferito);
+            controller.setOnDettagliAction(r -> {
+                RistoranteSelezionato.setRistorante(r);
+                Stage stage = (Stage) cardPane.getScene().getWindow();
+                SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
+            });
 
             return cardPane;
 

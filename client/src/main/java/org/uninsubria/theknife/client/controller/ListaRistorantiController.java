@@ -544,10 +544,10 @@ public class ListaRistorantiController {
      */
     private Node creaCardRistorante(RistoranteDTO r) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RestaurantItem.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RistoranteItem.fxml"));
             Pane card = loader.load();
 
-            RestaurantItemController controller = loader.getController();
+            RistoranteItemController controller = loader.getController();
             controller.setRistorante(r);
             controller.setOnDettagliAction(this::apriDettagliRistorante);
 

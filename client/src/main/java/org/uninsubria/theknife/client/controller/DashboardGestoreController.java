@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
@@ -27,21 +28,18 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 /**
- * Controller JavaFX della lista dei ristoranti gestiti da un ristoratore.
+ * Controller JavaFX della dashboard del gestore.
  * <p>
- * Verifica che l'utente autenticato abbia il ruolo di gestore, recupera i
- * ristoranti associati al suo account tramite RMI e crea una card per ogni
- * ristorante utilizzando la relativa vista FXML.
- * </p>
- * <p>
- * La vista permette di aprire i dettagli e accedere alla modifica di un
- * ristorante, oltre a tornare al profilo o alla schermata di inserimento.
+ * Mostra in un'unica schermata il profilo del gestore (nome, cognome, email, ruolo)
+ * nella parte superiore e la lista dei ristoranti gestiti nella parte inferiore.
+ * Consente di aggiungere, modificare e visualizzare i dettagli dei ristoranti,
+ * nonche' di accedere al profilo utente e di effettuare il logout.
  * </p>
  */
-public class ListaRistorantiGestoreController {
+public class DashboardGestoreController {
 
     private static final String VISTA_PROFILO =
-            "/org/uninsubria/theknife/client/views/AreaPersonale.fxml";
+            "/org/uninsubria/theknife/client/views/ProfiloView.fxml";
 
     @FXML
     private Label resultsCountLabel;
@@ -52,12 +50,24 @@ public class ListaRistorantiGestoreController {
     @FXML
     private VBox restaurantContainer;
 
+    @FXML
+    private Label lblNome;
+
+    @FXML
+    private Label lblCognome;
+
+    @FXML
+    private Label lblRuolo;
+
+    @FXML
+    private Label lblEmail;
+
     /**
-     * Inizializza la lista dei ristoranti del gestore autenticato.
+     * Inizializza la dashboard del gestore.
      * <p>
-     * Verifica il ruolo dell'utente corrente. Se l'accesso non è valido,
-     * mostra uno stato vuoto e un avviso; altrimenti carica i ristoranti e
-     * attiva l'aggiornamento automatico del catalogo.
+     * Verifica il ruolo dell'utente corrente, popola i dati del profilo,
+     * carica i ristoranti associati e attiva l'aggiornamento automatico
+     * del catalogo.
      * </p>
      */
     @FXML
@@ -65,9 +75,14 @@ public class ListaRistorantiGestoreController {
         UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
         if (gestore == null || !SessioneUtente.isGestore()) {
             emptyStateLabel.setText("Accedi come ristoratore per visualizzare i tuoi ristoranti.");
-            showError("Accesso non consentito", "Questa pagina è riservata ai ristoratori.");
+            showError("Accesso non consentito", "Questa pagina e' riservata ai ristoratori.");
             return;
         }
+
+        lblNome.setText(gestore.nome());
+        lblCognome.setText(gestore.cognome());
+        lblRuolo.setText(gestore.ruolo().name());
+        lblEmail.setText(gestore.email());
 
         caricaRistoranti(gestore);
         RemoteRefreshManager.subscribe(
@@ -103,27 +118,28 @@ public class ListaRistorantiGestoreController {
             emptyStateLabel.setManaged(false);
             for (RistoranteDTO ristorante : ristoranti) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                        "/org/uninsubria/theknife/client/views/RestaurantItem.fxml"));
+                        "/org/uninsubria/theknife/client/views/RistoranteItem.fxml"));
                 Node card = loader.load();
-                RestaurantItemController controller = loader.getController();
+                RistoranteItemController controller = loader.getController();
                 controller.setRistorante(ristorante);
-                controller.setOnDettagliAction(ristoranteSelezionato ->
-                        RistoranteSelezionato.setRitornoAiMieiRistoranti(true));
+                controller.setOnDettagliAction(ristoranteSelezionato -> {
+                    RistoranteSelezionato.setRitornoAiMieiRistoranti(true);
+                });
                 controller.setOnModificaAction((event, ristoranteSelezionato) -> {
                     RistoranteSelezionato.setRistorante(ristoranteSelezionato);
                     SceneManager.switchScene(event,
-                            "/org/uninsubria/theknife/client/views/ModificaRistorante.fxml");
+                            "/org/uninsubria/theknife/client/views/FormRistorante.fxml");
                 });
                 restaurantContainer.getChildren().add(card);
             }
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             resultsCountLabel.setText("Impossibile caricare i ristoranti.");
             showError("Errore di connessione",
-                    "Non è stato possibile recuperare i ristoranti associati al tuo account.");
+                    "Non e' stato possibile recuperare i ristoranti associati al tuo account.");
         } catch (IOException e) {
             resultsCountLabel.setText("Impossibile visualizzare i ristoranti.");
             showError("Errore di visualizzazione",
-                    "Non è stato possibile caricare la scheda di un ristorante.");
+                    "Non e' stato possibile caricare la scheda di un ristorante.");
         }
     }
 
@@ -144,13 +160,25 @@ public class ListaRistorantiGestoreController {
      */
     @FXML
     private void onAggiungiClick(ActionEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/AggiungiRistorante.fxml");
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/FormRistorante.fxml");
+    }
+
+    /**
+     * Effettua il logout dell'utente corrente e torna alla schermata principale.
+     *
+     * @param event evento JavaFX usato per cambiare scena
+     */
+    @FXML
+    private void onLogOutClick(ActionEvent event) {
+        SceneManager.clearHistory(SceneManager.getStage(event));
+        SessioneUtente.logout();
+        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 
     /**
      * Visualizza una finestra di errore configurabile.
      *
-     * @param titolo titolo della finestra
+     * @param titolo    titolo della finestra
      * @param messaggio descrizione dell'errore da mostrare
      */
     private void showError(String titolo, String messaggio) {

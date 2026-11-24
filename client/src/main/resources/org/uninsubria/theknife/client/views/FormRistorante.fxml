@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
@@ -13,7 +14,7 @@
 <?import org.uninsubria.theknife.client.util.LuogoInput?>
 <?import org.uninsubria.theknife.client.util.components.CuisineSelector?>
 
-<StackPane prefHeight="768.0" prefWidth="1024.0" styleClass="root-pane" stylesheets="@../styles/registraRistorante.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.AggiungiRistoranteController">
+<StackPane prefHeight="768.0" prefWidth="1024.0" styleClass="root-pane" stylesheets="@../styles/registraRistorante.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.uninsubria.theknife.client.controller.FormRistoranteController">
 
     <!-- Card bianca centrale contenente il Form -->
     <VBox alignment="CENTER" maxWidth="650.0" maxHeight="700.0" styleClass="card-container">
@@ -29,6 +30,14 @@
                     <VBox spacing="4.0">
                         <Label styleClass="form-title" text="Registra Ristorante" />
                         <Label styleClass="form-subtitle" text="Inserisci i dettagli della tua attività su TheKnife" />
+                    </VBox>
+
+                    <!-- Selezione ristorante (solo modifica) -->
+                    <VBox fx:id="containerRistoranti" spacing="5.0">
+                        <Label styleClass="input-label" text="Ristorante da modificare *" />
+                        <ComboBox fx:id="comboRistoranti" maxWidth="Infinity"
+                                  promptText="Seleziona un ristorante"
+                                  styleClass="custom-check-combo" />
                     </VBox>
 
                     <!-- Nome Ristorante -->
@@ -80,7 +89,6 @@
                                   styleClass="custom-text-field" wrapText="true" />
                     </VBox>
 
-
                     <!-- Tipologie di Cucina -->
                     <VBox spacing="5.0">
                         <Label styleClass="input-label" text="Tipologie di Cucina *" />
@@ -98,13 +106,14 @@
                         </HBox>
                     </VBox>
 
-                    <!-- Pulsanti Invia / Annulla -->
+                    <!-- Pulsanti Salva / Elimina / Annulla -->
                     <HBox alignment="CENTER" spacing="15.0">
                         <padding>
                             <Insets top="10.0" />
                         </padding>
                         <Button fx:id="btnAnnulla" mnemonicParsing="false" onAction="#onAnnullaClick" prefHeight="45.0" prefWidth="180.0" styleClass="btn-secondary" text="Annulla" />
                         <Button fx:id="btnSalva" mnemonicParsing="false" onAction="#onSalvaClick" prefHeight="45.0" prefWidth="220.0" styleClass="btn-primary" text="Salva Ristorante" />
+                        <Button fx:id="btnElimina" mnemonicParsing="false" onAction="#onEliminaClick" prefHeight="45.0" prefWidth="160.0" styleClass="btn-delete" text="Elimina ristorante" />
                     </HBox>
 
                 </VBox>

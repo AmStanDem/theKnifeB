@@ -95,7 +95,7 @@ public class BaseLayoutController {
     private void onAreaPersonaleClick(ActionEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/theknife/client/views/LoginView.fxml"
+                "/org/uninsubria/theknife/client/views/AuthView.fxml"
         );
     }
 
@@ -108,7 +108,7 @@ public class BaseLayoutController {
     private void onAreaPersonaleLoggatoClick(MouseEvent event) {
         SceneManager.switchScene(
                 event,
-                "/org/uninsubria/theknife/client/views/AreaPersonale.fxml"
+                "/org/uninsubria/theknife/client/views/ProfiloView.fxml"
         );
     }
 

@@ -290,7 +290,7 @@ public class RecensioneItemController {
                 && !rispostaPresente && recensione != null
                 && recensione.idRecensione() != null) {
             RecensioneDaRispondere.imposta(recensione);
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/RispondiRecensione.fxml");
+            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
         }
     }
 

@@ -14,17 +14,19 @@ import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Controller JavaFX della card di un ristorante presente nei preferiti.
+ * Controller JavaFX della card che rappresenta un ristorante in una lista.
  * <p>
- * Visualizza nome, indirizzo, descrizione, valutazione, tipologie di cucina,
- * prezzo medio e disponibilità dei servizi. Espone inoltre le azioni per
- * aprire i dettagli e rimuovere il ristorante dai preferiti.
+ * Visualizza i dati essenziali del ristorante, inclusi nome, indirizzo,
+ * valutazione, cucina, prezzo medio e servizi disponibili. Espone callback
+ * configurabili per le azioni di apertura dei dettagli, modifica e rimozione
+ * dai preferiti.
  * </p>
  */
-public class PreferitoItemController {
+public class RistoranteItemController {
 
     @FXML private Label nameLabel;
     @FXML private Label ratingValueLabel;
@@ -35,23 +37,28 @@ public class PreferitoItemController {
     @FXML private Label deliveryTag;
     @FXML private Label bookingTag;
     @FXML private Button detailsButton;
+    @FXML private Button editButton;
+    @FXML private Button removeButton;
 
     private RistoranteDTO ristorante;
+    private Consumer<RistoranteDTO> onDettagliAction;
+    private BiConsumer<ActionEvent, RistoranteDTO> onModificaAction;
     private Consumer<RistoranteDTO> onRemoveFavoriteAction;
 
     /**
-     * Popola la card con i dati del ristorante preferito.
+     * Popola la card con i dati del ristorante.
      *
      * @param ristorante ristorante da visualizzare
      */
     public void setRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
-
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
-        descriptionLabel.setText(ristorante.descrizione() == null || ristorante.descrizione().isBlank()
-                ? "Descrizione non disponibile."
-                : ristorante.descrizione().trim());
+        if (descriptionLabel != null) {
+            descriptionLabel.setText(ristorante.descrizione() == null || ristorante.descrizione().isBlank()
+                    ? "Descrizione non disponibile."
+                    : ristorante.descrizione().trim());
+        }
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
         CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
         metaLabel.setText(formattaMeta(ristorante.prezzoMedio(), ristorante.prezzoStimato()));
@@ -61,18 +68,44 @@ public class PreferitoItemController {
     }
 
     /**
-     * Imposta l'azione da eseguire per rimuovere il ristorante dai preferiti.
+     * Imposta l'azione da eseguire quando viene richiesto di aprire i dettagli.
      *
-     * @param onRemoveFavoriteAction azione chiamata con il ristorante da rimuovere
+     * @param onDettagliAction callback invocata con il ristorante selezionato
+     */
+    public void setOnDettagliAction(Consumer<RistoranteDTO> onDettagliAction) {
+        this.onDettagliAction = onDettagliAction;
+    }
+
+    /**
+     * Imposta l'azione di modifica e aggiorna la visibilità del relativo pulsante.
+     *
+     * @param onModificaAction callback che riceve l'evento e il ristorante;
+     *                         se {@code null}, il pulsante viene nascosto
+     */
+    public void setOnModificaAction(BiConsumer<ActionEvent, RistoranteDTO> onModificaAction) {
+        this.onModificaAction = onModificaAction;
+        editButton.setVisible(onModificaAction != null);
+        editButton.setManaged(onModificaAction != null);
+    }
+
+    /**
+     * Imposta l'azione di rimozione dai preferiti e aggiorna la visibilità
+     * del relativo pulsante.
+     *
+     * @param onRemoveFavoriteAction callback invocata con il ristorante da rimuovere;
+     *                               se {@code null}, il pulsante viene nascosto
      */
     public void setOnRemoveFavoriteAction(Consumer<RistoranteDTO> onRemoveFavoriteAction) {
         this.onRemoveFavoriteAction = onRemoveFavoriteAction;
+        removeButton.setVisible(onRemoveFavoriteAction != null);
+        removeButton.setManaged(onRemoveFavoriteAction != null);
     }
 
     /**
      * Gestisce il click sul pulsante dei dettagli.
      * <p>
-     * Memorizza il ristorante selezionato e apre la vista del ristorante.
+     * Memorizza il ristorante selezionato e invoca l'eventuale callback
+     * configurata.
      * </p>
      *
      * @param actionEvent evento JavaFX usato per cambiare scena
@@ -83,11 +116,36 @@ public class PreferitoItemController {
             return;
         }
         RistoranteSelezionato.setRistorante(ristorante);
+        if (onDettagliAction != null) {
+            onDettagliAction.accept(ristorante);
+        }
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
     }
 
     /**
-     * Mostra o nasconde un tag relativo ai servizi disponibili.
+     * Gestisce il click sul pulsante di modifica.
+     *
+     * @param actionEvent evento generato dal click sul pulsante
+     */
+    @FXML
+    private void onEditClicked(ActionEvent actionEvent) {
+        if (ristorante != null && onModificaAction != null) {
+            onModificaAction.accept(actionEvent, ristorante);
+        }
+    }
+
+    /**
+     * Gestisce il click sul pulsante di rimozione dai preferiti.
+     */
+    @FXML
+    private void onRemoveClicked() {
+        if (onRemoveFavoriteAction != null && ristorante != null) {
+            onRemoveFavoriteAction.accept(ristorante);
+        }
+    }
+
+    /**
+     * Mostra o nasconde un tag relativo ai servizi del ristorante.
      *
      * @param tagLabel etichetta da aggiornare
      * @param visibile {@code true} per mostrare il tag
@@ -111,10 +169,10 @@ public class PreferitoItemController {
     }
 
     /**
-     * Formatta il prezzo medio e il relativo indicatore di stima.
+     * Formatta il prezzo medio e l'eventuale indicazione che sia stimato.
      *
      * @param prezzoMedio prezzo medio del ristorante
-     * @param prezzoStimato indica se il prezzo è stimato
+     * @param prezzoStimato indica se il prezzo è una stima
      * @return testo descrittivo del prezzo medio
      */
     private String formattaMeta(Double prezzoMedio, boolean prezzoStimato) {
@@ -122,19 +180,5 @@ public class PreferitoItemController {
                 ? (prezzoStimato ? "≈ " : "") + String.format("%.0f €", prezzoMedio)
                 : "n.d.";
         return "Prezzo medio " + prezzo;
-    }
-
-    /**
-     * Gestisce il click sul pulsante di rimozione dai preferiti.
-     * <p>
-     * Richiama l'azione configurata dal controller padre passando il ristorante
-     * corrente.
-     * </p>
-     */
-    @FXML
-    private void onRemoveFavoriteClicked() {
-        if (onRemoveFavoriteAction != null && ristorante != null) {
-            onRemoveFavoriteAction.accept(ristorante);
-        }
     }
 }
