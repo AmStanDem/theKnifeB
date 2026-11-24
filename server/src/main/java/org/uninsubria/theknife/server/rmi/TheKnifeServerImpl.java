@@ -19,7 +19,7 @@ import java.util.UUID;
 public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
 
     private final RemoteSubscriptionManager subscriptions = new RemoteSubscriptionManager();
-    private final UtenteService utenteService = new UtenteService();
+    private final UtenteService utenteService = new UtenteService(subscriptions);
     private final RistoranteService ristoranteService = new RistoranteService(subscriptions);
     private final RecensioneService recensioneService = new RecensioneService(subscriptions);
     private final PreferitiService preferitiService = new PreferitiService(subscriptions);

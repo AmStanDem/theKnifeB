@@ -505,7 +505,9 @@ public class ListaRistorantiController {
      * @param r ristorante selezionato
      */
     private void apriDettagliRistorante(RistoranteDTO r) {
-        System.out.println("Apertura dettagli: " + r.nome());
+        // The actual navigation happens in RestaurantItemController.onDetailsClicked().
+        // This callback allows additional logic before navigation, if needed.
+        System.out.println("[NAV] Navigazione ai dettagli: " + r.nome());
     }
 
     /**
