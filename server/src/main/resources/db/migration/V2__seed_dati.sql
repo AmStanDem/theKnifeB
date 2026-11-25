@@ -7,12 +7,12 @@
 -- ==============================================================================
 -- 1. UTENTI
 -- ==============================================================================
--- Password comune per gli utenti di prova: password123
+-- Password comune per gli utenti di prova: KnifeDemo2026!
 INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES
-                                                                                        ('massimo.bottura@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Massimo', 'Bottura', '1962-09-30', 'Modena', 'gestore'),
-                                                                                        ('gordon.ramsay@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Gordon', 'Ramsay', '1966-11-08', 'Londra', 'gestore'),
-                                                                                        ('mario.rossi@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Mario', 'Rossi', '2001-05-20', 'Milano', 'cliente'),
-                                                                                        ('alberto.cliente@theknife.it', '$2a$12$mJR.c1CEAmmovy.fdnaO4OkPAm6AS3Q7.Tz1HlFO7/6HOf2Wj5Vwm', 'Alberto', 'Neri', '1999-03-12', 'Varese', 'cliente');
+                                                                                        ('massimo.bottura@theknife.it', '$2a$12$P6HgPeYeu6PTByZZ3VNZ0Oetrc.0GTnMbv6NtwVBxnnIQknUKMk5m', 'Massimo', 'Bottura', '1962-09-30', 'Modena', 'gestore'),
+                                                                                        ('gordon.ramsay@theknife.it', '$2a$12$P6HgPeYeu6PTByZZ3VNZ0Oetrc.0GTnMbv6NtwVBxnnIQknUKMk5m', 'Gordon', 'Ramsay', '1966-11-08', 'Londra', 'gestore'),
+                                                                                        ('mario.rossi@theknife.it', '$2a$12$P6HgPeYeu6PTByZZ3VNZ0Oetrc.0GTnMbv6NtwVBxnnIQknUKMk5m', 'Mario', 'Rossi', '2001-05-20', 'Milano', 'cliente'),
+                                                                                        ('alberto.cliente@theknife.it', '$2a$12$P6HgPeYeu6PTByZZ3VNZ0Oetrc.0GTnMbv6NtwVBxnnIQknUKMk5m', 'Alberto', 'Neri', '1999-03-12', 'Varese', 'cliente');
 
 -- Account dimostrativi aggiuntivi. Password: KnifeDemo2026!
 INSERT INTO Utenti (email, password, nome, cognome, data_nascita, domicilio, ruolo) VALUES

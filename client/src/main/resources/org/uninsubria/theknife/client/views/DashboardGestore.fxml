@@ -82,11 +82,9 @@
                         hbarPolicy="NEVER"
                         styleClass="restaurant-scroll-pane"
                         VBox.vgrow="ALWAYS">
-                <content>
-                    <VBox fx:id="restaurantContainer"
-                          spacing="14"
-                          styleClass="restaurant-container"/>
-                </content>
+                <VBox fx:id="restaurantContainer"
+                      spacing="14"
+                      styleClass="restaurant-container"/>
             </ScrollPane>
         </VBox>
     </center>
