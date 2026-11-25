@@ -1,0 +1,14 @@
+org.uninsubria.theknife.client
+org.uninsubria.theknife.client.controller
+org.uninsubria.theknife.client.util
+org.uninsubria.theknife.client.util.components
+org.uninsubria.theknife.client.util.stars
+org.uninsubria.theknife.common.dto
+org.uninsubria.theknife.common.exceptions
+org.uninsubria.theknife.common.rmi
+org.uninsubria.theknife.server
+org.uninsubria.theknife.server.config
+org.uninsubria.theknife.server.dao
+org.uninsubria.theknife.server.rmi
+org.uninsubria.theknife.server.service
+org.uninsubria.theknife.server.utils
