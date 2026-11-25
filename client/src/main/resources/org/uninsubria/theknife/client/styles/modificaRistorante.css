@@ -1,5 +1,6 @@
 .root-pane {
     -fx-background-color: #063221;
+    -fx-background-radius: 16px;
 }
 
 .card-container {

@@ -174,7 +174,10 @@
                       maxWidth="720.0"
                       maxHeight="740.0"
                       visible="false"
-                      managed="false">
+                      managed="false"
+                      stylesheets="@../styles/modifica-account.css, @../styles/modificaRistorante.css"
+                >
+
 
                     <ScrollPane fitToWidth="true"
                                 hbarPolicy="NEVER"
