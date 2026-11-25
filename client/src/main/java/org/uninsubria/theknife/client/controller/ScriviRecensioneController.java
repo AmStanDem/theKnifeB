@@ -298,7 +298,9 @@ public class ScriviRecensioneController {
             RecensioneDaRispondere.pulisci();
             RistoranteSelezionato.setRitornoAiMieiRistoranti(
                     RistoranteSelezionato.getRistorante() != null);
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
+            SceneManager.replaceCurrentScene(
+                    actionEvent,
+                    "/org/uninsubria/theknife/client/views/Ristorante.fxml");
             return;
         }
 
@@ -307,7 +309,9 @@ public class ScriviRecensioneController {
         if (modificaInCorso) {
             tornaAllaPaginaOrigine(actionEvent);
         } else {
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
+            SceneManager.replaceCurrentScene(
+                    actionEvent,
+                    "/org/uninsubria/theknife/client/views/Ristorante.fxml");
         }
     }
 
