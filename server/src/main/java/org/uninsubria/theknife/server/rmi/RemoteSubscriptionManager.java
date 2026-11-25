@@ -26,66 +26,66 @@ public final class RemoteSubscriptionManager implements AutoCloseable {
      * Sottoscrizione registrata da un osservatore remoto.
      *
      * @param id identificativo della sottoscrizione
-     * @param topic ambito degli eventi a cui è sottoscritto l'osservatore
-     * @param targetId identificativo dell'entità interessata, se previsto dall'ambito
-     * @param observer osservatore remoto da notificare
+     * @param ambito ambito degli eventi a cui è sottoscritto l'osservatore
+     * @param idDestinazione identificativo dell'entità interessata, se previsto dall'ambito
+     * @param osservatore osservatore remoto da notificare
      */
-    private record Subscription(
+    private record Sottoscrizione(
             UUID id,
-            SubscriptionTopic topic,
-            Integer targetId,
-            RemoteObserver observer
+            SubscriptionTopic ambito,
+            Integer idDestinazione,
+            RemoteObserver osservatore
     ) {}
 
-    private final ConcurrentMap<UUID, Subscription> subscriptions = new ConcurrentHashMap<>();
-    private final ExecutorService callbacks = Executors.newVirtualThreadPerTaskExecutor();
+    private final ConcurrentMap<UUID, Sottoscrizione> sottoscrizioni = new ConcurrentHashMap<>();
+    private final ExecutorService notifiche = Executors.newVirtualThreadPerTaskExecutor();
 
     /**
      * Registra un osservatore per il tipo di eventi e l'entità specificati.
      *
-     * @param topic ambito degli eventi a cui sottoscriversi
-     * @param targetId identificativo dell'entità interessata, oppure {@code null}
-     * @param observer osservatore remoto da notificare
+     * @param ambito ambito degli eventi a cui sottoscriversi
+     * @param idDestinazione identificativo dell'entità interessata, oppure {@code null}
+     * @param osservatore osservatore remoto da notificare
      * @return identificativo univoco della sottoscrizione
      */
-    public UUID subscribe(SubscriptionTopic topic, Integer targetId, RemoteObserver observer) {
+    public UUID sottoscrivi(SubscriptionTopic ambito, Integer idDestinazione, RemoteObserver osservatore) {
         UUID id = UUID.randomUUID();
-        subscriptions.put(id, new Subscription(id, topic, targetId, observer));
+        sottoscrizioni.put(id, new Sottoscrizione(id, ambito, idDestinazione, osservatore));
         return id;
     }
 
     /**
      * Annulla la sottoscrizione indicata; un identificativo {@code null} viene ignorato.
      *
-     * @param subscriptionId identificativo della sottoscrizione da rimuovere
+     * @param idSottoscrizione identificativo della sottoscrizione da rimuovere
      */
-    public void unsubscribe(UUID subscriptionId) {
-        if (subscriptionId != null) {
-            subscriptions.remove(subscriptionId);
+    public void annullaSottoscrizione(UUID idSottoscrizione) {
+        if (idSottoscrizione != null) {
+            sottoscrizioni.remove(idSottoscrizione);
         }
     }
 
     /**
      * Pubblica un evento di modifica e accoda una notifica per ogni sottoscrizione corrispondente.
      *
-     * @param restaurantId identificativo del ristorante coinvolto, oppure {@code null}
-     * @param userId identificativo dell'utente coinvolto, oppure {@code null}
-     * @param type tipo di modifica pubblicata
+     * @param idRistorante identificativo del ristorante coinvolto, oppure {@code null}
+     * @param idUtente identificativo dell'utente coinvolto, oppure {@code null}
+     * @param tipo tipo di modifica pubblicata
      */
-    public void publish(
-            Integer restaurantId,
-            Integer userId,
-            DataChangedEvent.ChangeType type
+    public void pubblica(
+            Integer idRistorante,
+            Integer idUtente,
+            DataChangedEvent.ChangeType tipo
     ) {
-        DataChangedEvent event = new DataChangedEvent(
-                null, UUID.randomUUID(), restaurantId, type, Instant.now());
+        DataChangedEvent evento = new DataChangedEvent(
+                null, UUID.randomUUID(), idRistorante, tipo, Instant.now());
 
-        for (Subscription subscription : subscriptions.values()) {
-            if (!matches(subscription, restaurantId, userId, type)) {
+        for (Sottoscrizione sottoscrizione : sottoscrizioni.values()) {
+            if (!corrisponde(sottoscrizione, idRistorante, idUtente, tipo)) {
                 continue;
             }
             try {
-                callbacks.execute(() -> notifyObserver(subscription, event));
+                notifiche.execute(() -> notificaOsservatore(sottoscrizione, evento));
             } catch (java.util.concurrent.RejectedExecutionException e) {
                 System.err.println("[RMI_CALLBACK] Notifica non accodata: executor in chiusura.");
                 return;
@@ -93,30 +93,30 @@ public final class RemoteSubscriptionManager implements AutoCloseable {
         }
     }
 
-    private boolean matches(
-            Subscription subscription,
-            Integer restaurantId,
-            Integer userId,
-            DataChangedEvent.ChangeType type
+    private boolean corrisponde(
+            Sottoscrizione sottoscrizione,
+            Integer idRistorante,
+            Integer idUtente,
+            DataChangedEvent.ChangeType tipo
     ) {
-        return switch (subscription.topic()) {
-            case CATALOG -> restaurantId != null
-                    && type != DataChangedEvent.ChangeType.FAVORITES_CHANGED;
-            case RESTAURANT -> restaurantId != null
-                    && restaurantId.equals(subscription.targetId());
-            case USER -> userId != null && userId.equals(subscription.targetId());
+        return switch (sottoscrizione.ambito()) {
+            case CATALOGO -> idRistorante != null
+                    && tipo != DataChangedEvent.ChangeType.PREFERITI_MODIFICATI;
+            case RISTORANTE -> idRistorante != null
+                    && idRistorante.equals(sottoscrizione.idDestinazione());
+            case UTENTE -> idUtente != null && idUtente.equals(sottoscrizione.idDestinazione());
         };
     }
 
-    private void notifyObserver(Subscription subscription, DataChangedEvent event) {
-        if (!subscriptions.containsKey(subscription.id())) {
+    private void notificaOsservatore(Sottoscrizione sottoscrizione, DataChangedEvent evento) {
+        if (!sottoscrizioni.containsKey(sottoscrizione.id())) {
             return;
         }
         try {
-            subscription.observer().onDataChanged(event.withSubscriptionId(subscription.id()));
+            sottoscrizione.osservatore().datiCambiati(evento.conIdSottoscrizione(sottoscrizione.id()));
         } catch (RemoteException e) {
-            subscriptions.remove(subscription.id(), subscription);
-            System.err.println("[RMI_CALLBACK] Sottoscrizione " + subscription.id()
+            sottoscrizioni.remove(sottoscrizione.id(), sottoscrizione);
+            System.err.println("[RMI_CALLBACK] Sottoscrizione " + sottoscrizione.id()
                     + " rimossa dopo disconnessione del client: " + e.getMessage());
         }
     }
@@ -126,7 +126,7 @@ public final class RemoteSubscriptionManager implements AutoCloseable {
      */
     @Override
     public void close() {
-        subscriptions.clear();
-        callbacks.shutdownNow();
+        sottoscrizioni.clear();
+        notifiche.shutdownNow();
     }
 }

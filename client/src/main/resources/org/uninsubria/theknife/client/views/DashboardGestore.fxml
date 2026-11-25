@@ -35,7 +35,7 @@
                         onAction="#onProfiloClick"/>
                 <Button text="Logout"
                         styleClass="secondary-button"
-                        onAction="#onLogOutClick"/>
+                        onAction="#onEsciClick"/>
             </HBox>
 
             <!-- Dati utente -->

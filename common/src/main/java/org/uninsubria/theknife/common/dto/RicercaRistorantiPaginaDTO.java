@@ -22,8 +22,8 @@ import java.util.List;
  * @param latitudineRiferimento latitudine del punto centrale della ricerca
  * @param longitudineRiferimento longitudine del punto centrale della ricerca
  * @param raggioKm raggio di ricerca in chilometri
- * @param delivery indica se cercare ristoranti con consegna a domicilio
- * @param bookingOnline indica se cercare ristoranti con prenotazione online
+ * @param consegna indica se cercare ristoranti con consegna a domicilio
+ * @param prenotazioneOnline indica se cercare ristoranti con prenotazione online
  */
 public record RicercaRistorantiPaginaDTO(
         String localita,
@@ -37,8 +37,8 @@ public record RicercaRistorantiPaginaDTO(
         Double latitudineRiferimento,
         Double longitudineRiferimento,
         Double raggioKm,
-        boolean delivery,
-        boolean bookingOnline
+        boolean consegna,
+        boolean prenotazioneOnline
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

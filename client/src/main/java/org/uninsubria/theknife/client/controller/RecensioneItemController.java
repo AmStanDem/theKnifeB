@@ -90,7 +90,7 @@ public class RecensioneItemController {
         ratingControl.setSpacing(1);
         ratingControl.setScaleX(0.5);
         ratingControl.setScaleY(0.5);
-        ratingControl.setColors(Color.web("#4CAF50"), Color.web("#dadce0"));
+        ratingControl.impostaColori(Color.web("#4CAF50"), Color.web("#dadce0"));
         if (ratingStarsContainer != null) {
             ratingStarsContainer.getChildren().add(ratingControl);
         }
@@ -109,7 +109,7 @@ public class RecensioneItemController {
         this.recensione = recensione;
 
         setAutore(recensione.nomeAutore());
-        setLocalGuide(false);
+        impostaGuidaLocale(false);
         boolean mostraRistorante = recensione.nomeRistorante() != null
                 && !recensione.nomeRistorante().isBlank();
         if (restaurantLabel != null) {
@@ -184,12 +184,12 @@ public class RecensioneItemController {
     /**
      * Imposta la visibilità dell'indicatore di guida locale.
      *
-     * @param isLocalGuide {@code true} per mostrare l'indicatore
+     * @param eGuidaLocale {@code true} per mostrare l'indicatore
      */
-    public void setLocalGuide(boolean isLocalGuide) {
+    public void impostaGuidaLocale(boolean eGuidaLocale) {
         if (localGuideLabel != null) {
-            localGuideLabel.setVisible(isLocalGuide);
-            localGuideLabel.setManaged(isLocalGuide);
+            localGuideLabel.setVisible(eGuidaLocale);
+            localGuideLabel.setManaged(eGuidaLocale);
         }
     }
 
@@ -210,7 +210,7 @@ public class RecensioneItemController {
      */
     public void setValutazione(double stelle) {
         stelle = Math.clamp(stelle, 0, 5);
-        if (ratingControl != null) ratingControl.setRating(stelle);
+        if (ratingControl != null) ratingControl.impostaValutazione(stelle);
     }
 
     /**
@@ -285,12 +285,12 @@ public class RecensioneItemController {
      * @param actionEvent evento JavaFX usato per cambiare scena
      */
     @FXML
-    public void onRispondiClicked(ActionEvent actionEvent) {
-        if (rispostaAbilitata && SessioneUtente.isGestore()
+    public void rispondiCliccato(ActionEvent actionEvent) {
+        if (rispostaAbilitata && SessioneUtente.eGestore()
                 && !rispostaPresente && recensione != null
                 && recensione.idRecensione() != null) {
             RecensioneDaRispondere.imposta(recensione);
-            SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
+            SceneManager.cambiaScena(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
         }
     }
 
@@ -299,7 +299,7 @@ public class RecensioneItemController {
      * disponibili.
      */
     @FXML
-    private void onModificaClicked() {
+    private void modificaCliccata() {
         if (recensione != null && onModificaAction != null) {
             onModificaAction.accept(recensione);
         }
@@ -310,7 +310,7 @@ public class RecensioneItemController {
      * sono disponibili.
      */
     @FXML
-    private void onEliminaClicked() {
+    private void eliminaCliccato() {
         if (recensione != null && onEliminaAction != null) {
             onEliminaAction.accept(recensione);
         }

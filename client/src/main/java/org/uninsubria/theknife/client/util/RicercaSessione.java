@@ -27,7 +27,7 @@ public class RicercaSessione {
      *
      * @return località memorizzata
      */
-    public static String getLocalita() {
+    public static String ottieniLocalita() {
         return localita;
     }
 
@@ -36,7 +36,7 @@ public class RicercaSessione {
      *
      * @return nome del ristorante memorizzato
      */
-    public static String getNomeRistorante() {
+    public static String ottieniNomeRistorante() {
         return nomeRistorante;
     }
 }

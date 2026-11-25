@@ -41,11 +41,11 @@ public class BaseRatingView extends HBox {
         setSpacing(6);
         setPadding(new Insets(5));
         setStyle("-fx-background-color: transparent;");
-        buildStars();
-        paintStars(rating);
+        creaStelle();
+        disegnaStelle(rating);
     }
 
-    private void buildStars() {
+    private void creaStelle() {
         for (int i = 0; i < maxStars; i++) {
             SVGPath star = new SVGPath();
             star.setContent(STAR_SVG);
@@ -61,13 +61,13 @@ public class BaseRatingView extends HBox {
      *
      * @param targetRating valutazione da rappresentare
      */
-    protected void paintStars(double targetRating) {
+    protected void disegnaStelle(double targetRating) {
         for (int i = 1; i <= maxStars; i++) {
             SVGPath star = stars.get(i - 1);
             if (i <= targetRating) {
                 star.setFill(filledColor);
             } else if (i - 1 < targetRating) {
-                star.setFill(createPartialGradient(targetRating - (i - 1)));
+                star.setFill(creaGradienteParziale(targetRating - (i - 1)));
             } else {
                 star.setFill(emptyColor);
             }
@@ -80,7 +80,7 @@ public class BaseRatingView extends HBox {
      * @param filledFraction frazione della stella da riempire
      * @return gradiente che combina il colore pieno e quello vuoto
      */
-    protected LinearGradient createPartialGradient(double filledFraction) {
+    protected LinearGradient creaGradienteParziale(double filledFraction) {
         return new LinearGradient(
                 0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0.0, filledColor),
@@ -95,9 +95,9 @@ public class BaseRatingView extends HBox {
      *
      * @param rating valutazione da visualizzare, limitata all'intervallo da 0 a 5
      */
-    public void setRating(double rating) {
+    public void impostaValutazione(double rating) {
         this.rating = Math.clamp(rating, 0.0, maxStars);
-        paintStars(this.rating);
+        disegnaStelle(this.rating);
     }
 
     /**
@@ -106,10 +106,10 @@ public class BaseRatingView extends HBox {
      * @param filled colore delle porzioni piene
      * @param empty colore delle porzioni vuote
      */
-    public void setColors(Color filled, Color empty) {
+    public void impostaColori(Color filled, Color empty) {
         this.filledColor = filled;
         this.emptyColor = empty;
-        paintStars(rating);
+        disegnaStelle(rating);
     }
 
     /**
@@ -117,7 +117,7 @@ public class BaseRatingView extends HBox {
      *
      * @return valutazione compresa tra 0 e 5
      */
-    public double getRating() {
+    public double ottieniValutazione() {
         return rating;
     }
 }

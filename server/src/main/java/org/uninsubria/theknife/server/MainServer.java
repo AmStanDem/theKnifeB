@@ -33,12 +33,12 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MainServer {
 
-    private static final String DEFAULT_DB_HOST = "localhost";
-    private static final int DEFAULT_DB_PORT = 5432;
-    private static final String DEFAULT_DB_NAME = "theknife";
-    private static final String DEFAULT_DB_USER = "admin";
-    private static final String DEFAULT_DB_PASSWORD = "admin";
-    private static final String PROCESS_LOCK_FILE = "theknife-server.lock";
+    private static final String HOST_DB_PREDEFINITO = "localhost";
+    private static final int PORTA_DB_PREDEFINITA = 5432;
+    private static final String NOME_DB_PREDEFINITO = "theknife";
+    private static final String UTENTE_DB_PREDEFINITO = "admin";
+    private static final String PASSWORD_DB_PREDEFINITA = "admin";
+    private static final String FILE_BLOCCO_PROCESSO = "theknife-server.lock";
 
     /**
      * Avvia il server: acquisisce il lock esclusivo, legge la configurazione RMI
@@ -51,8 +51,8 @@ public class MainServer {
     public static void main(String[] args) {
         System.out.println("[SYSTEM] Controllo istanza server in corso...");
         System.out.flush();
-        ServerProcessLock processLock = acquireProcessLock();
-        if (processLock == null) {
+        BloccoProcessoServer bloccoProcesso = acquisisciBloccoProcesso();
+        if (bloccoProcesso == null) {
             return;
         }
 
@@ -60,25 +60,25 @@ public class MainServer {
         System.out.println("      THE KNIFE - CORE SERVER INITIALIZATION     ");
         System.out.println("=================================================\n");
 
-        int rmiPort = 1099;
-        int defaultDbPort = DEFAULT_DB_PORT;
-        File envFile = new File(".env");
-        if (envFile.exists()) {
-            try (FileInputStream fis = new FileInputStream(envFile)) {
-                Properties props = new Properties();
-                props.load(fis);
-                String dbPortProp = props.getProperty("DB_HOST_PORT");
-                if (dbPortProp != null && !dbPortProp.isBlank()) {
+        int portaRmi = 1099;
+        int portaDbPredefinita = PORTA_DB_PREDEFINITA;
+        File fileEnv = new File(".env");
+        if (fileEnv.exists()) {
+            try (FileInputStream flussoFile = new FileInputStream(fileEnv)) {
+                Properties proprieta = new Properties();
+                proprieta.load(flussoFile);
+                String proprietaPortaDb = proprieta.getProperty("DB_HOST_PORT");
+                if (proprietaPortaDb != null && !proprietaPortaDb.isBlank()) {
                     try {
-                        defaultDbPort = parseDbPort(dbPortProp);
+                        portaDbPredefinita = leggiPortaDatabase(proprietaPortaDb);
                     } catch (IllegalArgumentException e) {
                         System.err.println("[CONFIG_WARN] DB_HOST_PORT non valida; uso la porta "
-                                + DEFAULT_DB_PORT + ".");
+                                + PORTA_DB_PREDEFINITA + ".");
                     }
                 }
-                String portProp = props.getProperty("RMI_PORT");
-                if (portProp != null && !portProp.isEmpty()) {
-                    rmiPort = Integer.parseInt(portProp.trim());
+                String proprietaPorta = proprieta.getProperty("RMI_PORT");
+                if (proprietaPorta != null && !proprietaPorta.isEmpty()) {
+                    portaRmi = Integer.parseInt(proprietaPorta.trim());
                 }
             } catch (IOException e) {
                 System.err.println("[CONFIG_WARN] Impossibile leggere RMI_PORT da .env; uso la porta 1099.");
@@ -90,40 +90,40 @@ public class MainServer {
         System.out.println("[CONFIG] Configurazione del database (premi Invio per usare il valore predefinito).");
         Console console = System.console();
         Scanner scanner = new Scanner(System.in);
-        String dbHost = prompt(scanner, console, "[CONFIG] Host DB", DEFAULT_DB_HOST);
-        int dbPort = promptPort(scanner, console, defaultDbPort);
-        String dbName = prompt(scanner, console, "[CONFIG] Nome database", DEFAULT_DB_NAME);
-        String dbUser = prompt(scanner, console, "[CONFIG] Utente PostgreSQL", DEFAULT_DB_USER);
-        String dbPassword = promptPassword(scanner, console);
-        String dbUrl = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName;
+        String hostDb = chiediValore(scanner, console, "[CONFIG] Host DB", HOST_DB_PREDEFINITO);
+        int portaDb = chiediPorta(scanner, console, portaDbPredefinita);
+        String nomeDb = chiediValore(scanner, console, "[CONFIG] Nome database", NOME_DB_PREDEFINITO);
+        String utenteDb = chiediValore(scanner, console, "[CONFIG] Utente PostgreSQL", UTENTE_DB_PREDEFINITO);
+        String passwordDb = chiediPassword(scanner, console);
+        String urlDb = "jdbc:postgresql://" + hostDb + ":" + portaDb + "/" + nomeDb;
 
-        AtomicReference<Registry> registryRef = new AtomicReference<>();
-        AtomicReference<TheKnifeServerImpl> serverRef = new AtomicReference<>();
+        AtomicReference<Registry> riferimentoRegistro = new AtomicReference<>();
+        AtomicReference<TheKnifeServerImpl> riferimentoServer = new AtomicReference<>();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\n[SYSTEM] Chiusura del server e del pool database...");
-            unexport(registryRef.get());
-            TheKnifeServerImpl server = serverRef.get();
-            unexport(server);
+            annullaEsportazione(riferimentoRegistro.get());
+            TheKnifeServerImpl server = riferimentoServer.get();
+            annullaEsportazione(server);
             if (server != null) {
                 server.close();
             }
             DatabaseConfig.close();
-            processLock.close();
+            bloccoProcesso.close();
         }, "theknife-server-shutdown"));
 
-        Registry registry;
+        Registry registro;
         try {
-            registry = LocateRegistry.createRegistry(rmiPort);
-            registryRef.set(registry);
+            registro = LocateRegistry.createRegistry(portaRmi);
+            riferimentoRegistro.set(registro);
         } catch (Exception e) {
-            System.err.println("[FATAL ERROR] Porta RMI " + rmiPort
+            System.err.println("[FATAL ERROR] Porta RMI " + portaRmi
                     + " non disponibile: " + e.getMessage());
             System.err.println("[SUGGERIMENTO] Arresta l'altra istanza del server oppure libera la porta.");
             System.exit(1);
             return;
         }
 
-        if (dbHost.isBlank() || dbName.isBlank() || dbUser.isBlank()) {
+        if (hostDb.isBlank() || nomeDb.isBlank() || utenteDb.isBlank()) {
             System.err.println("[FATAL ERROR] Host, nome database e utente PostgreSQL non possono essere vuoti.");
             System.exit(1);
             return;
@@ -132,7 +132,7 @@ public class MainServer {
         // Inizializzazione della persistenza con i parametri inseriti all'avvio.
         try {
             System.out.println("\n[SYSTEM] Tentativo di connessione al database in corso...");
-            DatabaseConfig.init(dbUrl, dbUser, dbPassword);
+            DatabaseConfig.init(urlDb, utenteDb, passwordDb);
         } catch (Exception e) {
             System.err.println("[FATAL ERROR] Inizializzazione database fallita: " + e.getMessage());
             System.exit(1);
@@ -143,12 +143,12 @@ public class MainServer {
 
         // Esposizione dei servizi tramite RMI.
         try {
-            TheKnifeServerImpl serverService = new TheKnifeServerImpl();
-            serverRef.set(serverService);
-            ITheKnifeServer stub = (ITheKnifeServer) UnicastRemoteObject.exportObject(serverService, 0);
-            registry.rebind("TheKnifeServer", stub);
+            TheKnifeServerImpl servizioServer = new TheKnifeServerImpl();
+            riferimentoServer.set(servizioServer);
+            ITheKnifeServer stub = (ITheKnifeServer) UnicastRemoteObject.exportObject(servizioServer, 0);
+            registro.rebind("TheKnifeServer", stub);
 
-            System.out.println("[RMI] Registro in ascolto sulla porta " + rmiPort);
+            System.out.println("[RMI] Registro in ascolto sulla porta " + portaRmi);
             System.out.println("[SYSTEM] Server THE KNIFE operativo e pronto a ricevere connessioni.\n");
 
         } catch (Exception e) {
@@ -163,79 +163,79 @@ public class MainServer {
         }
     }
 
-    private static void unexport(Remote remote) {
-        if (remote == null) {
+    private static void annullaEsportazione(Remote remoto) {
+        if (remoto == null) {
             return;
         }
         try {
-            UnicastRemoteObject.unexportObject(remote, true);
+            UnicastRemoteObject.unexportObject(remoto, true);
         } catch (java.rmi.NoSuchObjectException ignored) {
             // The object may not have been exported if startup failed partway through.
         }
     }
 
-    private static ServerProcessLock acquireProcessLock() {
-        Path lockPath = Paths.get(
+    private static BloccoProcessoServer acquisisciBloccoProcesso() {
+        Path percorsoBlocco = Paths.get(
                 System.getProperty("java.io.tmpdir"),
-                PROCESS_LOCK_FILE
+                FILE_BLOCCO_PROCESSO
         );
         try {
-            FileChannel channel = FileChannel.open(
-                    lockPath,
+            FileChannel canale = FileChannel.open(
+                    percorsoBlocco,
                     java.nio.file.StandardOpenOption.CREATE,
                     java.nio.file.StandardOpenOption.WRITE
             );
             try {
-                FileLock lock = channel.tryLock();
+                FileLock lock = canale.tryLock();
                 if (lock == null) {
-                    channel.close();
-                    stampaIstanzaAttiva(lockPath);
+                    canale.close();
+                    stampaIstanzaAttiva(percorsoBlocco);
                     return null;
                 }
-                String lockInfo = "PID=" + ProcessHandle.current().pid()
+                String infoBlocco = "PID=" + ProcessHandle.current().pid()
                         + System.lineSeparator()
                         + "PORTA_RMI=1099"
                         + System.lineSeparator();
-                java.nio.ByteBuffer lockInfoBuffer = java.nio.ByteBuffer.wrap(
-                        lockInfo.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                while (lockInfoBuffer.hasRemaining()) {
-                    int bytesWritten = channel.write(lockInfoBuffer);
-                    if (bytesWritten == 0) {
+                java.nio.ByteBuffer bufferInfoBlocco = java.nio.ByteBuffer.wrap(
+                        infoBlocco.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                while (bufferInfoBlocco.hasRemaining()) {
+                    int byteScritti = canale.write(bufferInfoBlocco);
+                    if (byteScritti == 0) {
                         throw new IOException("Impossibile scrivere il contenuto del lock.");
                     }
                 }
-                System.out.println("[SYSTEM] Lock server acquisito: " + lockPath);
+                System.out.println("[SYSTEM] Lock server acquisito: " + percorsoBlocco);
                 System.out.flush();
-                return new ServerProcessLock(channel, lock, lockPath);
+                return new BloccoProcessoServer(canale, lock, percorsoBlocco);
             } catch (OverlappingFileLockException e) {
-                channel.close();
-                stampaIstanzaAttiva(lockPath);
+                canale.close();
+                stampaIstanzaAttiva(percorsoBlocco);
                 return null;
             } catch (IOException e) {
-                channel.close();
+                canale.close();
                 throw e;
             }
         } catch (IOException e) {
             System.err.println("[FATAL ERROR] Impossibile creare il lock del server in "
-                    + lockPath + ": " + e.getMessage());
+                    + percorsoBlocco + ": " + e.getMessage());
             System.err.flush();
             return null;
         }
     }
 
-    private static void stampaIstanzaAttiva(Path lockPath) {
-        String message = "[FATAL ERROR] Un'altra istanza del server è già attiva.";
-        String suggestion = "[SUGGERIMENTO] Lock: " + lockPath
+    private static void stampaIstanzaAttiva(Path percorsoBlocco) {
+        String messaggio = "[FATAL ERROR] Un'altra istanza del server è già attiva.";
+        String suggerimento = "[SUGGERIMENTO] Lock: " + percorsoBlocco
                 + ". Usa Ctrl+C sull'istanza attiva; non Ctrl+Z, che sospende il processo.";
-        System.out.println(message);
-        System.out.println(suggestion);
+        System.out.println(messaggio);
+        System.out.println(suggerimento);
         System.out.flush();
-        System.err.println(message);
-        System.err.println(suggestion);
+        System.err.println(messaggio);
+        System.err.println(suggerimento);
         System.err.flush();
     }
 
-    private record ServerProcessLock(FileChannel channel, FileLock lock, Path path) {
+    private record BloccoProcessoServer(FileChannel canale, FileLock lock, Path path) {
 
         public void close() {
                 try {
@@ -247,7 +247,7 @@ public class MainServer {
                             + e.getMessage());
                 } finally {
                     try {
-                        channel.close();
+                        canale.close();
                     } catch (IOException e) {
                         System.err.println("[CONFIG_WARN] Impossibile chiudere il file di lock "
                                 + path + ": " + e.getMessage());
@@ -256,54 +256,54 @@ public class MainServer {
             }
         }
 
-    private static String prompt(Scanner scanner, Console console, String label, String defaultValue) {
-        String prompt = label + " [" + defaultValue + "]: ";
-        String value = console != null
-                ? console.readLine(prompt)
-                : promptFromScanner(scanner, prompt);
-        return value == null || value.isBlank() ? defaultValue : value.trim();
+    private static String chiediValore(Scanner scanner, Console console, String etichetta, String valorePredefinito) {
+        String messaggio = etichetta + " [" + valorePredefinito + "]: ";
+        String valore = console != null
+                ? console.readLine(messaggio)
+                : chiediDaScanner(scanner, messaggio);
+        return valore == null || valore.isBlank() ? valorePredefinito : valore.trim();
     }
 
-    private static int promptPort(Scanner scanner, Console console, int defaultPort) {
+    private static int chiediPorta(Scanner scanner, Console console, int portaPredefinita) {
         while (true) {
-            String value = prompt(scanner, console, "[CONFIG] Porta PostgreSQL",
-                    Integer.toString(defaultPort));
+            String valore = chiediValore(scanner, console, "[CONFIG] Porta PostgreSQL",
+                    Integer.toString(portaPredefinita));
             try {
-                return parseDbPort(value);
+                return leggiPortaDatabase(valore);
             } catch (IllegalArgumentException ignored) {
-                // Keep prompting until a valid TCP port is provided.
+                // Keep prompting until a valid TCP porta is provided.
             }
             System.out.println("[CONFIG] Porta non valida. Inserisci un valore compreso tra 1 e 65535.");
         }
     }
 
-    private static int parseDbPort(String value) {
-        int port;
+    private static int leggiPortaDatabase(String valore) {
+        int porta;
         try {
-            port = Integer.parseInt(value.trim());
+            porta = Integer.parseInt(valore.trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("La porta deve essere numerica.", e);
         }
-        if (port < 1 || port > 65535) {
+        if (porta < 1 || porta > 65535) {
             throw new IllegalArgumentException("La porta deve essere compresa tra 1 e 65535.");
         }
-        return port;
+        return porta;
     }
 
-    private static String promptPassword(Scanner scanner, Console console) {
-        String prompt = "[CONFIG] Password PostgreSQL [admin predefinita]: ";
-        String value;
+    private static String chiediPassword(Scanner scanner, Console console) {
+        String messaggio = "[CONFIG] Password PostgreSQL [admin predefinita]: ";
+        String valore;
         if (console != null) {
-            char[] password = console.readPassword(prompt);
-            value = password == null ? "" : new String(password);
+            char[] password = console.readPassword(messaggio);
+            valore = password == null ? "" : new String(password);
         } else {
-            value = promptFromScanner(scanner, prompt);
+            valore = chiediDaScanner(scanner, messaggio);
         }
-        return value.isBlank() ? DEFAULT_DB_PASSWORD : value;
+        return valore.isBlank() ? PASSWORD_DB_PREDEFINITA : valore;
     }
 
-    private static String promptFromScanner(Scanner scanner, String prompt) {
-        System.out.print(prompt);
+    private static String chiediDaScanner(Scanner scanner, String messaggioPrompt) {
+        System.out.print(messaggioPrompt);
         System.out.flush();
         return scanner.nextLine();
     }

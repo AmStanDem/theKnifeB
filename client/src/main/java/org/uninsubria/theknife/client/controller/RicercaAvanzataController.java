@@ -72,8 +72,8 @@ public class RicercaAvanzataController {
      */
     @FXML
     private void initialize() {
-        txtLocalita.addTextFieldStyleClass("field-input");
-        ratingStelleMinime.setOnRatingChanged(this::aggiornaEtichettaRating);
+        txtLocalita.aggiungiStileCampoTesto("field-input");
+        ratingStelleMinime.impostaSuValutazioneCambiata(this::aggiornaEtichettaRating);
 
         caricaTipologieCucina();
 
@@ -125,7 +125,7 @@ public class RicercaAvanzataController {
         Thread.startVirtualThread(() -> {
             try {
                 List<String> tipologie =
-                        ServerConnection.getServer().ottieniTutteTipologieCucina();
+                        ServerConnection.ottieniServer().ottieniTutteTipologieCucina();
 
                 Platform.runLater(() -> popolaMenuCucine(tipologie));
 
@@ -148,7 +148,7 @@ public class RicercaAvanzataController {
      * @param tipologie tipologie disponibili
      */
     private void popolaMenuCucine(List<String> tipologie) {
-        cuisineSelector.setCuisines(tipologie);
+        cuisineSelector.impostaCucine(tipologie);
     }
 
 
@@ -156,7 +156,7 @@ public class RicercaAvanzataController {
      * Aggiorna l'etichetta che descrive la valutazione minima selezionata.
      */
     private void aggiornaEtichettaRating() {
-        double rating = ratingStelleMinime.getRating();
+        double rating = ratingStelleMinime.ottieniValutazione();
         lblRatingValore.setText(rating == 0
                 ? "Nessun minimo"
                 : String.format(java.util.Locale.ITALY, "%.1f+ stelle", rating));
@@ -248,22 +248,22 @@ public class RicercaAvanzataController {
      * servizio di geocoding prima di avviare la ricerca.
      * </p>
      *
-     * @param event evento JavaFX usato per cambiare scena
+     * @param evento evento JavaFX usato per cambiare scena
      */
     @FXML
-    private void cercaRistorante(ActionEvent event) {
+    private void cercaRistorante(ActionEvent evento) {
         if (txtLocalita.getText().isBlank()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            SceneManager.initOwner(alert);
-            alert.setTitle("Località da selezionare");
-            alert.setHeaderText(null);
-            alert.setContentText("Inserisci una località oppure selezionala sulla mappa.");
-            alert.showAndWait();
+            Alert avviso = new Alert(Alert.AlertType.WARNING);
+            SceneManager.impostaProprietario(avviso);
+            avviso.setTitle("Località da selezionare");
+            avviso.setHeaderText(null);
+            avviso.setContentText("Inserisci una località oppure selezionala sulla mappa.");
+            avviso.showAndWait();
             return;
         }
 
         txtLocalita.risolviLuogo(
-                luogo -> avviaRicerca(event, luogo),
+                luogo -> avviaRicerca(evento, luogo),
                 messaggio -> mostraErroreLocalita(messaggio)
         );
     }
@@ -271,23 +271,23 @@ public class RicercaAvanzataController {
     /**
      * Memorizza i criteri selezionati e apre la lista dei ristoranti.
      *
-     * @param event evento JavaFX usato per cambiare scena
+     * @param evento evento JavaFX usato per cambiare scena
      * @param luogo località risolta dal servizio di geocoding
      */
-    private void avviaRicerca(ActionEvent event, GeocodingService.Luogo luogo) {
+    private void avviaRicerca(ActionEvent evento, GeocodingService.Luogo luogo) {
         double prezzoMinimo = rangeSliderPrezzo.getLowValue();
         double prezzoMassimo = rangeSliderPrezzo.getHighValue();
         RicercaIniziale.imposta(
                 "",
                 luogo,
-                cuisineSelector.getSelectedCuisines(),
+                cuisineSelector.ottieniCucineSelezionate(),
                 prezzoMinimo,
                 prezzoMassimo < PREZZO_MASSIMO ? prezzoMassimo : null,
-                ratingStelleMinime.getRating() > 0 ? ratingStelleMinime.getRating() : null,
+                ratingStelleMinime.ottieniValutazione() > 0 ? ratingStelleMinime.ottieniValutazione() : null,
                 chkDelivery.isSelected(),
                 chkPrenotazione.isSelected()
         );
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/listaRistoranti.fxml");
+        SceneManager.cambiaScena(evento, "/org/uninsubria/theknife/client/views/listaRistoranti.fxml");
     }
 
     /**
@@ -296,12 +296,12 @@ public class RicercaAvanzataController {
      * @param messaggio descrizione dell'errore da mostrare
      */
     private void mostraErroreLocalita(String messaggio) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        SceneManager.initOwner(alert);
-        alert.setTitle("Località non valida");
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
+        Alert avviso = new Alert(Alert.AlertType.WARNING);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle("Località non valida");
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.showAndWait();
     }
 
     /**
@@ -310,10 +310,10 @@ public class RicercaAvanzataController {
     @FXML
     private void reimpostaFiltri() {
         txtLocalita.setText("");
-        cuisineSelector.clearSelection();
+        cuisineSelector.svuotaSelezione();
         rangeSliderPrezzo.setLowValue(PREZZO_MINIMO);
         rangeSliderPrezzo.setHighValue(PREZZO_MASSIMO);
-        ratingStelleMinime.setRating(0);
+        ratingStelleMinime.impostaValutazione(0);
         aggiornaEtichettaRating();
         chkDelivery.setSelected(false);
         chkPrenotazione.setSelected(false);
@@ -326,11 +326,11 @@ public class RicercaAvanzataController {
      * @param messaggio testo da mostrare all'utente
      */
     private void mostraErrore(String titolo, String messaggio) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.show();
+        Alert avviso = new Alert(Alert.AlertType.WARNING);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.show();
     }
 }

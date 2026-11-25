@@ -58,7 +58,7 @@ public final class DataNascitaInput extends HBox {
         seleziona.setMnemonicParsing(false);
         seleziona.setPrefHeight(40);
         seleziona.getStyleClass().add("date-picker-button");
-        seleziona.setOnAction(event -> {
+        seleziona.setOnAction(evento -> {
             primaDiMostrare.run();
             mostraCalendario(getScene() == null ? null : getScene().getWindow());
         });
@@ -189,7 +189,7 @@ public final class DataNascitaInput extends HBox {
                 Button pulsanteGiorno = new Button(Integer.toString(giorno));
                 pulsanteGiorno.setMaxWidth(Double.MAX_VALUE);
                 pulsanteGiorno.setDisable(data.isBefore(DATA_MINIMA) || data.isAfter(dataMassima));
-                pulsanteGiorno.setOnAction(event -> {
+                pulsanteGiorno.setOnAction(evento -> {
                     dialog.setResult(data);
                     dialog.close();
                 });
@@ -197,8 +197,8 @@ public final class DataNascitaInput extends HBox {
                         (offset + giorno - 1) / 7 + 1);
             }
         };
-        meseComboBox.setOnAction(event -> aggiornaCalendario.run());
-        annoComboBox.setOnAction(event -> aggiornaCalendario.run());
+        meseComboBox.setOnAction(evento -> aggiornaCalendario.run());
+        annoComboBox.setOnAction(evento -> aggiornaCalendario.run());
         aggiornaCalendario.run();
 
         VBox contenuto = new VBox(8, new HBox(8, meseComboBox, annoComboBox), calendario);

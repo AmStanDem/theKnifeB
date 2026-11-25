@@ -32,23 +32,23 @@ public class MainClient extends Application {
      * l'icona e la vista iniziale e avvia la modalità a schermo intero.
      * </p>
      *
-     * @param stage finestra primaria fornita da JavaFX
+     * @param finestra finestra primaria fornita da JavaFX
      */
     @Override
-    public void start(Stage stage) {
+    public void start(Stage finestra) {
         hostServices = getHostServices();
-        stage.initStyle(StageStyle.UNDECORATED);
+        finestra.initStyle(StageStyle.UNDECORATED);
         InputStream resourceAsStream = getClass().getResourceAsStream("/org/uninsubria/theknife/client/assets/icon.png");
         assert resourceAsStream != null;
         Image icona = new Image(
                 resourceAsStream
         );
-        stage.getIcons().add(icona);
-        stage.setTitle("TheKnife");
+        finestra.getIcons().add(icona);
+        finestra.setTitle("TheKnife");
 
-        SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
-        stage.show();
-        SceneManager.avviaFullscreen(stage);
+        SceneManager.cambiaScena(finestra, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+        finestra.show();
+        SceneManager.avviaSchermoIntero(finestra);
     }
 
     /**
@@ -59,7 +59,7 @@ public class MainClient extends Application {
      */
     @Override
     public void stop() {
-        RemoteRefreshManager.shutdown();
+        RemoteRefreshManager.arresta();
     }
 
     /**

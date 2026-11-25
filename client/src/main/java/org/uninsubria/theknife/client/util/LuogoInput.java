@@ -61,8 +61,8 @@ public final class LuogoInput extends HBox {
         pin.setMouseTransparent(true);
         mappa.setGraphic(pin);
         mappa.getStyleClass().add("location-input-map-button");
-        mappa.setOnAction(event -> SelettoreLuogoDialog
-                .mostra(getScene() == null ? null : getScene().getWindow(), getLuogoSelezionato())
+        mappa.setOnAction(evento -> SelettoreLuogoDialog
+                .mostra(getScene() == null ? null : getScene().getWindow(), ottieniLuogoSelezionato())
                 .ifPresent(this::setLuogoSelezionato));
 
         getChildren().addAll(campo, mappa);
@@ -135,7 +135,7 @@ public final class LuogoInput extends HBox {
      *
      * @param styleClass classe CSS da aggiungere
      */
-    public void addTextFieldStyleClass(String styleClass) {
+    public void aggiungiStileCampoTesto(String styleClass) {
         if (!campo.getStyleClass().contains(styleClass)) {
             campo.getStyleClass().add(styleClass);
         }
@@ -156,7 +156,7 @@ public final class LuogoInput extends HBox {
      *
      * @param width larghezza del pulsante
      */
-    public void setMapButtonPrefWidth(double width) {
+    public void impostaAmpiezzaPulsanteMappa(double width) {
         mappa.setPrefWidth(width);
         mappa.setMinWidth(width);
         mappa.setMaxWidth(width);
@@ -176,7 +176,7 @@ public final class LuogoInput extends HBox {
      *
      * @param visible {@code true} per mostrare il pulsante
      */
-    public void setMapButtonVisible(boolean visible) {
+    public void impostaPulsanteMappaVisibile(boolean visible) {
         mappa.setVisible(visible);
         mappa.setManaged(visible);
     }
@@ -193,8 +193,8 @@ public final class LuogoInput extends HBox {
      *
      * @return località selezionata oppure {@code null} se non è stata selezionata
      */
-    public GeocodingService.Luogo getLuogoSelezionato() {
-        return autocomplete.getLuogoSelezionato();
+    public GeocodingService.Luogo ottieniLuogoSelezionato() {
+        return autocomplete.ottieniLuogoSelezionato();
     }
 
     /**
@@ -222,7 +222,7 @@ public final class LuogoInput extends HBox {
         Objects.requireNonNull(alSuccesso);
         Objects.requireNonNull(alErrore);
         String query = campo.getText() == null ? "" : campo.getText().trim();
-        GeocodingService.Luogo selezionato = getLuogoSelezionato();
+        GeocodingService.Luogo selezionato = ottieniLuogoSelezionato();
         if (selezionato != null && selezionato.etichetta().equals(query)) {
             alSuccesso.accept(selezionato);
             return;

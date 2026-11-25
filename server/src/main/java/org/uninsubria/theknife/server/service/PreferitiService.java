@@ -41,7 +41,7 @@ public class PreferitiService {
      * @throws SistemaIndisponibileException se l'identificativo è nullo o si verifica
      *         un errore durante l'accesso al database
      */
-    public List<RistoranteDTO> getPreferiti(Integer idUtente) throws SistemaIndisponibileException {
+    public List<RistoranteDTO> ottieniPreferiti(Integer idUtente) throws SistemaIndisponibileException {
         if (idUtente == null) {
             throw new SistemaIndisponibileException();
         }
@@ -73,8 +73,8 @@ public class PreferitiService {
             if (!successo) {
                 throw new AzioneDuplicataException("Il ristorante è già presente nei tuoi preferiti o non esiste.");
             }
-            subscriptions.publish(
-                    idRistorante, idUtente, DataChangedEvent.ChangeType.FAVORITES_CHANGED);
+            subscriptions.pubblica(
+                    idRistorante, idUtente, DataChangedEvent.ChangeType.PREFERITI_MODIFICATI);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore aggiunta preferito: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -101,8 +101,8 @@ public class PreferitiService {
             if (!successo) {
                 throw new RistoranteNonTrovatoException(idRistorante);
             }
-            subscriptions.publish(
-                    idRistorante, idUtente, DataChangedEvent.ChangeType.FAVORITES_CHANGED);
+            subscriptions.pubblica(
+                    idRistorante, idUtente, DataChangedEvent.ChangeType.PREFERITI_MODIFICATI);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore rimozione preferito: " + e.getMessage());
             throw new SistemaIndisponibileException(e);

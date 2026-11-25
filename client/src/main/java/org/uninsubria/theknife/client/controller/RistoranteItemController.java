@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Controller JavaFX della card che rappresenta un ristorante in una lista.
+ * Controller JavaFX della scheda che rappresenta un ristorante in una lista.
  * <p>
  * Visualizza i dati essenziali del ristorante, inclusi nome, indirizzo,
  * valutazione, cucina, prezzo medio e servizi disponibili. Espone callback
@@ -46,11 +46,11 @@ public class RistoranteItemController {
     private Consumer<RistoranteDTO> onRemoveFavoriteAction;
 
     /**
-     * Popola la card con i dati del ristorante.
+     * Popola la scheda con i dati del ristorante.
      *
      * @param ristorante ristorante da visualizzare
      */
-    public void setRistorante(RistoranteDTO ristorante) {
+    public void impostaRistorante(RistoranteDTO ristorante) {
         this.ristorante = ristorante;
         nameLabel.setText(ristorante.nome());
         addressLabel.setText(ristorante.indirizzo());
@@ -60,11 +60,11 @@ public class RistoranteItemController {
                     : ristorante.descrizione().trim());
         }
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
-        CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
+        CuisineTags.popola(cuisineTags, ristorante.tipologieCucina());
         metaLabel.setText(formattaMeta(ristorante.prezzoMedio(), ristorante.prezzoStimato()));
 
-        aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.delivery()));
-        aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.bookingOnline()));
+        aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.consegna()));
+        aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.prenotazioneOnline()));
     }
 
     /**
@@ -111,15 +111,15 @@ public class RistoranteItemController {
      * @param actionEvent evento JavaFX usato per cambiare scena
      */
     @FXML
-    private void onDetailsClicked(ActionEvent actionEvent) {
+    private void dettagliCliccato(ActionEvent actionEvent) {
         if (ristorante == null) {
             return;
         }
-        RistoranteSelezionato.setRistorante(ristorante);
+        RistoranteSelezionato.impostaRistorante(ristorante);
         if (onDettagliAction != null) {
             onDettagliAction.accept(ristorante);
         }
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
+        SceneManager.cambiaScena(actionEvent, "/org/uninsubria/theknife/client/views/Ristorante.fxml");
     }
 
     /**
@@ -128,7 +128,7 @@ public class RistoranteItemController {
      * @param actionEvent evento generato dal click sul pulsante
      */
     @FXML
-    private void onEditClicked(ActionEvent actionEvent) {
+    private void modificaCliccata(ActionEvent actionEvent) {
         if (ristorante != null && onModificaAction != null) {
             onModificaAction.accept(actionEvent, ristorante);
         }
@@ -138,7 +138,7 @@ public class RistoranteItemController {
      * Gestisce il click sul pulsante di rimozione dai preferiti.
      */
     @FXML
-    private void onRemoveClicked() {
+    private void rimuoviCliccato() {
         if (onRemoveFavoriteAction != null && ristorante != null) {
             onRemoveFavoriteAction.accept(ristorante);
         }

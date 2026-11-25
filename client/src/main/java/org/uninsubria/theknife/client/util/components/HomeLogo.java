@@ -28,7 +28,7 @@ public final class HomeLogo extends Button {
      * Crea il pulsante del logo e ne configura l'azione di ritorno alla home.
      */
     public HomeLogo() {
-        setImage(loadImage(DEFAULT_IMAGE));
+        setImage(caricaImmagine(DEFAULT_IMAGE));
         setFitWidth(441);
         setFitHeight(133);
         imageView.setPreserveRatio(true);
@@ -38,7 +38,7 @@ public final class HomeLogo extends Button {
         setStyle("-fx-background-color: transparent; -fx-background-insets: 0; "
                 + "-fx-border-color: transparent; -fx-border-width: 0; -fx-cursor: hand;");
         setAccessibleText("Torna alla home");
-        setOnAction(event -> SceneManager.switchScene(event, HOME_VIEW));
+        setOnAction(evento -> SceneManager.cambiaScena(evento, HOME_VIEW));
     }
 
     /**
@@ -124,7 +124,7 @@ public final class HomeLogo extends Button {
         imageView.setPreserveRatio(preserveRatio);
     }
 
-    private static Image loadImage(String resourcePath) {
+    private static Image caricaImmagine(String resourcePath) {
         var resource = HomeLogo.class.getResource(resourcePath);
         if (resource == null) {
             throw new IllegalStateException("Risorsa del logo non trovata: " + resourcePath);

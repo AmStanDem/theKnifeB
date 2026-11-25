@@ -34,6 +34,7 @@ import org.uninsubria.theknife.client.util.SessioneUtente;
 import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.client.util.stars.BaseRatingView;
 import org.uninsubria.theknife.common.dto.RecensioneDTO;
+import org.uninsubria.theknife.common.dto.RiepilogoRecensioniDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.dto.UtenteDTO;
 import org.uninsubria.theknife.common.exceptions.AzioneDuplicataException;
@@ -166,7 +167,7 @@ public class AreaRistoranteController {
     public void initialize() {
 
         boolean mostraRitornoMieiRistoranti =
-                RistoranteSelezionato.isRitornoAiMieiRistoranti();
+                RistoranteSelezionato.deveTornareAiMieiRistoranti();
         tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
         tornaAiMieiRistoranti.setManaged(mostraRitornoMieiRistoranti);
         averageRating = new BaseRatingView(0);
@@ -182,31 +183,31 @@ public class AreaRistoranteController {
         aggiornaDistribuzioneRecensioni(List.of());
 
         // Recupera il ristorante selezionato nella pagina precedente
-        ristorante = RistoranteSelezionato.getRistorante();
+        ristorante = RistoranteSelezionato.ottieniRistorante();
 
         if (ristorante != null) {
             mostraDatiRistorante();
             aggiornaStatoPreferito();
-            RemoteRefreshManager.subscribe(
-                    this, SubscriptionTopic.RESTAURANT, ristorante.idRistorante(), event -> {
-                        if (event.type() == DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+            RemoteRefreshManager.sottoscrivi(
+                    this, SubscriptionTopic.RISTORANTE, ristorante.idRistorante(), evento -> {
+                        if (evento.tipo() == DataChangedEvent.ChangeType.PREFERITI_MODIFICATI) {
                             return;
                         }
-                        if (event.type() == DataChangedEvent.ChangeType.RESTAURANT_CHANGED) {
+                        if (evento.tipo() == DataChangedEvent.ChangeType.RISTORANTE_MODIFICATO) {
                             aggiornaDettaglioRistorante();
                         }
-                        aggiornaAzioniRecensione(SessioneUtente.isCliente());
+                        aggiornaAzioniRecensione(SessioneUtente.eCliente());
                         caricaRecensioni();
                     }, () -> {
                         aggiornaDettaglioRistorante();
-                        aggiornaAzioniRecensione(SessioneUtente.isCliente());
+                        aggiornaAzioniRecensione(SessioneUtente.eCliente());
                         caricaRecensioni();
                     });
-            UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+            UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
             if (utente != null) {
-                RemoteRefreshManager.subscribe(
-                        this, SubscriptionTopic.USER, utente.idUtente(), event -> {
-                            if (event.type() == DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+                RemoteRefreshManager.sottoscrivi(
+                        this, SubscriptionTopic.UTENTE, utente.idUtente(), evento -> {
+                            if (evento.tipo() == DataChangedEvent.ChangeType.PREFERITI_MODIFICATI) {
                                 aggiornaStatoPreferito();
                             }
                         }, this::aggiornaStatoPreferito);
@@ -214,7 +215,7 @@ public class AreaRistoranteController {
         } else {
             // Nessun ristorante selezionato: la vista resta vuota
         }
-        boolean clienteLoggato = SessioneUtente.isCliente();
+        boolean clienteLoggato = SessioneUtente.eCliente();
         aggiornaAzioniRecensione(clienteLoggato);
         caricaRecensioni();
     }
@@ -224,13 +225,13 @@ public class AreaRistoranteController {
      */
     private void aggiornaDettaglioRistorante() {
         try {
-            ristorante = ServerConnection.getServer().getDettaglioRistorante(ristorante.idRistorante());
+            ristorante = ServerConnection.ottieniServer().visualizzaRistorante(ristorante.idRistorante());
             mostraDatiRistorante();
         } catch (org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException e) {
             // Il ristorante è stato eliminato: torna alla pagina precedente
             mostraMessaggio(Alert.AlertType.WARNING, "Ristorante eliminato",
                     "Il ristorante che stavi visualizzando è stato eliminato.");
-            SceneManager.goBack(
+            SceneManager.tornaIndietro(
                     (javafx.stage.Stage) lblNomeRistorante.getScene().getWindow());
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di aggiornamento",
@@ -263,8 +264,8 @@ public class AreaRistoranteController {
         }
 
         try {
-            recensioneUtente = ServerConnection.getServer()
-                    .getRecensioniUtente(SessioneUtente.getUtenteCorrente().idUtente())
+            recensioneUtente = ServerConnection.ottieniServer()
+                    .visualizzaRecensioniUtente(SessioneUtente.ottieniUtenteCorrente().idUtente())
                     .stream()
                     .filter(recensione -> Objects.equals(
                             recensione.idRistorante(), ristorante.idRistorante()))
@@ -308,14 +309,14 @@ public class AreaRistoranteController {
         );
 
         lblDelivery.setText(
-                Boolean.TRUE.equals(ristorante.delivery()) ? "Sì" : "No"
+                Boolean.TRUE.equals(ristorante.consegna()) ? "Sì" : "No"
         );
 
         lblPrenotazione.setText(
-                Boolean.TRUE.equals(ristorante.bookingOnline()) ? "Sì" : "No"
+                Boolean.TRUE.equals(ristorante.prenotazioneOnline()) ? "Sì" : "No"
         );
 
-        CuisineTags.populate(cuisineTags, ristorante.tipologieCucina());
+        CuisineTags.popola(cuisineTags, ristorante.tipologieCucina());
     }
 
     /**
@@ -380,20 +381,22 @@ public class AreaRistoranteController {
             if (ristorante == null || ristorante.idRistorante() == null) {
                 return;
             }
-            List<RecensioneDTO> recensioni = SessioneUtente.isLoggato()
-                    ? ServerConnection.getServer().getRecensioniRistorante(ristorante.idRistorante())
-                    : ServerConnection.getServer().getRecensioniRistoranteAnonimo(ristorante.idRistorante());
+            List<RecensioneDTO> recensioni = SessioneUtente.eLoggato()
+                    ? ServerConnection.ottieniServer().visualizzaRecensioni(ristorante.idRistorante())
+                    : ServerConnection.ottieniServer().visualizzaRecensioniAnonimo(ristorante.idRistorante());
+            RiepilogoRecensioniDTO riepilogo =
+                    ServerConnection.ottieniServer().visualizzaRiepilogo(ristorante.idRistorante());
             gestoreProprietario = false;
-            if (SessioneUtente.isGestore()) {
-                UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
+            if (SessioneUtente.eGestore()) {
+                UtenteDTO gestore = SessioneUtente.ottieniUtenteCorrente();
                 gestoreProprietario = gestore != null
-                        && ServerConnection.getServer().getRistorantiGestore(gestore.idUtente())
+                        && ServerConnection.ottieniServer().ottieniRistorantiGestore(gestore.idUtente())
                         .stream()
                         .anyMatch(proprio -> Objects.equals(
                                 proprio.idRistorante(), ristorante.idRistorante()));
             }
 
-            aggiornaMediaRecensioni(recensioni);
+            aggiornaMediaRecensioni(riepilogo);
             aggiornaDistribuzioneRecensioni(recensioni);
             recensioniCaricate = recensioni;
             mostraRecensioniFiltrate(gestoreProprietario);
@@ -433,14 +436,14 @@ public class AreaRistoranteController {
 
         for (RecensioneDTO recensione : recensioniVisibili) {
             try {
-                FXMLLoader loader = new FXMLLoader(
+                FXMLLoader caricatore = new FXMLLoader(
                         getClass().getResource("/org/uninsubria/theknife/client/views/RecensioneItem.fxml")
                 );
-                Node item = loader.load();
-                RecensioneItemController controller = loader.getController();
-                controller.setRecensione(recensione);
-                controller.setRispostaAbilitata(gestoreProprietario);
-                reviewContainer.getChildren().add(item);
+                Node elemento = caricatore.load();
+                RecensioneItemController controllore = caricatore.getController();
+                controllore.setRecensione(recensione);
+                controllore.setRispostaAbilitata(gestoreProprietario);
+                reviewContainer.getChildren().add(elemento);
             } catch (Exception e) {
                 System.err.println("ERRORE caricando RecensioneItem.fxml: " + e.getMessage());
                 e.printStackTrace();
@@ -459,31 +462,26 @@ public class AreaRistoranteController {
 
 
     /**
-     * Aggiorna la valutazione media mostrata nella vista.
+     * Aggiorna la valutazione media mostrata nella vista usando il riepilogo
+     * calcolato dal server.
      *
-     * @param recensioni recensioni usate per calcolare la media
+     * @param riepilogo riepilogo delle recensioni del ristorante
      */
-    private void aggiornaMediaRecensioni(List<RecensioneDTO> recensioni) {
+    private void aggiornaMediaRecensioni(RiepilogoRecensioniDTO riepilogo) {
 
-        if (recensioni == null || recensioni.isEmpty()) {
+        if (riepilogo == null || riepilogo.numeroRecensioni() == 0) {
             averageRatingLabel.setText("0.0 / 5");
-            averageRating.setRating(0);
+            averageRating.impostaValutazione(0);
             return;
         }
 
-        double somma = 0;
-
-        for (RecensioneDTO recensione : recensioni) {
-            somma += recensione.valutazione();
-        }
-
-        double media = somma / recensioni.size();
+        double media = riepilogo.mediaStelle();
 
         averageRatingLabel.setText(
                 String.format(Locale.ROOT, "%.1f / 5", media)
         );
 
-        averageRating.setRating(media);
+        averageRating.impostaValutazione(media);
     }
 
     /**
@@ -555,12 +553,12 @@ public class AreaRistoranteController {
             valoreLabel.setVisible(false);
             valoreLabel.setMouseTransparent(true);
             barra.getChildren().setAll(riempimento, valoreLabel);
-            barra.setOnMouseEntered(event -> valoreLabel.setVisible(true));
-            barra.setOnMouseExited(event -> valoreLabel.setVisible(false));
-            barra.setOnMouseClicked(event -> {
+            barra.setOnMouseEntered(evento -> valoreLabel.setVisible(true));
+            barra.setOnMouseExited(evento -> valoreLabel.setVisible(false));
+            barra.setOnMouseClicked(evento -> {
                 valutazioneSelezionata = valutazione;
                 mostraRecensioniFiltrate(gestoreProprietario);
-                event.consume();
+                evento.consume();
             });
             barraData.setNode(barra);
             serie.getData().add(barraData);
@@ -585,8 +583,8 @@ public class AreaRistoranteController {
      * @param actionEvent evento generato dal click sul pulsante preferiti
      */
     public void onPreferitiClick(ActionEvent actionEvent) {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per aggiungere ristoranti ai preferiti.");
             return;
@@ -599,12 +597,12 @@ public class AreaRistoranteController {
 
         try {
             if (ristorantePreferito) {
-                ServerConnection.getServer().rimuoviPreferito(utente.idUtente(), ristorante.idRistorante());
+                ServerConnection.ottieniServer().rimuoviPreferito(utente.idUtente(), ristorante.idRistorante());
                 ristorantePreferito = false;
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Preferiti",
                         "Ristorante rimosso dai preferiti.");
             } else {
-                ServerConnection.getServer().aggiungiPreferito(utente.idUtente(), ristorante.idRistorante());
+                ServerConnection.ottieniServer().aggiungiPreferito(utente.idUtente(), ristorante.idRistorante());
                 ristorantePreferito = true;
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Preferiti",
                         "Ristorante aggiunto ai preferiti.");
@@ -630,8 +628,8 @@ public class AreaRistoranteController {
      * Verifica lo stato del ristorante nei preferiti dell'utente cliente.
      */
     private void aggiornaStatoPreferito() {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        boolean clienteLoggato = utente != null && SessioneUtente.isCliente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        boolean clienteLoggato = utente != null && SessioneUtente.eCliente();
         aggiungiPreferito.setVisible(clienteLoggato);
         aggiungiPreferito.setManaged(clienteLoggato);
         if (!clienteLoggato) {
@@ -639,8 +637,8 @@ public class AreaRistoranteController {
         }
 
         try {
-            ristorantePreferito = ServerConnection.getServer()
-                    .getPreferitiUtente(utente.idUtente())
+            ristorantePreferito = ServerConnection.ottieniServer()
+                    .visualizzaPreferiti(utente.idUtente())
                     .stream()
                     .anyMatch(preferito -> preferito.idRistorante().equals(ristorante.idRistorante()));
             aggiornaTestoPulsantePreferito();
@@ -668,12 +666,12 @@ public class AreaRistoranteController {
      * @param messaggio contenuto da mostrare all'utente
      */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
-        Alert alert = new Alert(tipo);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
+        Alert avviso = new Alert(tipo);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.showAndWait();
     }
 
     // =========================================================
@@ -689,7 +687,7 @@ public class AreaRistoranteController {
     public void onRecensioniClick(ActionEvent actionEvent) {
         RecensioneSelezionata.pulisci();
         RecensioneDaRispondere.pulisci();
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
+        SceneManager.cambiaScena(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
     /**
@@ -707,7 +705,7 @@ public class AreaRistoranteController {
                 RecensioneSelezionata.OrigineModifica.RISTORANTE
         );
         RecensioneDaRispondere.pulisci();
-        SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
+        SceneManager.cambiaScena(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
     /**
@@ -720,7 +718,7 @@ public class AreaRistoranteController {
         }
 
         Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
-        SceneManager.initOwner(conferma);
+        SceneManager.impostaProprietario(conferma);
         conferma.setTitle("Rimuovi recensione");
         conferma.setHeaderText("Vuoi rimuovere la tua recensione?");
         conferma.setContentText("Questa operazione non può essere annullata.");
@@ -728,15 +726,15 @@ public class AreaRistoranteController {
             return;
         }
 
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per rimuovere una recensione.");
             return;
         }
 
         try {
-            ServerConnection.getServer().eliminaRecensione(
+            ServerConnection.ottieniServer().eliminaRecensione(
                     recensioneUtente.idRecensione(), utente.idUtente());
             recensioneUtente = null;
             aggiornaAzioniRecensione(true);
@@ -757,12 +755,12 @@ public class AreaRistoranteController {
     /**
      * Torna alla lista dei ristoranti gestiti dal ristoratore.
      *
-     * @param event evento JavaFX usato per cambiare scena
+     * @param evento evento JavaFX usato per cambiare scena
      */
     @FXML
-    private void onTornaAiMieiRistorantiClick(ActionEvent event) {
-        SceneManager.replaceCurrentScene(
-                event,
+    private void onTornaAiMieiRistorantiClick(ActionEvent evento) {
+        SceneManager.sostituisciScenaCorrente(
+                evento,
                 "/org/uninsubria/theknife/client/views/DashboardGestore.fxml"
         );
     }

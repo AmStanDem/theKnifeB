@@ -47,7 +47,7 @@
                     <Button fx:id="btnBack"
                             text="←"
                             accessibleText="Torna alla pagina precedente"
-                            onAction="#goBack"
+                            onAction="#tornaIndietro"
                             styleClass="back-button" />
 
                     <!-- LOGO -->

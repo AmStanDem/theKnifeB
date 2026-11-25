@@ -21,23 +21,23 @@ public interface ITheKnifeServer extends Remote {
     /**
      * Sottoscrive un osservatore remoto a un tipo di evento.
      *
-     * @param topic tipo di evento a cui sottoscriversi
-     * @param targetId identificativo dell'entità interessata, oppure {@code null}
-     * @param observer osservatore remoto da notificare
+     * @param ambito tipo di evento a cui sottoscriversi
+     * @param idDestinazione identificativo dell'entità interessata, oppure {@code null}
+     * @param osservatore osservatore remoto da notificare
      * @return identificativo univoco della sottoscrizione
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws DatiMancantiException se uno dei dati necessari manca
      */
-    UUID subscribe(SubscriptionTopic topic, Integer targetId, RemoteObserver observer)
+    UUID sottoscrivi(SubscriptionTopic ambito, Integer idDestinazione, RemoteObserver osservatore)
             throws RemoteException, DatiMancantiException;
 
     /**
      * Rimuove una sottoscrizione esistente.
      *
-     * @param subscriptionId identificativo della sottoscrizione
+     * @param idSottoscrizione identificativo della sottoscrizione
      * @throws RemoteException se la comunicazione RMI non è disponibile
      */
-    void unsubscribe(UUID subscriptionId) throws RemoteException;
+    void annullaSottoscrizione(UUID idSottoscrizione) throws RemoteException;
 
     // --- IDENTITÀ ---
     /**
@@ -50,7 +50,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws CredenzialiErrateException se email o password non sono valide
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    UtenteDTO eseguiLogin(String email, String password)
+    UtenteDTO accedi(String email, String password)
             throws RemoteException, CredenzialiErrateException, SistemaIndisponibileException;
 
     /**
@@ -64,7 +64,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws DatiMancantiException se uno dei dati obbligatori manca
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
+    UtenteDTO registrazione(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException;
 
     /**
@@ -103,7 +103,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
+    List<RistoranteDTO> cercaRistorante(FiltriRicercaDTO filtri)
             throws RemoteException, SistemaIndisponibileException;
 
     /**
@@ -114,7 +114,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+    PaginaRistorantiDTO cercaRistorantePaginato(RicercaRistorantiPaginaDTO richiesta)
             throws RemoteException, SistemaIndisponibileException;
 
     /**
@@ -136,7 +136,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RistoranteNonTrovatoException se il ristorante non esiste
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    RistoranteDTO getDettaglioRistorante(Integer idRistorante)
+    RistoranteDTO visualizzaRistorante(Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException;
 
     /**
@@ -147,7 +147,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    List<RistoranteDTO> getRistorantiGestore(Integer idGestore)
+    List<RistoranteDTO> ottieniRistorantiGestore(Integer idGestore)
             throws RemoteException, SistemaIndisponibileException;
 
     /**
@@ -160,7 +160,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws DatiMancantiException se uno dei dati obbligatori manca
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    void registraNuovoRistorante(RistoranteDTO ristorante, Integer idGestore)
+    void aggiungiRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
 
     /**
@@ -185,7 +185,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
+    List<RecensioneDTO> visualizzaRecensioni(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException;
 
     /**
@@ -196,7 +196,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    List<RecensioneDTO> getRecensioniRistoranteAnonimo(Integer idRistorante)
+    List<RecensioneDTO> visualizzaRecensioniAnonimo(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException;
 
     /**
@@ -207,7 +207,19 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    List<RecensioneDTO> getRecensioniUtente(Integer idUtente)
+    List<RecensioneDTO> visualizzaRecensioniUtente(Integer idUtente)
+            throws RemoteException, SistemaIndisponibileException;
+
+    /**
+     * Restituisce il riepilogo delle recensioni di un ristorante, cioè la
+     * valutazione media e il numero totale di recensioni.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @return riepilogo delle recensioni
+     * @throws RemoteException se la comunicazione RMI non è disponibile
+     * @throws SistemaIndisponibileException se il sistema non è disponibile
+     */
+    RiepilogoRecensioniDTO visualizzaRiepilogo(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException;
 
     /**
@@ -222,7 +234,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws AzioneDuplicataException se l'utente ha già recensito il ristorante
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
+    void aggiungiRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException;
 
     /**
@@ -269,7 +281,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws DatiMancantiException se uno dei dati obbligatori manca
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    void rispondiARecensione(Integer idRecensione, String testoRisposta, Integer idGestore)
+    void rispostaRecensioni(Integer idRecensione, String testoRisposta, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException;
 
     // --- PREFERITI ---
@@ -281,7 +293,7 @@ public interface ITheKnifeServer extends Remote {
      * @throws RemoteException se la comunicazione RMI non è disponibile
      * @throws SistemaIndisponibileException se il sistema non è disponibile
      */
-    List<RistoranteDTO> getPreferitiUtente(Integer idUtente)
+    List<RistoranteDTO> visualizzaPreferiti(Integer idUtente)
             throws RemoteException, SistemaIndisponibileException;
 
     /**

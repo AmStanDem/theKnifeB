@@ -53,7 +53,7 @@ public final class AutocompleteLuoghi {
                 debounce.stop();
                 return;
             }
-            debounce.setOnFinished(event -> caricaSuggerimenti(nuovo.trim(), richiesta));
+            debounce.setOnFinished(evento -> caricaSuggerimenti(nuovo.trim(), richiesta));
             debounce.playFromStart();
         });
         campo.sceneProperty().addListener((observable, oldScene, newScene) -> {
@@ -64,7 +64,7 @@ public final class AutocompleteLuoghi {
         });
         campo.focusedProperty().addListener((observable, eraAttivo, attivo) -> {
             if (attivo && luogoSelezionato == null && campo.getText().trim().length() >= 3) {
-                debounce.setOnFinished(event ->
+                debounce.setOnFinished(evento ->
                         caricaSuggerimenti(campo.getText().trim(), generazione.get()));
                 debounce.playFromStart();
             } else if (!attivo) {
@@ -78,7 +78,7 @@ public final class AutocompleteLuoghi {
      *
      * @return località selezionata oppure {@code null} se il testo non corrisponde a una selezione
      */
-    public GeocodingService.Luogo getLuogoSelezionato() {
+    public GeocodingService.Luogo ottieniLuogoSelezionato() {
         return luogoSelezionato;
     }
 
@@ -124,9 +124,9 @@ public final class AutocompleteLuoghi {
     private void mostraSuggerimenti(List<GeocodingService.Luogo> luoghi) {
         suggerimenti.getItems().clear();
         for (GeocodingService.Luogo luogo : luoghi) {
-            MenuItem item = new MenuItem(luogo.etichetta());
-            item.setOnAction(event -> seleziona(luogo));
-            suggerimenti.getItems().add(item);
+            MenuItem elemento = new MenuItem(luogo.etichetta());
+            elemento.setOnAction(evento -> seleziona(luogo));
+            suggerimenti.getItems().add(elemento);
         }
         if (luoghi.isEmpty()) {
             mostraMessaggio("Nessuna località trovata.");
@@ -142,9 +142,9 @@ public final class AutocompleteLuoghi {
     }
 
     private void mostraMessaggio(String messaggio) {
-        MenuItem item = new MenuItem(messaggio);
-        item.setDisable(true);
-        suggerimenti.getItems().setAll(item);
+        MenuItem elemento = new MenuItem(messaggio);
+        elemento.setDisable(true);
+        suggerimenti.getItems().setAll(elemento);
         if (campo.getScene() != null && campo.getScene().getWindow() != null
                 && campo.getScene().getWindow().isShowing()) {
             suggerimenti.show(campo, Side.BOTTOM, 0, 0);

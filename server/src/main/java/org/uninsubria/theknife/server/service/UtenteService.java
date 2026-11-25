@@ -235,7 +235,7 @@ public class UtenteService {
             if (!utenteDAO.aggiornaUtente(datiAggiornati, account.passwordHash(), hashNuovo)) {
                 throw new CredenzialiErrateException();
             }
-            subscriptions.publish(null, datiAggiornati.idUtente(), DataChangedEvent.ChangeType.USER_UPDATED);
+            subscriptions.pubblica(null, datiAggiornati.idUtente(), DataChangedEvent.ChangeType.UTENTE_MODIFICATO);
             return datiAggiornati;
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState())) {

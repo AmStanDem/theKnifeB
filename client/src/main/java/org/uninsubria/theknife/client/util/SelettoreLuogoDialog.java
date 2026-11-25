@@ -84,7 +84,7 @@ public final class SelettoreLuogoDialog {
         if (owner != null) {
             dialog.initOwner(owner);
         } else {
-            SceneManager.initOwner(dialog);
+            SceneManager.impostaProprietario(dialog);
         }
         dialog.getDialogPane().getButtonTypes().addAll(CONFERMA, ButtonType.CANCEL);
 
@@ -136,10 +136,10 @@ public final class SelettoreLuogoDialog {
                 "Torna alla posizione iniziale della mappa"));
         Button selezionaCentro = new Button("Usa il punto al centro");
         selezionaCentro.setDefaultButton(false);
-        zoomOut.setOnAction(event -> mappa.cambiaZoom(-1));
-        zoomIn.setOnAction(event -> mappa.cambiaZoom(1));
-        ricentra.setOnAction(event -> mappa.ricentra());
-        selezionaCentro.setOnAction(event -> mappa.selezionaCentro());
+        zoomOut.setOnAction(evento -> mappa.cambiaZoom(-1));
+        zoomIn.setOnAction(evento -> mappa.cambiaZoom(1));
+        ricentra.setOnAction(evento -> mappa.ricentra());
+        selezionaCentro.setOnAction(evento -> mappa.selezionaCentro());
         HBox controls = new HBox(8, zoomOut, zoomIn, ricentra, selezionaCentro);
         controls.setPadding(new Insets(8));
         controls.setAlignment(Pos.CENTER);
@@ -245,7 +245,7 @@ public final class SelettoreLuogoDialog {
             setMinSize(400, 300);
             setPrefSize(760, 420);
             setStyle("-fx-background-color: #e8edf0;");
-            caricamentoTileDopoPan.setOnFinished(event -> aggiornaMappa());
+            caricamentoTileDopoPan.setOnFinished(evento -> aggiornaMappa());
             widthProperty().addListener((observable, oldValue, newValue) -> {
                 areaVisibile.setWidth(newValue.doubleValue());
                 aggiornaMappa();
@@ -254,29 +254,29 @@ public final class SelettoreLuogoDialog {
                 areaVisibile.setHeight(newValue.doubleValue());
                 aggiornaMappa();
             });
-            setOnMousePressed(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
-                    dragX = event.getX();
-                    dragY = event.getY();
+            setOnMousePressed(evento -> {
+                if (evento.getButton() == MouseButton.PRIMARY) {
+                    dragX = evento.getX();
+                    dragY = evento.getY();
                     dragStartX = centroX;
                     dragStartY = centroY;
                     dragging = false;
                 }
             });
-            setOnMouseDragged(event -> {
-                if (event.isPrimaryButtonDown()) {
-                    if (Math.abs(event.getX() - dragX) > 4 || Math.abs(event.getY() - dragY) > 4) {
+            setOnMouseDragged(evento -> {
+                if (evento.isPrimaryButtonDown()) {
+                    if (Math.abs(evento.getX() - dragX) > 4 || Math.abs(evento.getY() - dragY) > 4) {
                         dragging = true;
                     }
-                    centroX = dragStartX - (event.getX() - dragX);
-                    centroY = dragStartY - (event.getY() - dragY);
+                    centroX = dragStartX - (evento.getX() - dragX);
+                    centroY = dragStartY - (evento.getY() - dragY);
                     aggiornaCentroCoordinate();
                     aggiornaMappa(false);
                     caricamentoTileDopoPan.playFromStart();
                 }
             });
-            setOnMouseReleased(event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
+            setOnMouseReleased(evento -> {
+                if (evento.getButton() == MouseButton.PRIMARY) {
                     caricamentoTileDopoPan.stop();
                     aggiornaCentroCoordinate();
                     aggiornaMappa();
@@ -287,10 +287,10 @@ public final class SelettoreLuogoDialog {
                 }
             });
             layoutBoundsProperty().addListener((observable, oldBounds, newBounds) -> aggiornaMappa());
-            addEventFilter(ScrollEvent.SCROLL, event -> {
-                if (Math.abs(event.getDeltaY()) > 0) {
-                    cambiaZoom(event.getDeltaY() > 0 ? 1 : -1);
-                    event.consume();
+            addEventFilter(ScrollEvent.SCROLL, evento -> {
+                if (Math.abs(evento.getDeltaY()) > 0) {
+                    cambiaZoom(evento.getDeltaY() > 0 ? 1 : -1);
+                    evento.consume();
                 }
             });
             Platform.runLater(this::aggiornaMappa);

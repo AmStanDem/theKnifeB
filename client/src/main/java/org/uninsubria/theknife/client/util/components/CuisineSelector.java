@@ -48,7 +48,7 @@ public final class CuisineSelector extends MenuButton {
      *
      * @param cuisines tipologie di cucina da mostrare, oppure {@code null} per non mostrarne
      */
-    public void setCuisines(Collection<String> cuisines) {
+    public void impostaCucine(Collection<String> cuisines) {
         cuisineCheckBoxes.clear();
         VBox menuContent = new VBox(8);
         menuContent.setPadding(new Insets(8));
@@ -65,10 +65,10 @@ public final class CuisineSelector extends MenuButton {
         TextField searchInput = new TextField();
         searchInput.setPromptText("Filtra cucine...");
         searchInput.getStyleClass().add("search-cuisine-input");
-        searchInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.SPACE) {
+        searchInput.addEventFilter(KeyEvent.KEY_PRESSED, evento -> {
+            if (evento.getCode() == KeyCode.SPACE) {
                 searchInput.insertText(searchInput.getCaretPosition(), " ");
-                event.consume();
+                evento.consume();
             }
         });
 
@@ -77,7 +77,7 @@ public final class CuisineSelector extends MenuButton {
             CheckBox checkBox = new CheckBox(cuisine);
             checkBox.setStyle("-fx-text-fill: #1e293b;");
             checkBox.setSelected(selectedCuisines.contains(checkBox.getText()));
-            checkBox.setOnAction(event -> {
+            checkBox.setOnAction(evento -> {
                 if (checkBox.isSelected()) {
                     selectedCuisines.add(checkBox.getText());
                 } else {
@@ -110,13 +110,13 @@ public final class CuisineSelector extends MenuButton {
         clearButton.setStyle(
                 "-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-cursor: hand;"
         );
-        clearButton.setOnAction(event -> clearSelection());
+        clearButton.setOnAction(evento -> svuotaSelezione());
 
         menuContent.getChildren().addAll(searchInput, scrollPane, clearButton);
         CustomMenuItem menuItem = new CustomMenuItem(menuContent, false);
         menuItem.setHideOnClick(false);
         getItems().setAll(menuItem);
-        setOnShowing(event -> Platform.runLater(searchInput::requestFocus));
+        setOnShowing(evento -> Platform.runLater(searchInput::requestFocus));
         aggiornaEtichetta();
     }
 
@@ -126,7 +126,7 @@ public final class CuisineSelector extends MenuButton {
      *
      * @param cuisines tipologie da selezionare, oppure {@code null} per azzerare la selezione
      */
-    public void setSelectedCuisines(Collection<String> cuisines) {
+    public void impostaCucineSelezionate(Collection<String> cuisines) {
         selectedCuisines.clear();
         if (cuisines != null) {
             cuisines.stream()
@@ -144,14 +144,14 @@ public final class CuisineSelector extends MenuButton {
      *
      * @return copia non modificabile delle tipologie selezionate
      */
-    public List<String> getSelectedCuisines() {
+    public List<String> ottieniCucineSelezionate() {
         return List.copyOf(selectedCuisines);
     }
 
     /**
      * Deseleziona tutte le tipologie.
      */
-    public void clearSelection() {
+    public void svuotaSelezione() {
         selectedCuisines.clear();
         cuisineCheckBoxes.forEach(checkBox -> checkBox.setSelected(false));
         aggiornaEtichetta();

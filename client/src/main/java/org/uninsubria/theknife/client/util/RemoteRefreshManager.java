@@ -21,124 +21,124 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- * Gestisce le sottoscrizioni RMI del client e inoltra gli eventi ricevuti ai listener JavaFX.
+ * Gestisce le sottoscrizioni RMI del client e inoltra gli eventi ricevuti ai ascoltatore JavaFX.
  */
 public final class RemoteRefreshManager {
 
-    private static volatile RemoteRefreshManager instance;
+    private static volatile RemoteRefreshManager istanza;
 
-    private static final class Subscription {
-        private final UUID localId = UUID.randomUUID();
-        private final Object owner;
-        private final SubscriptionTopic topic;
-        private final Integer targetId;
-        private final Consumer<DataChangedEvent> listener;
-        private final Runnable onSubscribed;
-        private volatile UUID remoteId;
-        private volatile boolean closed;
+    private static final class Sottoscrizione {
+        private final UUID idLocale = UUID.randomUUID();
+        private final Object proprietario;
+        private final SubscriptionTopic ambito;
+        private final Integer idDestinazione;
+        private final Consumer<DataChangedEvent> ascoltatore;
+        private final Runnable allaSottoscrizione;
+        private volatile UUID idRemoto;
+        private volatile boolean chiusa;
 
-        private Subscription(
-                Object owner,
-                SubscriptionTopic topic,
-                Integer targetId,
-                Consumer<DataChangedEvent> listener,
-                Runnable onSubscribed
+        private Sottoscrizione(
+                Object proprietario,
+                SubscriptionTopic ambito,
+                Integer idDestinazione,
+                Consumer<DataChangedEvent> ascoltatore,
+                Runnable allaSottoscrizione
         ) {
-            this.owner = owner;
-            this.topic = topic;
-            this.targetId = targetId;
-            this.listener = listener;
-            this.onSubscribed = onSubscribed;
+            this.proprietario = proprietario;
+            this.ambito = ambito;
+            this.idDestinazione = idDestinazione;
+            this.ascoltatore = ascoltatore;
+            this.allaSottoscrizione = allaSottoscrizione;
         }
     }
 
-    private static final class ClientObserver extends UnicastRemoteObject implements RemoteObserver {
-        private ClientObserver() throws RemoteException {
+    private static final class OsservatoreClient extends UnicastRemoteObject implements RemoteObserver {
+        private OsservatoreClient() throws RemoteException {
             super(0);
         }
 
         @Override
-        public void onDataChanged(DataChangedEvent event) throws RemoteException {
-            getInstance().dispatch(event);
+        public void datiCambiati(DataChangedEvent evento) throws RemoteException {
+            ottieniIstanza().distribuisci(evento);
         }
     }
 
-    private final ConcurrentMap<UUID, Subscription> subscriptions = new ConcurrentHashMap<>();
-    private final ConcurrentMap<UUID, Subscription> subscriptionsByRemoteId = new ConcurrentHashMap<>();
-    private final ExecutorService background = Executors.newVirtualThreadPerTaskExecutor();
-    private final RemoteObserver observer;
+    private final ConcurrentMap<UUID, Sottoscrizione> sottoscrizioni = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, Sottoscrizione> sottoscrizioniPerIdRemoto = new ConcurrentHashMap<>();
+    private final ExecutorService esecutoreSfondo = Executors.newVirtualThreadPerTaskExecutor();
+    private final RemoteObserver osservatore;
 
     /**
      * Impedisce l'istanziazione diretta del gestore singleton.
      */
     private RemoteRefreshManager() {
         try {
-            observer = new ClientObserver();
+            osservatore = new OsservatoreClient();
         } catch (RemoteException e) {
             throw new ExceptionInInitializerError(e);
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close, "theknife-client-callback-shutdown"));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::chiudi, "theknife-client-callback-arresta"));
     }
 
     /**
      * Sottoscrive un proprietario agli eventi del server.
      *
-     * @param owner oggetto proprietario della sottoscrizione, usato per annullarla in gruppo
-     * @param topic tipo di evento a cui sottoscriversi
-     * @param targetId identificativo dell'entità interessata, oppure {@code null}
-     * @param listener callback invocata quando viene ricevuta una notifica
-     * @param onSubscribed callback invocata quando la sottoscrizione remota è stata completata
+     * @param proprietario oggetto proprietario della sottoscrizione, usato per annullarla in gruppo
+     * @param ambito tipo di evento a cui sottoscriversi
+     * @param idDestinazione identificativo dell'entità interessata, oppure {@code null}
+     * @param ascoltatore callback invocata quando viene ricevuta una notifica
+     * @param allaSottoscrizione callback invocata quando la sottoscrizione remota è stata completata
      * @return identificativo locale della sottoscrizione
      * @throws IllegalArgumentException se proprietario, argomento o callback obbligatori sono {@code null}
      */
-    public static UUID subscribe(
-            Object owner,
-            SubscriptionTopic topic,
-            Integer targetId,
-            Consumer<DataChangedEvent> listener,
-            Runnable onSubscribed
+    public static UUID sottoscrivi(
+            Object proprietario,
+            SubscriptionTopic ambito,
+            Integer idDestinazione,
+            Consumer<DataChangedEvent> ascoltatore,
+            Runnable allaSottoscrizione
     ) {
-        return getInstance().addSubscription(owner, topic, targetId, listener, onSubscribed);
+        return ottieniIstanza().aggiungiSottoscrizione(proprietario, ambito, idDestinazione, ascoltatore, allaSottoscrizione);
     }
 
-    private UUID addSubscription(
-            Object owner,
-            SubscriptionTopic topic,
-            Integer targetId,
-            Consumer<DataChangedEvent> listener,
-            Runnable onSubscribed
+    private UUID aggiungiSottoscrizione(
+            Object proprietario,
+            SubscriptionTopic ambito,
+            Integer idDestinazione,
+            Consumer<DataChangedEvent> ascoltatore,
+            Runnable allaSottoscrizione
     ) {
-        if (owner == null || topic == null || listener == null || onSubscribed == null) {
-            throw new IllegalArgumentException("Owner, topic, listener e callback di registrazione sono obbligatori.");
+        if (proprietario == null || ambito == null || ascoltatore == null || allaSottoscrizione == null) {
+            throw new IllegalArgumentException("Owner, ambito, ascoltatore e callback di registrazione sono obbligatori.");
         }
 
-        Subscription subscription = new Subscription(owner, topic, targetId, listener, onSubscribed);
-        subscriptions.put(subscription.localId, subscription);
-        background.execute(() -> register(subscription));
-        return subscription.localId;
+        Sottoscrizione sottoscrizione = new Sottoscrizione(proprietario, ambito, idDestinazione, ascoltatore, allaSottoscrizione);
+        sottoscrizioni.put(sottoscrizione.idLocale, sottoscrizione);
+        esecutoreSfondo.execute(() -> registra(sottoscrizione));
+        return sottoscrizione.idLocale;
     }
 
-    private void register(Subscription subscription) {
+    private void registra(Sottoscrizione sottoscrizione) {
         try {
-            UUID remoteId = ServerConnection.getServer()
-                    .subscribe(subscription.topic, subscription.targetId, observer);
-            subscription.remoteId = remoteId;
-            if (subscription.closed) {
-                unsubscribeRemotely(remoteId);
+            UUID idRemoto = ServerConnection.ottieniServer()
+                    .sottoscrivi(sottoscrizione.ambito, sottoscrizione.idDestinazione, osservatore);
+            sottoscrizione.idRemoto = idRemoto;
+            if (sottoscrizione.chiusa) {
+                annullaSottoscrizioneRemota(idRemoto);
             } else {
-                subscriptionsByRemoteId.put(remoteId, subscription);
+                sottoscrizioniPerIdRemoto.put(idRemoto, sottoscrizione);
                 try {
                     Platform.runLater(() -> {
-                        if (!subscription.closed && subscriptions.containsKey(subscription.localId)) {
-                            subscription.onSubscribed.run();
+                        if (!sottoscrizione.chiusa && sottoscrizioni.containsKey(sottoscrizione.idLocale)) {
+                            sottoscrizione.allaSottoscrizione.run();
                         }
                     });
                 } catch (IllegalStateException e) {
-                    removeSubscription(subscription);
+                    rimuoviSottoscrizione(sottoscrizione);
                 }
             }
         } catch (RemoteException | NotBoundException | DatiMancantiException e) {
-            if (!subscription.closed) {
+            if (!sottoscrizione.chiusa) {
                 System.err.println("[RMI_CALLBACK] Sottoscrizione non riuscita: " + e.getMessage());
             }
         }
@@ -147,61 +147,61 @@ public final class RemoteRefreshManager {
     /**
      * Annulla tutte le sottoscrizioni associate al proprietario indicato.
      *
-     * @param owner proprietario delle sottoscrizioni da annullare
+     * @param proprietario proprietario delle sottoscrizioni da annullare
      */
-    public static void unsubscribeOwner(Object owner) {
-        RemoteRefreshManager manager = instance;
-        if (manager != null) {
-            manager.removeSubscriptions(owner);
+    public static void annullaSottoscrizioniProprietario(Object proprietario) {
+        RemoteRefreshManager gestore = istanza;
+        if (gestore != null) {
+            gestore.rimuoviSottoscrizioni(proprietario);
         }
     }
 
-    private static synchronized RemoteRefreshManager getInstance() {
-        if (instance == null) {
-            instance = new RemoteRefreshManager();
+    private static synchronized RemoteRefreshManager ottieniIstanza() {
+        if (istanza == null) {
+            istanza = new RemoteRefreshManager();
         }
-        return instance;
+        return istanza;
     }
 
-    private void removeSubscriptions(Object owner) {
-        subscriptions.values().stream()
-                .filter(subscription -> subscription.owner == owner)
+    private void rimuoviSottoscrizioni(Object proprietario) {
+        sottoscrizioni.values().stream()
+                .filter(sottoscrizione -> sottoscrizione.proprietario == proprietario)
                 .toList()
-                .forEach(this::removeSubscription);
+                .forEach(this::rimuoviSottoscrizione);
     }
 
-    private void removeSubscription(Subscription subscription) {
-        if (!subscriptions.remove(subscription.localId, subscription)) {
+    private void rimuoviSottoscrizione(Sottoscrizione sottoscrizione) {
+        if (!sottoscrizioni.remove(sottoscrizione.idLocale, sottoscrizione)) {
             return;
         }
-        subscription.closed = true;
-        UUID remoteId = subscription.remoteId;
-        if (remoteId != null) {
-            subscriptionsByRemoteId.remove(remoteId, subscription);
-            background.execute(() -> unsubscribeRemotely(remoteId));
+        sottoscrizione.chiusa = true;
+        UUID idRemoto = sottoscrizione.idRemoto;
+        if (idRemoto != null) {
+            sottoscrizioniPerIdRemoto.remove(idRemoto, sottoscrizione);
+            esecutoreSfondo.execute(() -> annullaSottoscrizioneRemota(idRemoto));
         }
     }
 
-    private void unsubscribeRemotely(UUID remoteId) {
+    private void annullaSottoscrizioneRemota(UUID idRemoto) {
         try {
-            ServerConnection.getServer().unsubscribe(remoteId);
+            ServerConnection.ottieniServer().annullaSottoscrizione(idRemoto);
         } catch (RemoteException | NotBoundException e) {
             System.err.println("[RMI_CALLBACK] Annullamento sottoscrizione non riuscito: " + e.getMessage());
         }
     }
 
-    private void dispatch(DataChangedEvent event) throws RemoteException {
-        if (event == null || event.subscriptionId() == null) {
+    private void distribuisci(DataChangedEvent evento) throws RemoteException {
+        if (evento == null || evento.idSottoscrizione() == null) {
             return;
         }
-        Subscription subscription = subscriptionsByRemoteId.get(event.subscriptionId());
-        if (subscription == null || subscription.closed) {
+        Sottoscrizione sottoscrizione = sottoscrizioniPerIdRemoto.get(evento.idSottoscrizione());
+        if (sottoscrizione == null || sottoscrizione.chiusa) {
             return;
         }
         try {
             Platform.runLater(() -> {
-                if (!subscription.closed && subscriptions.containsKey(subscription.localId)) {
-                    subscription.listener.accept(event);
+                if (!sottoscrizione.chiusa && sottoscrizioni.containsKey(sottoscrizione.idLocale)) {
+                    sottoscrizione.ascoltatore.accept(evento);
                 }
             });
         } catch (IllegalStateException e) {
@@ -212,22 +212,22 @@ public final class RemoteRefreshManager {
     /**
      * Arresta il gestore e rilascia le risorse RMI e i thread usati per le sottoscrizioni.
      */
-    public static void shutdown() {
-        RemoteRefreshManager manager = instance;
-        if (manager != null) {
-            manager.close();
+    public static void arresta() {
+        RemoteRefreshManager gestore = istanza;
+        if (gestore != null) {
+            gestore.chiudi();
         }
     }
 
-    private void close() {
-        subscriptions.values().forEach(subscription -> subscription.closed = true);
-        subscriptions.clear();
-        subscriptionsByRemoteId.clear();
-        background.shutdownNow();
+    private void chiudi() {
+        sottoscrizioni.values().forEach(sottoscrizione -> sottoscrizione.chiusa = true);
+        sottoscrizioni.clear();
+        sottoscrizioniPerIdRemoto.clear();
+        esecutoreSfondo.shutdownNow();
         try {
-            UnicastRemoteObject.unexportObject((java.rmi.Remote) observer, true);
+            UnicastRemoteObject.unexportObject((java.rmi.Remote) osservatore, true);
         } catch (java.rmi.NoSuchObjectException ignored) {
-            // The callback may already have been unexported during JVM shutdown.
+            // The callback may already have been unexported during JVM arresta.
         }
     }
 }

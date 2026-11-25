@@ -26,7 +26,7 @@ import java.util.Objects;
  * del contenuto della vista corrente.
  * </p>
  * <p>
- * Il contenuto interno viene sostituito tramite {@link #setContent(Node)}, mentre
+ * Il contenuto interno viene sostituito tramite {@link #impostaContenuto(Node)}, mentre
  * lo stato dei controlli viene adattato alla sessione utente e alla pagina
  * visualizzata.
  * </p>
@@ -70,7 +70,7 @@ public class BaseLayoutController {
      */
     @FXML
     private void initialize() {
-        loggato = SessioneUtente.getUtenteCorrente() != null;
+        loggato = SessioneUtente.ottieniUtenteCorrente() != null;
         imgUtente.setVisible(loggato);
         imgUtente.setManaged(loggato);
         aggiornaPulsanteAccesso();
@@ -79,22 +79,22 @@ public class BaseLayoutController {
     /**
      * Gestisce il comando per tornare alla pagina precedente.
      *
-     * @param event evento generato dal pulsante indietro
+     * @param evento evento generato dal pulsante indietro
      */
     @FXML
-    private void goBack(ActionEvent event) {
-        SceneManager.goBack(event);
+    private void tornaIndietro(ActionEvent evento) {
+        SceneManager.tornaIndietro(evento);
     }
 
     /**
      * Apre la schermata di login o registrazione per un utente non autenticato.
      *
-     * @param event evento generato dal pulsante di accesso
+     * @param evento evento generato dal pulsante di accesso
      */
     @FXML
-    private void onAreaPersonaleClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void onAreaPersonaleClick(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/AuthView.fxml"
         );
     }
@@ -102,12 +102,12 @@ public class BaseLayoutController {
     /**
      * Apre l'area personale dell'utente autenticato.
      *
-     * @param event evento generato dal click sull'icona utente
+     * @param evento evento generato dal click sull'icona utente
      */
     @FXML
-    private void onAreaPersonaleLoggatoClick(MouseEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void onAreaPersonaleLoggatoClick(MouseEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/ProfiloView.fxml"
         );
     }
@@ -118,17 +118,17 @@ public class BaseLayoutController {
      * @param content nodo da visualizzare nel layout
      * @throws NullPointerException se {@code content} è {@code null}
      */
-    public void setContent(Node content) {
+    public void impostaContenuto(Node content) {
         contentContainer.getChildren().setAll(Objects.requireNonNull(content));
     }
 
     /**
      * Aggiorna la disponibilità del pulsante per tornare alla pagina precedente.
      *
-     * @param canGoBack {@code true} se è disponibile una pagina precedente
+     * @param puoTornareIndietro {@code true} se è disponibile una pagina precedente
      */
-    public void setCanGoBack(boolean canGoBack) {
-        btnBack.setDisable(!canGoBack);
+    public void impostaPuoTornareIndietro(boolean puoTornareIndietro) {
+        btnBack.setDisable(!puoTornareIndietro);
     }
 
     /**
@@ -138,11 +138,11 @@ public class BaseLayoutController {
      * di accesso quando l'utente si trova già sulla relativa schermata.
      * </p>
      *
-     * @param loginPage {@code true} se la vista corrente è la pagina di login
+     * @param paginaDiAccesso {@code true} se la vista corrente è la pagina di login
      */
-    public void setLoginPage(boolean loginPage) {
-        paginaLogin = loginPage;
-        if (loginPage) {
+    public void impostaPaginaAccesso(boolean paginaDiAccesso) {
+        paginaLogin = paginaDiAccesso;
+        if (paginaDiAccesso) {
             layoutPane.setTop(null);
             header.setMaxHeight(Region.USE_PREF_SIZE);
             StackPane.setAlignment(header, Pos.TOP_LEFT);
@@ -153,11 +153,11 @@ public class BaseLayoutController {
             layoutRoot.getChildren().remove(header);
             layoutPane.setTop(header);
         }
-        imgLogo.setVisible(!loginPage);
-        imgLogo.setManaged(!loginPage);
-        imgLogo.setMouseTransparent(loginPage);
+        imgLogo.setVisible(!paginaDiAccesso);
+        imgLogo.setManaged(!paginaDiAccesso);
+        imgLogo.setMouseTransparent(paginaDiAccesso);
         header.getStyleClass().remove("login-header");
-        if (loginPage) {
+        if (paginaDiAccesso) {
             header.getStyleClass().add("login-header");
         }
         aggiornaPulsanteAccesso();

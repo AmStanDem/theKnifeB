@@ -34,15 +34,15 @@ public class InteractiveRatingView extends BaseRatingView {
 
             // Hover: solo anteprima, NON modifica "rating"
             star.setOnMouseMoved(e -> {
-                if (!isInteractive()) return;
-                paintStars(valueAt(star, starIndex, e.getX()));
+                if (!eInterattivo()) return;
+                disegnaStelle(valoreIn(star, starIndex, e.getX()));
             });
 
             // Click sinistro: conferma il voto
             star.setOnMouseClicked(e -> {
-                if (!isInteractive() || e.getButton() != MouseButton.PRIMARY) return;
-                rating = valueAt(star, starIndex, e.getX());
-                paintStars(rating);
+                if (!eInterattivo() || e.getButton() != MouseButton.PRIMARY) return;
+                rating = valoreIn(star, starIndex, e.getX());
+                disegnaStelle(rating);
                 if (onRatingChanged != null) {
                     onRatingChanged.run();
                 }
@@ -50,19 +50,19 @@ public class InteractiveRatingView extends BaseRatingView {
         }
 
         // Uscendo dal componente si torna al voto confermato
-        setOnMouseExited(e -> paintStars(rating));
+        setOnMouseExited(e -> disegnaStelle(rating));
 
-        updateCursor();
-        paintStars(rating);
+        aggiornaCursore();
+        disegnaStelle(rating);
     }
 
     /** Mezza stella se il mouse è nella metà sinistra, stella intera altrimenti. */
-    private double valueAt(SVGPath star, int starIndex, double mouseX) {
+    private double valoreIn(SVGPath star, int starIndex, double mouseX) {
         double starWidth = star.getLayoutBounds().getWidth();
         return (mouseX < starWidth / 2.0) ? (starIndex - 0.5) : starIndex;
     }
 
-    private void updateCursor() {
+    private void aggiornaCursore() {
         setCursor(interactive ? Cursor.HAND : Cursor.DEFAULT);
     }
 
@@ -71,10 +71,10 @@ public class InteractiveRatingView extends BaseRatingView {
      *
      * @param interactive {@code true} per abilitare l'interazione
      */
-    public void setInteractive(boolean interactive) {
+    public void impostaInterattivo(boolean interactive) {
         this.interactive = interactive;
-        updateCursor();
-        paintStars(rating);
+        aggiornaCursore();
+        disegnaStelle(rating);
     }
 
     /**
@@ -82,7 +82,7 @@ public class InteractiveRatingView extends BaseRatingView {
      *
      * @return {@code true} se la vista è interattiva
      */
-    public boolean isInteractive() {
+    public boolean eInterattivo() {
         return interactive;
     }
 
@@ -91,7 +91,7 @@ public class InteractiveRatingView extends BaseRatingView {
      *
      * @param onRatingChanged azione da eseguire, oppure {@code null} per non eseguirne alcuna
      */
-    public void setOnRatingChanged(Runnable onRatingChanged) {
+    public void impostaSuValutazioneCambiata(Runnable onRatingChanged) {
         this.onRatingChanged = onRatingChanged;
     }
 }

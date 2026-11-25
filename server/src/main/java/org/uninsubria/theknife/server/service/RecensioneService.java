@@ -135,11 +135,11 @@ public class RecensioneService {
         }
 
         try {
-            boolean successo = recensioneDAO.inserisciRecensione(idUtente, idRistorante, recensione);
+            boolean successo = recensioneDAO.aggiungiRecensione(idUtente, idRistorante, recensione);
             if (!successo) {
                 throw new AzioneDuplicataException("Hai già recensito questo ristorante.");
             }
-            subscriptions.publish(idRistorante, idUtente, DataChangedEvent.ChangeType.REVIEW_CREATED);
+            subscriptions.pubblica(idRistorante, idUtente, DataChangedEvent.ChangeType.RECENSIONE_CREATA);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore inserimento recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -187,7 +187,7 @@ public class RecensioneService {
                 throw new ModificaObsoletaException(
                         "La recensione è stata modificata da un altro client. Ricarica i dati e riprova.");
             }
-            subscriptions.publish(esito.restaurantId(), idUtente, DataChangedEvent.ChangeType.REVIEW_UPDATED);
+            subscriptions.pubblica(esito.idRistorante(), idUtente, DataChangedEvent.ChangeType.RECENSIONE_MODIFICATA);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore modifica recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -219,7 +219,7 @@ public class RecensioneService {
                 throw new RecensioneNonTrovataException(
                         "Impossibile eliminare: recensione inesistente o non di tua proprietà.");
             }
-            subscriptions.publish(target.restaurantId(), idUtente, DataChangedEvent.ChangeType.REVIEW_DELETED);
+            subscriptions.pubblica(target.idRistorante(), idUtente, DataChangedEvent.ChangeType.RECENSIONE_ELIMINATA);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore eliminazione recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);
@@ -253,8 +253,8 @@ public class RecensioneService {
                 throw new OperazioneNonConsentitaException(
                         "solo il gestore del ristorante può rispondere e ogni recensione può avere una sola risposta.");
             }
-            subscriptions.publish(
-                    target.restaurantId(), target.userId(), DataChangedEvent.ChangeType.REVIEW_REPLY_CHANGED);
+            subscriptions.pubblica(
+                    target.idRistorante(), target.idUtente(), DataChangedEvent.ChangeType.RISPOSTA_RECENSIONE_MODIFICATA);
         } catch (SQLException e) {
             System.err.println("[DAO_ERROR] Errore inserimento risposta recensione: " + e.getMessage());
             throw new SistemaIndisponibileException(e);

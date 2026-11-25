@@ -61,13 +61,13 @@ public final class PrezzoDatasetEstimator {
         };
 
         String normalizedCountry = country == null ? "" : country.trim().toLowerCase(Locale.ROOT);
-        double countryFactor = countryFactor(normalizedCountry);
+        double fattorePaese = fattorePaese(normalizedCountry);
         String identity = (restaurantName == null ? "" : restaurantName)
                 + "|" + (address == null ? "" : address)
                 + "|" + normalizedCountry;
         double variation = Math.floorMod(identity.hashCode(), 1_000) / 999.0;
         double positionInTier = 0.35 + variation * 0.30;
-        return Math.round((lower + (upper - lower) * positionInTier) * countryFactor * 100.0) / 100.0;
+        return Math.round((lower + (upper - lower) * positionInTier) * fattorePaese * 100.0) / 100.0;
     }
 
     private static int tier(String priceLevel) {
@@ -91,7 +91,7 @@ public final class PrezzoDatasetEstimator {
         return count >= 1 && count <= 4 ? count : 0;
     }
 
-    private static double countryFactor(String country) {
+    private static double fattorePaese(String country) {
         if (VERY_HIGH_COST_COUNTRIES.contains(country)) {
             return 1.45;
         }

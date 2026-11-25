@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Controller JavaFX della lista dei ristoranti preferiti dall'utente cliente.
  * <p>
- * Recupera i preferiti dal server, crea una card per ciascun ristorante e
+ * Recupera i preferiti dal server, crea una scheda per ciascun ristorante e
  * consente di rimuovere un elemento dalla lista. I dati vengono aggiornati
  * automaticamente in seguito alle modifiche dei preferiti o del catalogo.
  * </p>
@@ -57,15 +57,15 @@ public class PreferitiController {
     @FXML
     public void initialize() {
         caricaPreferiti();
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
         if (utente != null) {
-            RemoteRefreshManager.subscribe(this, SubscriptionTopic.USER, utente.idUtente(), event -> {
-                if (event.type() == DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+            RemoteRefreshManager.sottoscrivi(this, SubscriptionTopic.UTENTE, utente.idUtente(), evento -> {
+                if (evento.tipo() == DataChangedEvent.ChangeType.PREFERITI_MODIFICATI) {
                     caricaPreferiti();
                 }
             }, this::caricaPreferiti);
-            RemoteRefreshManager.subscribe(
-                    this, SubscriptionTopic.CATALOG, null, event -> caricaPreferiti(), this::caricaPreferiti);
+            RemoteRefreshManager.sottoscrivi(
+                    this, SubscriptionTopic.CATALOGO, null, evento -> caricaPreferiti(), this::caricaPreferiti);
         }
     }
 
@@ -77,8 +77,8 @@ public class PreferitiController {
      * </p>
      */
     private void caricaPreferiti() {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per visualizzare i tuoi ristoranti preferiti.");
             aggiornaLista(List.of());
@@ -86,7 +86,7 @@ public class PreferitiController {
         }
 
         try {
-            List<RistoranteDTO> preferiti = ServerConnection.getServer().getPreferitiUtente(utente.idUtente());
+            List<RistoranteDTO> preferiti = ServerConnection.ottieniServer().visualizzaPreferiti(utente.idUtente());
             ristorantiCompleti.setAll(preferiti);
             aggiornaLista(ristorantiCompleti);
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
@@ -104,9 +104,9 @@ public class PreferitiController {
         restaurantContainer.getChildren().clear();
 
         for (RistoranteDTO ristorante : nuovaLista) {
-            Node card = creaCardRistorante(ristorante);
-            if (card != null) {
-                restaurantContainer.getChildren().add(card);
+            Node scheda = creaCardRistorante(ristorante);
+            if (scheda != null) {
+                restaurantContainer.getChildren().add(scheda);
             }
         }
 
@@ -115,25 +115,25 @@ public class PreferitiController {
     }
 
     /**
-     * Crea la card grafica di un ristorante preferito.
+     * Crea la scheda grafica di un ristorante preferito.
      * <p>
-     * Collega il pulsante di rimozione della card al metodo del controller
+     * Collega il pulsante di rimozione della scheda al metodo del controllore
      * responsabile dell'aggiornamento del preferito sul server.
      * </p>
      *
      * @param ristorante ristorante da rappresentare
-     * @return nodo JavaFX della card, oppure {@code null} se il caricamento fallisce
+     * @return nodo JavaFX della scheda, oppure {@code null} se il caricamento fallisce
      */
     private Node creaCardRistorante(RistoranteDTO ristorante) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RistoranteItem.fxml"));
-            Pane cardPane = loader.load();
+            FXMLLoader caricatore = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RistoranteItem.fxml"));
+            Pane riquadroScheda = caricatore.load();
 
-            RistoranteItemController controller = loader.getController();
-            controller.setRistorante(ristorante);
-            controller.setOnRemoveFavoriteAction(this::rimuoviPreferito);
+            RistoranteItemController controllore = caricatore.getController();
+            controllore.impostaRistorante(ristorante);
+            controllore.setOnRemoveFavoriteAction(this::rimuoviPreferito);
 
-            return cardPane;
+            return riquadroScheda;
 
         } catch (IOException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore",
@@ -152,15 +152,15 @@ public class PreferitiController {
      * @param ristorante ristorante da rimuovere dai preferiti
      */
     private void rimuoviPreferito(RistoranteDTO ristorante) {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per modificare i preferiti.");
             return;
         }
 
         try {
-            ServerConnection.getServer().rimuoviPreferito(utente.idUtente(), ristorante.idRistorante());
+            ServerConnection.ottieniServer().rimuoviPreferito(utente.idUtente(), ristorante.idRistorante());
             ristorantiCompleti.removeIf(preferito ->
                     Objects.equals(preferito.idRistorante(), ristorante.idRistorante()));
             aggiornaLista(ristorantiCompleti);
@@ -182,11 +182,11 @@ public class PreferitiController {
      * @param messaggio testo da mostrare all'utente
      */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
-        Alert alert = new Alert(tipo);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
+        Alert avviso = new Alert(tipo);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.showAndWait();
     }
 }

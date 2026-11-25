@@ -67,11 +67,11 @@ public class MieRecensioniController {
     /**
      * Apre l'area personale dell'utente.
      *
-     * @param event evento generato dal click sull'area personale
+     * @param evento evento generato dal click sull'area personale
      */
     @FXML
-    private void onAreaPersonaleClick(MouseEvent event) {
-        SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/ProfiloView.fxml");
+    private void onAreaPersonaleClick(MouseEvent evento) {
+        SceneManager.cambiaScena(evento, "/org/uninsubria/theknife/client/views/ProfiloView.fxml");
     }
     // =========================================================
     // INIZIALIZZAZIONE
@@ -88,10 +88,10 @@ public class MieRecensioniController {
     public void initialize() {
         caricaRecensioni();
         aggiornaLista(recensioniComplete);
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
         if (utente != null) {
-            RemoteRefreshManager.subscribe(this, SubscriptionTopic.USER, utente.idUtente(), event -> {
-                if (event.type() != DataChangedEvent.ChangeType.FAVORITES_CHANGED) {
+            RemoteRefreshManager.sottoscrivi(this, SubscriptionTopic.UTENTE, utente.idUtente(), evento -> {
+                if (evento.tipo() != DataChangedEvent.ChangeType.PREFERITI_MODIFICATI) {
                     caricaRecensioni();
                     aggiornaLista(recensioniComplete);
                 }
@@ -110,8 +110,8 @@ public class MieRecensioniController {
      * </p>
      */
     private void caricaRecensioni() {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per visualizzare le tue recensioni.");
             recensioniComplete.clear();
@@ -119,7 +119,7 @@ public class MieRecensioniController {
         }
 
         try {
-            recensioniComplete.setAll(ServerConnection.getServer().getRecensioniUtente(utente.idUtente()));
+            recensioniComplete.setAll(ServerConnection.ottieniServer().visualizzaRecensioniUtente(utente.idUtente()));
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             mostraMessaggio(Alert.AlertType.ERROR, "Errore di connessione",
                     "Impossibile caricare le tue recensioni. Riprova più tardi.");
@@ -140,9 +140,9 @@ public class MieRecensioniController {
         restaurantContainer.getChildren().clear();
 
         for (RecensioneDTO recensione : nuovaLista) {
-            Node card = creaCardRecensione(recensione);
-            if (card != null) {
-                restaurantContainer.getChildren().add(card);
+            Node scheda = creaCardRecensione(recensione);
+            if (scheda != null) {
+                restaurantContainer.getChildren().add(scheda);
             }
         }
 
@@ -151,23 +151,23 @@ public class MieRecensioniController {
     }
 
     /**
-     * Crea la card grafica di una recensione caricando la relativa vista FXML.
+     * Crea la scheda grafica di una recensione caricando la relativa vista FXML.
      * <p>
      * Configura le azioni di modifica ed eliminazione disponibili per
      * l'utente proprietario della recensione.
      * </p>
      *
      * @param recensione recensione da rappresentare
-     * @return nodo JavaFX della card, oppure {@code null} se il caricamento fallisce
+     * @return nodo JavaFX della scheda, oppure {@code null} se il caricamento fallisce
      */
     private Node creaCardRecensione(RecensioneDTO recensione) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RecensioneItem.fxml"));
-            Node card = loader.load();
-            RecensioneItemController controller = loader.getController();
-            controller.setRecensione(recensione);
-            controller.setAzioniProprie(this::modificaRecensione, this::confermaEliminazione);
-            return card;
+            FXMLLoader caricatore = new FXMLLoader(getClass().getResource("/org/uninsubria/theknife/client/views/RecensioneItem.fxml"));
+            Node scheda = caricatore.load();
+            RecensioneItemController controllore = caricatore.getController();
+            controllore.setRecensione(recensione);
+            controllore.setAzioniProprie(this::modificaRecensione, this::confermaEliminazione);
+            return scheda;
         } catch (Exception e) {
             System.err.println("ERRORE caricando RecensioneItem.fxml: " + e.getMessage());
             e.printStackTrace();
@@ -188,8 +188,8 @@ public class MieRecensioniController {
                 recensione,
                 RecensioneSelezionata.OrigineModifica.MIE_RECENSIONI
         );
-        Stage stage = (Stage) restaurantContainer.getScene().getWindow();
-        SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
+        Stage finestra = (Stage) restaurantContainer.getScene().getWindow();
+        SceneManager.cambiaScena(finestra, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
     /**
@@ -204,7 +204,7 @@ public class MieRecensioniController {
      */
     private void confermaEliminazione(RecensioneDTO recensione) {
         Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
-        SceneManager.initOwner(conferma);
+        SceneManager.impostaProprietario(conferma);
         conferma.setTitle("Elimina recensione");
         conferma.setHeaderText("Vuoi eliminare la recensione per " + recensione.nomeRistorante() + "?");
         conferma.setContentText("Questa operazione non può essere annullata.");
@@ -213,15 +213,15 @@ public class MieRecensioniController {
             return;
         }
 
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per eliminare una recensione.");
             return;
         }
 
         try {
-            ServerConnection.getServer().eliminaRecensione(recensione.idRecensione(), utente.idUtente());
+            ServerConnection.ottieniServer().eliminaRecensione(recensione.idRecensione(), utente.idUtente());
             recensioniComplete.removeIf(elemento ->
                     java.util.Objects.equals(elemento.idRecensione(), recensione.idRecensione()));
             aggiornaLista(recensioniComplete);
@@ -244,11 +244,11 @@ public class MieRecensioniController {
      * @param messaggio testo da mostrare all'utente
      */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
-        Alert alert = new Alert(tipo);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
+        Alert avviso = new Alert(tipo);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.showAndWait();
     }
 }

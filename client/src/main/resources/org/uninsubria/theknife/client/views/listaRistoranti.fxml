@@ -37,12 +37,12 @@
                 <TextField fx:id="searchField"
                            promptText="Cerca per nome, indirizzo o cucina..."
                            styleClass="search-field"
-                           onAction="#onSearch"
+                           onAction="#cerca"
                            HBox.hgrow="ALWAYS"/>
                 <Button fx:id="searchButton"
                         text="Cerca"
                         styleClass="primary-button"
-                        onAction="#onSearch"/>
+                        onAction="#cerca"/>
             </HBox>
 
             <Label fx:id="locationFilterLabel" text="Posizione: ovunque" styleClass="filters-label"/>
@@ -53,21 +53,21 @@
 
                 <ComboBox fx:id="priceFilterCombo"
                           styleClass="filter-combo"
-                          onAction="#onFilterChanged"/>
+                          onAction="#filtriCambiati"/>
 
                 <ComboBox fx:id="ratingFilterCombo"
                           styleClass="filter-combo"
-                          onAction="#onFilterChanged"/>
+                          onAction="#filtriCambiati"/>
 
                 <CheckBox fx:id="deliveryFilterCheckBox"
                           text="Consegna a domicilio"
                           styleClass="service-filter-checkbox"
-                          onAction="#onFilterChanged"/>
+                          onAction="#filtriCambiati"/>
 
                 <CheckBox fx:id="bookingOnlineFilterCheckBox"
                           text="Prenotazione online"
                           styleClass="service-filter-checkbox"
-                          onAction="#onFilterChanged"/>
+                          onAction="#filtriCambiati"/>
 
                 <!-- MenuButton per selezione multipla cucine -->
                 <CuisineSelector fx:id="cuisineSelector"
@@ -78,7 +78,7 @@
                 <Button fx:id="resetFiltersButton"
                         text="Azzera filtri"
                         styleClass="secondary-button"
-                        onAction="#onResetFilters"/>
+                        onAction="#reimpostaFiltri"/>
             </HBox>
         </VBox>
     </top>
@@ -112,7 +112,7 @@
             <Button fx:id="loadMoreButton"
                     text="Carica altri ristoranti"
                     styleClass="secondary-button"
-                    onAction="#onLoadMore"
+                    onAction="#caricaAltri"
                     visible="false"
                     managed="false"/>
         </VBox>

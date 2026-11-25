@@ -157,7 +157,7 @@
                             managed="false" />
 
                     <Button mnemonicParsing="false"
-                            onAction="#onLogOutClick"
+                            onAction="#onEsciClick"
                             prefHeight="55.0"
                             prefWidth="500.0"
                             styleClass="profile-logout-button"

@@ -137,7 +137,7 @@ public class ProfiloController implements BackHandler {
      * popolando i campi con i dati correnti dell'utente.
      */
     private void mostraModifica() {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
         if (utente == null) {
             return;
         }
@@ -150,7 +150,7 @@ public class ProfiloController implements BackHandler {
         btnSalva.setDisable(false);
 
         domicilioField.setPromptText("Inizia a scrivere e seleziona un luogo");
-        domicilioField.addTextFieldStyleClass("custom-text-field");
+        domicilioField.aggiungiStileCampoTesto("custom-text-field");
         dataNascitaField.setDataMassima(LocalDate.now());
 
         nomeField.setText(utente.nome());
@@ -178,7 +178,7 @@ public class ProfiloController implements BackHandler {
      * @return {@code true} se la richiesta è stata gestita internamente
      */
     @Override
-    public boolean onBackRequested() {
+    public boolean richiestaIndietro() {
         if (sezioneModifica.isVisible()) {
             mostraProfilo();
             return true;
@@ -200,7 +200,7 @@ public class ProfiloController implements BackHandler {
     private void initialize() {
         mostraProfilo();
 
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
 
         if (utente == null) {
             return;
@@ -311,9 +311,9 @@ public class ProfiloController implements BackHandler {
      * Gestisce il click sul pulsante dei ristoranti preferiti.
      */
     @FXML
-    private void onPreferitiClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void onPreferitiClick(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/Preferiti.fxml"
         );
     }
@@ -322,9 +322,9 @@ public class ProfiloController implements BackHandler {
      * Gestisce il click sul pulsante delle recensioni personali.
      */
     @FXML
-    private void onRecensioniClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void onRecensioniClick(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/MieRecensioni.fxml"
         );
     }
@@ -333,9 +333,9 @@ public class ProfiloController implements BackHandler {
      * Gestisce il click sul pulsante di aggiunta di un ristorante.
      */
     @FXML
-    private void onAggiungiClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void onAggiungiClick(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/FormRistorante.fxml"
         );
     }
@@ -344,9 +344,9 @@ public class ProfiloController implements BackHandler {
      * Gestisce il click sul pulsante dei ristoranti gestiti.
      */
     @FXML
-    private void onRistorantiClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void onRistorantiClick(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/DashboardGestore.fxml"
         );
     }
@@ -358,7 +358,7 @@ public class ProfiloController implements BackHandler {
      * </p>
      */
     @FXML
-    private void onModificaCredenzialiClick(ActionEvent event) {
+    private void onModificaCredenzialiClick(ActionEvent evento) {
         mostraModifica();
     }
 
@@ -366,11 +366,11 @@ public class ProfiloController implements BackHandler {
      * Effettua il logout dell'utente corrente e torna alla schermata principale.
      */
     @FXML
-    private void onLogOutClick(ActionEvent event) {
-        SceneManager.clearHistory(SceneManager.getStage(event));
-        SessioneUtente.logout();
-        SceneManager.switchScene(
-                event,
+    private void onEsciClick(ActionEvent evento) {
+        SceneManager.pulisciCronologia(SceneManager.ottieniStage(evento));
+        SessioneUtente.esci();
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/MainLayout.fxml"
         );
     }
@@ -381,7 +381,7 @@ public class ProfiloController implements BackHandler {
      * Annulla la modifica e torna alla sezione profilo.
      */
     @FXML
-    private void onAnnullaModifica(ActionEvent event) {
+    private void onAnnullaModifica(ActionEvent evento) {
         mostraProfilo();
     }
 
@@ -394,8 +394,8 @@ public class ProfiloController implements BackHandler {
      * </p>
      */
     @FXML
-    private void onSalvaModifica(ActionEvent event) {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+    private void onSalvaModifica(ActionEvent evento) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
         if (utente == null || utente.ruolo() == RuoloUtente.GUEST) {
             messaggioLabel.setText("La sessione non è più attiva. Accedi nuovamente.");
             return;
@@ -435,7 +435,7 @@ public class ProfiloController implements BackHandler {
         btnSalva.setDisable(true);
         messaggioLabel.setText("Verifica della località...");
         domicilioField.risolviLuogo(
-                luogo -> aggiornaAccount(event, utente, nome, cognome, email, dataNascita,
+                luogo -> aggiornaAccount(evento, utente, nome, cognome, email, dataNascita,
                         passwordCorrente, nuovaPassword, luogo.etichetta()),
                 msg -> {
                     messaggioLabel.setText(msg);
@@ -448,7 +448,7 @@ public class ProfiloController implements BackHandler {
      * Invia al server i dati aggiornati dell'account.
      */
     private void aggiornaAccount(
-            ActionEvent event,
+            ActionEvent evento,
             UtenteDTO utente,
             String nome,
             String cognome,
@@ -460,16 +460,16 @@ public class ProfiloController implements BackHandler {
     ) {
         UtenteDTO aggiornato = new UtenteDTO(
                 utente.idUtente(), nome, cognome, email, dataNascita, domicilio, utente.ruolo());
-        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+        Stage finestra = (Stage) ((javafx.scene.Node) evento.getSource()).getScene().getWindow();
         messaggioLabel.setText("Salvataggio in corso...");
         Thread.startVirtualThread(() -> {
             try {
-                UtenteDTO risultato = ServerConnection.getServer()
+                UtenteDTO risultato = ServerConnection.ottieniServer()
                         .aggiornaAccount(aggiornato, passwordCorrente, nuovaPassword);
                 Platform.runLater(() -> {
-                    SessioneUtente.login(risultato);
-                    SceneManager.replaceCurrentScene(
-                            stage,
+                    SessioneUtente.accedi(risultato);
+                    SceneManager.sostituisciScenaCorrente(
+                            finestra,
                             "/org/uninsubria/theknife/client/views/ProfiloView.fxml"
                     );
                 });

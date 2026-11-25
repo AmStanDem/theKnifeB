@@ -16,8 +16,8 @@ public interface RemoteObserver extends Remote {
     /**
      * Riceve la notifica di una modifica ai dati.
      *
-     * @param event evento che descrive la modifica avvenuta
+     * @param evento evento che descrive la modifica avvenuta
      * @throws RemoteException se la comunicazione RMI non è disponibile
      */
-    void onDataChanged(DataChangedEvent event) throws RemoteException;
+    void datiCambiati(DataChangedEvent evento) throws RemoteException;
 }

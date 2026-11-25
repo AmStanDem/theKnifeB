@@ -12,18 +12,18 @@ import java.util.UUID;
 /**
  * Evento pubblicato quando i dati associati a una sottoscrizione cambiano.
  *
- * @param subscriptionId identificativo della sottoscrizione interessata
- * @param eventId identificativo univoco dell'evento
- * @param restaurantId identificativo del ristorante coinvolto
- * @param type tipo di modifica avvenuta
- * @param occurredAt istante in cui si è verificata la modifica
+ * @param idSottoscrizione identificativo della sottoscrizione interessata
+ * @param idEvento identificativo univoco dell'evento
+ * @param idRistorante identificativo del ristorante coinvolto
+ * @param tipo tipo di modifica avvenuta
+ * @param istanteOccorrenza istante in cui si è verificata la modifica
  */
 public record DataChangedEvent(
-        UUID subscriptionId,
-        UUID eventId,
-        Integer restaurantId,
-        ChangeType type,
-        Instant occurredAt
+        UUID idSottoscrizione,
+        UUID idEvento,
+        Integer idRistorante,
+        ChangeType tipo,
+        Instant istanteOccorrenza
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,13 +32,13 @@ public record DataChangedEvent(
      * Tipi di modifica notificabili ai sottoscrittori.
      */
     public enum ChangeType {
-        RESTAURANT_CHANGED,
-        REVIEW_CREATED,
-        REVIEW_UPDATED,
-        REVIEW_DELETED,
-        REVIEW_REPLY_CHANGED,
-        FAVORITES_CHANGED,
-        USER_UPDATED
+        RISTORANTE_MODIFICATO,
+        RECENSIONE_CREATA,
+        RECENSIONE_MODIFICATA,
+        RECENSIONE_ELIMINATA,
+        RISPOSTA_RECENSIONE_MODIFICATA,
+        PREFERITI_MODIFICATI,
+        UTENTE_MODIFICATO
     }
 
     /**
@@ -47,7 +47,7 @@ public record DataChangedEvent(
      * @param id nuovo identificativo della sottoscrizione
      * @return una copia con il nuovo identificativo di sottoscrizione
      */
-    public DataChangedEvent withSubscriptionId(UUID id) {
-        return new DataChangedEvent(id, eventId, restaurantId, type, occurredAt);
+    public DataChangedEvent conIdSottoscrizione(UUID id) {
+        return new DataChangedEvent(id, idEvento, idRistorante, tipo, istanteOccorrenza);
     }
 }

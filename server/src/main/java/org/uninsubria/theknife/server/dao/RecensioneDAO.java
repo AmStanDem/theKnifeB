@@ -19,10 +19,10 @@ public class RecensioneDAO {
     /**
      * Identificativi del ristorante e dell'utente associati a una recensione.
      *
-     * @param restaurantId identificativo del ristorante recensito
-     * @param userId identificativo dell'utente autore
+     * @param idRistorante identificativo del ristorante recensito
+     * @param idUtente identificativo dell utente autore
      */
-    public record RecensioneTarget(int restaurantId, int userId) {}
+    public record RecensioneTarget(int idRistorante, int idUtente) {}
 
     /**
      * Recupera il ristorante e l'utente associati alla recensione.
@@ -71,7 +71,7 @@ public class RecensioneDAO {
      * @return {@code true} se la recensione è stata inserita, {@code false} in caso di vincolo univoco duplicato
      * @throws SQLException se si verifica un errore durante l'accesso al database diverso da un duplicato
      */
-    public boolean inserisciRecensione(int idCliente, int idRistorante, RecensioneDTO r) throws SQLException {
+    public boolean aggiungiRecensione(int idCliente, int idRistorante, RecensioneDTO r) throws SQLException {
         String sql = "INSERT INTO Recensioni (id_utente, id_ristorante, valutazione, testo) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -181,9 +181,9 @@ public class RecensioneDAO {
      *
      * @param aggiornata indica se la recensione è stata aggiornata
      * @param esiste indica se la recensione dell'utente esisteva
-     * @param restaurantId identificativo del ristorante in caso di aggiornamento, altrimenti {@code null}
+     * @param idRistorante identificativo del ristorante in caso di aggiornamento, altrimenti {@code null}
      */
-    public record EsitoModifica(boolean aggiornata, boolean esiste, Integer restaurantId) {}
+    public record EsitoModifica(boolean aggiornata, boolean esiste, Integer idRistorante) {}
 
     /**
      * Aggiorna testo e valutazione della recensione solo se appartiene al cliente

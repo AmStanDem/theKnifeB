@@ -19,8 +19,8 @@ import java.io.Serializable;
  * @param prezzoMin prezzo minimo accettato
  * @param prezzoMax prezzo massimo accettato
  * @param mediaStelleMinima valutazione media minima compresa tra 0.0 e 5.0
- * @param delivery indica se cercare ristoranti con consegna a domicilio
- * @param bookingOnline indica se cercare ristoranti con prenotazione online
+ * @param consegna indica se cercare ristoranti con consegna a domicilio
+ * @param prenotazioneOnline indica se cercare ristoranti con prenotazione online
  */
 public record FiltriRicercaDTO(
         String locazione,
@@ -31,8 +31,8 @@ public record FiltriRicercaDTO(
         Double prezzoMin,
         Double prezzoMax,
         Double mediaStelleMinima, // Aggiunto per risolvere l'errore di compilazione nel DAO
-        Boolean delivery,
-        Boolean bookingOnline
+        Boolean consegna,
+        Boolean prenotazioneOnline
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

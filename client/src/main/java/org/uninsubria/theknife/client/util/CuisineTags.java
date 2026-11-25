@@ -28,7 +28,7 @@ public final class CuisineTags {
      * @param container contenitore da popolare
      * @param cuisines tipologie di cucina da visualizzare, oppure {@code null}
      */
-    public static void populate(FlowPane container, List<String> cuisines) {
+    public static void popola(FlowPane container, List<String> cuisines) {
         container.getChildren().clear();
         if (cuisines != null) {
             cuisines.stream()

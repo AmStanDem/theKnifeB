@@ -26,18 +26,18 @@ public final class SessioneUtente {
     }
 
     /**
-     * Imposta l'utente loggato dopo un login o una registrazione andati a buon fine.
+     * Imposta l'utente loggato dopo un accesso o una registrazione andati a buon fine.
      *
      * @param utente l'utente autenticato
      */
-    public static void login(UtenteDTO utente) {
+    public static void accedi(UtenteDTO utente) {
         utenteCorrente = utente;
     }
 
     /**
-     * Effettua il logout, azzerando lo stato della sessione.
+     * Effettua l'uscita, azzerando lo stato della sessione.
      */
-    public static void logout() {
+    public static void esci() {
         utenteCorrente = null;
 
     }
@@ -45,28 +45,28 @@ public final class SessioneUtente {
     /**
      * @return {@code true} se un utente è attualmente loggato
      */
-    public static boolean isLoggato() {
+    public static boolean eLoggato() {
         return utenteCorrente != null;
     }
 
     /**
      * @return l'utente attualmente loggato, o {@code null} se si è in modalità guest
      */
-    public static UtenteDTO getUtenteCorrente() {
+    public static UtenteDTO ottieniUtenteCorrente() {
         return utenteCorrente;
     }
 
     /**
      * @return {@code true} se l'utente loggato ha ruolo gestore
      */
-    public static boolean isGestore() {
-        return isLoggato() && utenteCorrente.ruolo() == RuoloUtente.GESTORE;
+    public static boolean eGestore() {
+        return eLoggato() && utenteCorrente.ruolo() == RuoloUtente.GESTORE;
     }
 
     /**
      * @return {@code true} se l'utente loggato ha ruolo cliente
      */
-    public static boolean isCliente() {
-        return isLoggato() && utenteCorrente.ruolo() == RuoloUtente.CLIENTE;
+    public static boolean eCliente() {
+        return eLoggato() && utenteCorrente.ruolo() == RuoloUtente.CLIENTE;
     }
 }

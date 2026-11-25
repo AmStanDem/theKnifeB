@@ -19,7 +19,7 @@ public class RistoranteSelezionato {
      *
      * @param r ristorante selezionato, oppure {@code null}
      */
-    public static void setRistorante(RistoranteDTO r) {
+    public static void impostaRistorante(RistoranteDTO r) {
         ristorante = r;
         ritornoAiMieiRistoranti = false;
     }
@@ -29,7 +29,7 @@ public class RistoranteSelezionato {
      *
      * @return ristorante selezionato oppure {@code null} se non impostato
      */
-    public static RistoranteDTO getRistorante() {
+    public static RistoranteDTO ottieniRistorante() {
         return ristorante;
     }
 
@@ -38,7 +38,7 @@ public class RistoranteSelezionato {
      *
      * @param ritorno {@code true} per indicare il ritorno ai ristoranti gestiti
      */
-    public static void setRitornoAiMieiRistoranti(boolean ritorno) {
+    public static void impostaRitornoAiMieiRistoranti(boolean ritorno) {
         ritornoAiMieiRistoranti = ritorno;
     }
 
@@ -46,14 +46,14 @@ public class RistoranteSelezionato {
      * Indica se, dopo la schermata corrente, si deve tornare ai ristoranti gestiti.
      * <p>
      * Il valore resta attivo finché non viene selezionato un nuovo ristorante
-     * tramite {@link #setRistorante(RistoranteDTO)}: in questo modo il pulsante
+     * tramite {@link #impostaRistorante(RistoranteDTO)}: in questo modo il pulsante
      * di ritorno resta visibile anche quando si rientra nella scheda del
      * ristorante utilizzando il pulsante "indietro".
      * </p>
      *
      * @return {@code true} se è richiesto il ritorno ai ristoranti gestiti
      */
-    public static boolean isRitornoAiMieiRistoranti() {
+    public static boolean deveTornareAiMieiRistoranti() {
         return ritornoAiMieiRistoranti;
     }
 }

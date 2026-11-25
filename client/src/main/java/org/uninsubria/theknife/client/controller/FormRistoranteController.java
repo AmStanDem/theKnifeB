@@ -103,8 +103,8 @@ public class FormRistoranteController implements BackHandler {
             String telefono,
             String sitoWeb,
             String descrizione,
-            boolean delivery,
-            boolean bookingOnline,
+            boolean consegna,
+            boolean prenotazioneOnline,
             List<String> cucine
     ) {
     }
@@ -113,21 +113,21 @@ public class FormRistoranteController implements BackHandler {
      * Inizializza i componenti della vista.
      * <p>
      * Determina automaticamente la modalità: se
-     * {@link RistoranteSelezionato#getRistorante()} restituisce un ristorante
+     * {@link RistoranteSelezionato#ottieniRistorante()} restituisce un ristorante
      * con identificatore, si entra in modalità modifica; altrimenti in modalità
      * creazione. Configura i campi, i listener e avvia i caricamenti asincroni.
      * </p>
      */
     @FXML
     public void initialize() {
-        RistoranteDTO selezionato = RistoranteSelezionato.getRistorante();
+        RistoranteDTO selezionato = RistoranteSelezionato.ottieniRistorante();
 
         if (selezionato != null && selezionato.idRistorante() != null) {
             modalitaModifica = true;
         }
 
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isGestore()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eGestore()) {
             btnSalva.setDisable(true);
             mostraMessaggio(
                     Alert.AlertType.ERROR,
@@ -157,7 +157,7 @@ public class FormRistoranteController implements BackHandler {
                     return null;
                 }
             });
-            comboRistoranti.setOnAction(event -> selezionaRistorante(comboRistoranti.getValue()));
+            comboRistoranti.setOnAction(evento -> selezionaRistorante(comboRistoranti.getValue()));
         } else {
             comboRistoranti.setVisible(false);
             comboRistoranti.setManaged(false);
@@ -165,7 +165,7 @@ public class FormRistoranteController implements BackHandler {
             btnElimina.setManaged(false);
         }
 
-        txtIndirizzo.addTextFieldStyleClass("custom-text-field");
+        txtIndirizzo.aggiungiStileCampoTesto("custom-text-field");
         txtCitta.setEditable(false);
         txtNazione.setEditable(false);
         txtIndirizzo.setOnLuogoSelezionato(luogo -> {
@@ -192,7 +192,7 @@ public class FormRistoranteController implements BackHandler {
      * @return {@code true} se l'utente sceglie di restare nel modulo
      */
     @Override
-    public boolean onBackRequested() {
+    public boolean richiestaIndietro() {
         if (!moduloModificato()) {
             return false;
         }
@@ -205,7 +205,7 @@ public class FormRistoranteController implements BackHandler {
         ButtonType esci = new ButtonType("Esci senza salvare", ButtonBar.ButtonData.OK_DONE);
         ButtonType continua = new ButtonType("Continua a modificare", ButtonBar.ButtonData.CANCEL_CLOSE);
         conferma.getButtonTypes().setAll(esci, continua);
-        SceneManager.initOwner(conferma);
+        SceneManager.impostaProprietario(conferma);
 
         return conferma.showAndWait().filter(esci::equals).isEmpty();
     }
@@ -232,7 +232,7 @@ public class FormRistoranteController implements BackHandler {
      * @return stato corrente dei campi
      */
     private StatoForm statoCorrente() {
-        List<String> cucine = comboCucine.getSelectedCuisines();
+        List<String> cucine = comboCucine.ottieniCucineSelezionate();
         return new StatoForm(
                 txtNome.getText(),
                 txtIndirizzo.getText(),
@@ -260,9 +260,9 @@ public class FormRistoranteController implements BackHandler {
     private void caricaTipologieCucina() {
         Thread.startVirtualThread(() -> {
             try {
-                List<String> tipologie = ServerConnection.getServer().ottieniTutteTipologieCucina();
+                List<String> tipologie = ServerConnection.ottieniServer().ottieniTutteTipologieCucina();
                 Platform.runLater(() -> {
-                    comboCucine.setCuisines(tipologie);
+                    comboCucine.impostaCucine(tipologie);
                     comboCucine.setDisable(false);
                     tipologieCaricate = true;
                     if (modalitaModifica) {
@@ -299,7 +299,7 @@ public class FormRistoranteController implements BackHandler {
         Thread.startVirtualThread(() -> {
             try {
                 List<RistoranteDTO> ristoranti =
-                        ServerConnection.getServer().getRistorantiGestore(utente.idUtente());
+                        ServerConnection.ottieniServer().ottieniRistorantiGestore(utente.idUtente());
                 Platform.runLater(() -> {
                     comboRistoranti.getItems().setAll(ristoranti);
                     ristorantiCaricati = true;
@@ -307,10 +307,10 @@ public class FormRistoranteController implements BackHandler {
                         mostraMessaggio(Alert.AlertType.INFORMATION, "Nessun ristorante",
                                 "Non hai ancora ristoranti da modificare.");
                     } else {
-                        RistoranteDTO selezionato = RistoranteSelezionato.getRistorante();
+                        RistoranteDTO selezionato = RistoranteSelezionato.ottieniRistorante();
                         RistoranteDTO ristoranteInLista = selezionato == null ? null
                                 : ristoranti.stream()
-                                .filter(item -> item.idRistorante().equals(selezionato.idRistorante()))
+                                .filter(elemento -> elemento.idRistorante().equals(selezionato.idRistorante()))
                                 .findFirst()
                                 .orElse(null);
                         RistoranteDTO scelta = ristoranteInLista == null
@@ -356,8 +356,8 @@ public class FormRistoranteController implements BackHandler {
         txtCitta.setText(ristorante.citta());
         txtNazione.setText(ristorante.nazione());
         txtPrezzoMedio.setText(String.valueOf(ristorante.prezzoMedio()));
-        chkDelivery.setSelected(Boolean.TRUE.equals(ristorante.delivery()));
-        chkBookingOnline.setSelected(Boolean.TRUE.equals(ristorante.bookingOnline()));
+        chkDelivery.setSelected(Boolean.TRUE.equals(ristorante.consegna()));
+        chkBookingOnline.setSelected(Boolean.TRUE.equals(ristorante.prenotazioneOnline()));
 
         txtTelefono.setText(ristorante.telefono() != null
                 ? ristorante.telefono() : "");
@@ -386,7 +386,7 @@ public class FormRistoranteController implements BackHandler {
      * Imposta nel selettore delle cucine le tipologie del ristorante selezionato (solo modifica).
      */
     private void aggiornaTipologieSelezionate() {
-        comboCucine.setSelectedCuisines(
+        comboCucine.impostaCucineSelezionate(
                 ristorante == null ? List.of() : ristorante.tipologieCucina());
     }
 
@@ -415,10 +415,10 @@ public class FormRistoranteController implements BackHandler {
      * località inserita prima di procedere con il salvataggio.
      * </p>
      *
-     * @param event evento generato dal click sull'elemento JavaFX
+     * @param evento evento generato dal click sull'elemento JavaFX
      */
     @FXML
-    public void onSalvaClick(ActionEvent event) {
+    public void onSalvaClick(ActionEvent evento) {
         if (!tipologieCaricate) {
             mostraMessaggio(
                     Alert.AlertType.WARNING,
@@ -443,9 +443,9 @@ public class FormRistoranteController implements BackHandler {
         }
 
         // 2. Verifica che sia presente un gestore autenticato.
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
 
-        if (utente == null || !SessioneUtente.isGestore()) {
+        if (utente == null || !SessioneUtente.eGestore()) {
             mostraMessaggio(
                     Alert.AlertType.WARNING,
                     "Accesso non consentito",
@@ -455,7 +455,7 @@ public class FormRistoranteController implements BackHandler {
         }
 
         txtIndirizzo.risolviLuogo(
-                luogo -> salvaRistorante(event, utente, luogo),
+                luogo -> salvaRistorante(evento, utente, luogo),
                 messaggio -> mostraMessaggio(Alert.AlertType.WARNING, "Località non valida", messaggio)
         );
     }
@@ -463,16 +463,16 @@ public class FormRistoranteController implements BackHandler {
     /**
      * Valida i dati del modulo e registra o modifica il ristorante tramite RMI.
      * <p>
-     * In modalità creazione chiama {@code registraNuovoRistorante()},
+     * In modalità creazione chiama {@code aggiungiRistorante()},
      * in modalità modifica chiama {@code modificaRistorante()}.
      * </p>
      *
-     * @param event          evento JavaFX usato per cambiare scena
+     * @param evento          evento JavaFX usato per cambiare scena
      * @param utente         utente gestore autenticato
      * @param luogoSelezionato luogo risolto dal servizio di geocoding
      */
     private void salvaRistorante(
-            ActionEvent event,
+            ActionEvent evento,
             UtenteDTO utente,
             GeocodingService.Luogo luogoSelezionato
     ) {
@@ -484,8 +484,8 @@ public class FormRistoranteController implements BackHandler {
             String telefono = testoFacoltativo(txtTelefono.getText());
             String sitoWeb = testoFacoltativo(txtSitoWeb.getText());
             String descrizione = testoFacoltativo(txtDescrizione.getText());
-            boolean delivery = chkDelivery.isSelected();
-            boolean bookingOnline = chkBookingOnline.isSelected();
+            boolean consegna = chkDelivery.isSelected();
+            boolean prenotazioneOnline = chkBookingOnline.isSelected();
             double prezzoMedio = Double.parseDouble(
                     txtPrezzoMedio.getText().trim().replace(",", ".")
             );
@@ -533,7 +533,7 @@ public class FormRistoranteController implements BackHandler {
             }
 
             // 5. Recupero delle tipologie di cucina selezionate.
-            List<String> cucineSelezionate = comboCucine.getSelectedCuisines();
+            List<String> cucineSelezionate = comboCucine.ottieniCucineSelezionate();
 
             if (cucineSelezionate.isEmpty()) {
                 mostraMessaggio(
@@ -583,8 +583,8 @@ public class FormRistoranteController implements BackHandler {
                         longitudine,
                         cucineSelezionate,
                         prezzoMedio,
-                        delivery,
-                        bookingOnline,
+                        consegna,
+                        prenotazioneOnline,
                         ristorante.mediaStelle(),
                         ristorante.prezzoStimato(),
                         telefono,
@@ -592,7 +592,7 @@ public class FormRistoranteController implements BackHandler {
                         descrizione
                 );
 
-                ServerConnection.getServer().modificaRistorante(aggiornato, utente.idUtente());
+                ServerConnection.ottieniServer().modificaRistorante(aggiornato, utente.idUtente());
 
                 mostraMessaggio(
                         Alert.AlertType.INFORMATION,
@@ -611,8 +611,8 @@ public class FormRistoranteController implements BackHandler {
                         longitudine,
                         cucineSelezionate,
                         prezzoMedio,
-                        delivery,
-                        bookingOnline,
+                        consegna,
+                        prenotazioneOnline,
                         null,               // Media stelle iniziale
                         false,
                         telefono,
@@ -620,7 +620,7 @@ public class FormRistoranteController implements BackHandler {
                         descrizione
                 );
 
-                ServerConnection.getServer().registraNuovoRistorante(
+                ServerConnection.ottieniServer().aggiungiRistorante(
                         ristorante,
                         utente.idUtente()
                 );
@@ -633,7 +633,7 @@ public class FormRistoranteController implements BackHandler {
                 );
             }
 
-            tornaAiMieiRistoranti(event);
+            tornaAiMieiRistoranti(evento);
 
         } catch (NumberFormatException e) {
             mostraMessaggio(
@@ -672,16 +672,16 @@ public class FormRistoranteController implements BackHandler {
      * il ristorante selezionato.
      * </p>
      *
-     * @param event evento JavaFX usato per cambiare scena dopo l'eliminazione
+     * @param evento evento JavaFX usato per cambiare scena dopo l'eliminazione
      */
     @FXML
-    public void onEliminaClick(ActionEvent event) {
+    public void onEliminaClick(ActionEvent evento) {
         if (ristorante == null) {
             return;
         }
 
         Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
-        SceneManager.initOwner(conferma);
+        SceneManager.impostaProprietario(conferma);
         conferma.setTitle("Elimina ristorante");
         conferma.setHeaderText("Eliminare " + ristorante.nome() + "?");
         conferma.setContentText(
@@ -704,7 +704,7 @@ public class FormRistoranteController implements BackHandler {
 
         if (risultato.isPresent() && risultato.get() == elimina) {
             if (eliminaRistorante()) {
-                tornaAiMieiRistoranti(event);
+                tornaAiMieiRistoranti(evento);
             }
         }
     }
@@ -715,9 +715,9 @@ public class FormRistoranteController implements BackHandler {
      * @return {@code true} se l'eliminazione è riuscita, {@code false} altrimenti
      */
     private boolean eliminaRistorante() {
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
 
-        if (utente == null || !SessioneUtente.isGestore()) {
+        if (utente == null || !SessioneUtente.eGestore()) {
             mostraMessaggio(
                     Alert.AlertType.ERROR,
                     "Accesso non consentito",
@@ -727,7 +727,7 @@ public class FormRistoranteController implements BackHandler {
         }
 
         try {
-            ServerConnection.getServer().eliminaRistorante(
+            ServerConnection.ottieniServer().eliminaRistorante(
                     ristorante.idRistorante(),
                     utente.idUtente()
             );
@@ -767,21 +767,21 @@ public class FormRistoranteController implements BackHandler {
      * gestiti dall'utente.
      * </p>
      *
-     * @param event evento generato dal click sull'elemento JavaFX
+     * @param evento evento generato dal click sull'elemento JavaFX
      */
     @FXML
-    public void onAnnullaClick(ActionEvent event) {
-        tornaAiMieiRistoranti(event);
+    public void onAnnullaClick(ActionEvent evento) {
+        tornaAiMieiRistoranti(evento);
     }
 
     /**
      * Mostra la lista dei ristoranti del gestore nella scena corrente.
      *
-     * @param event evento JavaFX contenente l'origine del cambio scena
+     * @param evento evento JavaFX contenente l'origine del cambio scena
      */
-    private void tornaAiMieiRistoranti(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    private void tornaAiMieiRistoranti(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/DashboardGestore.fxml"
         );
     }
@@ -798,12 +798,12 @@ public class FormRistoranteController implements BackHandler {
             String titolo,
             String contenuto
     ) {
-        Alert alert = new Alert(alertType);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(contenuto);
-        alert.showAndWait();
+        Alert avviso = new Alert(alertType);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(contenuto);
+        avviso.showAndWait();
     }
 
     /**

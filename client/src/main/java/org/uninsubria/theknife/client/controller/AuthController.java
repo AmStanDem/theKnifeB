@@ -106,7 +106,7 @@ public class AuthController implements BackHandler {
     private Button registratiButton;
 
     /**
-     * Inizializza il controller.
+     * Inizializza il controllore.
      * <p>
      * Configura il campo domicilio, aggiorna la data massima del calendario
      * e controlla dinamicamente la corrispondenza tra password e conferma.
@@ -155,10 +155,10 @@ public class AuthController implements BackHandler {
      * Mostra il pannello di login e nasconde quello di registrazione.
      * </p>
      *
-     * @param event evento JavaFX generato dal click sul collegamento
+     * @param evento evento JavaFX generato dal click sul collegamento
      */
     @FXML
-    private void onVaiLogin(MouseEvent event) {
+    private void onVaiLogin(MouseEvent evento) {
         modalitaRegistrazione = false;
         registrazioneFields.setVisible(false);
         registrazioneFields.setManaged(false);
@@ -178,7 +178,7 @@ public class AuthController implements BackHandler {
      * @return {@code true} se la richiesta è stata gestita internamente
      */
     @Override
-    public boolean onBackRequested() {
+    public boolean richiestaIndietro() {
         if (modalitaRegistrazione) {
             modalitaRegistrazione = false;
             registrazioneFields.setVisible(false);
@@ -199,10 +199,10 @@ public class AuthController implements BackHandler {
      * Gestisce il click sul pulsante "Accedi": invoca il login remoto e,
      * se le credenziali sono corrette, apre la home dell'utente.
      *
-     * @param event evento JavaFX generato dal pulsante di accesso
+     * @param evento evento JavaFX generato dal pulsante di accesso
      */
     @FXML
-    private void onAccedi(ActionEvent event) {
+    private void onAccedi(ActionEvent evento) {
         labelErrore.setText("");
         String email = campoEmail.getText().trim();
         String password = campoPassword.getText().trim();
@@ -212,16 +212,16 @@ public class AuthController implements BackHandler {
             return;
         }
 
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Stage finestra = (Stage) ((Node) evento.getSource()).getScene().getWindow();
         signInButton.setDisable(true);
 
         Thread.startVirtualThread(() -> {
             try {
-                UtenteDTO utente = ServerConnection.getServer().eseguiLogin(email, password);
+                UtenteDTO utente = ServerConnection.ottieniServer().accedi(email, password);
                 Platform.runLater(() -> {
-                    SessioneUtente.login(utente);
-                    SceneManager.clearHistory(stage);
-                    SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+                    SessioneUtente.accedi(utente);
+                    SceneManager.pulisciCronologia(finestra);
+                    SceneManager.cambiaScena(finestra, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
                 });
             } catch (CredenzialiErrateException e) {
                 Platform.runLater(() -> mostraErroreLogin("Email o password non corretti."));
@@ -255,10 +255,10 @@ public class AuthController implements BackHandler {
      * alla risoluzione del luogo.
      * </p>
      *
-     * @param event evento JavaFX associato al pulsante di registrazione
+     * @param evento evento JavaFX associato al pulsante di registrazione
      */
     @FXML
-    private void handleRegistrati(ActionEvent event) {
+    private void gestisciRegistrazione(ActionEvent evento) {
         labelErrore.setText("");
         String nome = nomeField.getText().trim();
         String cognome = cognomeField.getText().trim();
@@ -316,7 +316,7 @@ public class AuthController implements BackHandler {
 
         String ruoloValidato = ruolo;
         indirizzo.risolviLuogo(
-                luogo -> registraUtente(event, nome, cognome, ruoloValidato, email, password, dataNascita, luogo),
+                luogo -> registraUtente(evento, nome, cognome, ruoloValidato, email, password, dataNascita, luogo),
                 labelErrore::setText
         );
     }
@@ -328,7 +328,7 @@ public class AuthController implements BackHandler {
      * alla data corrente del server e invia i dati tramite il servizio remoto.
      * </p>
      *
-     * @param event evento JavaFX usato per cambiare scena dopo la registrazione
+     * @param evento evento JavaFX usato per cambiare scena dopo la registrazione
      * @param nome nome dell'utente
      * @param cognome cognome dell'utente
      * @param ruolo ruolo selezionato nel modulo
@@ -338,7 +338,7 @@ public class AuthController implements BackHandler {
      * @param luogo domicilio risolto dal servizio di geocoding
      */
     private void registraUtente(
-            ActionEvent event,
+            ActionEvent evento,
             String nome,
             String cognome,
             String ruolo,
@@ -349,7 +349,7 @@ public class AuthController implements BackHandler {
     ) {
         try {
             RuoloUtente ruoloEnum = ruolo.equals("Ristoratore") ? RuoloUtente.GESTORE : RuoloUtente.CLIENTE;
-            var server = ServerConnection.getServer();
+            var server = ServerConnection.ottieniServer();
             LocalDate dataCorrente = server.ottieniDataCorrente();
 
             if (dataNascita != null && dataNascita.isBefore(DATA_NASCITA_MINIMA)) {
@@ -367,14 +367,14 @@ public class AuthController implements BackHandler {
                     null, nome, cognome, email, dataNascita, luogo.etichetta(), ruoloEnum);
 
             // Chiamata remota al server
-            utente = server.registraCliente(utente, password);
-            SessioneUtente.login(utente);
+            utente = server.registrazione(utente, password);
+            SessioneUtente.accedi(utente);
 
             // Dopo la registrazione, la schermata di autenticazione non deve restare nello storico.
-            SceneManager.clearHistory(SceneManager.getStage(event));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            SceneManager.clearHistory(stage);
-            SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+            SceneManager.pulisciCronologia(SceneManager.ottieniStage(evento));
+            Stage finestra = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+            SceneManager.pulisciCronologia(finestra);
+            SceneManager.cambiaScena(finestra, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
 
         } catch (UtenteGiaEsistenteException e) {
             labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");
@@ -398,7 +398,7 @@ public class AuthController implements BackHandler {
     private void aggiornaDataMassimaCalendario() {
         LocalDate dataCorrenteDispositivo = LocalDate.now();
         try {
-            dataCorrenteDispositivo = ServerConnection.getServer().ottieniDataCorrente();
+            dataCorrenteDispositivo = ServerConnection.ottieniServer().ottieniDataCorrente();
         } catch (RemoteException | NotBoundException | SistemaIndisponibileException e) {
             labelErrore.setText(
                     "Calendario aperto con la data del dispositivo; il server verificherà la data alla registrazione.");

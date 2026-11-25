@@ -43,32 +43,32 @@ public final class RmiConcurrencyHarness {
         try {
             assertOneSuccessOneDuplicate(runTogether(
                     () -> {
-                        clientA.aggiungiPreferito(fixture.customerId(), fixture.restaurantId());
+                        clientA.aggiungiPreferito(fixture.customerId(), fixture.idRistorante());
                         return "success";
                     },
                     () -> {
-                        clientB.aggiungiPreferito(fixture.customerId(), fixture.restaurantId());
+                        clientB.aggiungiPreferito(fixture.customerId(), fixture.idRistorante());
                         return "success";
                     }), "preferiti");
             assertCount("SELECT COUNT(*) FROM Preferiti WHERE id_utente = ? AND id_ristorante = ?",
-                    fixture.customerId(), fixture.restaurantId(), 1);
+                    fixture.customerId(), fixture.idRistorante(), 1);
 
             RecensioneDTO newReview = new RecensioneDTO(
                     null, 4.5, "review-race-" + UUID.randomUUID(), "Harness",
-                    LocalDateTime.now(), null, fixture.restaurantId(), fixture.restaurantName());
+                    LocalDateTime.now(), null, fixture.idRistorante(), fixture.restaurantName());
             assertOneSuccessOneDuplicate(runTogether(
                     () -> {
-                        clientA.inserisciRecensione(newReview, fixture.restaurantId(), fixture.customerId());
+                        clientA.aggiungiRecensione(newReview, fixture.idRistorante(), fixture.customerId());
                         return "success";
                     },
                     () -> {
-                        clientB.inserisciRecensione(newReview, fixture.restaurantId(), fixture.customerId());
+                        clientB.aggiungiRecensione(newReview, fixture.idRistorante(), fixture.customerId());
                         return "success";
                     }), "recensioni");
             assertCount("SELECT COUNT(*) FROM Recensioni WHERE id_utente = ? AND id_ristorante = ?",
-                    fixture.customerId(), fixture.restaurantId(), 1);
+                    fixture.customerId(), fixture.idRistorante(), 1);
 
-            int reviewId = findReviewId(fixture.customerId(), fixture.restaurantId());
+            int reviewId = findReviewId(fixture.customerId(), fixture.idRistorante());
             List<String> updateResults = runTogether(
                     () -> update(clientA, reviewId, fixture.customerId(), "update-A"),
                     () -> update(clientB, reviewId, fixture.customerId(), "update-B"));
@@ -236,7 +236,7 @@ public final class RmiConcurrencyHarness {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             try (PreparedStatement statement = connection.prepareStatement(
                     "DELETE FROM RistorantiTheKnife WHERE id_ristorante = ?")) {
-                statement.setInt(1, fixture.restaurantId());
+                statement.setInt(1, fixture.idRistorante());
                 statement.executeUpdate();
             }
             try (PreparedStatement statement = connection.prepareStatement(
@@ -256,6 +256,6 @@ public final class RmiConcurrencyHarness {
         return value;
     }
 
-    private record Fixture(int managerId, int customerId, int restaurantId, String restaurantName) {
+    private record Fixture(int managerId, int customerId, int idRistorante, String restaurantName) {
     }
 }

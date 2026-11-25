@@ -14,20 +14,20 @@ import java.rmi.registry.Registry;
 /**
  * Punto di accesso unico allo stub RMI di {@link ITheKnifeServer}.
  * <p>
- * I org.uninsubria.menuprova.controller non devono mai creare direttamente il registry RMI: chiamano
- * {@link #getServer()}, che si occupa di stabilire la connessione al primo
+ * I org.uninsubria.menuprova.controllore non devono mai creare direttamente il registro RMI: chiamano
+ * {@link #ottieniServer()}, che si occupa di stabilire la connessione al primo
  * utilizzo e di riutilizzarla per tutta la sessione del client.
  *
  * @author TheKnife Team
  */
 public final class ServerConnection {
 
-    /** Nome con cui il serverTK espone il servizio remoto nel registry. */
-    private static final String SERVICE_NAME = "TheKnifeServer";
+    /** Nome con cui il serverTK espone il servizio remoto nel registro. */
+    private static final String NOME_SERVIZIO = "TheKnifeServer";
 
-    private record Endpoint(String host, int port, ITheKnifeServer server) {}
+    private record PuntoAccesso(String host, int porta, ITheKnifeServer server) {}
 
-    private static volatile Endpoint endpoint = new Endpoint("localhost", 1099, null);
+    private static volatile PuntoAccesso puntoAccesso = new PuntoAccesso("localhost", 1099, null);
 
     private ServerConnection() {
         // classe di utilità, non istanziabile
@@ -35,7 +35,7 @@ public final class ServerConnection {
 
     /**
      * Configura host e porta del serverTK a cui connettersi.
-     * Deve essere chiamato prima del primo {@link #getServer()}, tipicamente
+     * Deve essere chiamato prima del primo {@link #ottieniServer()}, tipicamente
      * dalla schermata di login/avvio del client.
      *
      * @param nuovoHost host del server RMI
@@ -45,12 +45,12 @@ public final class ServerConnection {
         if (nuovoHost == null || nuovoHost.isBlank() || nuovaPorta < 1 || nuovaPorta > 65535) {
             throw new IllegalArgumentException("Host e porta RMI non validi.");
         }
-        endpoint = new Endpoint(nuovoHost.trim(), nuovaPorta, null);
+        puntoAccesso = new PuntoAccesso(nuovoHost.trim(), nuovaPorta, null);
     }
 
     public static void invalidaConnessione() {
-        Endpoint current = endpoint;
-        endpoint = new Endpoint(current.host(), current.port(), null);
+        PuntoAccesso corrente = puntoAccesso;
+        puntoAccesso = new PuntoAccesso(corrente.host(), corrente.porta(), null);
     }
 
     /**
@@ -58,20 +58,20 @@ public final class ServerConnection {
      * stata stabilita una connessione attiva.
      *
      * @return lo stub di {@link ITheKnifeServer}
-     * @throws RemoteException se la connessione al registry o la lookup falliscono
-     * @throws NotBoundException se il servizio non è registrato sul registry indicato
+     * @throws RemoteException se la connessione al registro o la lookup falliscono
+     * @throws NotBoundException se il servizio non è registrato sul registro indicato
      */
-    public static ITheKnifeServer getServer() throws RemoteException, NotBoundException {
+    public static ITheKnifeServer ottieniServer() throws RemoteException, NotBoundException {
         while (true) {
-            Endpoint current = endpoint;
-            if (current.server() != null) {
-                return current.server();
+            PuntoAccesso corrente = puntoAccesso;
+            if (corrente.server() != null) {
+                return corrente.server();
             }
 
-            Registry registry = LocateRegistry.getRegistry(current.host(), current.port());
-            ITheKnifeServer stub = (ITheKnifeServer) registry.lookup(SERVICE_NAME);
-            if (endpoint == current) {
-                endpoint = new Endpoint(current.host(), current.port(), stub);
+            Registry registro = LocateRegistry.getRegistry(corrente.host(), corrente.porta());
+            ITheKnifeServer stub = (ITheKnifeServer) registro.lookup(NOME_SERVIZIO);
+            if (puntoAccesso == corrente) {
+                puntoAccesso = new PuntoAccesso(corrente.host(), corrente.porta(), stub);
                 return stub;
             }
         }

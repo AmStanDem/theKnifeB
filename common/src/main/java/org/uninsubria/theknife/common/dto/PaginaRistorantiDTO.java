@@ -12,11 +12,11 @@ import java.util.List;
  * Pagina dei risultati di una ricerca di ristoranti.
  *
  * @param ristoranti ristoranti inclusi nella pagina
- * @param hasMore indica se sono disponibili ulteriori pagine di risultati
+ * @param ciSonoAltri indica se sono disponibili ulteriori pagine di risultati
  */
 public record PaginaRistorantiDTO(
         List<RistoranteDTO> ristoranti,
-        boolean hasMore
+        boolean ciSonoAltri
 ) implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

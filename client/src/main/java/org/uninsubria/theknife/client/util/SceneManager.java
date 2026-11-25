@@ -46,56 +46,56 @@ import java.util.Stack;
  */
 public class SceneManager {
 
-    private static final Map<Stage, Stack<String>> historyMap = new HashMap<>();
-    private static final Map<Stage, String> currentFxmlMap = new HashMap<>();
-    private static final Map<Stage, Object> currentControllers = new HashMap<>();
-    private static final Map<Stage, Set<Window>> popupWindows = new HashMap<>();
-    private static final Set<Stage> configuredStages = new HashSet<>();
-    private static Stage applicationStage;
-    private static boolean popupListenerInstalled;
+    private static final Map<Stage, Stack<String>> cronologiaPerStage = new HashMap<>();
+    private static final Map<Stage, String> fxmlCorrentePerStage = new HashMap<>();
+    private static final Map<Stage, Object> controllerCorrenti = new HashMap<>();
+    private static final Map<Stage, Set<Window>> finestrePopup = new HashMap<>();
+    private static final Set<Stage> stageConfigurati = new HashSet<>();
+    private static Stage stageApplicazione;
+    private static boolean ascoltatorePopupInstallato;
 
-    private static final String BASE_LAYOUT_FXML = "/org/uninsubria/theknife/client/views/BaseLayout.fxml";
-    private static final String LOGIN_VIEW_FXML = "/org/uninsubria/theknife/client/views/AuthView.fxml";
-    private static final String HOME_VIEW_FXML = "/org/uninsubria/theknife/client/views/MainLayout.fxml";
-    private static final String GLOBAL_CSS = "/org/uninsubria/theknife/client/styles/style.css";
+    private static final String FXML_LAYOUT_BASE = "/org/uninsubria/theknife/client/views/BaseLayout.fxml";
+    private static final String FXML_VISTA_ACCESSO = "/org/uninsubria/theknife/client/views/AuthView.fxml";
+    private static final String FXML_VISTA_HOME = "/org/uninsubria/theknife/client/views/MainLayout.fxml";
+    private static final String CSS_GLOBALE = "/org/uninsubria/theknife/client/styles/style.css";
 
     /**
      * Carica una vista FXML nello stage associato all'evento e registra la vista corrente
      * nello storico di navigazione, se diversa dalla destinazione.
      *
-     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param evento evento JavaFX la cui sorgente appartiene allo stage da aggiornare
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static void switchScene(Event event, String fxmlPath) {
-        switchScene(event, fxmlPath, true);
+    public static void cambiaScena(Event evento, String fxmlPath) {
+        cambiaScena(evento, fxmlPath, true);
     }
 
     /**
      * Carica una vista FXML nello stage associato all'evento, scegliendo se aggiungere
      * la vista corrente allo storico di navigazione.
      *
-     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param evento evento JavaFX la cui sorgente appartiene allo stage da aggiornare
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
-     * @param saveToHistory {@code true} per salvare la vista corrente nello storico
+     * @param salvaInCronologia {@code true} per salvare la vista corrente nello storico
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static void switchScene(Event event, String fxmlPath, boolean saveToHistory) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        switchSceneAndGetController(stage, fxmlPath, saveToHistory);
+    public static void cambiaScena(Event evento, String fxmlPath, boolean salvaInCronologia) {
+        Stage stage = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+        cambiaScenaEOttieniController(stage, fxmlPath, salvaInCronologia);
     }
 
     /**
      * Sostituisce la vista corrente senza conservarla nello storico e rimuove
      * un'eventuale voce duplicata della destinazione.
      *
-     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param evento evento JavaFX la cui sorgente appartiene allo stage da aggiornare
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static void replaceCurrentScene(Event event, String fxmlPath) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        replaceCurrentScene(stage, fxmlPath);
+    public static void sostituisciScenaCorrente(Event evento, String fxmlPath) {
+        Stage stage = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+        sostituisciScenaCorrente(stage, fxmlPath);
     }
 
     /**
@@ -106,22 +106,22 @@ public class SceneManager {
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static void replaceCurrentScene(Stage stage, String fxmlPath) {
-        Stack<String> history = historyMap.get(stage);
-        if (history != null && !history.isEmpty() && fxmlPath.equals(history.peek())) {
-            history.pop();
+    public static void sostituisciScenaCorrente(Stage stage, String fxmlPath) {
+        Stack<String> cronologia = cronologiaPerStage.get(stage);
+        if (cronologia != null && !cronologia.isEmpty() && fxmlPath.equals(cronologia.peek())) {
+            cronologia.pop();
         }
-        switchSceneAndGetController(stage, fxmlPath, false);
+        cambiaScenaEOttieniController(stage, fxmlPath, false);
     }
 
     /**
      * Restituisce lo stage della finestra che contiene la sorgente dell'evento.
      *
-     * @param event evento JavaFX associato a un nodo di una scena
+     * @param evento evento JavaFX associato a un nodo di una scena
      * @return stage che contiene il nodo sorgente dell'evento
      */
-    public static Stage getStage(Event event) {
-        return (Stage) ((Node) event.getSource()).getScene().getWindow();
+    public static Stage ottieniStage(Event evento) {
+        return (Stage) ((Node) evento.getSource()).getScene().getWindow();
     }
 
     /**
@@ -132,76 +132,76 @@ public class SceneManager {
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static void switchScene(Stage stage, String fxmlPath) {
-        switchSceneAndGetController(stage, fxmlPath, true);
+    public static void cambiaScena(Stage stage, String fxmlPath) {
+        cambiaScenaEOttieniController(stage, fxmlPath, true);
     }
 
     /**
      * Carica una vista FXML nello stage specificato, mantenendo la finestra principale
-     * a schermo intero, e restituisce il controller della vista caricata.
+     * a schermo intero, e restituisce il controllore della vista caricata.
      *
      * @param stage stage in cui caricare la vista
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
-     * @param <T> tipo del controller della vista
-     * @return controller associato alla vista caricata
+     * @param <T> tipo del controllore della vista
+     * @return controllore associato alla vista caricata
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath) {
-        return switchSceneAndGetController(stage, fxmlPath, true);
+    public static <T> T cambiaScenaEOttieniController(Stage stage, String fxmlPath) {
+        return cambiaScenaEOttieniController(stage, fxmlPath, true);
     }
 
     /**
      * Carica una vista FXML nello stage, la inserisce nel layout principale e restituisce
-     * il relativo controller. La vista precedente viene aggiunta allo storico solo se
-     * {@code saveToHistory} è {@code true} e la destinazione è diversa.
+     * il relativo controllore. La vista precedente viene aggiunta allo storico solo se
+     * {@code salvaInCronologia} è {@code true} e la destinazione è diversa.
      *
      * @param stage stage in cui caricare la vista
      * @param fxmlPath percorso assoluto della risorsa FXML da caricare
-     * @param saveToHistory {@code true} per salvare la vista corrente nello storico
-     * @param <T> tipo del controller della vista
-     * @return controller associato alla vista caricata
+     * @param salvaInCronologia {@code true} per salvare la vista corrente nello storico
+     * @param <T> tipo del controllore della vista
+     * @return controllore associato alla vista caricata
      * @throws IllegalStateException se la risorsa FXML non può essere caricata
      */
-    public static <T> T switchSceneAndGetController(Stage stage, String fxmlPath, boolean saveToHistory) {
-        setApplicationStage(stage);
+    public static <T> T cambiaScenaEOttieniController(Stage stage, String fxmlPath, boolean salvaInCronologia) {
+        impostaStageApplicazione(stage);
         try {
-            String currentFxml = currentFxmlMap.get(stage);
+            String fxmlCorrente = fxmlCorrentePerStage.get(stage);
 
-            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
-            Parent page = loader.load();
+            FXMLLoader caricatore = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
+            Parent pagina = caricatore.load();
 
-            FXMLLoader baseLayoutLoader = new FXMLLoader(SceneManager.class.getResource(BASE_LAYOUT_FXML));
-            Parent baseLayout = baseLayoutLoader.load();
-            BaseLayoutController baseLayoutController = baseLayoutLoader.getController();
-            baseLayoutController.setContent(page);
-            baseLayoutController.setLoginPage(LOGIN_VIEW_FXML.equals(fxmlPath));
-            baseLayoutController.setCanGoBack(hasPreviousPage(stage)
-                    || (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)));
+            FXMLLoader caricatoreLayoutBase = new FXMLLoader(SceneManager.class.getResource(FXML_LAYOUT_BASE));
+            Parent layoutBase = caricatoreLayoutBase.load();
+            BaseLayoutController controlloreLayoutBase = caricatoreLayoutBase.getController();
+            controlloreLayoutBase.impostaContenuto(pagina);
+            controlloreLayoutBase.impostaPaginaAccesso(FXML_VISTA_ACCESSO.equals(fxmlPath));
+            controlloreLayoutBase.impostaPuoTornareIndietro(haPaginaPrecedente(stage)
+                    || (salvaInCronologia && fxmlCorrente != null && !fxmlCorrente.equals(fxmlPath)));
 
-            if (saveToHistory && currentFxml != null && !currentFxml.equals(fxmlPath)) {
-                historyMap.computeIfAbsent(stage, k -> new Stack<>()).push(currentFxml);
+            if (salvaInCronologia && fxmlCorrente != null && !fxmlCorrente.equals(fxmlPath)) {
+                cronologiaPerStage.computeIfAbsent(stage, k -> new Stack<>()).push(fxmlCorrente);
             }
-            currentFxmlMap.put(stage, fxmlPath);
+            fxmlCorrentePerStage.put(stage, fxmlPath);
 
-            StackPane applicationRoot = creaRootApplicativa(stage, baseLayout);
+            StackPane radiceApplicativa = creaRadiceApplicativa(stage, layoutBase);
 
             if (stage.getScene() != null) {
-                stage.getScene().setRoot(applicationRoot);
+                stage.getScene().setRoot(radiceApplicativa);
             } else {
-                Scene scene = new Scene(applicationRoot);
-                applyCssIfAvailable(scene);
-                stage.setScene(scene);
+                Scene scena = new Scene(radiceApplicativa);
+                applicaCssSeDisponibile(scena);
+                stage.setScene(scena);
                 stage.sizeToScene();
             }
 
-            Object previousController = currentControllers.remove(stage);
-            if (previousController != null) {
-                RemoteRefreshManager.unsubscribeOwner(previousController);
+            Object controllerPrecedente = controllerCorrenti.remove(stage);
+            if (controllerPrecedente != null) {
+                RemoteRefreshManager.annullaSottoscrizioniProprietario(controllerPrecedente);
             }
-            currentControllers.put(stage, loader.getController());
-            currentFxmlMap.put(stage, fxmlPath);
-            mantieneFullscreen(stage);
-            return loader.getController();
+            controllerCorrenti.put(stage, caricatore.getController());
+            fxmlCorrentePerStage.put(stage, fxmlPath);
+            mantieneSchermoIntero(stage);
+            return caricatore.getController();
 
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -214,11 +214,11 @@ public class SceneManager {
     /**
      * Imposta lo stage dell'applicazione come proprietario del dialogo, se già configurato.
      *
-     * @param dialog dialogo a cui assegnare lo stage proprietario
+     * @param dialogo dialogo a cui assegnare lo stage proprietario
      */
-    public static void initOwner(Dialog<?> dialog) {
-        if (applicationStage != null) {
-            dialog.initOwner(applicationStage);
+    public static void impostaProprietario(Dialog<?> dialogo) {
+        if (stageApplicazione != null) {
+            dialogo.initOwner(stageApplicazione);
         }
     }
 
@@ -227,8 +227,8 @@ public class SceneManager {
      *
      * @param stage stage principale dell'applicazione
      */
-    public static void setApplicationStage(Stage stage) {
-        applicationStage = stage;
+    public static void impostaStageApplicazione(Stage stage) {
+        stageApplicazione = stage;
         configuraStagePrincipale(stage);
     }
 
@@ -237,78 +237,78 @@ public class SceneManager {
      *
      * @param stage stage da visualizzare a schermo intero
      */
-    public static void avviaFullscreen(Stage stage) {
+    public static void avviaSchermoIntero(Stage stage) {
         if (stage.isShowing() && !stage.isFullScreen()) {
             stage.setFullScreen(true);
         }
     }
 
-    private static void mantieneFullscreen(Stage stage) {
+    private static void mantieneSchermoIntero(Stage stage) {
         configuraStagePrincipale(stage);
-        if (!popupWindows.containsKey(stage)) {
-            popupWindows.put(stage, new HashSet<>());
-            stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, event -> {
-                Object controller = currentControllers.remove(stage);
-                if (controller != null) {
-                    RemoteRefreshManager.unsubscribeOwner(controller);
+        if (!finestrePopup.containsKey(stage)) {
+            finestrePopup.put(stage, new HashSet<>());
+            stage.addEventHandler(WindowEvent.WINDOW_HIDDEN, evento -> {
+                Object controllore = controllerCorrenti.remove(stage);
+                if (controllore != null) {
+                    RemoteRefreshManager.annullaSottoscrizioniProprietario(controllore);
                 }
-                popupWindows.remove(stage);
-                configuredStages.remove(stage);
-                historyMap.remove(stage);
-                currentFxmlMap.remove(stage);
+                finestrePopup.remove(stage);
+                stageConfigurati.remove(stage);
+                cronologiaPerStage.remove(stage);
+                fxmlCorrentePerStage.remove(stage);
             });
         }
 
-        if (!popupListenerInstalled) {
+        if (!ascoltatorePopupInstallato) {
             Window.getWindows().addListener((ListChangeListener<Window>) change -> {
                 while (change.next()) {
                     if (change.wasAdded()) {
-                        for (Window window : change.getAddedSubList()) {
-                            monitoraPopup(window);
+                        for (Window finestra : change.getAddedSubList()) {
+                            monitoraPopup(finestra);
                         }
                     }
                 }
             });
-            popupListenerInstalled = true;
+            ascoltatorePopupInstallato = true;
         }
 
-        for (Window window : Window.getWindows()) {
-            if (window != stage) {
-                monitoraPopup(stage, window);
+        for (Window finestra : Window.getWindows()) {
+            if (finestra != stage) {
+                monitoraPopup(stage, finestra);
             }
         }
 
-        ripristinaFullscreen(stage);
+        ripristinaSchermoIntero(stage);
     }
 
-    private static void monitoraPopup(Window window) {
-        for (Stage stage : Set.copyOf(popupWindows.keySet())) {
-            monitoraPopup(stage, window);
+    private static void monitoraPopup(Window finestra) {
+        for (Stage stage : Set.copyOf(finestrePopup.keySet())) {
+            monitoraPopup(stage, finestra);
         }
     }
 
-    private static void monitoraPopup(Stage stage, Window window) {
-        if (window == stage || !appartieneA(window, stage)) {
+    private static void monitoraPopup(Stage stage, Window finestra) {
+        if (finestra == stage || !appartieneA(finestra, stage)) {
             return;
         }
-        Set<Window> monitorate = popupWindows.get(stage);
-        if (monitorate == null || !monitorate.add(window)) {
+        Set<Window> finestreMonitorate = finestrePopup.get(stage);
+        if (finestreMonitorate == null || !finestreMonitorate.add(finestra)) {
             return;
         }
 
-        window.showingProperty().addListener((observable, precedente, visibile) -> {
+        finestra.showingProperty().addListener((osservabile, precedente, visibile) -> {
             if (!visibile) {
-                Platform.runLater(() -> ripristinaFullscreen(stage));
+                Platform.runLater(() -> ripristinaSchermoIntero(stage));
             } else {
-                // Windows può uscire dal fullscreen quando un dialog prende il focus.
-                Platform.runLater(() -> ripristinaFullscreen(stage));
+                // Windows può uscire dal fullscreen quando un dialogo prende il focus.
+                Platform.runLater(() -> ripristinaSchermoIntero(stage));
             }
         });
     }
 
     private static void configuraStagePrincipale(Stage stage) {
 
-        if (!configuredStages.add(stage)) {
+        if (!stageConfigurati.add(stage)) {
             return;
         }
 
@@ -316,69 +316,69 @@ public class SceneManager {
         stage.setFullScreenExitHint("");
         stage.setResizable(false);
 
-        // Quando un dialog modale (Alert, ecc.) viene mostrato con showAndWait(),
+        // Quando un dialogo modale (Alert, ecc.) viene mostrato con showAndWait(),
         // blocca il JavaFX Application Thread impedendo l'esecuzione dei task
         // accodati con Platform.runLater(). Su alcune piattaforme il focus del
-        // dialog può far uscire momentaneamente dal fullscreen.
+        // dialogo può far uscire momentaneamente dal fullscreen.
         // Ascoltando fullScreenProperty intercettiamo subito il cambiamento
         // e lo ripristiamo prima che Platform.runLater() possa eseguire,
         // superando il blocco di showAndWait().
-        stage.fullScreenProperty().addListener((observable, precedente, corrente) -> {
+        stage.fullScreenProperty().addListener((osservabile, precedente, corrente) -> {
             if (!corrente && stage.isShowing()) {
                 stage.setFullScreen(true);
             }
         });
 
-        stage.iconifiedProperty().addListener((observable, precedente, minimizzata) -> {
+        stage.iconifiedProperty().addListener((osservabile, precedente, minimizzata) -> {
             if (!minimizzata) {
                 Platform.runLater(() -> {
                     if (stage.isShowing()) {
-                        applicaFullscreen(stage);
+                        applicaSchermoIntero(stage);
                     }
                 });
             }
         });
     }
 
-    private static void ripristinaFullscreen(Stage stage) {
+    private static void ripristinaSchermoIntero(Stage stage) {
 
         if (!stage.isShowing()) {
             return;
         }
 
-        applicaFullscreen(stage);
+        applicaSchermoIntero(stage);
     }
 
-    private static void applicaFullscreen(Stage stage) {
+    private static void applicaSchermoIntero(Stage stage) {
         if (stage.isShowing() && !stage.isFullScreen()) {
             stage.setFullScreen(true);
         }
     }
 
-    private static boolean appartieneA(Window window, Stage stage) {
-        Window owner = proprietario(window);
-        while (owner != null) {
-            if (owner == stage) {
+    private static boolean appartieneA(Window finestra, Stage stage) {
+        Window possessore = proprietario(finestra);
+        while (possessore != null) {
+            if (possessore == stage) {
                 return true;
             }
-            owner = proprietario(owner);
+            possessore = proprietario(possessore);
         }
         return false;
     }
 
-    private static Window proprietario(Window window) {
-        if (window instanceof PopupWindow popup) {
+    private static Window proprietario(Window finestra) {
+        if (finestra instanceof PopupWindow popup) {
             return popup.getOwnerWindow();
         }
-        if (window instanceof Stage stage) {
+        if (finestra instanceof Stage stage) {
             return stage.getOwner();
         }
         return null;
     }
 
-    private static StackPane creaRootApplicativa(Stage stage, Parent contenuto) {
-        StackPane root = new StackPane(contenuto);
-        root.setPickOnBounds(false);
+    private static StackPane creaRadiceApplicativa(Stage stage, Parent contenuto) {
+        StackPane radice = new StackPane(contenuto);
+        radice.setPickOnBounds(false);
 
         Button minimizza = new Button();
         SVGPath iconaMinimizza = new SVGPath();
@@ -388,7 +388,7 @@ public class SceneManager {
         minimizza.getStyleClass().add("app-minimize-button");
         minimizza.setAccessibleText("Minimizza applicazione");
         minimizza.setTooltip(creaTooltip("Minimizza applicazione"));
-        minimizza.setOnAction(event -> stage.setIconified(true));
+        minimizza.setOnAction(evento -> stage.setIconified(true));
 
         Button esci = new Button();
         SVGPath iconaEsci = new SVGPath();
@@ -398,23 +398,23 @@ public class SceneManager {
         esci.getStyleClass().add("app-exit-button");
         esci.setAccessibleText("Esci dall'applicazione");
         esci.setTooltip(creaTooltip("Esci dall'applicazione"));
-        esci.setOnAction(event -> {
+        esci.setOnAction(evento -> {
             stage.close();
             Platform.exit();
         });
 
         HBox controlliFinestra = new HBox(6, minimizza, esci);
         controlliFinestra.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        root.getChildren().add(controlliFinestra);
+        radice.getChildren().add(controlliFinestra);
         StackPane.setAlignment(controlliFinestra, Pos.TOP_RIGHT);
         StackPane.setMargin(controlliFinestra, new Insets(10, 12, 0, 0));
-        return root;
+        return radice;
     }
 
     private static Tooltip creaTooltip(String testo) {
-        Tooltip tooltip = new Tooltip(testo);
+        Tooltip suggerimento = new Tooltip(testo);
 
-        tooltip.setStyle(
+        suggerimento.setStyle(
                 "-fx-background-color: #343434;" +
                         "-fx-background-insets: 0;" +
                         "-fx-background-radius: 0;" +
@@ -424,23 +424,23 @@ public class SceneManager {
                         "-fx-effect: null;"
         );
 
-        return tooltip;
+        return suggerimento;
     }
 
     /**
      * Torna alla vista precedente nello storico dello stage associato all'evento.
      *
-     * @param event evento JavaFX la cui sorgente appartiene allo stage da aggiornare
+     * @param evento evento JavaFX la cui sorgente appartiene allo stage da aggiornare
      */
-    public static void goBack(Event event) {
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        goBack(stage);
+    public static void tornaIndietro(Event evento) {
+        Stage stage = (Stage) ((Node) evento.getSource()).getScene().getWindow();
+        tornaIndietro(stage);
     }
 
     /**
      * Torna alla vista precedente nello storico dello stage specificato, se disponibile.
      * <p>
-     * Prima di navigare, la richiesta viene offerta al controller corrente: se
+     * Prima di navigare, la richiesta viene offerta al controllore corrente: se
      * implementa {@link BackHandler} e gestisce localmente il comando (ad
      * esempio chiudendo una sezione di modifica o chiedendo conferma per dati
      * non salvati), la navigazione viene annullata. Quando lo storico è vuoto
@@ -450,20 +450,20 @@ public class SceneManager {
      *
      * @param stage stage per cui ripristinare la vista precedente
      */
-    public static void goBack(Stage stage) {
-        Object controller = currentControllers.get(stage);
-        if (controller instanceof BackHandler backHandler && backHandler.onBackRequested()) {
+    public static void tornaIndietro(Stage stage) {
+        Object controllore = controllerCorrenti.get(stage);
+        if (controllore instanceof BackHandler backHandler && backHandler.richiestaIndietro()) {
             return;
         }
 
-        Stack<String> history = historyMap.get(stage);
+        Stack<String> cronologia = cronologiaPerStage.get(stage);
 
-        if (history != null && !history.isEmpty()) {
-            String previousFxml = history.pop();
-            // Carichiamo la pagina precedente impostando saveToHistory a false per non sporcare la pila
-            switchSceneAndGetController(stage, previousFxml, false);
+        if (cronologia != null && !cronologia.isEmpty()) {
+            String fxmlPrecedente = cronologia.pop();
+            // Carichiamo la pagina precedente impostando salvaInCronologia a false per non sporcare la pila
+            cambiaScenaEOttieniController(stage, fxmlPrecedente, false);
         } else {
-            switchSceneAndGetController(stage, HOME_VIEW_FXML, false);
+            cambiaScenaEOttieniController(stage, FXML_VISTA_HOME, false);
         }
     }
 
@@ -473,9 +473,9 @@ public class SceneManager {
      * @param stage stage di cui verificare lo storico
      * @return {@code true} se è possibile tornare a una vista precedente
      */
-    public static boolean hasPreviousPage(Stage stage) {
-        Stack<String> history = historyMap.get(stage);
-        return history != null && !history.isEmpty();
+    public static boolean haPaginaPrecedente(Stage stage) {
+        Stack<String> cronologia = cronologiaPerStage.get(stage);
+        return cronologia != null && !cronologia.isEmpty();
     }
 
     /**
@@ -483,16 +483,16 @@ public class SceneManager {
      *
      * @param stage stage di cui azzerare lo stato di navigazione
      */
-    public static void clearHistory(Stage stage) {
-        if (historyMap.containsKey(stage)) {
-            historyMap.get(stage).clear();
+    public static void pulisciCronologia(Stage stage) {
+        if (cronologiaPerStage.containsKey(stage)) {
+            cronologiaPerStage.get(stage).clear();
         }
-        currentFxmlMap.remove(stage);
+        fxmlCorrentePerStage.remove(stage);
     }
 
-    private static void applyCssIfAvailable(Scene scene) {
-        if (SceneManager.class.getResource(GLOBAL_CSS) != null) {
-            scene.getStylesheets().add(SceneManager.class.getResource(GLOBAL_CSS).toExternalForm());
+    private static void applicaCssSeDisponibile(Scene scena) {
+        if (SceneManager.class.getResource(CSS_GLOBALE) != null) {
+            scena.getStylesheets().add(SceneManager.class.getResource(CSS_GLOBALE).toExternalForm());
         }
     }
 }

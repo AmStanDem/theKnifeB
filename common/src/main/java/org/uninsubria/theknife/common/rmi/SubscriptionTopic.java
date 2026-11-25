@@ -5,7 +5,7 @@
 package org.uninsubria.theknife.common.rmi;
 
 public enum SubscriptionTopic {
-    RESTAURANT,
-    USER,
-    CATALOG
+    RISTORANTE,
+    UTENTE,
+    CATALOGO
 }

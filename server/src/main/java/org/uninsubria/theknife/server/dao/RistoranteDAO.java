@@ -7,6 +7,7 @@ package org.uninsubria.theknife.server.dao;
 import org.uninsubria.theknife.common.dto.FiltriRicercaDTO;
 import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
+import org.uninsubria.theknife.common.dto.RiepilogoRecensioniDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.server.config.DatabaseConfig;
 
@@ -54,8 +55,8 @@ public class RistoranteDAO {
                 stmt.setDouble(6, r.latitudine() != null ? r.latitudine() : 0.0);
                 stmt.setDouble(7, r.longitudine() != null ? r.longitudine() : 0.0);
                 stmt.setDouble(8, r.prezzoMedio());
-                stmt.setBoolean(9, r.delivery() != null ? r.delivery() : false);
-                stmt.setBoolean(10, r.bookingOnline() != null && r.bookingOnline());
+                stmt.setBoolean(9, r.consegna() != null ? r.consegna() : false);
+                stmt.setBoolean(10, r.prenotazioneOnline() != null && r.prenotazioneOnline());
                 stmt.setBoolean(11, false);
                 stmt.setString(12, r.telefono());
                 stmt.setString(13, r.sitoWeb());
@@ -158,8 +159,8 @@ public class RistoranteDAO {
                     stmt.setDouble(5, r.latitudine());
                     stmt.setDouble(6, r.longitudine());
                     stmt.setDouble(7, r.prezzoMedio());
-                    stmt.setBoolean(8, Boolean.TRUE.equals(r.delivery()));
-                    stmt.setBoolean(9, Boolean.TRUE.equals(r.bookingOnline()));
+                    stmt.setBoolean(8, Boolean.TRUE.equals(r.consegna()));
+                    stmt.setBoolean(9, Boolean.TRUE.equals(r.prenotazioneOnline()));
 
                     stmt.setString(10, r.telefono());
                     stmt.setString(11, r.sitoWeb());
@@ -319,10 +320,10 @@ public class RistoranteDAO {
                 sql.append(" AND r.prezzo_medio <= ?");
                 parametri.add(filtri.prezzoMax());
             }
-            if (filtri.delivery() != null && filtri.delivery()) {
+            if (filtri.consegna() != null && filtri.consegna()) {
                 sql.append(" AND r.delivery = TRUE");
             }
-            if (filtri.bookingOnline() != null && filtri.bookingOnline()) {
+            if (filtri.prenotazioneOnline() != null && filtri.prenotazioneOnline()) {
                 sql.append(" AND r.booking_online = TRUE");
             }
 
@@ -414,10 +415,10 @@ public class RistoranteDAO {
             sql.append(" AND r.prezzo_medio <= ?");
             parametri.add(richiesta.prezzoMax());
         }
-        if (richiesta.delivery()) {
+        if (richiesta.consegna()) {
             sql.append(" AND r.delivery = TRUE");
         }
-        if (richiesta.bookingOnline()) {
+        if (richiesta.prenotazioneOnline()) {
             sql.append(" AND r.booking_online = TRUE");
         }
 
@@ -451,11 +452,11 @@ public class RistoranteDAO {
             }
         }
 
-        boolean hasMore = risultati.size() > richiesta.limite();
-        if (hasMore) {
+        boolean ciSonoAltri = risultati.size() > richiesta.limite();
+        if (ciSonoAltri) {
             risultati.remove(risultati.size() - 1);
         }
-        return new PaginaRistorantiDTO(risultati, hasMore);
+        return new PaginaRistorantiDTO(risultati, ciSonoAltri);
     }
 
     private String costruisciQueryBase() {
@@ -490,6 +491,29 @@ public class RistoranteDAO {
             }
         }
         return tipologie;
+    }
+
+    /**
+     * Calcola il riepilogo delle recensioni di un ristorante.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @return valutazione media e numero totale di recensioni
+     * @throws SQLException se si verifica un errore durante l'accesso al database
+     */
+    public RiepilogoRecensioniDTO trovaRiepilogo(int idRistorante) throws SQLException {
+        String sql = "SELECT COUNT(*) AS numero_recensioni, COALESCE(AVG(valutazione), 0.0) AS media_stelle " +
+                "FROM Recensioni WHERE id_ristorante = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idRistorante);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return new RiepilogoRecensioniDTO(
+                        idRistorante,
+                        rs.getDouble("media_stelle"),
+                        rs.getInt("numero_recensioni"));
+            }
+        }
     }
 
     private RistoranteDTO mappaResultSetRistorante(ResultSet rs) throws SQLException {

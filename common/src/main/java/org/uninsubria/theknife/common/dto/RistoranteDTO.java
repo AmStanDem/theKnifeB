@@ -20,8 +20,8 @@ import java.util.List;
  * @param longitudine longitudine della posizione del ristorante
  * @param tipologieCucina tipologie di cucina offerte
  * @param prezzoMedio prezzo medio indicativo
- * @param delivery indica se è disponibile la consegna a domicilio
- * @param bookingOnline indica se è disponibile la prenotazione online
+ * @param consegna indica se è disponibile la consegna a domicilio
+ * @param prenotazioneOnline indica se è disponibile la prenotazione online
  * @param mediaStelle valutazione media del ristorante
  * @param prezzoStimato indica se il prezzo medio è stato stimato
  * @param telefono numero di telefono del ristorante, se disponibile
@@ -38,8 +38,8 @@ public record RistoranteDTO(
         Double longitudine,
         List<String> tipologieCucina,
         Double prezzoMedio,
-        Boolean delivery,
-        Boolean bookingOnline,
+        Boolean consegna,
+        Boolean prenotazioneOnline,
         Double mediaStelle,
         boolean prezzoStimato,
         String telefono,
@@ -61,8 +61,8 @@ public record RistoranteDTO(
      * @param longitudine longitudine della posizione del ristorante
      * @param tipologieCucina tipologie di cucina offerte
      * @param prezzoMedio prezzo medio indicativo
-     * @param delivery indica se è disponibile la consegna a domicilio
-     * @param bookingOnline indica se è disponibile la prenotazione online
+     * @param consegna indica se è disponibile la consegna a domicilio
+     * @param prenotazioneOnline indica se è disponibile la prenotazione online
      * @param mediaStelle valutazione media del ristorante
      */
     public RistoranteDTO(
@@ -75,12 +75,12 @@ public record RistoranteDTO(
             Double longitudine,
             List<String> tipologieCucina,
             Double prezzoMedio,
-            Boolean delivery,
-            Boolean bookingOnline,
+            Boolean consegna,
+            Boolean prenotazioneOnline,
             Double mediaStelle
     ) {
         this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
-                tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle, false);
+                tipologieCucina, prezzoMedio, consegna, prenotazioneOnline, mediaStelle, false);
     }
 
     /**
@@ -95,8 +95,8 @@ public record RistoranteDTO(
      * @param longitudine longitudine della posizione del ristorante
      * @param tipologieCucina tipologie di cucina offerte
      * @param prezzoMedio prezzo medio indicativo
-     * @param delivery indica se è disponibile la consegna a domicilio
-     * @param bookingOnline indica se è disponibile la prenotazione online
+     * @param consegna indica se è disponibile la consegna a domicilio
+     * @param prenotazioneOnline indica se è disponibile la prenotazione online
      * @param mediaStelle valutazione media del ristorante
      * @param prezzoStimato indica se il prezzo medio è stato stimato
      */
@@ -110,13 +110,13 @@ public record RistoranteDTO(
             Double longitudine,
             List<String> tipologieCucina,
             Double prezzoMedio,
-            Boolean delivery,
-            Boolean bookingOnline,
+            Boolean consegna,
+            Boolean prenotazioneOnline,
             Double mediaStelle,
             boolean prezzoStimato
     ) {
         this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
-                tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle,
+                tipologieCucina, prezzoMedio, consegna, prenotazioneOnline, mediaStelle,
                 prezzoStimato, null, null, null);
     }
 
@@ -132,8 +132,8 @@ public record RistoranteDTO(
      * @param longitudine longitudine della posizione del ristorante
      * @param tipologieCucina tipologie di cucina offerte
      * @param prezzoMedio prezzo medio indicativo
-     * @param delivery indica se è disponibile la consegna a domicilio
-     * @param bookingOnline indica se è disponibile la prenotazione online
+     * @param consegna indica se è disponibile la consegna a domicilio
+     * @param prenotazioneOnline indica se è disponibile la prenotazione online
      * @param mediaStelle valutazione media del ristorante
      * @param prezzoStimato indica se il prezzo medio è stato stimato
      * @param telefono numero di telefono del ristorante
@@ -149,15 +149,15 @@ public record RistoranteDTO(
             Double longitudine,
             List<String> tipologieCucina,
             Double prezzoMedio,
-            Boolean delivery,
-            Boolean bookingOnline,
+            Boolean consegna,
+            Boolean prenotazioneOnline,
             Double mediaStelle,
             boolean prezzoStimato,
             String telefono,
             String sitoWeb
     ) {
         this(idRistorante, nome, indirizzo, citta, nazione, latitudine, longitudine,
-                tipologieCucina, prezzoMedio, delivery, bookingOnline, mediaStelle,
+                tipologieCucina, prezzoMedio, consegna, prenotazioneOnline, mediaStelle,
                 prezzoStimato, telefono, sitoWeb, null);
     }
 }

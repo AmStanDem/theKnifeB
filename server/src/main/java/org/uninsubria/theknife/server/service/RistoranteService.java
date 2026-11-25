@@ -8,6 +8,7 @@ import org.uninsubria.theknife.common.dto.FiltriRicercaDTO;
 import org.uninsubria.theknife.common.dto.DataChangedEvent;
 import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
+import org.uninsubria.theknife.common.dto.RiepilogoRecensioniDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
@@ -81,9 +82,9 @@ public class RistoranteService {
             if (restaurantId == null) {
                 throw new SistemaIndisponibileException();
             }
-            subscriptions.publish(restaurantId, idGestore, DataChangedEvent.ChangeType.RESTAURANT_CHANGED);
+            subscriptions.pubblica(restaurantId, idGestore, DataChangedEvent.ChangeType.RISTORANTE_MODIFICATO);
         } catch (SQLException e) {
-            throw databaseError("inserimento ristorante", e);
+            throw erroreDatabase("inserimento ristorante", e);
         }
     }
 
@@ -116,10 +117,10 @@ public class RistoranteService {
                 throw new OperazioneNonConsentitaException(
                         "Il ristorante non esiste o non appartiene al gestore corrente.");
             }
-            subscriptions.publish(
-                    ristorante.idRistorante(), idGestore, DataChangedEvent.ChangeType.RESTAURANT_CHANGED);
+            subscriptions.pubblica(
+                    ristorante.idRistorante(), idGestore, DataChangedEvent.ChangeType.RISTORANTE_MODIFICATO);
         } catch (SQLException e) {
-            throw databaseError("modifica ristorante", e);
+            throw erroreDatabase("modifica ristorante", e);
         }
     }
 
@@ -162,7 +163,7 @@ public class RistoranteService {
             }
             return ristorante;
         } catch (SQLException e) {
-            throw databaseError("ricerca ristorante per ID", e);
+            throw erroreDatabase("ricerca ristorante per ID", e);
         }
     }
 
@@ -176,7 +177,7 @@ public class RistoranteService {
         try {
             return ristoranteDAO.ottieniTutteTipologieCucina();
         } catch (SQLException e) {
-            throw databaseError("caricamento tipologie cucina", e);
+            throw erroreDatabase("caricamento tipologie cucina", e);
         }
     }
 
@@ -194,7 +195,7 @@ public class RistoranteService {
         try {
             return ristoranteDAO.trovaPerGestore(idGestore);
         } catch (SQLException e) {
-            throw databaseError("ricerca ristoranti del gestore", e);
+            throw erroreDatabase("ricerca ristoranti del gestore", e);
         }
     }
 
@@ -205,11 +206,11 @@ public class RistoranteService {
      * @return ristoranti corrispondenti ai criteri
      * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
      */
-    public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri) throws SistemaIndisponibileException {
+    public List<RistoranteDTO> cercaRistorante(FiltriRicercaDTO filtri) throws SistemaIndisponibileException {
         try {
             return ristoranteDAO.cercaConFiltri(filtri);
         } catch (SQLException e) {
-            throw databaseError("ricerca ristoranti", e);
+            throw erroreDatabase("ricerca ristoranti", e);
         }
     }
 
@@ -221,7 +222,7 @@ public class RistoranteService {
      * @throws IllegalArgumentException se la richiesta è nulla o mancano località, coordinate o raggio
      * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
      */
-    public PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+    public PaginaRistorantiDTO cercaRistorantePaginato(RicercaRistorantiPaginaDTO richiesta)
             throws SistemaIndisponibileException {
         if (richiesta == null) {
             throw new IllegalArgumentException("La richiesta di ricerca è obbligatoria.");
@@ -236,12 +237,29 @@ public class RistoranteService {
         try {
             return ristoranteDAO.cercaPagina(richiesta);
         } catch (SQLException e) {
-            throw databaseError("ricerca paginata ristoranti", e);
+            throw erroreDatabase("ricerca paginata ristoranti", e);
         }
     }
 
-    private SistemaIndisponibileException databaseError(String operation, SQLException cause) {
-        System.err.println("[DAO_ERROR] Errore durante " + operation + ": " + cause.getMessage());
+    /**
+     * Restituisce il riepilogo delle recensioni di un ristorante.
+     *
+     * @param idRistorante identificativo del ristorante
+     * @return valutazione media e numero totale di recensioni
+     * @throws SistemaIndisponibileException se si verifica un errore durante l'accesso al database
+     */
+    public RiepilogoRecensioniDTO visualizzaRiepilogo(Integer idRistorante) throws SistemaIndisponibileException {
+        if (idRistorante == null) {
+            throw new IllegalArgumentException("L'identificativo del ristorante è obbligatorio.");
+        }
+        try {
+            return ristoranteDAO.trovaRiepilogo(idRistorante);
+        } catch (SQLException e) {
+            throw erroreDatabase("riepilogo recensioni del ristorante", e);
+        }
+    }
+
+    private SistemaIndisponibileException erroreDatabase(String operation, SQLException cause) {        System.err.println("[DAO_ERROR] Errore durante " + operation + ": " + cause.getMessage());
         return new SistemaIndisponibileException(cause);
     }
 
@@ -270,13 +288,13 @@ public class RistoranteService {
                 throw new RistoranteNonTrovatoException(idRistorante);
             }
 
-            subscriptions.publish(
+            subscriptions.pubblica(
                     idRistorante,
                     idGestore,
-                    DataChangedEvent.ChangeType.RESTAURANT_CHANGED);
+                    DataChangedEvent.ChangeType.RISTORANTE_MODIFICATO);
 
         } catch (SQLException e) {
-            throw databaseError("eliminazione ristorante", e);
+            throw erroreDatabase("eliminazione ristorante", e);
         }
     }
 

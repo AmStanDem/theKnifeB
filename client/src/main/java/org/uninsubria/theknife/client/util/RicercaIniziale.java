@@ -28,8 +28,8 @@ public final class RicercaIniziale {
      * @param prezzoMin prezzo minimo
      * @param prezzoMax prezzo massimo
      * @param mediaStelleMinima valutazione media minima
-     * @param delivery indica se filtrare per disponibilità della consegna a domicilio
-     * @param bookingOnline indica se filtrare per disponibilità della prenotazione online
+     * @param consegna indica se filtrare per disponibilità della consegna a domicilio
+     * @param prenotazioneOnline indica se filtrare per disponibilità della prenotazione online
      */
     public record Criteri(
             String testo,
@@ -40,8 +40,8 @@ public final class RicercaIniziale {
             Double prezzoMin,
             Double prezzoMax,
             Double mediaStelleMinima,
-            boolean delivery,
-            boolean bookingOnline
+            boolean consegna,
+            boolean prenotazioneOnline
     ) {
         public Criteri {
             tipologieCucina = tipologieCucina == null ? List.of() : List.copyOf(tipologieCucina);
@@ -75,8 +75,8 @@ public final class RicercaIniziale {
      * @param prezzoMin prezzo minimo
      * @param prezzoMax prezzo massimo
      * @param mediaStelleMinima valutazione media minima
-     * @param delivery indica se filtrare per disponibilità della consegna a domicilio
-     * @param bookingOnline indica se filtrare per disponibilità della prenotazione online
+     * @param consegna indica se filtrare per disponibilità della consegna a domicilio
+     * @param prenotazioneOnline indica se filtrare per disponibilità della prenotazione online
      */
     public static void imposta(
             String testo,
@@ -85,8 +85,8 @@ public final class RicercaIniziale {
             Double prezzoMin,
             Double prezzoMax,
             Double mediaStelleMinima,
-            boolean delivery,
-            boolean bookingOnline
+            boolean consegna,
+            boolean prenotazioneOnline
     ) {
         CRITERI.set(new Criteri(
                 testo,
@@ -97,8 +97,8 @@ public final class RicercaIniziale {
                 prezzoMin,
                 prezzoMax,
                 mediaStelleMinima,
-                delivery,
-                bookingOnline
+                consegna,
+                prenotazioneOnline
         ));
     }
 

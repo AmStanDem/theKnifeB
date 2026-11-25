@@ -42,15 +42,15 @@ public class MainLayoutController {
      */
     @FXML
     public void initialize() {
-        if (SessioneUtente.getUtenteCorrente() != null) {
-            String domicilio = SessioneUtente.getUtenteCorrente().domicilio();
+        if (SessioneUtente.ottieniUtenteCorrente() != null) {
+            String domicilio = SessioneUtente.ottieniUtenteCorrente().domicilio();
             if (domicilio != null && !domicilio.isBlank()) {
                 txtLocalita.setText(domicilio);
             }
         }
 
         txtLocalita.setTextFieldPrefHeight(65);
-        txtLocalita.setMapButtonPrefWidth(65);
+        txtLocalita.impostaAmpiezzaPulsanteMappa(65);
     }
 
     /**
@@ -61,10 +61,10 @@ public class MainLayoutController {
      * ristoranti.
      * </p>
      *
-     * @param event evento JavaFX usato per cambiare scena
+     * @param evento evento JavaFX usato per cambiare scena
      */
     @FXML
-    private void onRicercaClick(ActionEvent event) {
+    private void onRicercaClick(ActionEvent evento) {
         if (txtLocalita.getText().isBlank()) {
             mostraErrore(
                     "Località da selezionare",
@@ -75,8 +75,8 @@ public class MainLayoutController {
 
         txtLocalita.risolviLuogo(luogo -> {
             RicercaIniziale.imposta(txtRicerca.getText(), luogo);
-            SceneManager.switchScene(
-                    event,
+            SceneManager.cambiaScena(
+                    evento,
                     "/org/uninsubria/theknife/client/views/listaRistoranti.fxml"
             );
         }, messaggio -> mostraErrore("Località non valida", messaggio));
@@ -85,12 +85,12 @@ public class MainLayoutController {
     /**
      * Apre la schermata di ricerca avanzata.
      *
-     * @param event evento JavaFX usato per cambiare scena
+     * @param evento evento JavaFX usato per cambiare scena
      */
     @FXML
-    public void onRicercaAvanzataClick(ActionEvent event) {
-        SceneManager.switchScene(
-                event,
+    public void onRicercaAvanzataClick(ActionEvent evento) {
+        SceneManager.cambiaScena(
+                evento,
                 "/org/uninsubria/theknife/client/views/RicercaAvanzataView.fxml"
         );
     }
@@ -103,11 +103,11 @@ public class MainLayoutController {
      */
     @FXML
     private void mostraErrore(String titolo, String messaggio) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
+        Alert avviso = new Alert(Alert.AlertType.WARNING);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.showAndWait();
     }
 }

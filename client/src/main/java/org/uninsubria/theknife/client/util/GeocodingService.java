@@ -92,7 +92,7 @@ public final class GeocodingService {
         if (query == null || query.trim().length() < 3) {
             return List.of();
         }
-        String url = BASE_URL + "/search?q=" + encode(query.trim())
+        String url = BASE_URL + "/search?q=" + codifica(query.trim())
                 + "&format=jsonv2&addressdetails=1&limit=5&accept-language=it";
         String json = inviaRichiesta(url);
         List<Luogo> luoghi = new ArrayList<>();
@@ -232,7 +232,7 @@ public final class GeocodingService {
         return oggetti;
     }
 
-    private static String encode(String value) {
+    private static String codifica(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 

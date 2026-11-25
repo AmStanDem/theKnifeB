@@ -170,7 +170,7 @@
             <Region prefHeight="10.0" />
 
             <!-- Registrati button -->
-            <Button fx:id="registratiButton" maxWidth="Infinity" onAction="#handleRegistrati" prefHeight="45.0" styleClass="sign-in-button" text="Registrati">
+            <Button fx:id="registratiButton" maxWidth="Infinity" onAction="#gestisciRegistrazione" prefHeight="45.0" styleClass="sign-in-button" text="Registrati">
                 <VBox.margin>
                     <Insets bottom="14.0" top="8.0" />
                 </VBox.margin>

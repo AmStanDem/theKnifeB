@@ -52,8 +52,8 @@ public class RatingContainer extends HBox {
      * @param filled colore delle porzioni piene
      * @param empty colore delle porzioni vuote
      */
-    public void setColors(Color filled, Color empty) {
-        ratingView.setColors(filled, empty);
+    public void impostaColori(Color filled, Color empty) {
+        ratingView.impostaColori(filled, empty);
     }
 
     /**
@@ -61,8 +61,8 @@ public class RatingContainer extends HBox {
      *
      * @return valutazione compresa tra 0 e 5
      */
-    public double getRating() {
-        return ratingView.getRating();
+    public double ottieniValutazione() {
+        return ratingView.ottieniValutazione();
     }
 
     /**
@@ -70,10 +70,10 @@ public class RatingContainer extends HBox {
      *
      * @param rating valutazione da visualizzare, limitata all'intervallo da 0 a 5
      */
-    public void setRating(double rating) {
+    public void impostaValutazione(double rating) {
         // Imposta il voto senza bloccare l'interattività, così l'utente può sempre modificarlo
-        ratingView.setRating(rating);
-        ratingView.setInteractive(true);
+        ratingView.impostaValutazione(rating);
+        ratingView.impostaInterattivo(true);
     }
 
     /**
@@ -81,8 +81,8 @@ public class RatingContainer extends HBox {
      *
      * @param interactive {@code true} per consentire la selezione
      */
-    public void setInteractive(boolean interactive) {
-        ratingView.setInteractive(interactive);
+    public void impostaInterattivo(boolean interactive) {
+        ratingView.impostaInterattivo(interactive);
     }
 
     /**
@@ -90,7 +90,7 @@ public class RatingContainer extends HBox {
      *
      * @param onRatingChanged azione da eseguire, oppure {@code null} per non eseguirne alcuna
      */
-    public void setOnRatingChanged(Runnable onRatingChanged) {
-        ratingView.setOnRatingChanged(onRatingChanged);
+    public void impostaSuValutazioneCambiata(Runnable onRatingChanged) {
+        ratingView.impostaSuValutazioneCambiata(onRatingChanged);
     }
 }

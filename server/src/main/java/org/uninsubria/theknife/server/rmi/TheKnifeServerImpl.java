@@ -30,19 +30,19 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     private final PreferitiService preferitiService = new PreferitiService(subscriptions);
 
     @Override
-    public UUID subscribe(SubscriptionTopic topic, Integer targetId, RemoteObserver observer)
+    public UUID sottoscrivi(SubscriptionTopic ambito, Integer idDestinazione, RemoteObserver osservatore)
             throws RemoteException, DatiMancantiException {
-        if (topic == null || observer == null
-                || (topic == SubscriptionTopic.CATALOG && targetId != null)
-                || (topic != SubscriptionTopic.CATALOG && (targetId == null || targetId <= 0))) {
+        if (ambito == null || osservatore == null
+                || (ambito == SubscriptionTopic.CATALOGO && idDestinazione != null)
+                || (ambito != SubscriptionTopic.CATALOGO && (idDestinazione == null || idDestinazione <= 0))) {
             throw new DatiMancantiException("Argomenti di sottoscrizione non validi.");
         }
-        return subscriptions.subscribe(topic, targetId, observer);
+        return subscriptions.sottoscrivi(ambito, idDestinazione, osservatore);
     }
 
     @Override
-    public void unsubscribe(UUID subscriptionId) {
-        subscriptions.unsubscribe(subscriptionId);
+    public void annullaSottoscrizione(UUID idSottoscrizione) {
+        subscriptions.annullaSottoscrizione(idSottoscrizione);
     }
 
     /**
@@ -54,13 +54,13 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
-    public UtenteDTO eseguiLogin(String email, String password)
+    public UtenteDTO accedi(String email, String password)
             throws RemoteException, CredenzialiErrateException, SistemaIndisponibileException {
         return utenteService.autentica(email, password);
     }
 
     @Override
-    public UtenteDTO registraCliente(UtenteDTO nuovoUtente, String passwordInChiaro)
+    public UtenteDTO registrazione(UtenteDTO nuovoUtente, String passwordInChiaro)
             throws RemoteException, UtenteGiaEsistenteException, DatiMancantiException, SistemaIndisponibileException {
         return utenteService.registra(nuovoUtente, passwordInChiaro);
     }
@@ -78,15 +78,15 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
-    public List<RistoranteDTO> cercaRistoranti(FiltriRicercaDTO filtri)
+    public List<RistoranteDTO> cercaRistorante(FiltriRicercaDTO filtri)
             throws RemoteException, SistemaIndisponibileException {
-        return ristoranteService.cercaRistoranti(filtri);
+        return ristoranteService.cercaRistorante(filtri);
     }
 
     @Override
-    public PaginaRistorantiDTO cercaRistorantiPagina(RicercaRistorantiPaginaDTO richiesta)
+    public PaginaRistorantiDTO cercaRistorantePaginato(RicercaRistorantiPaginaDTO richiesta)
             throws RemoteException, SistemaIndisponibileException {
-        return ristoranteService.cercaRistorantiPagina(richiesta);
+        return ristoranteService.cercaRistorantePaginato(richiesta);
     }
 
     @Override
@@ -96,19 +96,19 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
-    public RistoranteDTO getDettaglioRistorante(Integer idRistorante)
+    public RistoranteDTO visualizzaRistorante(Integer idRistorante)
             throws RemoteException, RistoranteNonTrovatoException, SistemaIndisponibileException {
         return ristoranteService.ottieniDettaglio(idRistorante);
     }
 
     @Override
-    public List<RistoranteDTO> getRistorantiGestore(Integer idGestore)
+    public List<RistoranteDTO> ottieniRistorantiGestore(Integer idGestore)
             throws RemoteException, SistemaIndisponibileException {
         return ristoranteService.ottieniRistorantiGestore(idGestore);
     }
 
     @Override
-    public void registraNuovoRistorante(RistoranteDTO ristorante, Integer idGestore)
+    public void aggiungiRistorante(RistoranteDTO ristorante, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
         ristoranteService.aggiungiRistorante(ristorante, idGestore);
     }
@@ -120,25 +120,31 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
-    public List<RecensioneDTO> getRecensioniRistorante(Integer idRistorante)
+    public List<RecensioneDTO> visualizzaRecensioni(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException {
         return recensioneService.ottieniPerRistorante(idRistorante);
     }
 
     @Override
-    public List<RecensioneDTO> getRecensioniRistoranteAnonimo(Integer idRistorante)
+    public List<RecensioneDTO> visualizzaRecensioniAnonimo(Integer idRistorante)
             throws RemoteException, SistemaIndisponibileException {
         return recensioneService.ottieniPerRistoranteAnonimo(idRistorante);
     }
 
     @Override
-    public List<RecensioneDTO> getRecensioniUtente(Integer idUtente)
+    public List<RecensioneDTO> visualizzaRecensioniUtente(Integer idUtente)
             throws RemoteException, SistemaIndisponibileException {
         return recensioneService.ottieniPerUtente(idUtente);
     }
 
     @Override
-    public void inserisciRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
+    public RiepilogoRecensioniDTO visualizzaRiepilogo(Integer idRistorante)
+            throws RemoteException, SistemaIndisponibileException {
+        return ristoranteService.visualizzaRiepilogo(idRistorante);
+    }
+
+    @Override
+    public void aggiungiRecensione(RecensioneDTO recensione, Integer idRistorante, Integer idUtente)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, AzioneDuplicataException, SistemaIndisponibileException {
         recensioneService.aggiungiRecensione(recensione, idRistorante, idUtente);
     }
@@ -158,16 +164,16 @@ public class TheKnifeServerImpl implements ITheKnifeServer, AutoCloseable {
     }
 
     @Override
-    public void rispondiARecensione(Integer idRecensione, String testoRisposta, Integer idGestore)
+    public void rispostaRecensioni(Integer idRecensione, String testoRisposta, Integer idGestore)
             throws RemoteException, OperazioneNonConsentitaException, DatiMancantiException, SistemaIndisponibileException {
         // Corretta la chiamata aggiungendo l'idGestore come parametro
         recensioneService.aggiungiRisposta(idRecensione, idGestore, testoRisposta);
     }
 
     @Override
-    public List<RistoranteDTO> getPreferitiUtente(Integer idUtente)
+    public List<RistoranteDTO> visualizzaPreferiti(Integer idUtente)
             throws RemoteException, SistemaIndisponibileException {
-        return preferitiService.getPreferiti(idUtente);
+        return preferitiService.ottieniPreferiti(idUtente);
     }
 
     @Override

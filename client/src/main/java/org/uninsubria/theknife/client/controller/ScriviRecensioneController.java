@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
  * Gestisce la compilazione e la validazione del testo e della valutazione,
  * invia nuove recensioni al server e permette di aggiornare una recensione
  * esistente. In {@code modalitaRisposta} nasconde la valutazione a stelle e
- * invia una risposta tramite {@code rispondiARecensione}. Al termine di
+ * invia una risposta tramite {@code rispostaRecensioni}. Al termine di
  * un'operazione torna alla schermata da cui è stata avviata.
  * </p>
  * <p>
@@ -80,7 +80,7 @@ public class ScriviRecensioneController {
     @FXML
     public void initialize() {
         recensioneDaRispondere = RecensioneDaRispondere.get();
-        if (recensioneDaRispondere != null && !SessioneUtente.isGestore()) {
+        if (recensioneDaRispondere != null && !SessioneUtente.eGestore()) {
             // Stato residuo di una risposta abbandonata con il pulsante "indietro":
             // un utente non gestore deve sempre aprire la modalità recensione.
             RecensioneDaRispondere.pulisci();
@@ -101,9 +101,9 @@ public class ScriviRecensioneController {
      * Configura la UI per la modalità risposta (gestore).
      */
     private void inizializzaModalitaRisposta() {
-        ristorante = RistoranteSelezionato.getRistorante();
+        ristorante = RistoranteSelezionato.ottieniRistorante();
 
-        boolean abilitato = SessioneUtente.isGestore()
+        boolean abilitato = SessioneUtente.eGestore()
                 && recensioneDaRispondere.idRecensione() != null
                 && (recensioneDaRispondere.rispostaGestore() == null
                 || recensioneDaRispondere.rispostaGestore().isBlank());
@@ -130,9 +130,9 @@ public class ScriviRecensioneController {
     private void inizializzaModalitaRecensione() {
         recensioneDaModificare = RecensioneSelezionata.get();
         origineModifica = RecensioneSelezionata.getOrigineModifica();
-        ristorante = RistoranteSelezionato.getRistorante();
+        ristorante = RistoranteSelezionato.ottieniRistorante();
 
-        boolean clienteLoggato = SessioneUtente.isCliente();
+        boolean clienteLoggato = SessioneUtente.eCliente();
         txtRecensione.setDisable(!clienteLoggato);
         ratingRecensione.setDisable(!clienteLoggato);
         btnInviaRecensione.setDisable(!clienteLoggato);
@@ -147,7 +147,7 @@ public class ScriviRecensioneController {
             titoloLabel.setText("Modifica la tua recensione");
             btnInviaRecensione.setText("Salva modifiche");
             txtRecensione.setText(recensioneDaModificare.testo());
-            ratingRecensione.setRating(recensioneDaModificare.valutazione());
+            ratingRecensione.impostaValutazione(recensioneDaModificare.valutazione());
         } else if (ristorante == null || ristorante.idRistorante() == null) {
             btnInviaRecensione.setDisable(true);
             mostraMessaggio(Alert.AlertType.ERROR, "Ristorante non selezionato",
@@ -173,15 +173,15 @@ public class ScriviRecensioneController {
             return;
         }
 
-        UtenteDTO utente = SessioneUtente.getUtenteCorrente();
-        if (utente == null || !SessioneUtente.isCliente()) {
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eCliente()) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come cliente per scrivere una recensione.");
             return;
         }
 
         String testo = txtRecensione.getText();
-        double stelle = ratingRecensione.getRating();
+        double stelle = ratingRecensione.ottieniValutazione();
         if (testo == null || testo.isBlank() || stelle < 1 || stelle > 5) {
             mostraMessaggio(Alert.AlertType.WARNING, "Dati incompleti",
                     "Inserisci il testo e assegna da 1 a 5 stelle.");
@@ -190,7 +190,7 @@ public class ScriviRecensioneController {
 
         try {
             if (recensioneDaModificare != null) {
-                ServerConnection.getServer().modificaRecensione(
+                ServerConnection.ottieniServer().modificaRecensione(
                         recensioneDaModificare.idRecensione(),
                         utente.idUtente(),
                         testo.trim(),
@@ -212,16 +212,16 @@ public class ScriviRecensioneController {
                         ristorante.idRistorante(),
                         ristorante.nome()
                 );
-                ServerConnection.getServer().inserisciRecensione(
+                ServerConnection.ottieniServer().aggiungiRecensione(
                         recensione,
                         ristorante.idRistorante(),
                         utente.idUtente()
                 );
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione inviata",
                         "La tua recensione è stata pubblicata.");
-                RistoranteSelezionato.setRitornoAiMieiRistoranti(
-                        RistoranteSelezionato.getRistorante() != null);
-                SceneManager.replaceCurrentScene(
+                RistoranteSelezionato.impostaRitornoAiMieiRistoranti(
+                        RistoranteSelezionato.ottieniRistorante() != null);
+                SceneManager.sostituisciScenaCorrente(
                         actionEvent,
                         "/org/uninsubria/theknife/client/views/Ristorante.fxml"
                 );
@@ -258,8 +258,8 @@ public class ScriviRecensioneController {
      * @param actionEvent evento JavaFX usato per cambiare scena dopo l'invio
      */
     private void onInviaRispostaClick(ActionEvent actionEvent) {
-        UtenteDTO gestore = SessioneUtente.getUtenteCorrente();
-        if (!SessioneUtente.isGestore() || gestore == null
+        UtenteDTO gestore = SessioneUtente.ottieniUtenteCorrente();
+        if (!SessioneUtente.eGestore() || gestore == null
                 || recensioneDaRispondere == null || recensioneDaRispondere.idRecensione() == null) {
             mostraMessaggio(Alert.AlertType.WARNING, "Accesso richiesto",
                     "Accedi come gestore e seleziona una recensione valida.");
@@ -274,14 +274,14 @@ public class ScriviRecensioneController {
         }
 
         try {
-            ServerConnection.getServer().rispondiARecensione(
+            ServerConnection.ottieniServer().rispostaRecensioni(
                     recensioneDaRispondere.idRecensione(), testo.trim(), gestore.idUtente());
             RecensioneDaRispondere.pulisci();
             mostraMessaggio(Alert.AlertType.INFORMATION, "Risposta inviata",
                     "La risposta è stata pubblicata.");
-            RistoranteSelezionato.setRitornoAiMieiRistoranti(
-                    RistoranteSelezionato.getRistorante() != null);
-            SceneManager.replaceCurrentScene(
+            RistoranteSelezionato.impostaRitornoAiMieiRistoranti(
+                    RistoranteSelezionato.ottieniRistorante() != null);
+            SceneManager.sostituisciScenaCorrente(
                     actionEvent,
                     "/org/uninsubria/theknife/client/views/Ristorante.fxml"
             );
@@ -303,9 +303,9 @@ public class ScriviRecensioneController {
     public void onAnnullaClick(ActionEvent actionEvent) {
         if (modalitaRisposta) {
             RecensioneDaRispondere.pulisci();
-            RistoranteSelezionato.setRitornoAiMieiRistoranti(
-                    RistoranteSelezionato.getRistorante() != null);
-            SceneManager.replaceCurrentScene(
+            RistoranteSelezionato.impostaRitornoAiMieiRistoranti(
+                    RistoranteSelezionato.ottieniRistorante() != null);
+            SceneManager.sostituisciScenaCorrente(
                     actionEvent,
                     "/org/uninsubria/theknife/client/views/Ristorante.fxml");
             return;
@@ -316,7 +316,7 @@ public class ScriviRecensioneController {
         if (modificaInCorso) {
             tornaAllaPaginaOrigine(actionEvent);
         } else {
-            SceneManager.replaceCurrentScene(
+            SceneManager.sostituisciScenaCorrente(
                     actionEvent,
                     "/org/uninsubria/theknife/client/views/Ristorante.fxml");
         }
@@ -333,10 +333,10 @@ public class ScriviRecensioneController {
                 ? "/org/uninsubria/theknife/client/views/Ristorante.fxml"
                 : "/org/uninsubria/theknife/client/views/MieRecensioni.fxml";
         if ("/org/uninsubria/theknife/client/views/Ristorante.fxml".equals(destinazione)) {
-            RistoranteSelezionato.setRitornoAiMieiRistoranti(
-                    RistoranteSelezionato.getRistorante() != null);
+            RistoranteSelezionato.impostaRitornoAiMieiRistoranti(
+                    RistoranteSelezionato.ottieniRistorante() != null);
         }
-        SceneManager.replaceCurrentScene(actionEvent, destinazione);
+        SceneManager.sostituisciScenaCorrente(actionEvent, destinazione);
     }
 
     /**
@@ -347,11 +347,11 @@ public class ScriviRecensioneController {
      * @param messaggio testo da mostrare all'utente
      */
     private void mostraMessaggio(Alert.AlertType tipo, String titolo, String messaggio) {
-        Alert alert = new Alert(tipo);
-        SceneManager.initOwner(alert);
-        alert.setTitle(titolo);
-        alert.setHeaderText(null);
-        alert.setContentText(messaggio);
-        alert.showAndWait();
+        Alert avviso = new Alert(tipo);
+        SceneManager.impostaProprietario(avviso);
+        avviso.setTitle(titolo);
+        avviso.setHeaderText(null);
+        avviso.setContentText(messaggio);
+        avviso.showAndWait();
     }
 }

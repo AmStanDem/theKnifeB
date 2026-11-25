@@ -5,7 +5,7 @@
 package org.uninsubria.theknife.client.util;
 
 /**
- * Permette a un controller di intercettare il pulsante "indietro" del layout
+ * Permette a un controllore di intercettare il pulsante "indietro" del layout
  * comune prima che venga applicata la navigazione nello storico.
  * <p>
  * Le viste che hanno stati interni (ad esempio una sezione di modifica aperta
@@ -18,10 +18,10 @@ public interface BackHandler {
     /**
      * Gestisce una richiesta di navigazione all'indietro.
      *
-     * @return {@code true} se il controller ha gestito la richiesta e la
+     * @return {@code true} se il controllore ha gestito la richiesta e la
      *         navigazione nello storico deve essere annullata; {@code false}
      *         per lasciare che il {@link SceneManager} torni alla pagina
      *         precedente
      */
-    boolean onBackRequested();
+    boolean richiestaIndietro();
 }
