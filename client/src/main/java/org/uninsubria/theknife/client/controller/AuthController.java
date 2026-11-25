@@ -370,7 +370,8 @@ public class AuthController implements BackHandler {
             utente = server.registraCliente(utente, password);
             SessioneUtente.login(utente);
 
-            // Cambio scena pulito tramite SceneManager centralizzato
+            // Dopo la registrazione, la schermata di autenticazione non deve restare nello storico.
+            SceneManager.clearHistory(SceneManager.getStage(event));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             SceneManager.clearHistory(stage);
             SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
