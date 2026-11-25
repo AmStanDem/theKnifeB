@@ -14,7 +14,7 @@ import java.util.UUID;
  *
  * @param idSottoscrizione identificativo della sottoscrizione interessata
  * @param idEvento identificativo univoco dell'evento
- * @param idRistorante identificativo del ristorante coinvolto
+ * @param idRistorante identificativo del ristorante coinvolto, oppure {@code null} per eventi non riferiti a un ristorante
  * @param tipo tipo di modifica avvenuta
  * @param istanteOccorrenza istante in cui si è verificata la modifica
  */
@@ -32,12 +32,19 @@ public record DataChangedEvent(
      * Tipi di modifica notificabili ai sottoscrittori.
      */
     public enum ChangeType {
+        /** Un ristorante è stato aggiunto, modificato o eliminato. */
         RISTORANTE_MODIFICATO,
+        /** È stata creata una recensione. */
         RECENSIONE_CREATA,
+        /** Sono stati modificati testo o valutazione di una recensione. */
         RECENSIONE_MODIFICATA,
+        /** È stata eliminata una recensione. */
         RECENSIONE_ELIMINATA,
+        /** È stata aggiunta una risposta del gestore a una recensione. */
         RISPOSTA_RECENSIONE_MODIFICATA,
+        /** È cambiata l'associazione tra un utente e uno dei suoi ristoranti preferiti. */
         PREFERITI_MODIFICATI,
+        /** Sono stati aggiornati i dati o le credenziali di un utente. */
         UTENTE_MODIFICATO
     }
 

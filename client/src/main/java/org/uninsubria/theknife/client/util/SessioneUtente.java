@@ -9,13 +9,6 @@ import org.uninsubria.theknife.common.dto.UtenteDTO.RuoloUtente;
 
 /**
  * Contiene lo stato dell'utente attualmente autenticato sul client.
- * <p>
- * Essendo un client desktop mono-utente per istanza (una sola persona usa
- * l'applicazione client alla volta), è sufficiente un semplice singleton
- * con campi statici: non ci sono problemi di concorrenza da gestire qui,
- * quella riguarda solo il serverTK che serve più client in parallelo.
- *
- * @author TheKnife Team
  */
 public final class SessioneUtente {
 
@@ -43,6 +36,8 @@ public final class SessioneUtente {
     }
 
     /**
+     * Indica se è presente un utente autenticato.
+     *
      * @return {@code true} se un utente è attualmente loggato
      */
     public static boolean eLoggato() {
@@ -50,6 +45,8 @@ public final class SessioneUtente {
     }
 
     /**
+     * Restituisce i dati dell'utente autenticato.
+     *
      * @return l'utente attualmente loggato, o {@code null} se si è in modalità guest
      */
     public static UtenteDTO ottieniUtenteCorrente() {
@@ -57,6 +54,8 @@ public final class SessioneUtente {
     }
 
     /**
+     * Verifica se l'utente autenticato ha il ruolo di gestore.
+     *
      * @return {@code true} se l'utente loggato ha ruolo gestore
      */
     public static boolean eGestore() {
@@ -64,6 +63,8 @@ public final class SessioneUtente {
     }
 
     /**
+     * Verifica se l'utente autenticato ha il ruolo di cliente.
+     *
      * @return {@code true} se l'utente loggato ha ruolo cliente
      */
     public static boolean eCliente() {

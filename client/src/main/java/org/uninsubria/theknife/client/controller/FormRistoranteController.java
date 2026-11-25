@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Controller JavaFX del form unificato per l'inserimento e la modifica di un ristorante.
+ * Controller JavaFX del modulo usato dai gestori per creare, modificare ed eliminare ristoranti.
  * <p>
- * In modalità creazione si comporta come {@code AggiungiRistoranteController},
- * in modalità modifica come {@code ModificaRistoranteController}. La modalità
- * viene determinata automaticamente in base alla presenza di un ristorante
- * selezionato in {@link RistoranteSelezionato}.
+ * Determina la modalità in base al ristorante presente in {@link RistoranteSelezionato}:
+ * senza un ristorante selezionato permette di crearne uno, altrimenti carica i dati
+ * per la modifica e abilita anche l'eliminazione. Verifica i dati inseriti e usa
+ * i servizi remoti per salvare le modifiche.
  * </p>
  */
 public class FormRistoranteController implements BackHandler {

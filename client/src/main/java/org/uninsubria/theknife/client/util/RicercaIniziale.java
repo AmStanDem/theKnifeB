@@ -43,6 +43,20 @@ public final class RicercaIniziale {
             boolean consegna,
             boolean prenotazioneOnline
     ) {
+        /**
+         * Copia in modo immutabile l'elenco delle tipologie di cucina.
+         *
+         * @param testo testo libero della ricerca
+         * @param localita nome della località selezionata
+         * @param latitudine latitudine della località selezionata
+         * @param longitudine longitudine della località selezionata
+         * @param tipologieCucina tipologie di cucina selezionate, normalizzate a lista vuota se {@code null}
+         * @param prezzoMin prezzo minimo
+         * @param prezzoMax prezzo massimo
+         * @param mediaStelleMinima valutazione media minima
+         * @param consegna indica se filtrare per disponibilità della consegna a domicilio
+         * @param prenotazioneOnline indica se filtrare per disponibilità della prenotazione online
+         */
         public Criteri {
             tipologieCucina = tipologieCucina == null ? List.of() : List.copyOf(tipologieCucina);
         }

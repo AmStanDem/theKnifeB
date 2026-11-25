@@ -32,8 +32,11 @@ public record UtenteDTO(
      * Ruoli disponibili per gli utenti della piattaforma.
      */
     public enum RuoloUtente {
+        /** Utente non autenticato. */
         GUEST,
+        /** Utente registrato che può scrivere recensioni e gestire i preferiti. */
         CLIENTE,
+        /** Utente che gestisce uno o più ristoranti. */
         GESTORE
     }
 

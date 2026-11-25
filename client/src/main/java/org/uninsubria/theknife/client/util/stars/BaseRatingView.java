@@ -21,14 +21,20 @@ import java.util.List;
  */
 public class BaseRatingView extends HBox {
 
+    /** Percorso SVG dell'icona a stella usata dalla vista. */
     protected static final String STAR_SVG = "M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.399 8.168-7.333-3.854-7.333 3.854 1.399-8.168-5.934-5.787 8.2-1.192z";
 
+    /** Numero massimo di stelle visualizzate. */
     protected final int maxStars = 5;
+    /** Valutazione corrente, compresa tra zero e {@link #maxStars}. */
     protected double rating = 0.0;
 
+    /** Colore delle porzioni piene delle stelle. */
     protected Color filledColor = Color.web("#66CC33");
+    /** Colore delle porzioni vuote delle stelle. */
     protected Color emptyColor = Color.web("#334d40");
 
+    /** Elementi grafici delle stelle, nell'ordine di visualizzazione. */
     protected final List<SVGPath> stars = new ArrayList<>();
 
     /**

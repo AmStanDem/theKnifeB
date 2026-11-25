@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- * Gestisce le sottoscrizioni RMI del client e inoltra gli eventi ricevuti ai ascoltatore JavaFX.
+ * Gestisce le sottoscrizioni RMI del client e inoltra gli eventi ricevuti alle callback JavaFX.
  */
 public final class RemoteRefreshManager {
 

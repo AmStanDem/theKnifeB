@@ -20,7 +20,7 @@ public class RecensioneDAO {
      * Identificativi del ristorante e dell'utente associati a una recensione.
      *
      * @param idRistorante identificativo del ristorante recensito
-     * @param idUtente identificativo dell utente autore
+     * @param idUtente identificativo dell'utente autore
      */
     public record RecensioneTarget(int idRistorante, int idUtente) {}
 

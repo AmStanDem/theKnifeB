@@ -1,12 +1,12 @@
-/**
- * Stima in euro un prezzo medio a partire dalla fascia relativa presente nel dataset Michelin.
- * La stima è euristica: usa la fascia (numero di simboli) e un coefficiente economico per Paese.
- */
 package org.uninsubria.theknife.server.utils;
 
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Stima in euro un prezzo medio a partire dalla fascia relativa presente nel dataset Michelin.
+ * La stima è euristica: usa la fascia (numero di simboli) e un coefficiente economico per Paese.
+ */
 public final class PrezzoDatasetEstimator {
     private static final Set<String> LOW_COST_COUNTRIES = Set.of(
             "bangladesh", "cambodia", "india", "indonesia", "laos", "nepal",
