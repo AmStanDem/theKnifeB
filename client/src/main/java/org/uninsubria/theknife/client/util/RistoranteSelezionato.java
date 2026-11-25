@@ -43,13 +43,17 @@ public class RistoranteSelezionato {
     }
 
     /**
-     * Restituisce e azzera l'indicatore di ritorno ai ristoranti gestiti.
+     * Indica se, dopo la schermata corrente, si deve tornare ai ristoranti gestiti.
+     * <p>
+     * Il valore resta attivo finché non viene selezionato un nuovo ristorante
+     * tramite {@link #setRistorante(RistoranteDTO)}: in questo modo il pulsante
+     * di ritorno resta visibile anche quando si rientra nella scheda del
+     * ristorante utilizzando il pulsante "indietro".
+     * </p>
      *
-     * @return {@code true} se era richiesto il ritorno ai ristoranti gestiti
+     * @return {@code true} se è richiesto il ritorno ai ristoranti gestiti
      */
-    public static boolean consumaRitornoAiMieiRistoranti() {
-        boolean ritorno = ritornoAiMieiRistoranti;
-        ritornoAiMieiRistoranti = false;
-        return ritorno;
+    public static boolean isRitornoAiMieiRistoranti() {
+        return ritornoAiMieiRistoranti;
     }
 }

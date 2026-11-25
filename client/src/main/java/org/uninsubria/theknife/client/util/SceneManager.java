@@ -56,6 +56,7 @@ public class SceneManager {
 
     private static final String BASE_LAYOUT_FXML = "/org/uninsubria/theknife/client/views/BaseLayout.fxml";
     private static final String LOGIN_VIEW_FXML = "/org/uninsubria/theknife/client/views/AuthView.fxml";
+    private static final String HOME_VIEW_FXML = "/org/uninsubria/theknife/client/views/MainLayout.fxml";
     private static final String GLOBAL_CSS = "/org/uninsubria/theknife/client/styles/style.css";
 
     /**
@@ -193,6 +194,10 @@ public class SceneManager {
                 stage.sizeToScene();
             }
 
+            Object previousController = currentControllers.remove(stage);
+            if (previousController != null) {
+                RemoteRefreshManager.unsubscribeOwner(previousController);
+            }
             currentControllers.put(stage, loader.getController());
             currentFxmlMap.put(stage, fxmlPath);
             mantieneFullscreen(stage);
@@ -434,10 +439,23 @@ public class SceneManager {
 
     /**
      * Torna alla vista precedente nello storico dello stage specificato, se disponibile.
+     * <p>
+     * Prima di navigare, la richiesta viene offerta al controller corrente: se
+     * implementa {@link BackHandler} e gestisce localmente il comando (ad
+     * esempio chiudendo una sezione di modifica o chiedendo conferma per dati
+     * non salvati), la navigazione viene annullata. Quando lo storico è vuoto
+     * viene mostrata la home, evitando di lasciare l'utente su una pagina non
+     * più valida.
+     * </p>
      *
      * @param stage stage per cui ripristinare la vista precedente
      */
     public static void goBack(Stage stage) {
+        Object controller = currentControllers.get(stage);
+        if (controller instanceof BackHandler backHandler && backHandler.onBackRequested()) {
+            return;
+        }
+
         Stack<String> history = historyMap.get(stage);
 
         if (history != null && !history.isEmpty()) {
@@ -445,7 +463,7 @@ public class SceneManager {
             // Carichiamo la pagina precedente impostando saveToHistory a false per non sporcare la pila
             switchSceneAndGetController(stage, previousFxml, false);
         } else {
-            System.out.println("Nessuna pagina precedente nello storico per questo stage.");
+            switchSceneAndGetController(stage, HOME_VIEW_FXML, false);
         }
     }
 

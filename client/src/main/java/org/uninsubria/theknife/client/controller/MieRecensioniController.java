@@ -15,6 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.uninsubria.theknife.client.util.RecensioneDaRispondere;
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.SceneManager;
@@ -182,6 +183,7 @@ public class MieRecensioniController {
      * @param recensione recensione da modificare
      */
     private void modificaRecensione(RecensioneDTO recensione) {
+        RecensioneDaRispondere.pulisci();
         RecensioneSelezionata.imposta(
                 recensione,
                 RecensioneSelezionata.OrigineModifica.MIE_RECENSIONI

@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.StringConverter;
+import org.uninsubria.theknife.client.util.BackHandler;
 import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.RistoranteSelezionato;
@@ -39,7 +40,7 @@ import java.util.Optional;
  * selezionato in {@link RistoranteSelezionato}.
  * </p>
  */
-public class FormRistoranteController {
+public class FormRistoranteController implements BackHandler {
 
     @FXML
     private TextField txtNome;
@@ -87,6 +88,26 @@ public class FormRistoranteController {
     private boolean tipologieCaricate;
     private boolean ristorantiCaricati;
     private RistoranteDTO ristorante;
+    private StatoForm statoIniziale;
+
+    /**
+     * Fotografia dei valori del modulo, usata per capire se ci sono modifiche
+     * non ancora salvate prima di abbandonare la pagina.
+     */
+    private record StatoForm(
+            String nome,
+            String indirizzo,
+            String citta,
+            String nazione,
+            String prezzoMedio,
+            String telefono,
+            String sitoWeb,
+            String descrizione,
+            boolean delivery,
+            boolean bookingOnline,
+            List<String> cucine
+    ) {
+    }
 
     /**
      * Inizializza i componenti della vista.
@@ -157,6 +178,74 @@ public class FormRistoranteController {
         if (modalitaModifica) {
             caricaRistoranti(utente);
         }
+
+        aggiornaStatoIniziale();
+    }
+
+    /**
+     * Intercetta il pulsante "indietro" del layout comune.
+     * <p>
+     * Se il modulo contiene modifiche non salvate viene chiesta conferma,
+     * evitando di perdere i dati inseriti per un click accidentale.
+     * </p>
+     *
+     * @return {@code true} se l'utente sceglie di restare nel modulo
+     */
+    @Override
+    public boolean onBackRequested() {
+        if (!moduloModificato()) {
+            return false;
+        }
+
+        Alert conferma = new Alert(Alert.AlertType.CONFIRMATION);
+        conferma.setTitle("Modifiche non salvate");
+        conferma.setHeaderText(null);
+        conferma.setContentText(
+                "Le modifiche non salvate andranno perse. Vuoi uscire comunque?");
+        ButtonType esci = new ButtonType("Esci senza salvare", ButtonBar.ButtonData.OK_DONE);
+        ButtonType continua = new ButtonType("Continua a modificare", ButtonBar.ButtonData.CANCEL_CLOSE);
+        conferma.getButtonTypes().setAll(esci, continua);
+        SceneManager.initOwner(conferma);
+
+        return conferma.showAndWait().filter(esci::equals).isEmpty();
+    }
+
+    /**
+     * Aggiorna la fotografia dei valori correnti del modulo.
+     */
+    private void aggiornaStatoIniziale() {
+        statoIniziale = statoCorrente();
+    }
+
+    /**
+     * Verifica se i valori attuali del modulo differiscono da quelli iniziali.
+     *
+     * @return {@code true} se ci sono modifiche non salvate
+     */
+    private boolean moduloModificato() {
+        return statoIniziale != null && !statoIniziale.equals(statoCorrente());
+    }
+
+    /**
+     * Costruisce la fotografia dei valori attualmente presenti nel modulo.
+     *
+     * @return stato corrente dei campi
+     */
+    private StatoForm statoCorrente() {
+        List<String> cucine = comboCucine.getSelectedCuisines();
+        return new StatoForm(
+                txtNome.getText(),
+                txtIndirizzo.getText(),
+                txtCitta.getText(),
+                txtNazione.getText(),
+                txtPrezzoMedio.getText(),
+                txtTelefono.getText(),
+                txtSitoWeb.getText(),
+                txtDescrizione.getText(),
+                chkDelivery.isSelected(),
+                chkBookingOnline.isSelected(),
+                cucine == null ? List.of() : List.copyOf(cucine)
+        );
     }
 
     /**
@@ -179,6 +268,7 @@ public class FormRistoranteController {
                     if (modalitaModifica) {
                         aggiornaTipologieSelezionate();
                         aggiornaStatoSalvataggio();
+                        aggiornaStatoIniziale();
                     } else {
                         btnSalva.setDisable(false);
                     }
@@ -255,6 +345,7 @@ public class FormRistoranteController {
         popolaCampi();
         aggiornaTipologieSelezionate();
         aggiornaStatoSalvataggio();
+        aggiornaStatoIniziale();
     }
 
     /**

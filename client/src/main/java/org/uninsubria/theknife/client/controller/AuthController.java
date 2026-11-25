@@ -15,6 +15,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import org.uninsubria.theknife.client.util.BackHandler;
 import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.SceneManager;
@@ -43,7 +44,7 @@ import java.util.Locale;
  * (AuthView.fxml), nascondendo/mostrando i relativi pannelli.
  * </p>
  */
-public class AuthController {
+public class AuthController implements BackHandler {
 
     private static final LocalDate DATA_NASCITA_MINIMA = LocalDate.of(1900, 1, 1);
     private static final DateTimeFormatter DATE_FORMATTER =
@@ -164,6 +165,30 @@ public class AuthController {
         loginFields.setVisible(true);
         loginFields.setManaged(true);
         labelErrore.setText("");
+    }
+
+    /**
+     * Intercetta il pulsante "indietro" del layout comune.
+     * <p>
+     * Se è attiva la modalità registrazione, torna al pannello di login
+     * restando nella stessa schermata; altrimenti lascia che la navigazione
+     * prosegua normalmente.
+     * </p>
+     *
+     * @return {@code true} se la richiesta è stata gestita internamente
+     */
+    @Override
+    public boolean onBackRequested() {
+        if (modalitaRegistrazione) {
+            modalitaRegistrazione = false;
+            registrazioneFields.setVisible(false);
+            registrazioneFields.setManaged(false);
+            loginFields.setVisible(true);
+            loginFields.setManaged(true);
+            labelErrore.setText("");
+            return true;
+        }
+        return false;
     }
 
     // =====================================================================
@@ -346,7 +371,9 @@ public class AuthController {
             SessioneUtente.login(utente);
 
             // Cambio scena pulito tramite SceneManager centralizzato
-            SceneManager.switchScene(event, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            SceneManager.clearHistory(stage);
+            SceneManager.switchScene(stage, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
 
         } catch (UtenteGiaEsistenteException e) {
             labelErrore.setText("Esiste già un account con questa email. Prova ad accedere.");

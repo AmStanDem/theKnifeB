@@ -26,6 +26,7 @@ import javafx.util.StringConverter;
 import org.uninsubria.theknife.client.util.CuisineTags;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RistoranteSelezionato;
+import org.uninsubria.theknife.client.util.RecensioneDaRispondere;
 import org.uninsubria.theknife.client.util.RecensioneSelezionata;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
@@ -165,7 +166,7 @@ public class AreaRistoranteController {
     public void initialize() {
 
         boolean mostraRitornoMieiRistoranti =
-                RistoranteSelezionato.consumaRitornoAiMieiRistoranti();
+                RistoranteSelezionato.isRitornoAiMieiRistoranti();
         tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
         tornaAiMieiRistoranti.setManaged(mostraRitornoMieiRistoranti);
         averageRating = new BaseRatingView(0);
@@ -687,6 +688,7 @@ public class AreaRistoranteController {
     @FXML
     public void onRecensioniClick(ActionEvent actionEvent) {
         RecensioneSelezionata.pulisci();
+        RecensioneDaRispondere.pulisci();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
@@ -704,6 +706,7 @@ public class AreaRistoranteController {
                 recensioneUtente,
                 RecensioneSelezionata.OrigineModifica.RISTORANTE
         );
+        RecensioneDaRispondere.pulisci();
         SceneManager.switchScene(actionEvent, "/org/uninsubria/theknife/client/views/ScriviRecensione.fxml");
     }
 
@@ -758,7 +761,7 @@ public class AreaRistoranteController {
      */
     @FXML
     private void onTornaAiMieiRistorantiClick(ActionEvent event) {
-        SceneManager.switchScene(
+        SceneManager.replaceCurrentScene(
                 event,
                 "/org/uninsubria/theknife/client/views/DashboardGestore.fxml"
         );

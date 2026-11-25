@@ -80,10 +80,17 @@ public class ScriviRecensioneController {
     @FXML
     public void initialize() {
         recensioneDaRispondere = RecensioneDaRispondere.get();
+        if (recensioneDaRispondere != null && !SessioneUtente.isGestore()) {
+            // Stato residuo di una risposta abbandonata con il pulsante "indietro":
+            // un utente non gestore deve sempre aprire la modalità recensione.
+            RecensioneDaRispondere.pulisci();
+            recensioneDaRispondere = null;
+        }
         modalitaRisposta = recensioneDaRispondere != null
                 && recensioneDaRispondere.idRecensione() != null;
 
         if (modalitaRisposta) {
+            RecensioneSelezionata.pulisci();
             inizializzaModalitaRisposta();
         } else {
             inizializzaModalitaRecensione();

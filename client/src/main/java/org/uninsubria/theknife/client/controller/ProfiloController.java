@@ -13,6 +13,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.uninsubria.theknife.client.util.BackHandler;
 import org.uninsubria.theknife.client.util.LuogoInput;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
@@ -40,7 +41,7 @@ import java.time.format.ResolverStyle;
  * e informazioni differenziati in base al ruolo.
  * </p>
  */
-public class ProfiloController {
+public class ProfiloController implements BackHandler {
 
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
@@ -164,6 +165,25 @@ public class ProfiloController {
         passwordCorrenteField.setText("");
         nuovaPasswordField.setText("");
         confermaPasswordField.setText("");
+    }
+
+    /**
+     * Intercetta il pulsante "indietro" del layout comune.
+     * <p>
+     * Se è aperta la sezione di modifica delle credenziali, la freccia riporta
+     * alla vista del profilo invece di uscire dalla pagina; altrimenti lascia
+     * che la navigazione prosegua normalmente.
+     * </p>
+     *
+     * @return {@code true} se la richiesta è stata gestita internamente
+     */
+    @Override
+    public boolean onBackRequested() {
+        if (sezioneModifica.isVisible()) {
+            mostraProfilo();
+            return true;
+        }
+        return false;
     }
 
     // ===================== INIZIALIZZAZIONE =====================
