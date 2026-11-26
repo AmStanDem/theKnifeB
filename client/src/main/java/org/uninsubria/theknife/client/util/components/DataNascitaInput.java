@@ -85,6 +85,15 @@ public final class DataNascitaInput extends HBox {
     }
 
     /**
+     * Restituisce il campo di testo interno, utile per osservarne le modifiche.
+     *
+     * @return campo di testo interno
+     */
+    public TextField getCampoTesto() {
+        return campo;
+    }
+
+    /**
      * Richiede il focus per il campo di inserimento.
      */
     public void requestFocus() {

@@ -46,6 +46,22 @@
     -fx-text-fill: -fx-text-dark;
 }
 
+.field-error {
+    -fx-font-size: 12px;
+    -fx-text-fill: #D9534F;
+}
+
+.error-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #D9534F;
+}
+
+.hint-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-text-gray;
+}
+
 .text-input {
     -fx-pref-height: 44px;
     -fx-background-color: #FFFFFF;

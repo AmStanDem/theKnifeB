@@ -86,6 +86,15 @@ public final class LuogoInput extends HBox {
     }
 
     /**
+     * Restituisce il campo di testo interno, utile per osservarne le modifiche.
+     *
+     * @return campo di testo interno
+     */
+    public TextField getCampoTesto() {
+        return campo;
+    }
+
+    /**
      * Imposta il testo del campo.
      *
      * @param value testo da visualizzare

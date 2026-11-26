@@ -90,6 +90,7 @@
                 </VBox.margin>
                 <Label styleClass="field-label" text="Nome" />
                 <TextField fx:id="nomeField" prefHeight="40.0" promptText="Inserisci il nome" />
+                <Label fx:id="nomeErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- COGNOME -->
@@ -99,6 +100,7 @@
                 </VBox.margin>
                 <Label styleClass="field-label" text="Cognome" />
                 <TextField fx:id="cognomeField" prefHeight="40.0" promptText="Inserisci il cognome" />
+                <Label fx:id="cognomeErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- DATA DI NASCITA -->
@@ -108,6 +110,7 @@
                 </VBox.margin>
                 <Label styleClass="field-label" text="Data di nascita (opzionale)" />
                 <DataNascitaInput fx:id="dataNascitaField" prefHeight="40.0" />
+                <Label fx:id="dataNascitaErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- DOMICILIO -->
@@ -118,6 +121,7 @@
                 <Label styleClass="field-label" text="Domicilio" />
                 <LuogoInput fx:id="indirizzo" prefHeight="40.0"
                             promptText="Cerca e seleziona il tuo domicilio" />
+                <Label fx:id="domicilioErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- RUOLO -->
@@ -134,6 +138,7 @@
                         </FXCollections>
                     </items>
                 </ComboBox>
+                <Label fx:id="ruoloErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- EMAIL -->
@@ -143,6 +148,7 @@
                 </VBox.margin>
                 <Label styleClass="field-label" text="E-mail" />
                 <TextField fx:id="emailField" prefHeight="40.0" promptText="Inserisci l'e-mail" />
+                <Label fx:id="emailErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- PASSWORD -->
@@ -153,6 +159,7 @@
                 <Label styleClass="field-label" text="Password" />
                 <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Inserisci la password" />
                 <Label styleClass="hint-label" text="&#9432; La password deve avere almeno 8 caratteri, un numero, una maiuscola e una minuscola e un carattere speciale" wrapText="true" />
+                <Label fx:id="passwordErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- CONFERMA PASSWORD -->
@@ -162,6 +169,7 @@
                 </VBox.margin>
                 <Label styleClass="field-label" text="Conferma password" />
                 <PasswordField fx:id="confermaPasswordField" prefHeight="40.0" promptText="Ripeti la password" />
+                <Label fx:id="confermaPasswordErrore" managed="false" styleClass="field-error" visible="false" wrapText="true" />
             </VBox>
 
             <!-- Messaggio di errore (condiviso con login) -->

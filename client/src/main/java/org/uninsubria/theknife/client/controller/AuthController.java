@@ -54,6 +54,12 @@ public class AuthController implements BackHandler {
     private static final String EMAIL_REGEX =
             "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
+    // Vincoli di lunghezza dei campi anagrafici (allineati alla colonna VARCHAR(100) del database).
+    private static final int NOME_MIN_LENGTH = 2;
+    private static final int NOME_MAX_LENGTH = 100;
+    private static final int COGNOME_MIN_LENGTH = 2;
+    private static final int COGNOME_MAX_LENGTH = 100;
+
     // --- Flag di modalità ---
     private boolean modalitaRegistrazione = false;
 
@@ -105,6 +111,31 @@ public class AuthController implements BackHandler {
     @FXML
     private Button registratiButton;
 
+    // --- Etichette di errore per singolo campo della registrazione ---
+    @FXML
+    private Label nomeErrore;
+
+    @FXML
+    private Label cognomeErrore;
+
+    @FXML
+    private Label dataNascitaErrore;
+
+    @FXML
+    private Label domicilioErrore;
+
+    @FXML
+    private Label ruoloErrore;
+
+    @FXML
+    private Label emailErrore;
+
+    @FXML
+    private Label passwordErrore;
+
+    @FXML
+    private Label confermaPasswordErrore;
+
     /**
      * Inizializza il controllore.
      * <p>
@@ -124,13 +155,48 @@ public class AuthController implements BackHandler {
         indirizzo.setPromptText("Inizia a scrivere e seleziona un indirizzo valido");
         dataNascitaField.setOnPrimaDiMostrare(this::aggiornaDataMassimaCalendario);
 
-        passwordField.textProperty().addListener((obs, oldValue, newValue) ->
-                controllaConfermaPassword()
-        );
+        configuraValidazioneDinamica();
+    }
 
-        confermaPasswordField.textProperty().addListener((obs, oldValue, newValue) ->
-                controllaConfermaPassword()
-        );
+    /**
+     * Collega la validazione in tempo reale ai campi della registrazione.
+     * <p>
+     * Un campo viene rivalutato mentre l'utente digita solo se il relativo
+     * messaggio di errore è già visibile, così il messaggio scompare appena
+     * l'utente corregge il valore senza disturbare la compilazione.
+     * </p>
+     */
+    private void configuraValidazioneDinamica() {
+        nomeField.textProperty().addListener((obs, oldValue, newValue) ->
+                aggiornaErroreSeMostrato(nomeErrore, validaNome(newValue.trim())));
+
+        cognomeField.textProperty().addListener((obs, oldValue, newValue) ->
+                aggiornaErroreSeMostrato(cognomeErrore, validaCognome(newValue.trim())));
+
+        emailField.textProperty().addListener((obs, oldValue, newValue) ->
+                aggiornaErroreSeMostrato(emailErrore, validaEmail(newValue.trim())));
+
+        ruoloComboBox.valueProperty().addListener((obs, oldValue, newValue) ->
+                aggiornaErroreSeMostrato(ruoloErrore, validaRuolo(newValue)));
+
+        passwordField.textProperty().addListener((obs, oldValue, newValue) -> {
+            aggiornaErroreSeMostrato(passwordErrore, validaPassword(newValue));
+            aggiornaErroreSeMostrato(confermaPasswordErrore,
+                    validaConfermaPassword(newValue, confermaPasswordField.getText()));
+            controllaConfermaPassword();
+        });
+
+        confermaPasswordField.textProperty().addListener((obs, oldValue, newValue) -> {
+            aggiornaErroreSeMostrato(confermaPasswordErrore,
+                    validaConfermaPassword(passwordField.getText(), newValue));
+            controllaConfermaPassword();
+        });
+
+        dataNascitaField.getCampoTesto().textProperty().addListener((obs, oldValue, newValue) ->
+                aggiornaErroreSeMostrato(dataNascitaErrore, validaDataNascita(newValue.trim())));
+
+        indirizzo.getCampoTesto().textProperty().addListener((obs, oldValue, newValue) ->
+                aggiornaErroreSeMostrato(domicilioErrore, validaDomicilio(newValue.trim())));
     }
 
     /**
@@ -147,6 +213,7 @@ public class AuthController implements BackHandler {
         registrazioneFields.setVisible(true);
         registrazioneFields.setManaged(true);
         labelErrore.setText("");
+        pulisciErroriRegistrazione();
     }
 
     /**
@@ -165,6 +232,7 @@ public class AuthController implements BackHandler {
         loginFields.setVisible(true);
         loginFields.setManaged(true);
         labelErrore.setText("");
+        pulisciErroriRegistrazione();
     }
 
     /**
@@ -186,6 +254,7 @@ public class AuthController implements BackHandler {
             loginFields.setVisible(true);
             loginFields.setManaged(true);
             labelErrore.setText("");
+            pulisciErroriRegistrazione();
             return true;
         }
         return false;
@@ -249,10 +318,11 @@ public class AuthController implements BackHandler {
     /**
      * Valida i dati inseriti e avvia la risoluzione del domicilio.
      * <p>
-     * Verifica i campi obbligatori, il formato dell'email, il ruolo, la
-     * corrispondenza e i requisiti della password. Quando i controlli
-     * preliminari sono superati, delega il completamento della registrazione
-     * alla risoluzione del luogo.
+     * Verifica tutti i campi del modulo (nome, cognome, data di nascita,
+     * domicilio, ruolo, email, password e conferma password) mostrando per
+     * ciascuno il relativo messaggio di errore. Quando tutti i controlli sono
+     * superati, delega il completamento della registrazione alla risoluzione
+     * del luogo.
      * </p>
      *
      * @param evento evento JavaFX associato al pulsante di registrazione
@@ -260,6 +330,7 @@ public class AuthController implements BackHandler {
     @FXML
     private void gestisciRegistrazione(ActionEvent evento) {
         labelErrore.setText("");
+
         String nome = nomeField.getText().trim();
         String cognome = cognomeField.getText().trim();
         String ruolo = ruoloComboBox.getValue();
@@ -267,58 +338,276 @@ public class AuthController implements BackHandler {
         String email = emailField.getText().trim();
         String password = passwordField.getText().trim();
         String confermaPassword = confermaPasswordField.getText().trim();
+        String dataNascitaTesto = dataNascitaField.getText().trim();
 
-        LocalDate dataNascita;
-        try {
-            String dataNascitaTesto = dataNascitaField.getText().trim();
-            dataNascita = dataNascitaTesto.isEmpty()
-                    ? null
-                    : LocalDate.parse(dataNascitaTesto, DATE_FORMATTER);
-        } catch (DateTimeParseException e) {
-            labelErrore.setText("Inserisci una data valida nel formato gg/mm/aaaa.");
-            dataNascitaField.requestFocus();
+        // Forza il controllo di ogni campo e mostra il relativo messaggio di errore.
+        if (!validaCampiRegistrazione(nome, cognome, ruolo, domicilio, email,
+                password, confermaPassword, dataNascitaTesto)) {
+            focalizzaPrimoCampoNonValido();
             return;
         }
 
-        if (nome.isEmpty() || cognome.isEmpty() || ruolo == null || email.isEmpty()
-                || password.isEmpty() || confermaPassword.isEmpty() || domicilio.isEmpty()) {
-            labelErrore.setText("Compila tutti i campi obbligatori!");
-            return;
-        }
+        LocalDate dataNascita = dataNascitaTesto.isEmpty()
+                ? null
+                : LocalDate.parse(dataNascitaTesto, DATE_FORMATTER);
 
-        if (email.length() > 254 || !email.matches(EMAIL_REGEX)) {
-            labelErrore.setText("Inserisci un indirizzo email valido.");
-            emailField.requestFocus();
-            return;
-        }
-
-        ruolo = ruolo.trim();
-
-        if (!password.equals(confermaPassword)) {
-            labelErrore.setText("Le password non coincidono.");
-            confermaPasswordField.requestFocus();
-            return;
-        }
-
-        if (!ruolo.equals("Cliente") && !ruolo.equals("Ristoratore")) {
-            labelErrore.setText("Il ruolo selezionato non è valido.");
-            ruoloComboBox.requestFocus();
-            return;
-        }
-
-        if (password.length() < 8 || password.length() > 64 || password.contains(" ") ||
-                !password.matches(".*[a-z].*") || !password.matches(".*[A-Z].*") ||
-                !password.matches(".*\\d.*") || !password.matches(".*[^A-Za-z0-9].*")) {
-            labelErrore.setText("La password non soddisfa i requisiti di sicurezza.");
-            passwordField.requestFocus();
-            return;
-        }
-
-        String ruoloValidato = ruolo;
+        String ruoloValidato = ruolo.trim();
         indirizzo.risolviLuogo(
                 luogo -> registraUtente(evento, nome, cognome, ruoloValidato, email, password, dataNascita, luogo),
-                labelErrore::setText
+                messaggio -> {
+                    mostraErroreCampo(domicilioErrore, messaggio);
+                    indirizzo.requestFocus();
+                }
         );
+    }
+
+    /**
+     * Valida tutti i campi della registrazione, aggiornando per ognuno la
+     * relativa etichetta di errore quando il valore non è valido.
+     *
+     * @return {@code true} se tutti i campi sono validi, {@code false} altrimenti
+     */
+    private boolean validaCampiRegistrazione(
+            String nome,
+            String cognome,
+            String ruolo,
+            String domicilio,
+            String email,
+            String password,
+            String confermaPassword,
+            String dataNascitaTesto
+    ) {
+        boolean valido = true;
+
+        String erroreNome = validaNome(nome);
+        mostraErroreCampo(nomeErrore, erroreNome);
+        valido = valido && erroreNome == null;
+
+        String erroreCognome = validaCognome(cognome);
+        mostraErroreCampo(cognomeErrore, erroreCognome);
+        valido = valido && erroreCognome == null;
+
+        String erroreData = validaDataNascita(dataNascitaTesto);
+        mostraErroreCampo(dataNascitaErrore, erroreData);
+        valido = valido && erroreData == null;
+
+        String erroreDomicilio = validaDomicilio(domicilio);
+        mostraErroreCampo(domicilioErrore, erroreDomicilio);
+        valido = valido && erroreDomicilio == null;
+
+        String erroreRuolo = validaRuolo(ruolo);
+        mostraErroreCampo(ruoloErrore, erroreRuolo);
+        valido = valido && erroreRuolo == null;
+
+        String erroreEmail = validaEmail(email);
+        mostraErroreCampo(emailErrore, erroreEmail);
+        valido = valido && erroreEmail == null;
+
+        String errorePassword = validaPassword(password);
+        mostraErroreCampo(passwordErrore, errorePassword);
+        valido = valido && errorePassword == null;
+
+        String erroreConferma = validaConfermaPassword(password, confermaPassword);
+        mostraErroreCampo(confermaPasswordErrore, erroreConferma);
+        valido = valido && erroreConferma == null;
+
+        return valido;
+    }
+
+    /**
+     * Verifica che il nome sia compilato e rispetti i vincoli di lunghezza.
+     *
+     * @param nome nome da validare, già ripulito dagli spazi
+     * @return messaggio di errore, oppure {@code null} se il nome è valido
+     */
+    private String validaNome(String nome) {
+        if (nome.isEmpty()) {
+            return "Il nome è obbligatorio.";
+        }
+        if (nome.length() < NOME_MIN_LENGTH) {
+            return "Il nome deve contenere almeno " + NOME_MIN_LENGTH + " caratteri.";
+        }
+        if (nome.length() > NOME_MAX_LENGTH) {
+            return "Il nome non può superare " + NOME_MAX_LENGTH + " caratteri.";
+        }
+        return null;
+    }
+
+    /**
+     * Verifica che il cognome sia compilato e rispetti i vincoli di lunghezza.
+     *
+     * @param cognome cognome da validare, già ripulito dagli spazi
+     * @return messaggio di errore, oppure {@code null} se il cognome è valido
+     */
+    private String validaCognome(String cognome) {
+        if (cognome.isEmpty()) {
+            return "Il cognome è obbligatorio.";
+        }
+        if (cognome.length() < COGNOME_MIN_LENGTH) {
+            return "Il cognome deve contenere almeno " + COGNOME_MIN_LENGTH + " caratteri.";
+        }
+        if (cognome.length() > COGNOME_MAX_LENGTH) {
+            return "Il cognome non può superare " + COGNOME_MAX_LENGTH + " caratteri.";
+        }
+        return null;
+    }
+
+    /**
+     * Verifica che la data di nascita (opzionale) sia nel formato corretto.
+     *
+     * @param dataNascitaTesto testo della data inserita
+     * @return messaggio di errore, oppure {@code null} se la data è valida o assente
+     */
+    private String validaDataNascita(String dataNascitaTesto) {
+        if (dataNascitaTesto == null || dataNascitaTesto.isEmpty()) {
+            return null;
+        }
+        try {
+            LocalDate.parse(dataNascitaTesto, DATE_FORMATTER);
+            return null;
+        } catch (DateTimeParseException e) {
+            return "Inserisci una data valida nel formato gg/mm/aaaa.";
+        }
+    }
+
+    /**
+     * Verifica che il domicilio sia stato compilato.
+     *
+     * @param domicilio testo del domicilio
+     * @return messaggio di errore, oppure {@code null} se valido
+     */
+    private String validaDomicilio(String domicilio) {
+        if (domicilio == null || domicilio.isEmpty()) {
+            return "Il domicilio è obbligatorio.";
+        }
+        return null;
+    }
+
+    /**
+     * Verifica che sia stato selezionato un ruolo valido.
+     *
+     * @param ruolo ruolo selezionato
+     * @return messaggio di errore, oppure {@code null} se valido
+     */
+    private String validaRuolo(String ruolo) {
+        if (ruolo == null || ruolo.isBlank()) {
+            return "Seleziona un ruolo.";
+        }
+        if (!ruolo.equals("Cliente") && !ruolo.equals("Ristoratore")) {
+            return "Il ruolo selezionato non è valido.";
+        }
+        return null;
+    }
+
+    /**
+     * Verifica che l'email sia compilata e nel formato corretto.
+     *
+     * @param email indirizzo email
+     * @return messaggio di errore, oppure {@code null} se valido
+     */
+    private String validaEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            return "L'e-mail è obbligatoria.";
+        }
+        if (email.length() > 254 || !email.matches(EMAIL_REGEX)) {
+            return "Inserisci un indirizzo email valido.";
+        }
+        return null;
+    }
+
+    /**
+     * Verifica che la password rispetti i requisiti di sicurezza.
+     *
+     * @param password password da validare
+     * @return messaggio di errore, oppure {@code null} se valida
+     */
+    private String validaPassword(String password) {
+        if (password == null || password.isEmpty()) {
+            return "La password è obbligatoria.";
+        }
+        if (password.length() < 8 || password.length() > 64 || password.contains(" ")
+                || !password.matches(".*[a-z].*") || !password.matches(".*[A-Z].*")
+                || !password.matches(".*\\d.*") || !password.matches(".*[^A-Za-z0-9].*")) {
+            return "La password non soddisfa i requisiti di sicurezza.";
+        }
+        return null;
+    }
+
+    /**
+     * Verifica che la conferma password coincida con la password.
+     *
+     * @param password password inserita
+     * @param confermaPassword conferma inserita
+     * @return messaggio di errore, oppure {@code null} se valida
+     */
+    private String validaConfermaPassword(String password, String confermaPassword) {
+        if (confermaPassword == null || confermaPassword.isEmpty()) {
+            return "Conferma la password.";
+        }
+        if (!password.equals(confermaPassword)) {
+            return "Le password non coincidono.";
+        }
+        return null;
+    }
+
+    /**
+     * Mostra o nasconde il messaggio di errore di un campo.
+     *
+     * @param etichetta etichetta associata al campo
+     * @param messaggio messaggio di errore, oppure {@code null} per nasconderlo
+     */
+    private void mostraErroreCampo(Label etichetta, String messaggio) {
+        boolean visibile = messaggio != null && !messaggio.isEmpty();
+        etichetta.setText(visibile ? messaggio : "");
+        etichetta.setManaged(visibile);
+        etichetta.setVisible(visibile);
+    }
+
+    /**
+     * Aggiorna un messaggio di errore durante la digitazione, ma solo se era
+     * già visibile, così da non segnalare campi ancora da compilare.
+     *
+     * @param etichetta etichetta associata al campo
+     * @param messaggio nuovo messaggio di errore, oppure {@code null} se valido
+     */
+    private void aggiornaErroreSeMostrato(Label etichetta, String messaggio) {
+        if (etichetta.isVisible()) {
+            mostraErroreCampo(etichetta, messaggio);
+        }
+    }
+
+    /**
+     * Porta il focus sul primo campo che presenta un messaggio di errore.
+     */
+    private void focalizzaPrimoCampoNonValido() {
+        Label[] etichette = {
+                nomeErrore, cognomeErrore, dataNascitaErrore, domicilioErrore,
+                ruoloErrore, emailErrore, passwordErrore, confermaPasswordErrore
+        };
+        Node[] campi = {
+                nomeField, cognomeField, dataNascitaField, indirizzo,
+                ruoloComboBox, emailField, passwordField, confermaPasswordField
+        };
+        for (int i = 0; i < etichette.length; i++) {
+            if (etichette[i] != null && etichette[i].isVisible()) {
+                campi[i].requestFocus();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Nasconde tutti i messaggi di errore della registrazione.
+     */
+    private void pulisciErroriRegistrazione() {
+        mostraErroreCampo(nomeErrore, null);
+        mostraErroreCampo(cognomeErrore, null);
+        mostraErroreCampo(dataNascitaErrore, null);
+        mostraErroreCampo(domicilioErrore, null);
+        mostraErroreCampo(ruoloErrore, null);
+        mostraErroreCampo(emailErrore, null);
+        mostraErroreCampo(passwordErrore, null);
+        mostraErroreCampo(confermaPasswordErrore, null);
     }
 
     /**
