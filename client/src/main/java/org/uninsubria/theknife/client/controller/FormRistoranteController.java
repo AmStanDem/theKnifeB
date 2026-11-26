@@ -582,6 +582,7 @@ public class FormRistoranteController implements BackHandler {
                 return;
             }
 
+            telefono = telefono.replaceAll("\\s+", "");
             if (!telefonoValido(telefono)) {
                 mostraMessaggio(
                         Alert.AlertType.WARNING,
