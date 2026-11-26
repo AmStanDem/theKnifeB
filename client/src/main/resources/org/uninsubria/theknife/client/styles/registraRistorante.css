@@ -72,6 +72,52 @@
     -fx-border-color: #48b33c;
 }
 
+/* Il popup del MenuButton usa un ContextMenu separato dal nodo proprietario. */
+.context-menu {
+    -fx-background-color: #ffffff !important;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 12, 0, 0, 4);
+}
+
+.context-menu .menu-item,
+.context-menu .menu-item:focused,
+.context-menu .menu-item:hover,
+.context-menu .custom-menu-item,
+.context-menu .custom-menu-item:focused,
+.context-menu .custom-menu-item:hover {
+    -fx-background-color: transparent !important;
+    -fx-background: transparent !important;
+}
+
+.context-menu .check-box,
+.context-menu .check-box:hover,
+.context-menu .check-box:focused {
+    -fx-background-color: transparent !important;
+}
+
+.context-menu .check-box .text,
+.context-menu .check-box:focused .text,
+.context-menu .check-box:hover .text {
+    -fx-fill: #1e293b !important;
+}
+
+.search-cuisine-input {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 10px;
+    -fx-text-fill: #1e293b;
+}
+
+.search-cuisine-input:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #48b33c;
+}
+
 /* Checkbox stile TheKnife */
 .custom-checkbox {
     -fx-font-size: 13px;
