@@ -219,8 +219,9 @@ public class ScriviRecensioneController {
                 );
                 mostraMessaggio(Alert.AlertType.INFORMATION, "Recensione inviata",
                         "La tua recensione è stata pubblicata.");
-                RistoranteSelezionato.impostaRitornoAiMieiRistoranti(
-                        RistoranteSelezionato.ottieniRistorante() != null);
+                // La scrittura della recensione è riservata al cliente: il
+                // pulsante "Torna ai miei ristoranti" non deve comparire.
+                RistoranteSelezionato.impostaRitornoAiMieiRistoranti(false);
                 SceneManager.sostituisciScenaCorrente(
                         actionEvent,
                         "/org/uninsubria/theknife/client/views/Ristorante.fxml"
@@ -333,8 +334,9 @@ public class ScriviRecensioneController {
                 ? "/org/uninsubria/theknife/client/views/Ristorante.fxml"
                 : "/org/uninsubria/theknife/client/views/MieRecensioni.fxml";
         if ("/org/uninsubria/theknife/client/views/Ristorante.fxml".equals(destinazione)) {
-            RistoranteSelezionato.impostaRitornoAiMieiRistoranti(
-                    RistoranteSelezionato.ottieniRistorante() != null);
+            // La modifica della recensione è un'operazione del cliente: nessun
+            // ritorno alla lista dei ristoranti gestiti.
+            RistoranteSelezionato.impostaRitornoAiMieiRistoranti(false);
         }
         SceneManager.sostituisciScenaCorrente(actionEvent, destinazione);
     }

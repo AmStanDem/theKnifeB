@@ -172,6 +172,7 @@ public class DashboardGestoreController {
     private void onEsciClick(ActionEvent evento) {
         SceneManager.pulisciCronologia(SceneManager.ottieniStage(evento));
         SessioneUtente.esci();
+        ListaRistorantiController.pulisciRicercaSalvata();
         SceneManager.cambiaScena(evento, "/org/uninsubria/theknife/client/views/MainLayout.fxml");
     }
 

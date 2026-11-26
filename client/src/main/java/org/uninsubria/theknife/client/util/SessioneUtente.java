@@ -32,7 +32,12 @@ public final class SessioneUtente {
      */
     public static void esci() {
         utenteCorrente = null;
-
+        // Azzera lo stato condiviso legato all'utente, così non resta attivo
+        // dopo il logout e non ricompare per un altro utente.
+        RistoranteSelezionato.pulisci();
+        RecensioneSelezionata.pulisci();
+        RecensioneDaRispondere.pulisci();
+        RicercaIniziale.pulisci();
     }
 
     /**

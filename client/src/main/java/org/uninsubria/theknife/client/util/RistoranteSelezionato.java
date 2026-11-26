@@ -56,4 +56,16 @@ public class RistoranteSelezionato {
     public static boolean deveTornareAiMieiRistoranti() {
         return ritornoAiMieiRistoranti;
     }
+
+    /**
+     * Azzera lo stato di selezione del ristorante e il ritorno ai ristoranti gestiti.
+     * <p>
+     * Va invocato al termine di una sessione per non lasciare dati del
+     * ristorante precedente a un utente successivo.
+     * </p>
+     */
+    public static void pulisci() {
+        ristorante = null;
+        ritornoAiMieiRistoranti = false;
+    }
 }

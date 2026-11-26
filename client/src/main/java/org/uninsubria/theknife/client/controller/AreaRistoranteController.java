@@ -166,8 +166,11 @@ public class AreaRistoranteController {
     @FXML
     public void initialize() {
 
-        boolean mostraRitornoMieiRistoranti =
-                RistoranteSelezionato.deveTornareAiMieiRistoranti();
+        // Il pulsante "Torna ai miei ristoranti" è riservato al gestore che
+        // ha aperto la scheda dalla propria dashboard: non deve mai comparire
+        // per un cliente.
+        boolean mostraRitornoMieiRistoranti = SessioneUtente.eGestore()
+                && RistoranteSelezionato.deveTornareAiMieiRistoranti();
         tornaAiMieiRistoranti.setVisible(mostraRitornoMieiRistoranti);
         tornaAiMieiRistoranti.setManaged(mostraRitornoMieiRistoranti);
         averageRating = new BaseRatingView(0);

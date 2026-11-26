@@ -18,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.RemoteRefreshManager;
-import org.uninsubria.theknife.client.util.RicercaSessione;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.RicercaIniziale;
 import org.uninsubria.theknife.client.util.components.CuisineSelector;
@@ -69,6 +68,17 @@ public class ListaRistorantiController {
             boolean ciSonoAltri,
             double posizioneScroll
     ) {
+    }
+
+    /**
+     * Elimina la ricerca salvata in attesa di ripristino.
+     * <p>
+     * Va invocato al logout per non applicare i filtri di un utente precedente
+     * al primo caricamento della lista da parte di un utente successivo.
+     * </p>
+     */
+    public static void pulisciRicercaSalvata() {
+        snapshotRicerca = null;
     }
 
     @FXML private TextField searchField;
@@ -140,13 +150,6 @@ public class ListaRistorantiController {
                 retryTransition.stop();
             }
         });
-
-        String nomeRistorante = RicercaSessione.ottieniNomeRistorante();
-
-
-        if (criteri == null && nomeRistorante != null && !nomeRistorante.isBlank()) {
-            searchField.setText(nomeRistorante);
-        }
 
         if (istantanea != null) {
             ripristinaRicerca(istantanea);

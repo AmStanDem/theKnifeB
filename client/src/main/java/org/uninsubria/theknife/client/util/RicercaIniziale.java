@@ -124,4 +124,15 @@ public final class RicercaIniziale {
     public static Criteri consuma() {
         return CRITERI.getAndSet(null);
     }
+
+    /**
+     * Elimina i criteri memorizzati senza restituirli.
+     * <p>
+     * Va invocato al termine di una sessione per non applicare la ricerca di
+     * un utente precedente a un utente successivo.
+     * </p>
+     */
+    public static void pulisci() {
+        CRITERI.set(null);
+    }
 }
