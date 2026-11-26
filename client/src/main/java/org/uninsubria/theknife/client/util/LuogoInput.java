@@ -6,6 +6,7 @@ package org.uninsubria.theknife.client.util;
 
 import javafx.geometry.Pos;
 import javafx.application.Platform;
+import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -24,6 +25,8 @@ import java.util.function.Consumer;
  * Campo per inserire una località con suggerimenti automatici e selezione tramite mappa.
  */
 public final class LuogoInput extends HBox {
+
+    private static final PseudoClass FOCUSED_WITHIN = PseudoClass.getPseudoClass("focused-within");
 
     private final TextField campo = new TextField();
     private final Button mappa = new Button();
@@ -46,6 +49,8 @@ public final class LuogoInput extends HBox {
         );
         campo.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(campo, Priority.ALWAYS);
+        campo.focusedProperty().addListener((observable, prima, focalizzato) ->
+                pseudoClassStateChanged(FOCUSED_WITHIN, focalizzato));
 
         mappa.setMnemonicParsing(false);
         mappa.setAccessibleText("Seleziona un luogo sulla mappa");

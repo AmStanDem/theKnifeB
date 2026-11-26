@@ -29,8 +29,16 @@
     -fx-font-size: 14px;
 }
 
-.text-input:focused {
+.root .text-input:focused,
+.root .text-field:focused,
+.root .password-field:focused,
+.root .text-area:focused,
+.root .custom-text-field:focused,
+.root .field-input:focused,
+.root .search-field:focused,
+.root .price-input:focused {
     -fx-border-color: -fx-primary-green;
+    -fx-border-width: 2px;
 }
 
 .root .text-input:hover {
@@ -38,8 +46,15 @@
     -fx-border-width: 2px;
 }
 
-.root .text-input.location-field:hover {
+.root .location-field:focused,
+.root .location-field:hover {
+    -fx-border-color: transparent;
     -fx-border-width: 0;
+}
+
+.root .location-container:focused-within {
+    -fx-border-color: #3E9330;
+    -fx-border-width: 2px;
 }
 
 /* ===================== BOTTONI GLOBALI ===================== */
