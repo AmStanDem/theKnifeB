@@ -24,7 +24,9 @@
             fx:controller="org.uninsubria.theknife.client.controller.ProfiloController">
 
     <center>
-        <StackPane alignment="CENTER">
+        <StackPane fx:id="contenitoreCentrale"
+                   alignment="CENTER"
+                   styleClass="profile-background">
 
             <children>
 
@@ -175,9 +177,8 @@
                       maxHeight="740.0"
                       visible="false"
                       managed="false"
-                      stylesheets="@../styles/modifica-account.css, @../styles/modificaRistorante.css"
-                >
-
+                      styleClass="account-card"
+                      stylesheets="@../styles/areaUtente.css, @../styles/modifica-account.css, @../styles/modificaRistorante.css">
 
                     <ScrollPane fitToWidth="true"
                                 hbarPolicy="NEVER"

@@ -216,3 +216,22 @@
 .profile-logout-button:pressed {
     -fx-background-color: #9A1717;
 }
+
+
+/* Sfondo della sezione profilo */
+.profile-background {
+    -fx-background-color: #F5F5F5;
+}
+
+/* Sfondo dell'intera sezione modifica */
+.edit-background {
+    -fx-background-color: #063221;
+}
+
+/* Card bianca del modulo */
+.account-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 15, 0, 0, 4);
+}

@@ -25,6 +25,7 @@ import org.uninsubria.theknife.common.exceptions.CredenzialiErrateException;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
 import org.uninsubria.theknife.common.exceptions.UtenteGiaEsistenteException;
+import javafx.scene.layout.StackPane;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -120,6 +121,9 @@ public class ProfiloController implements BackHandler {
     @FXML
     private Button btnAnnulla;
 
+    @FXML
+    private StackPane contenitoreCentrale;
+
     // ===================== NAVIGAZIONE VISTE =====================
 
     /**
@@ -128,8 +132,15 @@ public class ProfiloController implements BackHandler {
     private void mostraProfilo() {
         sezioneProfilo.setVisible(true);
         sezioneProfilo.setManaged(true);
+
         sezioneModifica.setVisible(false);
         sezioneModifica.setManaged(false);
+
+        // Ripristina lo sfondo chiaro del profilo
+        contenitoreCentrale.getStyleClass().remove("edit-background");
+        if (!contenitoreCentrale.getStyleClass().contains("profile-background")) {
+            contenitoreCentrale.getStyleClass().add("profile-background");
+        }
     }
 
     /**
@@ -138,13 +149,22 @@ public class ProfiloController implements BackHandler {
      */
     private void mostraModifica() {
         UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+
         if (utente == null) {
             return;
         }
+
         sezioneProfilo.setVisible(false);
         sezioneProfilo.setManaged(false);
+
         sezioneModifica.setVisible(true);
         sezioneModifica.setManaged(true);
+
+        // Imposta lo sfondo verde su tutta l'area centrale
+        contenitoreCentrale.getStyleClass().remove("profile-background");
+        if (!contenitoreCentrale.getStyleClass().contains("edit-background")) {
+            contenitoreCentrale.getStyleClass().add("edit-background");
+        }
 
         messaggioLabel.setText("");
         btnSalva.setDisable(false);
@@ -156,11 +176,13 @@ public class ProfiloController implements BackHandler {
         nomeField.setText(utente.nome());
         cognomeField.setText(utente.cognome());
         emailField.setText(utente.email());
+
         if (utente.dataNascita() != null) {
             dataNascitaField.setText(DATE_FORMAT.format(utente.dataNascita()));
         } else {
             dataNascitaField.setText("");
         }
+
         domicilioField.setText(utente.domicilio());
         passwordCorrenteField.setText("");
         nuovaPasswordField.setText("");
