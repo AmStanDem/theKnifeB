@@ -73,7 +73,7 @@
                             <Label text="Data di nascita:"
                                    styleClass="profile-label" />
                             <Label fx:id="lblData"
-                                   text="-"
+                                   text="/"
                                    styleClass="profile-value" />
                         </HBox>
 
