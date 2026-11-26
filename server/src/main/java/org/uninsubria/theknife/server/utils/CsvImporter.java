@@ -13,11 +13,14 @@ import org.uninsubria.theknife.server.config.DatabaseConfig;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -26,6 +29,24 @@ import java.util.UUID;
  */
 public class CsvImporter {
     private static final int BATCH_SIZE = 1_000;
+
+    /**
+     * Paese associato alle città-stato che nel dataset compaiono senza il
+     * secondo componente nella colonna {@code Location}.
+     */
+    private static final Map<String, String> CITTA_STATO = Map.of(
+            "singapore", "Singapore",
+            "hong kong", "Hong Kong SAR China",
+            "dubai", "United Arab Emirates",
+            "abu dhabi", "United Arab Emirates",
+            "macau", "Macau SAR China",
+            "luxembourg", "Luxembourg");
+
+    /**
+     * Etichette di paese incoerenti presenti nel dataset da normalizzare.
+     */
+    private static final Map<String, String> ALIAS_PAESE = Map.of(
+            "czech republic", "Czechia");
 
     /**
      * Importa il dataset se non sono già presenti ristoranti e, in caso contrario,
@@ -152,12 +173,9 @@ public class CsvImporter {
                 try {
                     String name = pulisciStringa(record.get(0));
                     String address = pulisciStringa(record.get(1));
-                    String location = pulisciStringa(record.get(2));
-                    String[] locationParts = location.split(",", 2);
-                    String city = locationParts[0].isBlank() ? "Sconosciuta" : locationParts[0].trim();
-                    String country = locationParts.length > 1 && !locationParts[1].isBlank()
-                            ? locationParts[1].trim()
-                            : "Non specificata";
+                    String[] localita = analizzaLocalita(record.get(2));
+                    String city = localita[0];
+                    String country = localita[1];
                     String rawCuisines = pulisciStringa(record.get(4));
                     double longitude = Double.parseDouble(pulisciStringa(record.get(5)));
                     double latitude = Double.parseDouble(pulisciStringa(record.get(6)));
@@ -178,8 +196,8 @@ public class CsvImporter {
                     restaurants.setDouble(6, latitude);
                     restaurants.setDouble(7, longitude);
                     restaurants.setObject(8, estimatedPrice);
-                    restaurants.setString(9, valoreDataset(record, 7));
-                    restaurants.setString(10, valoreDataset(record, 9));
+                    restaurants.setString(9, normalizzaTelefono(valoreDataset(record, 7)));
+                    restaurants.setString(10, normalizzaUrl(valoreDataset(record, 9)));
                     restaurants.setString(11, valoreDataset(record, 13));
                     restaurants.addBatch();
                     pendingRestaurants++;
@@ -348,11 +366,11 @@ public class CsvImporter {
                 if (record.size() < 10) {
                     continue;
                 }
-                String[] locationParts = pulisciStringa(record.get(2)).split(",", 2);
-                String city = locationParts[0].trim();
-                String country = locationParts.length > 1 ? locationParts[1].trim() : "Non specificata";
-                stmt.setString(1, valoreDataset(record, 7));
-                stmt.setString(2, valoreDataset(record, 9));
+                String[] localita = analizzaLocalita(record.get(2));
+                String city = localita[0];
+                String country = localita[1];
+                stmt.setString(1, normalizzaTelefono(valoreDataset(record, 7)));
+                stmt.setString(2, normalizzaUrl(valoreDataset(record, 9)));
                 stmt.setString(3, valoreDataset(record, 13));
                 stmt.setString(4, pulisciStringa(record.get(0)));
                 stmt.setString(5, pulisciStringa(record.get(1)));
@@ -360,8 +378,8 @@ public class CsvImporter {
                 stmt.setString(7, country);
                 stmt.setString(8, pulisciStringa(record.get(5)));
                 stmt.setString(9, pulisciStringa(record.get(6)));
-                stmt.setString(10, valoreDataset(record, 7));
-                stmt.setString(11, valoreDataset(record, 9));
+                stmt.setString(10, normalizzaTelefono(valoreDataset(record, 7)));
+                stmt.setString(11, normalizzaUrl(valoreDataset(record, 9)));
                 stmt.setString(12, valoreDataset(record, 13));
                 stmt.addBatch();
 
@@ -462,5 +480,91 @@ public class CsvImporter {
             return trimmed.substring(1, trimmed.length() - 1).trim();
         }
         return trimmed;
+    }
+
+    /**
+     * Scompone la colonna {@code Location} in città e paese, normalizzando le
+     * etichette di paese e assegnando il paese alle città-stato che nel dataset
+     * compaiono senza il secondo componente.
+     *
+     * @param location valore grezzo della colonna {@code Location}
+     * @return array di due elementi: città e paese (mai {@code null})
+     */
+    private static String[] analizzaLocalita(String location) {
+        String pulita = pulisciStringa(location);
+        int separatore = pulita.indexOf(',');
+        if (separatore < 0) {
+            String paese = CITTA_STATO.get(pulita.toLowerCase(Locale.ROOT));
+            if (paese != null) {
+                return new String[] {pulita, paese};
+            }
+            return new String[] {
+                    pulita.isBlank() ? "Sconosciuta" : pulita,
+                    "Non specificata"};
+        }
+        String citta = pulita.substring(0, separatore).trim();
+        String paese = pulita.substring(separatore + 1).trim();
+        paese = ALIAS_PAESE.getOrDefault(paese.toLowerCase(Locale.ROOT), paese);
+        return new String[] {
+                citta.isBlank() ? "Sconosciuta" : citta,
+                paese.isBlank() ? "Non specificata" : paese};
+    }
+
+    /**
+     * Normalizza un numero di telefono. I valori in notazione scientifica
+     * (effetto dell'apertura del CSV in Excel) vengono espansi in cifre; gli
+     * altri valori vengono ripuliti da separatori e prefissi mantenendo le sole
+     * cifre.
+     *
+     * @param valore valore grezzo del numero di telefono
+     * @return numero di telefono con le sole cifre, oppure {@code null} se assente
+     */
+    private static String normalizzaTelefono(String valore) {
+        String pulito = pulisciStringa(valore);
+        if (pulito.isEmpty()) {
+            return null;
+        }
+        if (pulito.matches("[+-]?\\d+(\\.\\d+)?[eE][+-]?\\d+")) {
+            try {
+                return new BigDecimal(pulito).toBigIntegerExact().toString();
+            } catch (ArithmeticException e) {
+                // Valore non intero: si ripiega sulla sola estrazione delle cifre.
+            }
+        }
+        return pulito.replaceAll("\\D", "");
+    }
+
+    /**
+     * Normalizza l'URL del sito web correggendo gli schemi malformati
+     * (``httpss://``, ``http://httpss//``, schema mancante).
+     *
+     * @param valore valore grezzo dell'URL
+     * @return URL con schema valido, oppure {@code null} se assente
+     */
+    private static String normalizzaUrl(String valore) {
+        String url = pulisciStringa(valore);
+        if (url.isEmpty()) {
+            return null;
+        }
+        String[][] schemiMalformati = {
+                {"http://httpss//", "https://"},
+                {"https://httpss//", "https://"},
+                {"httpss://", "https://"},
+                {"httpss//", "https://"},
+                {"https//", "https://"},
+                {"http//", "http://"},
+        };
+        for (String[] schema : schemiMalformati) {
+            String prefisso = schema[0];
+            if (url.regionMatches(true, 0, prefisso, 0, prefisso.length())) {
+                url = schema[1] + url.substring(prefisso.length());
+                break;
+            }
+        }
+        if (!url.regionMatches(true, 0, "http://", 0, 7)
+                && !url.regionMatches(true, 0, "https://", 0, 8)) {
+            url = "https://" + url;
+        }
+        return url;
     }
 }
