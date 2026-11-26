@@ -33,6 +33,15 @@
     -fx-border-color: -fx-primary-green;
 }
 
+.root .text-input:hover {
+    -fx-border-color: #3E9330;
+    -fx-border-width: 2px;
+}
+
+.root .text-input.location-field:hover {
+    -fx-border-width: 0;
+}
+
 /* ===================== BOTTONI GLOBALI ===================== */
 .button {
     -fx-pref-height: 44px;
@@ -175,4 +184,3 @@
     -fx-font-weight: 600;
     -fx-text-fill: -fx-text-dark;
 }
-
