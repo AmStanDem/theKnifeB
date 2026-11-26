@@ -8,11 +8,11 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.uninsubria.theknife.client.util.BackHandler;
 import org.uninsubria.theknife.client.util.GeocodingService;
 import org.uninsubria.theknife.client.util.LuogoInput;
-import org.uninsubria.theknife.client.util.RistoranteSelezionato;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SessioneUtente;
@@ -34,16 +34,19 @@ import java.util.Optional;
 /**
  * Controller JavaFX del modulo usato dai gestori per creare, modificare ed eliminare ristoranti.
  * <p>
- * Determina la modalità in base al ristorante presente in {@link RistoranteSelezionato}:
- * senza un ristorante selezionato permette di crearne uno, altrimenti carica i dati
- * per la modifica e abilita anche l'eliminazione. Verifica i dati inseriti e usa
- * i servizi remoti per salvare le modifiche.
+ * La modalità viene scelta in modo esplicito dal chiamante: {@link #apriCreazione()}
+ * prepara un nuovo inserimento, mentre {@link #apriModifica(RistoranteDTO)} carica
+ * i dati di un ristorante esistente e abilita anche l'eliminazione. Verifica i dati
+ * inseriti e usa i servizi remoti per salvare le modifiche.
  * </p>
  */
 public class FormRistoranteController implements BackHandler {
 
     @FXML
     private TextField txtNome;
+
+    @FXML
+    private VBox containerRistoranti;
 
     @FXML
     private ComboBox<RistoranteDTO> comboRistoranti;
@@ -110,22 +113,16 @@ public class FormRistoranteController implements BackHandler {
     }
 
     /**
-     * Inizializza i componenti della vista.
+     * Inizializza i componenti comuni della vista.
      * <p>
-     * Determina automaticamente la modalità: se
-     * {@link RistoranteSelezionato#ottieniRistorante()} restituisce un ristorante
-     * con identificatore, si entra in modalità modifica; altrimenti in modalità
-     * creazione. Configura i campi, i listener e avvia i caricamenti asincroni.
+     * Configura i campi, i listener e avvia il caricamento delle tipologie di
+     * cucina. La modalità viene decisa in modo esplicito dal chiamante tramite
+     * {@link #apriCreazione()} o {@link #apriModifica(RistoranteDTO)}; in
+     * assenza di indicazioni il modulo si apre in creazione.
      * </p>
      */
     @FXML
     public void initialize() {
-        RistoranteDTO selezionato = RistoranteSelezionato.ottieniRistorante();
-
-        if (selezionato != null && selezionato.idRistorante() != null) {
-            modalitaModifica = true;
-        }
-
         UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
         if (utente == null || !SessioneUtente.eGestore()) {
             btnSalva.setDisable(true);
@@ -137,33 +134,18 @@ public class FormRistoranteController implements BackHandler {
             return;
         }
 
-        comboCucine.setDisable(true);
-        btnSalva.setDisable(true);
+        comboRistoranti.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(RistoranteDTO value) {
+                return value == null ? "" : value.nome() + " — " + value.citta();
+            }
 
-        if (modalitaModifica) {
-            comboRistoranti.setVisible(true);
-            comboRistoranti.setManaged(true);
-            btnElimina.setVisible(true);
-            btnElimina.setManaged(true);
-
-            comboRistoranti.setConverter(new StringConverter<>() {
-                @Override
-                public String toString(RistoranteDTO value) {
-                    return value == null ? "" : value.nome() + " — " + value.citta();
-                }
-
-                @Override
-                public RistoranteDTO fromString(String value) {
-                    return null;
-                }
-            });
-            comboRistoranti.setOnAction(evento -> selezionaRistorante(comboRistoranti.getValue()));
-        } else {
-            comboRistoranti.setVisible(false);
-            comboRistoranti.setManaged(false);
-            btnElimina.setVisible(false);
-            btnElimina.setManaged(false);
-        }
+            @Override
+            public RistoranteDTO fromString(String value) {
+                return null;
+            }
+        });
+        comboRistoranti.setOnAction(evento -> selezionaRistorante(comboRistoranti.getValue()));
 
         txtIndirizzo.aggiungiStileCampoTesto("custom-text-field");
         txtCitta.setEditable(false);
@@ -173,13 +155,68 @@ public class FormRistoranteController implements BackHandler {
             txtNazione.setText(luogo.nazione());
         });
 
-        caricaTipologieCucina();
+        comboCucine.setDisable(true);
+        btnSalva.setDisable(true);
 
-        if (modalitaModifica) {
-            caricaRistoranti(utente);
+        // Modalità predefinita: creazione, sovrascrivibile con apriModifica.
+        apriCreazione();
+
+        caricaTipologieCucina();
+    }
+
+    /**
+     * Prepara il modulo per la creazione di un nuovo ristorante.
+     * <p>
+     * Nasconde la selezione del ristorante e i comandi di eliminazione, così
+     * che il salvataggio registri una nuova attività.
+     * </p>
+     */
+    public void apriCreazione() {
+        modalitaModifica = false;
+        ristorante = null;
+        mostraSelettoreRistorante(false);
+        aggiornaStatoIniziale();
+    }
+
+    /**
+     * Prepara il modulo per la modifica di un ristorante esistente.
+     * <p>
+     * Mostra il selettore dei ristoranti del gestore e i comandi di
+     * eliminazione, quindi carica i dati del ristorante indicato. Se il
+     * ristorante non è valido o non ha un identificativo, il modulo si apre
+     * in creazione.
+     * </p>
+     *
+     * @param ristorante ristorante da modificare
+     */
+    public void apriModifica(RistoranteDTO ristorante) {
+        if (ristorante == null || ristorante.idRistorante() == null) {
+            apriCreazione();
+            return;
         }
 
-        aggiornaStatoIniziale();
+        modalitaModifica = true;
+        mostraSelettoreRistorante(true);
+
+        UtenteDTO utente = SessioneUtente.ottieniUtenteCorrente();
+        if (utente == null || !SessioneUtente.eGestore()) {
+            return;
+        }
+        caricaRistoranti(utente, ristorante);
+    }
+
+    /**
+     * Mostra o nasconde i controlli disponibili solo in modalità modifica.
+     *
+     * @param visibile {@code true} per mostrare selettore ed eliminazione
+     */
+    private void mostraSelettoreRistorante(boolean visibile) {
+        containerRistoranti.setVisible(visibile);
+        containerRistoranti.setManaged(visibile);
+        comboRistoranti.setVisible(visibile);
+        comboRistoranti.setManaged(visibile);
+        btnElimina.setVisible(visibile);
+        btnElimina.setManaged(visibile);
     }
 
     /**
@@ -289,13 +326,14 @@ public class FormRistoranteController implements BackHandler {
     /**
      * Carica dal server i ristoranti associati al gestore autenticato (solo modifica).
      * <p>
-     * Popola il selettore sul thread JavaFX e seleziona il ristorante già
-     * memorizzato dalla navigazione precedente, se presente tra i risultati.
+     * Popola il selettore sul thread JavaFX e seleziona il ristorante indicato
+     * se presente tra i risultati, altrimenti il primo disponibile.
      * </p>
      *
      * @param utente gestore proprietario dei ristoranti
+     * @param ristoranteDaSelezionare ristorante da preselezionare, oppure {@code null}
      */
-    private void caricaRistoranti(UtenteDTO utente) {
+    private void caricaRistoranti(UtenteDTO utente, RistoranteDTO ristoranteDaSelezionare) {
         Thread.startVirtualThread(() -> {
             try {
                 List<RistoranteDTO> ristoranti =
@@ -307,10 +345,10 @@ public class FormRistoranteController implements BackHandler {
                         mostraMessaggio(Alert.AlertType.INFORMATION, "Nessun ristorante",
                                 "Non hai ancora ristoranti da modificare.");
                     } else {
-                        RistoranteDTO selezionato = RistoranteSelezionato.ottieniRistorante();
-                        RistoranteDTO ristoranteInLista = selezionato == null ? null
+                        RistoranteDTO ristoranteInLista = ristoranteDaSelezionare == null ? null
                                 : ristoranti.stream()
-                                .filter(elemento -> elemento.idRistorante().equals(selezionato.idRistorante()))
+                                .filter(elemento -> elemento.idRistorante()
+                                        .equals(ristoranteDaSelezionare.idRistorante()))
                                 .findFirst()
                                 .orElse(null);
                         RistoranteDTO scelta = ristoranteInLista == null

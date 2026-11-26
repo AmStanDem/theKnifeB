@@ -126,9 +126,10 @@ public class DashboardGestoreController {
                     RistoranteSelezionato.impostaRitornoAiMieiRistoranti(true);
                 });
                 controllore.setOnModificaAction((evento, ristoranteSelezionato) -> {
-                    RistoranteSelezionato.impostaRistorante(ristoranteSelezionato);
-                    SceneManager.cambiaScena(evento,
+                    FormRistoranteController formController = SceneManager.cambiaScenaEOttieniController(
+                            SceneManager.ottieniStage(evento),
                             "/org/uninsubria/theknife/client/views/FormRistorante.fxml");
+                    formController.apriModifica(ristoranteSelezionato);
                 });
                 restaurantContainer.getChildren().add(scheda);
             }
@@ -160,7 +161,10 @@ public class DashboardGestoreController {
      */
     @FXML
     private void onAggiungiClick(ActionEvent evento) {
-        SceneManager.cambiaScena(evento, "/org/uninsubria/theknife/client/views/FormRistorante.fxml");
+        FormRistoranteController formController = SceneManager.cambiaScenaEOttieniController(
+                SceneManager.ottieniStage(evento),
+                "/org/uninsubria/theknife/client/views/FormRistorante.fxml");
+        formController.apriCreazione();
     }
 
     /**

@@ -334,10 +334,11 @@ public class ProfiloController implements BackHandler {
      */
     @FXML
     private void onAggiungiClick(ActionEvent evento) {
-        SceneManager.cambiaScena(
-                evento,
+        FormRistoranteController formController = SceneManager.cambiaScenaEOttieniController(
+                SceneManager.ottieniStage(evento),
                 "/org/uninsubria/theknife/client/views/FormRistorante.fxml"
         );
+        formController.apriCreazione();
     }
 
     /**
