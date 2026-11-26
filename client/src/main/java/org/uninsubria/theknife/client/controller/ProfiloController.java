@@ -221,7 +221,7 @@ public class ProfiloController implements BackHandler {
 
             // Data di nascita
             if (utente.dataNascita() != null) {
-                lblData.setText(utente.dataNascita().toString());
+                lblData.setText(DATE_FORMAT.format(utente.dataNascita()));
             } else {
                 lblData.setText("-");
             }
@@ -267,7 +267,7 @@ public class ProfiloController implements BackHandler {
 
             // Data di nascita
             if (utente.dataNascita() != null) {
-                lblData.setText(utente.dataNascita().toString());
+                lblData.setText(DATE_FORMAT.format(utente.dataNascita()));
             } else {
                 lblData.setText("-");
             }
