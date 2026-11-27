@@ -7,7 +7,7 @@ import org.uninsubria.theknife.common.dto.RecensioneDTO;
 import org.uninsubria.theknife.common.exceptions.AzioneDuplicataException;
 import org.uninsubria.theknife.common.exceptions.ModificaObsoletaException;
 import org.uninsubria.theknife.common.rmi.ITheKnifeServer;
-import org.uninsubria.theknife.server.utils.PrezzoDatasetEstimator;
+import org.uninsubria.theknife.common.util.FasciaPrezzo;
 
 import java.rmi.registry.LocateRegistry;
 import java.sql.Connection;
@@ -28,7 +28,7 @@ public final class RmiConcurrencyHarness {
     }
 
     public static void main(String[] args) throws Exception {
-        verificaStimePrezzo();
+        verificaFascePrezzo();
         String databaseName = DB_URL.substring(DB_URL.lastIndexOf('/') + 1).split("\\?", 2)[0];
         if (!databaseName.toLowerCase().contains("test")) {
             throw new IllegalStateException("Il database di test deve avere 'test' nel nome.");
@@ -83,19 +83,14 @@ public final class RmiConcurrencyHarness {
         }
     }
 
-    private static void verificaStimePrezzo() {
-        double economico = PrezzoDatasetEstimator.stimaInEuro("€", "Italy", "Ristorante A", "Via 1");
-        double medio = PrezzoDatasetEstimator.stimaInEuro("€€", "Italy", "Ristorante A", "Via 1");
-        double alto = PrezzoDatasetEstimator.stimaInEuro("€€€", "Italy", "Ristorante A", "Via 1");
-        double lusso = PrezzoDatasetEstimator.stimaInEuro("€€€€", "Italy", "Ristorante A", "Via 1");
-        double lowCost = PrezzoDatasetEstimator.stimaInEuro("€€", "India", "Ristorante A", "Via 1");
-        double highCost = PrezzoDatasetEstimator.stimaInEuro("€€", "Switzerland", "Ristorante A", "Via 1");
-
-        if (!(economico < medio && medio < alto && alto < lusso && lowCost < medio && medio < highCost)
-                || PrezzoDatasetEstimator.stimaInEuro("", "Italy", "Ristorante A", "Via 1") != null
-                || PrezzoDatasetEstimator.stimaInEuro("€$", "Italy", "Ristorante A", "Via 1") != null
-                || medio == PrezzoDatasetEstimator.stimaInEuro("€€", "Italy", "Ristorante B", "Via 2")) {
-            throw new AssertionError("La stima dei prezzi non rispetta fasce, costo locale o variazione.");
+    private static void verificaFascePrezzo() {
+        if (FasciaPrezzo.livello("$") != 1
+                || FasciaPrezzo.livello("¥¥¥") != 3
+                || FasciaPrezzo.livello("€€€€") != 4
+                || FasciaPrezzo.livello("*") != 0
+                || FasciaPrezzo.normalizza("€$") != null
+                || !"₹₹".equals(FasciaPrezzo.simboli("₹", 2))) {
+            throw new AssertionError("La normalizzazione delle fasce simboliche non è coerente.");
         }
     }
 
@@ -154,8 +149,8 @@ public final class RmiConcurrencyHarness {
                 String restaurantName = "concurrency-" + suffix;
                 String restaurantSql = """
                         INSERT INTO RistorantiTheKnife
-                            (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio)
-                        VALUES (?, ?, 'Harness Street 1', 'Varese', 'Italia', 45.8, 8.8, 20.00)
+                            (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, fascia_prezzo)
+                        VALUES (?, ?, 'Harness Street 1', 'Varese', 'Italia', 45.8, 8.8, '€')
                         RETURNING id_ristorante
                         """;
                 try (PreparedStatement statement = connection.prepareStatement(restaurantSql)) {

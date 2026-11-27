@@ -25,8 +25,8 @@ public final class RicercaIniziale {
      * @param latitudine latitudine della località selezionata
      * @param longitudine longitudine della località selezionata
      * @param tipologieCucina tipologie di cucina selezionate
-     * @param prezzoMin prezzo minimo
-     * @param prezzoMax prezzo massimo
+     * @param prezzoMin fascia simbolica minima
+     * @param prezzoMax fascia simbolica massima
      * @param mediaStelleMinima valutazione media minima
      * @param consegna indica se filtrare per disponibilità della consegna a domicilio
      * @param prenotazioneOnline indica se filtrare per disponibilità della prenotazione online
@@ -37,8 +37,9 @@ public final class RicercaIniziale {
             Double latitudine,
             Double longitudine,
             List<String> tipologieCucina,
-            Double prezzoMin,
-            Double prezzoMax,
+            String prezzoMin,
+            String prezzoMax,
+            String simboloValuta,
             Double mediaStelleMinima,
             boolean consegna,
             boolean prenotazioneOnline
@@ -51,8 +52,8 @@ public final class RicercaIniziale {
          * @param latitudine latitudine della località selezionata
          * @param longitudine longitudine della località selezionata
          * @param tipologieCucina tipologie di cucina selezionate, normalizzate a lista vuota se {@code null}
-         * @param prezzoMin prezzo minimo
-         * @param prezzoMax prezzo massimo
+         * @param prezzoMin fascia simbolica minima
+         * @param prezzoMax fascia simbolica massima
          * @param mediaStelleMinima valutazione media minima
          * @param consegna indica se filtrare per disponibilità della consegna a domicilio
          * @param prenotazioneOnline indica se filtrare per disponibilità della prenotazione online
@@ -86,8 +87,8 @@ public final class RicercaIniziale {
      * @param testo testo libero della ricerca
      * @param luogo località selezionata, oppure {@code null}
      * @param tipologieCucina tipologie di cucina selezionate
-     * @param prezzoMin prezzo minimo
-     * @param prezzoMax prezzo massimo
+     * @param prezzoMin fascia simbolica minima
+     * @param prezzoMax fascia simbolica massima
      * @param mediaStelleMinima valutazione media minima
      * @param consegna indica se filtrare per disponibilità della consegna a domicilio
      * @param prenotazioneOnline indica se filtrare per disponibilità della prenotazione online
@@ -96,11 +97,27 @@ public final class RicercaIniziale {
             String testo,
             GeocodingService.Luogo luogo,
             List<String> tipologieCucina,
-            Double prezzoMin,
-            Double prezzoMax,
+            String prezzoMin,
+            String prezzoMax,
             Double mediaStelleMinima,
             boolean consegna,
             boolean prenotazioneOnline
+    ) {
+        String simbolo = primoSimbolo(prezzoMin, prezzoMax);
+        imposta(testo, luogo, tipologieCucina, prezzoMin, prezzoMax,
+                mediaStelleMinima, consegna, prenotazioneOnline, simbolo);
+    }
+
+    public static void imposta(
+            String testo,
+            GeocodingService.Luogo luogo,
+            List<String> tipologieCucina,
+            String prezzoMin,
+            String prezzoMax,
+            Double mediaStelleMinima,
+            boolean consegna,
+            boolean prenotazioneOnline,
+            String simboloValuta
     ) {
         CRITERI.set(new Criteri(
                 testo,
@@ -110,10 +127,17 @@ public final class RicercaIniziale {
                 tipologieCucina,
                 prezzoMin,
                 prezzoMax,
+                simboloValuta,
                 mediaStelleMinima,
                 consegna,
                 prenotazioneOnline
         ));
+    }
+
+    private static String primoSimbolo(String fasciaMinima, String fasciaMassima) {
+        String fascia = fasciaMinima != null && !fasciaMinima.equals("*")
+                ? fasciaMinima : fasciaMassima;
+        return fascia == null || fascia.equals("*") ? "¤" : fascia.substring(0, 1);
     }
 
     /**

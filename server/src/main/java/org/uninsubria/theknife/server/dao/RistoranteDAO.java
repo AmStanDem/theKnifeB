@@ -12,7 +12,6 @@ import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.server.config.DatabaseConfig;
 
 import java.sql.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,8 +36,8 @@ public class RistoranteDAO {
      * @throws SQLException se si verifica un errore durante l'inserimento
      */
     public Integer inserisciRistorante(RistoranteDTO r, int idGestore) throws SQLException {
-        String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, prezzo_medio, delivery, booking_online, prezzo_stimato, telefono, sito_web, descrizione) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlRisto = "INSERT INTO RistorantiTheKnife (id_gestore, nome, indirizzo, citta, nazione, latitudine, longitudine, fascia_prezzo, delivery, booking_online, telefono, sito_web, descrizione) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlTipologiaCheck = "INSERT INTO Tipologia_Cucina (nome) VALUES (?) ON CONFLICT (nome) DO NOTHING";
         String sqlTipologiaId = "SELECT id_tipologia FROM Tipologia_Cucina WHERE nome = ?";
         String sqlRistoTipo = "INSERT INTO Ristoranti_Tipologie (id_ristorante, id_tipologia) VALUES (?, ?) ON CONFLICT DO NOTHING";
@@ -54,13 +53,12 @@ public class RistoranteDAO {
                 stmt.setString(5, r.nazione());
                 stmt.setDouble(6, r.latitudine() != null ? r.latitudine() : 0.0);
                 stmt.setDouble(7, r.longitudine() != null ? r.longitudine() : 0.0);
-                stmt.setDouble(8, r.prezzoMedio());
+                stmt.setString(8, r.fasciaPrezzo());
                 stmt.setBoolean(9, r.consegna() != null ? r.consegna() : false);
                 stmt.setBoolean(10, r.prenotazioneOnline() != null && r.prenotazioneOnline());
-                stmt.setBoolean(11, false);
-                stmt.setString(12, r.telefono());
-                stmt.setString(13, r.sitoWeb());
-                stmt.setString(14, r.descrizione());
+                stmt.setString(11, r.telefono());
+                stmt.setString(12, r.sitoWeb());
+                stmt.setString(13, r.descrizione());
 
                 if (stmt.executeUpdate() == 0) {
                     conn.rollback();
@@ -136,7 +134,7 @@ public class RistoranteDAO {
      */
     public boolean modificaRistorante(RistoranteDTO r, int idGestore) throws SQLException {
         String sqlRistorante = "UPDATE RistorantiTheKnife SET nome = ?, indirizzo = ?, citta = ?, " +
-                "nazione = ?, latitudine = ?, longitudine = ?, prezzo_medio = ?, prezzo_stimato = FALSE, " +
+                "nazione = ?, latitudine = ?, longitudine = ?, fascia_prezzo = ?, " +
                 "delivery = ?, booking_online = ?, " +
                 "telefono = COALESCE(NULLIF(TRIM(?), ''), telefono), " +
                 "sito_web = COALESCE(NULLIF(TRIM(?), ''), sito_web), " +
@@ -158,7 +156,7 @@ public class RistoranteDAO {
                     stmt.setString(4, r.nazione().trim());
                     stmt.setDouble(5, r.latitudine());
                     stmt.setDouble(6, r.longitudine());
-                    stmt.setDouble(7, r.prezzoMedio());
+                    stmt.setString(7, r.fasciaPrezzo());
                     stmt.setBoolean(8, Boolean.TRUE.equals(r.consegna()));
                     stmt.setBoolean(9, Boolean.TRUE.equals(r.prenotazioneOnline()));
 
@@ -312,13 +310,13 @@ public class RistoranteDAO {
                 parametri.add("%" + filtri.tipoCucina().trim() + "%");
             }
 
-            if (filtri.prezzoMin() != null) {
-                sql.append(" AND r.prezzo_medio >= ?");
-                parametri.add(filtri.prezzoMin());
+            if (isFasciaSpecificata(filtri.prezzoMin())) {
+                sql.append(" AND char_length(r.fascia_prezzo) >= ?");
+                parametri.add(org.uninsubria.theknife.common.util.FasciaPrezzo.livello(filtri.prezzoMin()));
             }
-            if (filtri.prezzoMax() != null) {
-                sql.append(" AND r.prezzo_medio <= ?");
-                parametri.add(filtri.prezzoMax());
+            if (isFasciaSpecificata(filtri.prezzoMax())) {
+                sql.append(" AND char_length(r.fascia_prezzo) <= ?");
+                parametri.add(org.uninsubria.theknife.common.util.FasciaPrezzo.livello(filtri.prezzoMax()));
             }
             if (filtri.consegna() != null && filtri.consegna()) {
                 sql.append(" AND r.delivery = TRUE");
@@ -407,13 +405,13 @@ public class RistoranteDAO {
                     .forEach(parametri::add);
         }
 
-        if (richiesta.prezzoMin() != null) {
-            sql.append(" AND r.prezzo_medio >= ?");
-            parametri.add(richiesta.prezzoMin());
+        if (isFasciaSpecificata(richiesta.prezzoMin())) {
+            sql.append(" AND char_length(r.fascia_prezzo) >= ?");
+            parametri.add(org.uninsubria.theknife.common.util.FasciaPrezzo.livello(richiesta.prezzoMin()));
         }
-        if (richiesta.prezzoMax() != null) {
-            sql.append(" AND r.prezzo_medio <= ?");
-            parametri.add(richiesta.prezzoMax());
+        if (isFasciaSpecificata(richiesta.prezzoMax())) {
+            sql.append(" AND char_length(r.fascia_prezzo) <= ?");
+            parametri.add(org.uninsubria.theknife.common.util.FasciaPrezzo.livello(richiesta.prezzoMax()));
         }
         if (richiesta.consegna()) {
             sql.append(" AND r.delivery = TRUE");
@@ -461,7 +459,7 @@ public class RistoranteDAO {
 
     private String costruisciQueryBase() {
         return "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, r.latitudine, r.longitudine, " +
-                "r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, r.telefono, r.sito_web, r.descrizione, " +
+                "r.fascia_prezzo, r.delivery, r.booking_online, r.telefono, r.sito_web, r.descrizione, " +
                 "COALESCE(rec_stat.media_stelle, 0.0) as media_stelle, " +
                 "cucine.tipologie_cucina " +
                 "FROM RistorantiTheKnife r " +
@@ -521,8 +519,6 @@ public class RistoranteDAO {
         List<String> tipologie = (stringaCucine != null && !stringaCucine.isBlank())
                 ? Arrays.asList(stringaCucine.split(","))
                 : new ArrayList<>();
-        BigDecimal prezzoMedio = rs.getBigDecimal("prezzo_medio");
-
         return new RistoranteDTO(
                 rs.getInt("id_ristorante"),
                 rs.getString("nome"),
@@ -532,14 +528,17 @@ public class RistoranteDAO {
                 rs.getDouble("latitudine"),
                 rs.getDouble("longitudine"),
                 tipologie,
-                prezzoMedio == null ? null : prezzoMedio.doubleValue(),
+                rs.getString("fascia_prezzo"),
                 rs.getBoolean("delivery"),
                 rs.getBoolean("booking_online"),
                 rs.getDouble("media_stelle"),
-                rs.getBoolean("prezzo_stimato"),
                 rs.getString("telefono"),
                 rs.getString("sito_web"),
                 rs.getString("descrizione")
         );
+    }
+
+    private static boolean isFasciaSpecificata(String fascia) {
+        return fascia != null && !org.uninsubria.theknife.common.util.FasciaPrezzo.QUALSIASI.equals(fascia);
     }
 }

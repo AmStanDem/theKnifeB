@@ -84,32 +84,26 @@
                             <VBox spacing="6" styleClass="field-group">
                                 <Label text="Fascia di prezzo" styleClass="field-label"/>
                                 <RangeSlider fx:id="rangeSliderPrezzo"
-                                             min="10" max="350"
-                                             lowValue="10" highValue="350"
-                                             blockIncrement="5"
-                                             majorTickUnit="50"
-                                             minorTickCount="9"
+                                             min="1" max="4"
+                                             lowValue="1" highValue="4"
+                                             blockIncrement="1"
+                                             majorTickUnit="1"
+                                             minorTickCount="0"
                                              snapToTicks="true"
-                                             showTickLabels="true"
+                                             showTickLabels="false"
                                              showTickMarks="true"
                                              styleClass="price-range-slider"/>
                                 <HBox spacing="16">
                                     <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                        <Label text="Inizio range (€)" styleClass="field-label"/>
-                                        <TextField fx:id="txtPrezzoMin"
-                                                   text="10"
-                                                   styleClass="price-input"
-                                                   onAction="#aggiornaPrezzoMin"/>
+                                        <Label text="Fascia minima" styleClass="field-label"/>
+                                        <Label fx:id="lblFasciaPrezzoMin" text="¤" styleClass="field-hint"/>
                                     </VBox>
                                     <VBox spacing="6" HBox.hgrow="ALWAYS">
-                                        <Label text="Fine range (€)" styleClass="field-label"/>
-                                        <TextField fx:id="txtPrezzoMax"
-                                                   text="350+"
-                                                   styleClass="price-input"
-                                                   onAction="#aggiornaPrezzoMax"/>
+                                        <Label text="Fascia massima" styleClass="field-label"/>
+                                        <Label fx:id="lblFasciaPrezzoMax" text="¤¤¤¤" styleClass="field-hint"/>
                                     </VBox>
                                 </HBox>
-                                <Label text="350+ indica 350 € o più" styleClass="field-hint"/>
+                                <Label text="La valuta segue la località; * include tutte le fasce." styleClass="field-hint"/>
                             </VBox>
 
                             <!-- Valutazione minima (stelle) -->

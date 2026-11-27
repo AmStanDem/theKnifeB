@@ -16,6 +16,7 @@ import org.uninsubria.theknife.client.util.ServerConnection;
 import org.uninsubria.theknife.client.util.SceneManager;
 import org.uninsubria.theknife.client.util.components.CuisineSelector;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.util.FasciaPrezzo;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -32,8 +33,9 @@ import java.util.List;
  */
 public class RicercaAvanzataController {
 
-    private static final int PREZZO_MINIMO = 10;
-    private static final int PREZZO_MASSIMO = 350;
+    private static final int FASCIA_MINIMA = 1;
+    private static final int FASCIA_MASSIMA = 4;
+    private String simboloValuta = "¤";
 
     @FXML
     private LuogoInput txtLocalita;
@@ -42,10 +44,10 @@ public class RicercaAvanzataController {
     private RangeSlider rangeSliderPrezzo;
 
     @FXML
-    private TextField txtPrezzoMin;
+    private Label lblFasciaPrezzoMin;
 
     @FXML
-    private TextField txtPrezzoMax;
+    private Label lblFasciaPrezzoMax;
 
     @FXML
     private CuisineSelector cuisineSelector;
@@ -73,45 +75,43 @@ public class RicercaAvanzataController {
     @FXML
     private void initialize() {
         txtLocalita.aggiungiStileCampoTesto("field-input");
+        txtLocalita.setOnLuogoSelezionato(luogo -> aggiornaSimboloValuta(luogo.codiceNazione()));
         ratingStelleMinime.impostaSuValutazioneCambiata(this::aggiornaEtichettaRating);
 
         caricaTipologieCucina();
 
-        configuraCampoPrezzo(txtPrezzoMin, false);
-        configuraCampoPrezzo(txtPrezzoMax, true);
-
         rangeSliderPrezzo.lowValueProperty().addListener((observable, oldValue, newValue) -> {
-            double valore = Math.max(PREZZO_MINIMO,
+            double valore = Math.max(FASCIA_MINIMA,
                     Math.min(Math.round(newValue.doubleValue()), rangeSliderPrezzo.getHighValue()));
             if (valore != newValue.doubleValue()) {
                 rangeSliderPrezzo.setLowValue(valore);
                 return;
             }
-            txtPrezzoMin.setText(Integer.toString((int) valore));
+            aggiornaEtichetteFascia();
         });
         rangeSliderPrezzo.highValueProperty().addListener((observable, oldValue, newValue) -> {
-            double valore = Math.min(PREZZO_MASSIMO,
+            double valore = Math.min(FASCIA_MASSIMA,
                     Math.max(Math.round(newValue.doubleValue()), rangeSliderPrezzo.getLowValue()));
             if (valore != newValue.doubleValue()) {
                 rangeSliderPrezzo.setHighValue(valore);
                 return;
             }
-            txtPrezzoMax.setText(formattaPrezzoMassimo((int) valore));
+            aggiornaEtichetteFascia();
         });
-
-        txtPrezzoMin.focusedProperty().addListener((observable, wasFocused, isFocused) -> {
-            if (!isFocused) {
-                aggiornaPrezzoMin();
-            }
-        });
-        txtPrezzoMax.focusedProperty().addListener((observable, wasFocused, isFocused) -> {
-            if (!isFocused) {
-                aggiornaPrezzoMax();
-            }
-        });
-        aggiornaPrezzoMin();
-        aggiornaPrezzoMax();
+        aggiornaEtichetteFascia();
         aggiornaEtichettaRating();
+    }
+
+    private void aggiornaSimboloValuta(String codiceNazione) {
+        simboloValuta = FasciaPrezzo.simboloValuta(codiceNazione);
+        aggiornaEtichetteFascia();
+    }
+
+    private void aggiornaEtichetteFascia() {
+        int minimo = (int) Math.round(rangeSliderPrezzo.getLowValue());
+        int massimo = (int) Math.round(rangeSliderPrezzo.getHighValue());
+        lblFasciaPrezzoMin.setText(FasciaPrezzo.simboli(simboloValuta, minimo));
+        lblFasciaPrezzoMax.setText(FasciaPrezzo.simboli(simboloValuta, massimo));
     }
 
     /**
@@ -163,85 +163,6 @@ public class RicercaAvanzataController {
     }
 
     /**
-     * Limita il testo inseribile in un campo di prezzo al formato previsto.
-     *
-     * @param campo campo di testo da configurare
-     * @param accettaPiu {@code true} se è ammesso il suffisso {@code +}
-     */
-    private void configuraCampoPrezzo(TextField campo, boolean accettaPiu) {
-        String pattern = accettaPiu ? "\\d{0,3}\\+?" : "\\d{0,3}";
-        campo.setTextFormatter(new javafx.scene.control.TextFormatter<String>(change ->
-                change.getControlNewText().matches(pattern) ? change : null));
-    }
-
-    /**
-     * Aggiorna il limite minimo di prezzo a partire dal campo di testo,
-     * mantenendolo entro i limiti e coerente con quello massimo.
-     */
-    @FXML
-    private void aggiornaPrezzoMin() {
-        Integer prezzo = parsePrezzo(txtPrezzoMin.getText(), false);
-        if (prezzo == null) {
-            txtPrezzoMin.setText(Integer.toString((int) Math.round(rangeSliderPrezzo.getLowValue())));
-            return;
-        }
-        double valore = Math.max(PREZZO_MINIMO,
-                Math.min(prezzo, (int) Math.round(rangeSliderPrezzo.getHighValue())));
-        rangeSliderPrezzo.setLowValue(valore);
-        txtPrezzoMin.setText(Integer.toString((int) valore));
-    }
-
-    /**
-     * Aggiorna il limite massimo di prezzo a partire dal campo di testo,
-     * mantenendolo entro i limiti e coerente con quello minimo.
-     */
-    @FXML
-    private void aggiornaPrezzoMax() {
-        Integer prezzo = parsePrezzo(txtPrezzoMax.getText(), true);
-        if (prezzo == null) {
-            txtPrezzoMax.setText(formattaPrezzoMassimo(
-                    (int) Math.round(rangeSliderPrezzo.getHighValue())));
-            return;
-        }
-        double valore = Math.min(PREZZO_MASSIMO,
-                Math.max(prezzo, (int) Math.round(rangeSliderPrezzo.getLowValue())));
-        rangeSliderPrezzo.setHighValue(valore);
-        txtPrezzoMax.setText(formattaPrezzoMassimo((int) valore));
-    }
-
-    /**
-     * Converte il testo del prezzo in un intero e ne verifica il formato e
-     * l'intervallo ammesso.
-     *
-     * @param testo valore inserito
-     * @param accettaPiu {@code true} se il suffisso {@code +} è consentito
-     * @return prezzo valido, oppure {@code null} se il testo non è valido
-     */
-    private Integer parsePrezzo(String testo, boolean accettaPiu) {
-        if (testo == null || !testo.matches(accettaPiu ? "\\d{1,3}\\+?" : "\\d{1,3}")) {
-            return null;
-        }
-        String valore = testo.endsWith("+") ? testo.substring(0, testo.length() - 1) : testo;
-        try {
-            int prezzo = Integer.parseInt(valore);
-            return prezzo >= PREZZO_MINIMO && prezzo <= PREZZO_MASSIMO ? prezzo : null;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Formatta il limite massimo di prezzo, indicando con {@code +} il valore
-     * massimo della fascia.
-     *
-     * @param prezzo limite da formattare
-     * @return testo del prezzo formattato
-     */
-    private String formattaPrezzoMassimo(int prezzo) {
-        return prezzo == PREZZO_MASSIMO ? PREZZO_MASSIMO + "+" : Integer.toString(prezzo);
-    }
-
-    /**
      * Gestisce l'avvio della ricerca avanzata.
      * <p>
      * Verifica che sia stata inserita una località e la risolve tramite il
@@ -275,17 +196,22 @@ public class RicercaAvanzataController {
      * @param luogo località risolta dal servizio di geocoding
      */
     private void avviaRicerca(ActionEvent evento, GeocodingService.Luogo luogo) {
-        double prezzoMinimo = rangeSliderPrezzo.getLowValue();
-        double prezzoMassimo = rangeSliderPrezzo.getHighValue();
+        int prezzoMinimo = (int) Math.round(rangeSliderPrezzo.getLowValue());
+        int prezzoMassimo = (int) Math.round(rangeSliderPrezzo.getHighValue());
+        String fasciaMinima = prezzoMinimo == FASCIA_MINIMA && prezzoMassimo == FASCIA_MASSIMA
+                ? FasciaPrezzo.QUALSIASI : FasciaPrezzo.simboli(simboloValuta, prezzoMinimo);
+        String fasciaMassima = prezzoMinimo == FASCIA_MINIMA && prezzoMassimo == FASCIA_MASSIMA
+                ? FasciaPrezzo.QUALSIASI : FasciaPrezzo.simboli(simboloValuta, prezzoMassimo);
         RicercaIniziale.imposta(
                 "",
                 luogo,
                 cuisineSelector.ottieniCucineSelezionate(),
-                prezzoMinimo,
-                prezzoMassimo < PREZZO_MASSIMO ? prezzoMassimo : null,
+                fasciaMinima,
+                fasciaMassima,
                 ratingStelleMinime.ottieniValutazione() > 0 ? ratingStelleMinime.ottieniValutazione() : null,
                 chkDelivery.isSelected(),
-                chkPrenotazione.isSelected()
+                chkPrenotazione.isSelected(),
+                simboloValuta
         );
         SceneManager.cambiaScena(evento, "/org/uninsubria/theknife/client/views/listaRistoranti.fxml");
     }
@@ -311,8 +237,10 @@ public class RicercaAvanzataController {
     private void reimpostaFiltri() {
         txtLocalita.setText("");
         cuisineSelector.svuotaSelezione();
-        rangeSliderPrezzo.setLowValue(PREZZO_MINIMO);
-        rangeSliderPrezzo.setHighValue(PREZZO_MASSIMO);
+        rangeSliderPrezzo.setLowValue(FASCIA_MINIMA);
+        rangeSliderPrezzo.setHighValue(FASCIA_MASSIMA);
+        simboloValuta = "¤";
+        aggiornaEtichetteFascia();
         ratingStelleMinime.impostaValutazione(0);
         aggiornaEtichettaRating();
         chkDelivery.setSelected(false);

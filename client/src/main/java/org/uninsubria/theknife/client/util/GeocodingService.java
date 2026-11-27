@@ -52,6 +52,7 @@ public final class GeocodingService {
      * @param indirizzo indirizzo o riferimento stradale
      * @param localita nome della città o della località
      * @param nazione nome della nazione
+     * @param codiceNazione codice ISO 3166-1 alpha-2 della nazione
      * @param latitudine latitudine compresa tra -90 e 90 gradi
      * @param longitudine longitudine compresa tra -180 e 180 gradi
      */
@@ -60,6 +61,7 @@ public final class GeocodingService {
             String indirizzo,
             String localita,
             String nazione,
+            String codiceNazione,
             double latitudine,
             double longitudine
     ) {
@@ -73,6 +75,7 @@ public final class GeocodingService {
                     || indirizzo == null || indirizzo.isBlank()
                     || localita == null || localita.isBlank()
                     || nazione == null || nazione.isBlank()
+                    || (codiceNazione != null && !codiceNazione.matches("(?i)[a-z]{2}"))
                     || !Double.isFinite(latitudine) || latitudine < -90 || latitudine > 90
                     || !Double.isFinite(longitudine) || longitudine < -180 || longitudine > 180) {
                 throw new IllegalArgumentException("Dati del luogo non validi.");
@@ -103,14 +106,15 @@ public final class GeocodingService {
             String locality = primaStringa(object,
                     "city", "town", "municipality", "village", "hamlet", "county");
             String country = stringa(object, "country");
+            String countryCode = stringa(object, "country_code");
             if (locality == null) {
                 locality = displayName;
             }
             String address = indirizzoDaJson(object, locality);
             try {
                 if (displayName != null && lat != null && lon != null
-                        && locality != null && country != null && address != null) {
-                    luoghi.add(new Luogo(displayName, address, locality, country,
+                        && locality != null && country != null && countryCode != null && address != null) {
+                    luoghi.add(new Luogo(displayName, address, locality, country, countryCode,
                             Double.parseDouble(lat), Double.parseDouble(lon)));
                 }
             } catch (IllegalArgumentException ignored) {
@@ -144,14 +148,15 @@ public final class GeocodingService {
         String locality = primaStringa(json,
                 "city", "town", "municipality", "village", "hamlet", "county");
         String country = stringa(json, "country");
+        String countryCode = stringa(json, "country_code");
         if (locality == null) {
             locality = displayName;
         }
         String address = indirizzoDaJson(json, locality);
-        if (displayName == null || locality == null || country == null || address == null) {
+        if (displayName == null || locality == null || country == null || countryCode == null || address == null) {
             throw new IOException("Non è stato possibile identificare il luogo selezionato.");
         }
-        return new Luogo(displayName, address, locality, country, latitudine, longitudine);
+        return new Luogo(displayName, address, locality, country, countryCode, latitudine, longitudine);
     }
 
     /**

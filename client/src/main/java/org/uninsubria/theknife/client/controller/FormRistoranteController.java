@@ -23,6 +23,7 @@ import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.util.FasciaPrezzo;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -61,7 +62,7 @@ public class FormRistoranteController implements BackHandler {
     private TextField txtNazione;
 
     @FXML
-    private TextField txtPrezzoMedio;
+    private ComboBox<String> comboFasciaPrezzo;
 
     @FXML
     private TextField txtTelefono;
@@ -102,7 +103,7 @@ public class FormRistoranteController implements BackHandler {
             String indirizzo,
             String citta,
             String nazione,
-            String prezzoMedio,
+            String fasciaPrezzo,
             String telefono,
             String sitoWeb,
             String descrizione,
@@ -153,6 +154,7 @@ public class FormRistoranteController implements BackHandler {
         txtIndirizzo.setOnLuogoSelezionato(luogo -> {
             txtCitta.setText(luogo.localita());
             txtNazione.setText(luogo.nazione());
+            impostaFascePrezzo(FasciaPrezzo.simboloValuta(luogo.codiceNazione()));
         });
 
         comboCucine.setDisable(true);
@@ -275,7 +277,7 @@ public class FormRistoranteController implements BackHandler {
                 txtIndirizzo.getText(),
                 txtCitta.getText(),
                 txtNazione.getText(),
-                txtPrezzoMedio.getText(),
+                comboFasciaPrezzo.getValue(),
                 txtTelefono.getText(),
                 txtSitoWeb.getText(),
                 txtDescrizione.getText(),
@@ -393,7 +395,9 @@ public class FormRistoranteController implements BackHandler {
         txtNome.setText(ristorante.nome());
         txtCitta.setText(ristorante.citta());
         txtNazione.setText(ristorante.nazione());
-        txtPrezzoMedio.setText(String.valueOf(ristorante.prezzoMedio()));
+        String simbolo = ristorante.fasciaPrezzo() == null ? "¤"
+                : ristorante.fasciaPrezzo().substring(0, 1);
+        impostaFascePrezzo(simbolo);
         chkDelivery.setSelected(Boolean.TRUE.equals(ristorante.consegna()));
         chkBookingOnline.setSelected(Boolean.TRUE.equals(ristorante.prenotazioneOnline()));
 
@@ -412,11 +416,25 @@ public class FormRistoranteController implements BackHandler {
                     ristorante.indirizzo(),
                     ristorante.citta(),
                     ristorante.nazione(),
+                    null,
                     ristorante.latitudine(),
                     ristorante.longitudine()
             ));
         } else {
             txtIndirizzo.setText(ristorante.indirizzo());
+        }
+        comboFasciaPrezzo.setValue(ristorante.fasciaPrezzo());
+    }
+
+    private void impostaFascePrezzo(String simbolo) {
+        comboFasciaPrezzo.getItems().setAll(
+                FasciaPrezzo.simboli(simbolo, 1),
+                FasciaPrezzo.simboli(simbolo, 2),
+                FasciaPrezzo.simboli(simbolo, 3),
+                FasciaPrezzo.simboli(simbolo, 4)
+        );
+        if (comboFasciaPrezzo.getValue() == null) {
+            comboFasciaPrezzo.setValue(comboFasciaPrezzo.getItems().getFirst());
         }
     }
 
@@ -469,7 +487,7 @@ public class FormRistoranteController implements BackHandler {
         // 1. Verifica che tutti i campi obbligatori siano compilati.
         if (txtNome.getText().trim().isEmpty()
                 || txtIndirizzo.getText().trim().isEmpty()
-                || txtPrezzoMedio.getText().trim().isEmpty()) {
+                || comboFasciaPrezzo.getValue() == null) {
 
             mostraMessaggio(
                     Alert.AlertType.WARNING,
@@ -524,30 +542,18 @@ public class FormRistoranteController implements BackHandler {
             String descrizione = testoFacoltativo(txtDescrizione.getText());
             boolean consegna = chkDelivery.isSelected();
             boolean prenotazioneOnline = chkBookingOnline.isSelected();
-            double prezzoMedio = Double.parseDouble(
-                    txtPrezzoMedio.getText().trim().replace(",", ".")
-            );
+            String fasciaPrezzo = comboFasciaPrezzo.getValue();
             double latitudine = luogoSelezionato.latitudine();
             double longitudine = luogoSelezionato.longitudine();
 
             // 4. Controllo dei valori inseriti.
-            if (!Double.isFinite(prezzoMedio)
-                    || !Double.isFinite(latitudine)
+            if (!Double.isFinite(latitudine)
                     || !Double.isFinite(longitudine)) {
 
                 mostraMessaggio(
                         Alert.AlertType.WARNING,
                         "Dati non validi",
-                        "Inserisci valori numerici finiti."
-                );
-                return;
-            }
-
-            if (prezzoMedio < 0) {
-                mostraMessaggio(
-                        Alert.AlertType.WARNING,
-                        "Dati non validi",
-                        "Il prezzo medio non può essere negativo."
+                        "Le coordinate geografiche non sono valide."
                 );
                 return;
             }
@@ -621,11 +627,10 @@ public class FormRistoranteController implements BackHandler {
                         latitudine,
                         longitudine,
                         cucineSelezionate,
-                        prezzoMedio,
+                        fasciaPrezzo,
                         consegna,
                         prenotazioneOnline,
                         ristorante.mediaStelle(),
-                        ristorante.prezzoStimato(),
                         telefono,
                         sitoWeb,
                         descrizione
@@ -649,11 +654,10 @@ public class FormRistoranteController implements BackHandler {
                         latitudine,
                         longitudine,
                         cucineSelezionate,
-                        prezzoMedio,
+                        fasciaPrezzo,
                         consegna,
                         prenotazioneOnline,
                         null,               // Media stelle iniziale
-                        false,
                         telefono,
                         sitoWeb,
                         descrizione
@@ -673,13 +677,6 @@ public class FormRistoranteController implements BackHandler {
             }
 
             tornaAiMieiRistoranti(evento);
-
-        } catch (NumberFormatException e) {
-            mostraMessaggio(
-                    Alert.AlertType.ERROR,
-                    "Errore di formato",
-                    "Il prezzo medio deve essere un valore numerico valido."
-            );
 
         } catch (RemoteException | NotBoundException | OperazioneNonConsentitaException
                  | DatiMancantiException | SistemaIndisponibileException e) {

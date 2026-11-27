@@ -69,7 +69,7 @@ public class PreferitiDAO {
         List<RistoranteDTO> lista = new ArrayList<>();
 
         String sql = "SELECT r.id_ristorante, r.nome, r.indirizzo, r.citta, r.nazione, " +
-                "r.latitudine, r.longitudine, r.prezzo_medio, r.prezzo_stimato, r.delivery, r.booking_online, " +
+                "r.latitudine, r.longitudine, r.fascia_prezzo, r.delivery, r.booking_online, " +
                 "r.telefono, r.sito_web, r.descrizione, " +
                 "COALESCE(rec.media_stelle, 0.0) AS media_stelle, cucine.tipi_cucina " +
                 "FROM RistorantiTheKnife r " +
@@ -92,8 +92,6 @@ public class PreferitiDAO {
                     String tipiCucinaRaw = rs.getString("tipi_cucina");
                     List<String> tipologie = tipiCucinaRaw != null && !tipiCucinaRaw.isEmpty()
                             ? Arrays.asList(tipiCucinaRaw.split(",")) : new ArrayList<>();
-                    BigDecimal prezzoMedio = rs.getBigDecimal("prezzo_medio");
-
                     lista.add(new RistoranteDTO(
                             rs.getInt("id_ristorante"),
                             rs.getString("nome"),
@@ -103,11 +101,10 @@ public class PreferitiDAO {
                             rs.getDouble("latitudine"),
                             rs.getDouble("longitudine"),
                             tipologie,
-                            prezzoMedio == null ? null : prezzoMedio.doubleValue(),
+                            rs.getString("fascia_prezzo"),
                             rs.getBoolean("delivery"),
                             rs.getBoolean("booking_online"),
                             rs.getDouble("media_stelle"),
-                            rs.getBoolean("prezzo_stimato"),
                             rs.getString("telefono"),
                             rs.getString("sito_web"),
                             rs.getString("descrizione")

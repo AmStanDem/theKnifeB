@@ -61,7 +61,7 @@ public class RistoranteItemController {
         }
         ratingValueLabel.setText(formattaRating(ristorante.mediaStelle()));
         CuisineTags.popola(cuisineTags, ristorante.tipologieCucina());
-        metaLabel.setText(formattaMeta(ristorante.prezzoMedio(), ristorante.prezzoStimato()));
+        metaLabel.setText(formattaMeta(ristorante.fasciaPrezzo()));
 
         aggiornaTag(deliveryTag, Boolean.TRUE.equals(ristorante.consegna()));
         aggiornaTag(bookingTag, Boolean.TRUE.equals(ristorante.prenotazioneOnline()));
@@ -169,16 +169,12 @@ public class RistoranteItemController {
     }
 
     /**
-     * Formatta il prezzo medio e l'eventuale indicazione che sia stimato.
+     * Formatta la fascia simbolica di prezzo.
      *
-     * @param prezzoMedio prezzo medio del ristorante
-     * @param prezzoStimato indica se il prezzo è una stima
-     * @return testo descrittivo del prezzo medio
+     * @param fasciaPrezzo fascia simbolica del ristorante
+     * @return testo descrittivo della fascia
      */
-    private String formattaMeta(Double prezzoMedio, boolean prezzoStimato) {
-        String prezzo = (prezzoMedio != null)
-                ? (prezzoStimato ? "≈ " : "") + String.format("%.0f €", prezzoMedio)
-                : "n.d.";
-        return "Prezzo medio " + prezzo;
+    private String formattaMeta(String fasciaPrezzo) {
+        return "Fascia prezzo " + (fasciaPrezzo == null ? "n.d." : fasciaPrezzo);
     }
 }

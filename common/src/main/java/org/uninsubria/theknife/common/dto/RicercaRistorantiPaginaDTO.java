@@ -7,6 +7,7 @@ package org.uninsubria.theknife.common.dto;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import org.uninsubria.theknife.common.util.FasciaPrezzo;
 
 /**
  * Parametri di una ricerca paginata di ristoranti.
@@ -14,8 +15,8 @@ import java.util.List;
  * @param localita località geografica da utilizzare nella ricerca
  * @param testo testo libero da cercare tra i dati dei ristoranti
  * @param tipologieCucina tipologie di cucina da includere nella ricerca
- * @param prezzoMin prezzo minimo accettato
- * @param prezzoMax prezzo massimo accettato
+ * @param prezzoMin limite inferiore simbolico; {@code *} indica qualsiasi fascia
+ * @param prezzoMax limite superiore simbolico; {@code *} indica qualsiasi fascia
  * @param mediaStelleMinima valutazione media minima compresa tra 0 e 5
  * @param offset numero di risultati da saltare
  * @param limite numero massimo di risultati da restituire, compreso tra 1 e 100
@@ -29,8 +30,8 @@ public record RicercaRistorantiPaginaDTO(
         String localita,
         String testo,
         List<String> tipologieCucina,
-        Double prezzoMin,
-        Double prezzoMax,
+        String prezzoMin,
+        String prezzoMax,
         Double mediaStelleMinima,
         int offset,
         int limite,
@@ -54,8 +55,12 @@ public record RicercaRistorantiPaginaDTO(
 
         localita = localita == null ? "" : localita.trim();
         tipologieCucina = tipologieCucina == null ? List.of() : List.copyOf(tipologieCucina);
-        if (prezzoMin != null && prezzoMax != null && prezzoMin > prezzoMax) {
-            throw new IllegalArgumentException("Il prezzo minimo non può superare il prezzo massimo.");
+        int livelloMin = FasciaPrezzo.livello(prezzoMin);
+        int livelloMax = FasciaPrezzo.livello(prezzoMax);
+        if ((prezzoMin != null && livelloMin == 0 && !FasciaPrezzo.QUALSIASI.equals(prezzoMin))
+                || (prezzoMax != null && livelloMax == 0 && !FasciaPrezzo.QUALSIASI.equals(prezzoMax))
+                || (livelloMin > 0 && livelloMax > 0 && livelloMin > livelloMax)) {
+            throw new IllegalArgumentException("Intervallo di fasce di prezzo non valido.");
         }
         if (mediaStelleMinima != null && (mediaStelleMinima < 0 || mediaStelleMinima > 5)) {
             throw new IllegalArgumentException("La valutazione deve essere compresa tra 0 e 5.");

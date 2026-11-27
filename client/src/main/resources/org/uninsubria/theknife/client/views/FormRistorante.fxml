@@ -65,8 +65,9 @@
                             <TextField fx:id="txtNazione" promptText="Si compila selezionando l'indirizzo" styleClass="custom-text-field" />
                         </VBox>
                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                            <Label styleClass="input-label" text="Prezzo Medio (€) *" />
-                            <TextField fx:id="txtPrezzoMedio" promptText="25.50" styleClass="custom-text-field" />
+                            <Label styleClass="input-label" text="Fascia di prezzo *" />
+                            <ComboBox fx:id="comboFasciaPrezzo" maxWidth="Infinity"
+                                      promptText="Seleziona la fascia" styleClass="custom-check-combo" />
                         </VBox>
                     </HBox>
 

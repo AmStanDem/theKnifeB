@@ -25,6 +25,7 @@ import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
 import org.uninsubria.theknife.common.exceptions.SistemaIndisponibileException;
+import org.uninsubria.theknife.common.util.FasciaPrezzo;
 import org.uninsubria.theknife.common.rmi.ITheKnifeServer;
 import org.uninsubria.theknife.common.rmi.SubscriptionTopic;
 
@@ -58,8 +59,9 @@ public class ListaRistorantiController {
             Double longitudine,
             String filtroPrezzo,
             String filtroValutazione,
-            Double prezzoMinPersonalizzato,
-            Double prezzoMaxPersonalizzato,
+            String prezzoMinPersonalizzato,
+            String prezzoMaxPersonalizzato,
+            String simboloValuta,
             List<String> tipologieCucina,
             List<String> tipologieDisponibili,
             boolean consegna,
@@ -111,9 +113,10 @@ public class ListaRistorantiController {
     private Double latitudineRicerca;
     private Double longitudineRicerca;
     private String localitaRicerca;
-    private Double prezzoMinPersonalizzato;
-    private Double prezzoMaxPersonalizzato;
+    private String prezzoMinPersonalizzato;
+    private String prezzoMaxPersonalizzato;
     private String etichettaPrezzoPersonalizzata;
+    private String simboloValuta = "¤";
 
     /**
      * Inizializza i filtri, ripristina i criteri salvati e avvia il primo
@@ -129,11 +132,15 @@ public class ListaRistorantiController {
         RicercaIniziale.Criteri criteri = RicercaIniziale.consuma();
         SearchSnapshot istantanea = snapshotRicerca;
         snapshotRicerca = null;
+        if (istantanea != null) {
+            simboloValuta = istantanea.simboloValuta();
+        }
         if (criteri != null) {
             searchField.setText(criteri.testo() == null ? "" : criteri.testo());
             latitudineRicerca = criteri.latitudine();
             longitudineRicerca = criteri.longitudine();
             localitaRicerca = criteri.localita();
+            simboloValuta = criteri.simboloValuta();
             cuisineSelector.impostaCucineSelezionate(criteri.tipologieCucina());
             prezzoMinPersonalizzato = criteri.prezzoMin();
             prezzoMaxPersonalizzato = criteri.prezzoMax();
@@ -198,10 +205,10 @@ public class ListaRistorantiController {
     private void configuraFiltriFissi() {
         priceFilterCombo.getItems().setAll(
                 TUTTI_PREZZI,
-                "€ (Economico ≤ 25€)",
-                "€€ (Medio 25,01€ - 50€)",
-                "€€€ (Medio-Alto 50,01€ - 80€)",
-                "€€€€ (Lusso > 80€)"
+                etichettaFascia(1),
+                etichettaFascia(2),
+                etichettaFascia(3),
+                etichettaFascia(4)
         );
         priceFilterCombo.setValue(TUTTI_PREZZI);
 
@@ -364,23 +371,19 @@ public class ListaRistorantiController {
      * @return criterio completo di ricerca paginata
      */
     private RicercaRistorantiPaginaDTO creaRichiesta(int offset) {
-        Double prezzoMin = null;
-        Double prezzoMax = null;
+        String prezzoMin = FasciaPrezzo.QUALSIASI;
+        String prezzoMax = FasciaPrezzo.QUALSIASI;
         String prezzo = priceFilterCombo.getValue();
         if (prezzo != null && prezzo.equals(etichettaPrezzoPersonalizzata)) {
             prezzoMin = prezzoMinPersonalizzato;
             prezzoMax = prezzoMaxPersonalizzato;
-        } else if (prezzo != null) {
-            if (prezzo.startsWith("€ (Economico")) {
-                prezzoMax = 25.0;
-            } else if (prezzo.startsWith("€€ (Medio")) {
-                prezzoMin = 25.01;
-                prezzoMax = 50.0;
-            } else if (prezzo.startsWith("€€€ (Medio-Alto")) {
-                prezzoMin = 50.01;
-                prezzoMax = 80.0;
-            } else if (prezzo.startsWith("€€€€ (Lusso")) {
-                prezzoMin = 80.01;
+        } else if (prezzo != null && !prezzo.equals(TUTTI_PREZZI)) {
+            for (int livello = 1; livello <= 4; livello++) {
+                if (prezzo.equals(etichettaFascia(livello))) {
+                    prezzoMin = FasciaPrezzo.simboli(simboloValuta, livello);
+                    prezzoMax = prezzoMin;
+                    break;
+                }
             }
         }
 
@@ -576,6 +579,7 @@ public class ListaRistorantiController {
                 ratingFilterCombo.getValue(),
                 prezzoMinPersonalizzato,
                 prezzoMaxPersonalizzato,
+                simboloValuta,
                 cuisineSelector.ottieniCucineSelezionate(),
                 tipologieDisponibili,
                 deliveryFilterCheckBox.isSelected(),
@@ -593,20 +597,16 @@ public class ListaRistorantiController {
      * @param prezzoMax limite massimo, oppure {@code null} se non definito
      * @return descrizione leggibile dell'intervallo
      */
-    private String formattaEtichettaPrezzo(Double prezzoMin, Double prezzoMax) {
-        String minimo = prezzoMin == null ? "qualsiasi" : "da " + formatoEuro(prezzoMin);
-        String massimo = prezzoMax == null ? "350+ €" : "fino a " + formatoEuro(prezzoMax);
+    private String formattaEtichettaPrezzo(String prezzoMin, String prezzoMax) {
+        String minimo = prezzoMin == null || FasciaPrezzo.QUALSIASI.equals(prezzoMin)
+                ? "qualsiasi" : "da " + prezzoMin;
+        String massimo = prezzoMax == null || FasciaPrezzo.QUALSIASI.equals(prezzoMax)
+                ? "qualsiasi" : "fino a " + prezzoMax;
         return "Personalizzato: " + minimo + ", " + massimo;
     }
 
-    /**
-     * Formatta un valore monetario senza cifre decimali.
-     *
-     * @param valore importo da formattare
-     * @return importo seguito dal simbolo dell'euro
-     */
-    private String formatoEuro(double valore) {
-        return String.format(Locale.ROOT, "%.0f €", valore);
+    private String etichettaFascia(int livello) {
+        return FasciaPrezzo.simboli(simboloValuta, livello) + " — Fascia " + livello;
     }
 
     /**

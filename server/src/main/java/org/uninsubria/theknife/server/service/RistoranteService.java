@@ -10,6 +10,7 @@ import org.uninsubria.theknife.common.dto.PaginaRistorantiDTO;
 import org.uninsubria.theknife.common.dto.RicercaRistorantiPaginaDTO;
 import org.uninsubria.theknife.common.dto.RiepilogoRecensioniDTO;
 import org.uninsubria.theknife.common.dto.RistoranteDTO;
+import org.uninsubria.theknife.common.util.FasciaPrezzo;
 import org.uninsubria.theknife.common.exceptions.DatiMancantiException;
 import org.uninsubria.theknife.common.exceptions.OperazioneNonConsentitaException;
 import org.uninsubria.theknife.common.exceptions.RistoranteNonTrovatoException;
@@ -60,9 +61,8 @@ public class RistoranteService {
                 ristorante.indirizzo() == null || ristorante.indirizzo().trim().isEmpty() ||
                 ristorante.citta() == null || ristorante.citta().trim().isEmpty() ||
                 ristorante.nazione() == null || ristorante.nazione().trim().isEmpty() ||
-                ristorante.prezzoMedio() == null || !Double.isFinite(ristorante.prezzoMedio())
-                || ristorante.prezzoMedio() < 0.0) {
-            throw new DatiMancantiException("Campi obbligatori mancanti o prezzo medio non valido.");
+                FasciaPrezzo.livello(ristorante.fasciaPrezzo()) == 0) {
+            throw new DatiMancantiException("Campi obbligatori mancanti o fascia prezzo non valida.");
         }
 
         if (ristorante.latitudine() == null || !Double.isFinite(ristorante.latitudine())
@@ -129,8 +129,7 @@ public class RistoranteService {
                 || ristorante.indirizzo() == null || ristorante.indirizzo().isBlank()
                 || ristorante.citta() == null || ristorante.citta().isBlank()
                 || ristorante.nazione() == null || ristorante.nazione().isBlank()
-                || ristorante.prezzoMedio() == null || !Double.isFinite(ristorante.prezzoMedio())
-                || ristorante.prezzoMedio() < 0
+                || FasciaPrezzo.livello(ristorante.fasciaPrezzo()) == 0
                 || ristorante.latitudine() == null || !Double.isFinite(ristorante.latitudine())
                 || ristorante.latitudine() < -90 || ristorante.latitudine() > 90
                 || ristorante.longitudine() == null || !Double.isFinite(ristorante.longitudine())

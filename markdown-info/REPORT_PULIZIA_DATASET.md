@@ -2,16 +2,16 @@
 
 ## 1. Scopo
 
-Il file `server/src/main/resources/dataset/michelin_my_maps_clean.csv`, importato a runtime da
+Il file `../server/src/main/resources/dataset/michelin_my_maps_clean.csv`, importato a runtime da
 `CsvImporter`, conteneva diversi problemi di qualità del dato: numeri di telefono in notazione
 scientifica (con perdita di cifre), URL malformati, campi invertiti, etichette di paese incoerenti
 e città-stato prive del paese. Questo documento descrive le anomalie individuate, le correzioni
 applicate e come riprodurle.
 
-- **File sorgente (intatto):** `server/src/main/resources/dataset/michelin_my_maps.csv`
-- **File corretto (importato dall'app):** `server/src/main/resources/dataset/michelin_my_maps_clean.csv`
-- **Script di rigenerazione:** `tools/clean_michelin_dataset.py`
-- **Codice reso difensivo:** `server/src/main/java/org/uninsubria/theknife/server/utils/CsvImporter.java`
+- **File sorgente (intatto):** `../server/src/main/resources/dataset/michelin_my_maps.csv`
+- **File corretto (importato dall'app):** `../server/src/main/resources/dataset/michelin_my_maps_clean.csv`
+- **Script di rigenerazione:** `../tools/clean_michelin_dataset.py`
+- **Codice reso difensivo:** `../server/src/main/java/org/uninsubria/theknife/server/utils/CsvImporter.java`
 
 Dataset: **17.737 record**, 14 colonne (`Name, Address, Location, Price, Cuisine, Longitude,
 Latitude, PhoneNumber, Url, WebsiteUrl, Award, GreenStar, FacilitiesAndServices, Description`).
@@ -125,7 +125,7 @@ Per completezza, sono state verificate e **scartate** le seguenti ipotesi di err
 
 ## 4. Correzioni applicate
 
-Lo script `tools/clean_michelin_dataset.py` rigenera il file pulito dal file originale applicando,
+Lo script `../tools/clean_michelin_dataset.py` rigenera il file pulito dal file originale applicando,
 in ordine:
 
 1. **Telefoni** — recupero delle cifre complete dallo snapshot (aggancio per `Url`); in assenza di
